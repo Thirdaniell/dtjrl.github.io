@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Futures Trade Journal</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --surface: #111111;
+    --surface2: #181818;
+    --border: #222222;
+    --border2: #2a2a2a;
+    --text: #e8e8e8;
+    --text2: #888;
+    --text3: #444;
+    --green: #00e676;
+    --green-dim: rgba(0,230,118,0.08);
+    --red: #ff4444;
+    --red-dim: rgba(255,68,68,0.08);
+    --accent: #c8ff00;
+    --mono: 'Space Mono', monospace;
+    --sans: 'DM Sans', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 14px;
+    min-height: 100vh;
+  }
+
+  header {
+    border-bottom: 1px solid var(--border);
+    padding: 1.5rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 100;
+  }
+
+  .logo {
+    font-family: var(--mono);
+    font-size: 13px;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    text-transform: uppercase;
+  }
+
+  .refresh-btn {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--text2);
+    background: none;
+    border: 1px solid var(--border2);
+    padding: 6px 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-transform: uppercase;
+  }
+  .refresh-btn:hover { color: var(--accent); border-color: var(--accent); }
+
+  .container { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-bottom: 2rem;
+  }
+
+  .stat {
+    background: var(--surface);
+    padding: 1.25rem 1.5rem;
+  }
+
+  .stat-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: var(--text3);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .stat-value {
+    font-family: var(--mono);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .stat-value.pos { color: var(--green); }
+  .stat-value.neg { color: var(--red); }
+
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 1.5rem;
+  }
+
+  .filters input, .filters select {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    color: var(--text);
+    padding: 8px 12px;
+    outline: none;
+    transition: border-color 0.15s;
+    min-width: 140px;
+    flex: 1;
+    appearance: none;
+  }
+
+  .filters input::placeholder { color: var(--text3); }
+  .filters input:focus, .filters select:focus { border-color: var(--accent); }
+  .filters select option { background: var(--surface); }
+
+  .results-count {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--text3);
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 1px;
+    background: var(--border);
+  }
+
+  .card {
+    background: var(--surface);
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: background 0.15s;
+  }
+  .card:hover { background: var(--surface2); }
+
+  .card-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .card-instrument {
+    font-family: var(--mono);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1;
+  }
+
+  .card-dir {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+  .card-dir.long { color: var(--green); }
+  .card-dir.short { color: var(--red); }
+
+  .card-badges { display: flex; gap: 6px; flex-wrap: wrap; }
+
+  .badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    padding: 3px 8px;
+    text-transform: uppercase;
+    border: 1px solid;
+  }
+  .badge-win { color: var(--green); border-color: rgba(0,230,118,0.3); background: var(--green-dim); }
+  .badge-loss { color: var(--red); border-color: rgba(255,68,68,0.3); background: var(--red-dim); }
+  .badge-be { color: var(--text2); border-color: var(--border2); }
+
+  .card-pnl {
+    font-family: var(--mono);
+    font-size: 20px;
+    font-weight: 700;
+  }
+  .card-pnl.pos { color: var(--green); }
+  .card-pnl.neg { color: var(--red); }
+
+  .divider { height: 1px; background: var(--border); }
+
+  .card-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 16px;
+  }
+
+  .field-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    color: var(--text3);
+    text-transform: uppercase;
+    margin-bottom: 2px;
+  }
+
+  .field-value {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text2);
+  }
+
+  .confs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+
+  .conf-tag {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.06em;
+    padding: 3px 7px;
+    border: 1px solid var(--border2);
+    color: var(--text3);
+    text-transform: uppercase;
+  }
+
+  .chart-frame {
+    width: 100%;
+    aspect-ratio: 16/9;
+    border: 1px solid var(--border2);
+    background: #0d0d0d;
+    overflow: hidden;
+  }
+
+  .chart-frame iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+  }
+
+  .no-chart {
+    width: 100%;
+    padding: 1.5rem;
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--text3);
+    text-transform: uppercase;
+  }
+
+  .notes-block { display: flex; flex-direction: column; gap: 8px; }
+
+  .note-item .field-value {
+    font-family: var(--sans);
+    font-size: 12px;
+    color: var(--text2);
+    line-height: 1.5;
+  }
+
+  .empty-state, .loading-state {
+    text-align: center;
+    padding: 5rem 2rem;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: var(--text3);
+    text-transform: uppercase;
+    background: var(--surface);
+  }
+
+  .loading-state span { animation: blink 1s infinite; display: inline-block; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
+  .error-state {
+    padding: 2rem;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--red);
+    background: var(--red-dim);
+    border: 1px solid rgba(255,68,68,0.2);
+    line-height: 1.8;
+  }
+
+  @media (max-width: 600px) {
+    .container { padding: 1rem; }
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+    .cards { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">// Trade Journal</div>
+  <button class="refresh-btn" onclick="loadTrades()">↻ Refresh</button>
+</header>
+
+<div class="container">
+  <div class="stats-row">
+    <div class="stat"><div class="stat-label">Trades</div><div class="stat-value" id="s-total">—</div></div>
+    <div class="stat"><div class="stat-label">Win Rate</div><div class="stat-value" id="s-wr">—</div></div>
+    <div class="stat"><div class="stat-label">Total P&L</div><div class="stat-value" id="s-pnl">—</div></div>
+    <div class="stat"><div class="stat-label">Avg P&L</div><div class="stat-value" id="s-avg">—</div></div>
+  </div>
+
+  <div class="filters">
+    <input type="text" id="f-conf" placeholder="Search confluences..." oninput="renderAll()" />
+    <select id="f-session" onchange="renderAll()">
+      <option value="">All sessions</option>
+      <option>Asia</option><option>London</option><option>New York</option><option option>Overnight</option>
+    </select>
+    <select id="f-dir" onchange="renderAll()">
+      <option value="">Long & Short</option>
+      <option>Long</option><option>Short</option>
+    </select>
+    <select id="f-inst" onchange="renderAll()">
+      <option value="">All instruments</option>
+      <option>NQ</option><option>ES</option><option>MNQ</option><option>MES</option><option>CL</option><option>GC</option><option>RTY</option>
+    </select>
+    <select id="f-outcome" onchange="renderAll()">
+      <option value="">All outcomes</option>
+      <option value="Closed - Win">Win</option>
+      <option value="Closed - Loss">Loss</option>
+      <option value="Breakeven">Breakeven</option>
+    </select>
+    <select id="f-date" onchange="renderAll()"><option value="">All dates</option></select>
+  </div>
+
+  <div class="results-count" id="results-count"></div>
+  <div id="main"></div>
+</div>
+
+<script>
+// !! REPLACE THIS with your Cloudflare Worker URL after deploying !!
+const WORKER_URL = "https://trade-journal-proxy.daniel-mouldd.workers.dev";
+const DATABASE_ID = "5398f956345943b7b12b2298bbb6e127";
+
+let allTrades = [];
+
+async function notionQuery(cursor) {
+  const body = { page_size: 100 };
+  if (cursor) body.start_cursor = cursor;
+
+  const res = await fetch(`${WORKER_URL}/notion/databases/${DATABASE_ID}/query`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body)
+  });
+
+  if (!res.ok) throw new Error(`Worker error: ${res.status}`);
+  return res.json();
+}
+
+async function getPageContent(pageId) {
+  const res = await fetch(`${WORKER_URL}/notion/blocks/${pageId}/children`);
+  if (!res.ok) return null;
+  return res.json();
+}
+
+function extractText(richText) {
+  if (!richText || !richText.length) return "";
+  return richText.map(r => r.plain_text || "").join("");
+}
+
+function parseProps(page) {
+  const props = page.properties;
+  return {
+    id: page.id,
+    name: extractText(props["Trade Name"]?.title),
+    instrument: props["Instrument"]?.select?.name || "",
+    direction: props["Direction"]?.select?.name || "",
+    session: props["Session"]?.select?.name || "",
+    timeframe: props["Timeframe"]?.select?.name || "",
+    entryPrice: props["Entry Price"]?.number,
+    exitPrice: props["Exit Price"]?.number,
+    stopLoss: props["Stop Loss"]?.number,
+    takeProfit: props["Take Profit"]?.number,
+    contracts: props["Contracts"]?.number,
+    pnl: props["P&L ($)"]?.number,
+    confluences: props["Confluences"]?.multi_select?.map(o => o.name) || [],
+    status: props["Status"]?.select?.name || "",
+    date: props["Date"]?.date?.start || "",
+    entryTime: extractText(props["Entry Time"]?.rich_text),
+    exitTime: extractText(props["Exit Time"]?.rich_text),
+    notes: extractText(props["Notes"]?.rich_text),
+    mistakes: extractText(props["Mistakes"]?.rich_text),
+    lessons: extractText(props["Lessons Learned"]?.rich_text),
+  };
+}
+
+function extractTVUrl(blocks) {
+  if (!blocks?.results) return null;
+  for (const block of blocks.results) {
+    const type = block.type;
+    const content = block[type];
+    if (!content) continue;
+
+    if (type === "bookmark" || type === "embed") {
+      const u = content.url || "";
+      if (u.includes("tradingview.com/x/")) return u;
+    }
+
+    const texts = content.rich_text || content.text || [];
+    for (const t of texts) {
+      const plain = t.plain_text || "";
+      const href = t.href || t.text?.link?.url || "";
+      const match = (plain + " " + href).match(/https:\/\/www\.tradingview\.com\/x\/[A-Za-z0-9]+\/?/);
+      if (match) return match[0];
+    }
+  }
+  return null;
+}
+
+async function loadTrades() {
+  document.getElementById("main").innerHTML = `<div class="loading-state">Loading trades <span>...</span></div>`;
+  document.getElementById("results-count").textContent = "";
+
+  try {
+    let pages = [];
+    let cursor = null;
+    do {
+      const data = await notionQuery(cursor);
+      pages = pages.concat(data.results || []);
+      cursor = data.has_more ? data.next_cursor : null;
+    } while (cursor);
+
+    const trades = await Promise.all(pages.map(async page => {
+      const t = parseProps(page);
+      const content = await getPageContent(page.id);
+      t.screenshotUrl = extractTVUrl(content);
+      return t;
+    }));
+
+    allTrades = trades.sort((a, b) => (b.date || "").localeCompare(a.date || ""));
+    populateDateFilter();
+    renderAll();
+
+  } catch(e) {
+    document.getElementById("main").innerHTML = `<div class="error-state">Error: ${e.message}<br><br>Make sure your Worker URL is set correctly in the HTML file.</div>`;
+  }
+}
+
+function populateDateFilter() {
+  const dates = [...new Set(allTrades.map(t => t.date).filter(Boolean))].sort().reverse();
+  const sel = document.getElementById("f-date");
+  sel.innerHTML = '<option value="">All dates</option>';
+  dates.forEach(d => {
+    const o = document.createElement("option");
+    o.value = d; o.textContent = d; sel.appendChild(o);
+  });
+}
+
+function getFiltered() {
+  const conf = document.getElementById("f-conf").value.toLowerCase().trim();
+  const session = document.getElementById("f-session").value;
+  const dir = document.getElementById("f-dir").value;
+  const inst = document.getElementById("f-inst").value;
+  const outcome = document.getElementById("f-outcome").value;
+  const date = document.getElementById("f-date").value;
+
+  return allTrades.filter(t => {
+    if (conf && !t.confluences.some(c => c.toLowerCase().includes(conf))) return false;
+    if (session && t.session !== session) return false;
+    if (dir && t.direction !== dir) return false;
+    if (inst && t.instrument !== inst) return false;
+    if (outcome && t.status !== outcome) return false;
+    if (date && t.date !== date) return false;
+    return true;
+  });
+}
+
+function updateStats(trades) {
+  const total = trades.length;
+  const wins = trades.filter(t => t.status === "Closed - Win").length;
+  const pnl = trades.reduce((s, t) => s + (t.pnl || 0), 0);
+  const avg = total ? Math.round(pnl / total) : 0;
+
+  document.getElementById("s-total").textContent = total;
+  document.getElementById("s-wr").textContent = total ? Math.round((wins/total)*100) + "%" : "—";
+
+  const pnlEl = document.getElementById("s-pnl");
+  pnlEl.textContent = total ? (pnl >= 0 ? "+" : "-") + "$" + Math.abs(pnl).toLocaleString() : "—";
+  pnlEl.className = "stat-value" + (pnl > 0 ? " pos" : pnl < 0 ? " neg" : "");
+
+  const avgEl = document.getElementById("s-avg");
+  avgEl.textContent = total ? (avg >= 0 ? "+" : "-") + "$" + Math.abs(avg).toLocaleString() : "—";
+  avgEl.className = "stat-value" + (avg > 0 ? " pos" : avg < 0 ? " neg" : "");
+}
+
+function renderCard(t) {
+  const pnl = t.pnl;
+  const pnlStr = pnl != null ? (pnl >= 0 ? "+" : "-") + "$" + Math.abs(pnl).toLocaleString() : "—";
+  const pnlClass = pnl > 0 ? "pos" : pnl < 0 ? "neg" : "";
+  const badgeClass = t.status === "Closed - Win" ? "badge-win" : t.status === "Closed - Loss" ? "badge-loss" : "badge-be";
+  const badgeText = t.status === "Closed - Win" ? "Win" : t.status === "Closed - Loss" ? "Loss" : t.status || "Open";
+  const dirClass = t.direction === "Long" ? "long" : "short";
+
+  const chartHtml = t.screenshotUrl
+    ? `<div class="chart-frame"><iframe src="${t.screenshotUrl}" scrolling="no" allowfullscreen loading="lazy"></iframe></div>`
+    : `<div class="no-chart">No chart attached</div>`;
+
+  const notesHtml = [
+    t.notes ? `<div class="note-item"><div class="field-label">Notes</div><div class="field-value">${t.notes}</div></div>` : "",
+    t.mistakes ? `<div class="note-item"><div class="field-label">Mistakes</div><div class="field-value">${t.mistakes}</div></div>` : "",
+    t.lessons ? `<div class="note-item"><div class="field-label">Lessons</div><div class="field-value">${t.lessons}</div></div>` : ""
+  ].filter(Boolean).join("");
+
+  return `<div class="card">
+    <div class="card-top">
+      <div>
+        <div class="card-instrument">${t.instrument || "—"}</div>
+        <div class="card-dir ${dirClass}">${t.direction || "—"}</div>
+      </div>
+      <div style="text-align:right">
+        <div class="card-pnl ${pnlClass}">${pnlStr}</div>
+        <div class="card-badges" style="justify-content:flex-end;margin-top:6px">
+          <span class="badge ${badgeClass}">${badgeText}</span>
+        </div>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div class="card-grid">
+      <div><div class="field-label">Date</div><div class="field-value">${t.date || "—"}</div></div>
+      <div><div class="field-label">Session</div><div class="field-value">${t.session || "—"}</div></div>
+      <div><div class="field-label">Timeframe</div><div class="field-value">${t.timeframe || "—"}</div></div>
+      <div><div class="field-label">Contracts</div><div class="field-value">${t.contracts != null ? t.contracts : "—"}</div></div>
+      <div>
+        <div class="field-label">Entry${t.entryTime ? " · " + t.entryTime : ""}</div>
+        <div class="field-value">${t.entryPrice != null ? t.entryPrice.toLocaleString() : "—"}</div>
+      </div>
+      <div>
+        <div class="field-label">Exit${t.exitTime ? " · " + t.exitTime : ""}</div>
+        <div class="field-value">${t.exitPrice != null ? t.exitPrice.toLocaleString() : "—"}</div>
+      </div>
+      <div><div class="field-label">Stop Loss</div><div class="field-value">${t.stopLoss != null ? t.stopLoss.toLocaleString() : "—"}</div></div>
+      <div><div class="field-label">Take Profit</div><div class="field-value">${t.takeProfit != null ? t.takeProfit.toLocaleString() : "—"}</div></div>
+    </div>
+    ${t.confluences.length ? `<div class="divider"></div><div class="confs">${t.confluences.map(c => `<span class="conf-tag">${c}</span>`).join("")}</div>` : ""}
+    <div class="divider"></div>
+    ${chartHtml}
+    ${notesHtml ? `<div class="divider"></div><div class="notes-block">${notesHtml}</div>` : ""}
+  </div>`;
+}
+
+function renderAll() {
+  const filtered = getFiltered();
+  updateStats(filtered);
+  document.getElementById("results-count").textContent = `${filtered.length} trade${filtered.length !== 1 ? "s" : ""}`;
+  if (!filtered.length) {
+    document.getElementById("main").innerHTML = `<div class="empty-state">No trades match your filters</div>`;
+    return;
+  }
+  document.getElementById("main").innerHTML = `<div class="cards">${filtered.map(renderCard).join("")}</div>`;
+}
+
+loadTrades();
+</script>
+</body>
+</html>
