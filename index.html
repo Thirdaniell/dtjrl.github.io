@@ -241,20 +241,29 @@
     text-transform: uppercase;
   }
 
-  .chart-frame {
+  .chart-img {
     width: 100%;
-    aspect-ratio: 16/9;
     border: 1px solid var(--border2);
-    background: #0d0d0d;
-    overflow: hidden;
+    display: block;
+    object-fit: cover;
   }
 
-  .chart-frame iframe {
-    width: 100%;
-    height: 100%;
-    border: none;
-    display: block;
+  .chart-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    border: 1px solid var(--border2);
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: var(--text2);
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: all 0.15s;
   }
+  .chart-link:hover { border-color: var(--accent); color: var(--accent); }
+  .chart-link-arrow { font-size: 14px; }
 
   .no-chart {
     width: 100%;
@@ -354,7 +363,7 @@
 
 <script>
 // !! REPLACE THIS with your Cloudflare Worker URL after deploying !!
-const WORKER_URL = "https://trade-journal-proxy.daniel-mouldd.workers.dev";
+const WORKER_URL = "https://YOUR-WORKER-NAME.YOUR-SUBDOMAIN.workers.dev";
 const DATABASE_ID = "5398f956345943b7b12b2298bbb6e127";
 
 let allTrades = [];
@@ -517,9 +526,19 @@ function renderCard(t) {
   const badgeText = t.status === "Closed - Win" ? "Win" : t.status === "Closed - Loss" ? "Loss" : t.status || "Open";
   const dirClass = t.direction === "Long" ? "long" : "short";
 
-  const chartHtml = t.screenshotUrl
-    ? `<div class="chart-frame"><iframe src="${t.screenshotUrl}" scrolling="no" allowfullscreen loading="lazy"></iframe></div>`
-    : `<div class="no-chart">No chart attached</div>`;
+  function buildChartHtml(url) {
+    if (!url) return `<div class="no-chart">No chart attached</div>`;
+    const isImage = /\.(png|jpg|jpeg|gif|webp)(\?.*)?$/i.test(url) || url.includes('i.imgur.com') || (url.includes('imgur.com') && !url.includes('gallery'));
+    if (isImage) {
+      const imgUrl = url.includes('imgur.com/') && !url.includes('i.imgur.com') ? url.replace('imgur.com/', 'i.imgur.com/') : url;
+      return `<img class="chart-img" src="${imgUrl}" alt="Trade chart" loading="lazy" />`;
+    }
+    return `<a class="chart-link" href="${url}" target="_blank" rel="noopener">
+      <span>View chart on TradingView</span>
+      <span class="chart-link-arrow">↗</span>
+    </a>`;
+  }
+  const chartHtml = buildChartHtml(t.screenshotUrl);
 
   const notesHtml = [
     t.notes ? `<div class="note-item"><div class="field-label">Notes</div><div class="field-value">${t.notes}</div></div>` : "",
