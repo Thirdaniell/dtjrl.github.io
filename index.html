@@ -732,19 +732,14 @@ Lessons: ${trade.lessons || 'none'}
   `.trim();
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await fetch(WORKER_URL + '/verify', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 600,
-        system: RULES_CONTEXT,
-        messages: [{ role: 'user', content: 'Verify this trade:\n\n' + tradeData }]
-      })
+      body: JSON.stringify({ trade: tradeData })
     });
 
     const data = await res.json();
-    const text = data.content?.filter(b => b.type === 'text').map(b => b.text).join('') || 'No response.';
+    const text = data.result || 'No response.';
 
     // Detect verdict
     const upperText = text.toUpperCase();
