@@ -318,6 +318,7 @@
     .cards { grid-template-columns: 1fr; }
   }
 </style>
+<script src="nav.js"></script>
 </head>
 <body>
 
@@ -594,6 +595,7 @@ function renderAll() {
   document.getElementById("main").innerHTML = `<div class="cards">${filtered.map(renderCard).join("")}</div>`;
 }
 
+document.addEventListener("DOMContentLoaded", () => initNav("index"));
 loadTrades();
 </script>
 </body>
