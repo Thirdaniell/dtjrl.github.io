@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Analytics — FTJ</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="nav.js"></script>
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --surface: #111111;
+    --surface2: #181818;
+    --border: #1a1a1a;
+    --border2: #2a2a2a;
+    --text: #e8e8e8;
+    --text2: #888;
+    --text3: #444;
+    --green: #00e676;
+    --red: #ff4444;
+    --accent: #c8ff00;
+    --mono: 'Space Mono', monospace;
+    --sans: 'DM Sans', sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 14px; min-height: 100vh; }
+
+  .page { max-width: 1200px; margin: 0 auto; padding: 3rem 2rem; }
+
+  .page-header { margin-bottom: 2.5rem; display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+  .page-eyebrow { font-family: var(--mono); font-size: 10px; letter-spacing: 0.2em; color: var(--accent); text-transform: uppercase; margin-bottom: 10px; }
+  .page-title { font-family: var(--mono); font-size: 28px; font-weight: 700; color: var(--text); line-height: 1.1; }
+
+  .period-tabs { display: flex; gap: 1px; background: var(--border); }
+  .period-tab {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 8px 16px;
+    background: var(--surface);
+    color: var(--text3);
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s;
+  }
+  .period-tab:hover { color: var(--text2); }
+  .period-tab.active { background: var(--surface2); color: var(--accent); }
+
+  .stats-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); margin-bottom: 2rem; }
+  .stat { background: var(--surface); padding: 1.25rem 1.5rem; }
+  .stat-label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em; color: var(--text3); text-transform: uppercase; margin-bottom: 8px; }
+  .stat-value { font-family: var(--mono); font-size: 20px; font-weight: 700; color: var(--text); }
+  .stat-value.pos { color: var(--green); }
+  .stat-value.neg { color: var(--red); }
+
+  .charts-grid { display: grid; grid-template-columns: 1fr 340px; gap: 1px; background: var(--border); margin-bottom: 2rem; }
+  .chart-panel { background: var(--surface); padding: 1.5rem; }
+  .chart-panel-title { font-family: var(--mono); font-size: 10px; letter-spacing: 0.15em; color: var(--text3); text-transform: uppercase; margin-bottom: 1.25rem; }
+
+  canvas { display: block; }
+
+  .donut-wrap { display: flex; flex-direction: column; align-items: center; gap: 1.5rem; }
+  .donut-canvas { position: relative; }
+  .donut-legend { width: 100%; display: flex; flex-direction: column; gap: 8px; }
+  .legend-item { display: flex; align-items: center; justify-content: space-between; font-family: var(--mono); font-size: 11px; }
+  .legend-left { display: flex; align-items: center; gap: 8px; }
+  .legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .legend-name { color: var(--text2); }
+  .legend-pct { color: var(--text3); }
+
+  .loading-state { text-align: center; padding: 5rem 2rem; font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; color: var(--text3); text-transform: uppercase; }
+  .loading-state span { animation: blink 1s infinite; display: inline-block; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+  .error-state { padding: 2rem; font-family: var(--mono); font-size: 11px; color: var(--red); background: rgba(255,68,68,0.05); border: 1px solid rgba(255,68,68,0.2); }
+
+  @media (max-width: 900px) {
+    .charts-grid { grid-template-columns: 1fr; }
+    .stats-row { grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (max-width: 600px) {
+    .page { padding: 2rem 1rem; }
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="page-header">
+    <div>
+      <div class="page-eyebrow">// Performance</div>
+      <div class="page-title">Analytics</div>
+    </div>
+    <div class="period-tabs">
+      <button class="period-tab active" data-period="all">All</button>
+      <button class="period-tab" data-period="week">Week</button>
+      <button class="period-tab" data-period="month">Month</button>
+      <button class="period-tab" data-period="3month">3M</button>
+    </div>
+  </div>
+
+  <div id="stats-row" class="stats-row">
+    <div class="stat"><div class="stat-label">Trades</div><div class="stat-value" id="s-total">—</div></div>
+    <div class="stat"><div class="stat-label">Win Rate</div><div class="stat-value" id="s-wr">—</div></div>
+    <div class="stat"><div class="stat-label">Total P&L</div><div class="stat-value" id="s-pnl">—</div></div>
+    <div class="stat"><div class="stat-label">Avg P&L</div><div class="stat-value" id="s-avg">—</div></div>
+    <div class="stat"><div class="stat-label">Best Trade</div><div class="stat-value pos" id="s-best">—</div></div>
+  </div>
+
+  <div id="main-content"><div class="loading-state">Loading analytics <span>...</span></div></div>
+</div>
+
+<script src="nav.js"></script>
+<script>
+const WORKER_URL = "https://trade-journal-proxy.daniel-mouldd.workers.dev";
+const DATABASE_ID = "5398f956345943b7b12b2298bbb6e127";
+
+const INSTRUMENT_COLORS = {
+  'NQ': '#c8ff00', 'ES': '#00e676', 'MNQ': '#40c4ff',
+  'MES': '#ff6d00', 'CL': '#ea80fc', 'GC': '#ffd740',
+  'RTY': '#ff4444', 'Other': '#888'
+};
+
+let allTrades = [];
+let currentPeriod = 'all';
+let equityChart = null;
+let donutChart = null;
+
+async function fetchTrades() {
+  try {
+    let pages = [], cursor = null;
+    do {
+      const body = { page_size: 100 };
+      if (cursor) body.start_cursor = cursor;
+      const res = await fetch(`${WORKER_URL}/notion/databases/${DATABASE_ID}/query`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      if (!res.ok) throw new Error(`Worker error: ${res.status}`);
+      const data = await res.json();
+      pages = pages.concat(data.results || []);
+      cursor = data.has_more ? data.next_cursor : null;
+    } while (cursor);
+
+    allTrades = pages.map(page => {
+      const p = page.properties;
+      return {
+        instrument: p['Instrument']?.select?.name || 'Other',
+        pnl: p['P&L ($)']?.number || 0,
+        status: p['Status']?.select?.name || '',
+        date: p['Date']?.date?.start || '',
+      };
+    }).filter(t => t.date).sort((a,b) => a.date.localeCompare(b.date));
+
+    renderAll();
+  } catch(e) {
+    document.getElementById('main-content').innerHTML = `<div class="error-state">Error: ${e.message}</div>`;
+  }
+}
+
+function filterByPeriod(trades, period) {
+  if (period === 'all') return trades;
+  const now = new Date();
+  const cutoff = new Date();
+  if (period === 'week') cutoff.setDate(now.getDate() - 7);
+  else if (period === 'month') cutoff.setMonth(now.getMonth() - 1);
+  else if (period === '3month') cutoff.setMonth(now.getMonth() - 3);
+  return trades.filter(t => new Date(t.date) >= cutoff);
+}
+
+function updateStats(trades) {
+  const total = trades.length;
+  const wins = trades.filter(t => t.status === 'Closed - Win').length;
+  const pnl = trades.reduce((s,t) => s + t.pnl, 0);
+  const avg = total ? Math.round(pnl / total) : 0;
+  const best = total ? Math.max(...trades.map(t => t.pnl)) : 0;
+
+  document.getElementById('s-total').textContent = total;
+  document.getElementById('s-wr').textContent = total ? Math.round((wins/total)*100) + '%' : '—';
+
+  const pnlEl = document.getElementById('s-pnl');
+  pnlEl.textContent = total ? (pnl >= 0 ? '+' : '-') + '$' + Math.abs(pnl).toLocaleString() : '—';
+  pnlEl.className = 'stat-value' + (pnl > 0 ? ' pos' : pnl < 0 ? ' neg' : '');
+
+  const avgEl = document.getElementById('s-avg');
+  avgEl.textContent = total ? (avg >= 0 ? '+' : '-') + '$' + Math.abs(avg).toLocaleString() : '—';
+  avgEl.className = 'stat-value' + (avg > 0 ? ' pos' : avg < 0 ? ' neg' : '');
+
+  document.getElementById('s-best').textContent = best ? '+$' + best.toLocaleString() : '—';
+}
+
+function renderEquityChart(trades) {
+  const canvas = document.getElementById('equity-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+
+  if (!trades.length) {
+    ctx.fillStyle = '#444';
+    ctx.font = '11px Space Mono';
+    ctx.textAlign = 'center';
+    ctx.fillText('NO DATA', W/2, H/2);
+    return;
+  }
+
+  // Build cumulative equity
+  let cumulative = 0;
+  const points = [{ date: '', value: 0 }];
+  trades.forEach(t => { cumulative += t.pnl; points.push({ date: t.date, value: cumulative }); });
+
+  const values = points.map(p => p.value);
+  const minV = Math.min(...values);
+  const maxV = Math.max(...values);
+  const range = maxV - minV || 1;
+
+  const pad = { top: 20, right: 20, bottom: 40, left: 60 };
+  const cW = W - pad.left - pad.right;
+  const cH = H - pad.top - pad.bottom;
+
+  const toX = i => pad.left + (i / (points.length - 1)) * cW;
+  const toY = v => pad.top + cH - ((v - minV) / range) * cH;
+
+  // Grid lines
+  const gridLines = 5;
+  for (let i = 0; i <= gridLines; i++) {
+    const y = pad.top + (i / gridLines) * cH;
+    const val = maxV - (i / gridLines) * range;
+    ctx.beginPath();
+    ctx.strokeStyle = '#1a1a1a';
+    ctx.lineWidth = 1;
+    ctx.moveTo(pad.left, y);
+    ctx.lineTo(W - pad.right, y);
+    ctx.stroke();
+    ctx.fillStyle = '#444';
+    ctx.font = '9px Space Mono';
+    ctx.textAlign = 'right';
+    ctx.fillText((val >= 0 ? '+' : '') + '$' + Math.round(val).toLocaleString(), pad.left - 8, y + 3);
+  }
+
+  // Zero line
+  if (minV < 0 && maxV > 0) {
+    const zeroY = toY(0);
+    ctx.beginPath();
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 4]);
+    ctx.moveTo(pad.left, zeroY);
+    ctx.lineTo(W - pad.right, zeroY);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  // Gradient fill
+  const grad = ctx.createLinearGradient(0, pad.top, 0, H - pad.bottom);
+  const isPositive = cumulative >= 0;
+  grad.addColorStop(0, isPositive ? 'rgba(0,230,118,0.3)' : 'rgba(255,68,68,0.3)');
+  grad.addColorStop(1, 'rgba(0,0,0,0)');
+
+  ctx.beginPath();
+  ctx.moveTo(toX(0), toY(0));
+  points.forEach((p, i) => ctx.lineTo(toX(i), toY(p.value)));
+  ctx.lineTo(toX(points.length - 1), H - pad.bottom);
+  ctx.lineTo(toX(0), H - pad.bottom);
+  ctx.closePath();
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  // Line
+  ctx.beginPath();
+  ctx.strokeStyle = isPositive ? '#00e676' : '#ff4444';
+  ctx.lineWidth = 2;
+  points.forEach((p, i) => {
+    if (i === 0) ctx.moveTo(toX(i), toY(p.value));
+    else ctx.lineTo(toX(i), toY(p.value));
+  });
+  ctx.stroke();
+
+  // Dots on data points
+  points.forEach((p, i) => {
+    if (i === 0) return;
+    ctx.beginPath();
+    ctx.arc(toX(i), toY(p.value), 3, 0, Math.PI * 2);
+    ctx.fillStyle = isPositive ? '#00e676' : '#ff4444';
+    ctx.fill();
+  });
+
+  // Date labels
+  const labelStep = Math.max(1, Math.floor(points.length / 6));
+  ctx.fillStyle = '#444';
+  ctx.font = '9px Space Mono';
+  ctx.textAlign = 'center';
+  points.forEach((p, i) => {
+    if (i === 0 || i % labelStep !== 0 || !p.date) return;
+    ctx.fillText(p.date.slice(5), toX(i), H - pad.bottom + 16);
+  });
+}
+
+function renderDonut(trades) {
+  const canvas = document.getElementById('donut-canvas');
+  const legendEl = document.getElementById('donut-legend');
+  if (!canvas || !legendEl) return;
+
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+
+  // Count by instrument
+  const counts = {};
+  trades.forEach(t => { counts[t.instrument] = (counts[t.instrument] || 0) + 1; });
+  const total = trades.length;
+  if (!total) {
+    ctx.fillStyle = '#444';
+    ctx.font = '11px Space Mono';
+    ctx.textAlign = 'center';
+    ctx.fillText('NO DATA', W/2, H/2);
+    legendEl.innerHTML = '';
+    return;
+  }
+
+  const entries = Object.entries(counts).sort((a,b) => b[1]-a[1]);
+  const cx = W/2, cy = H/2, r = Math.min(W,H)/2 - 10, inner = r * 0.58;
+
+  let startAngle = -Math.PI / 2;
+  entries.forEach(([inst, count]) => {
+    const slice = (count / total) * Math.PI * 2;
+    const color = INSTRUMENT_COLORS[inst] || '#888';
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, r, startAngle, startAngle + slice);
+    ctx.closePath();
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(cx, cy, inner, 0, Math.PI * 2);
+    ctx.fillStyle = '#111';
+    ctx.fill();
+    startAngle += slice;
+  });
+
+  // Center text
+  ctx.fillStyle = '#e8e8e8';
+  ctx.font = 'bold 20px Space Mono';
+  ctx.textAlign = 'center';
+  ctx.fillText(total, cx, cy + 4);
+  ctx.fillStyle = '#444';
+  ctx.font = '9px Space Mono';
+  ctx.fillText('TRADES', cx, cy + 18);
+
+  // Legend
+  legendEl.innerHTML = entries.map(([inst, count]) => `
+    <div class="legend-item">
+      <div class="legend-left">
+        <div class="legend-dot" style="background:${INSTRUMENT_COLORS[inst] || '#888'}"></div>
+        <span class="legend-name">${inst}</span>
+      </div>
+      <span class="legend-pct">${count} · ${Math.round((count/total)*100)}%</span>
+    </div>
+  `).join('');
+}
+
+function renderAll() {
+  const filtered = filterByPeriod(allTrades, currentPeriod);
+  updateStats(filtered);
+
+  document.getElementById('main-content').innerHTML = `
+    <div class="charts-grid">
+      <div class="chart-panel">
+        <div class="chart-panel-title">Equity Curve</div>
+        <canvas id="equity-canvas" width="700" height="300" style="width:100%;height:300px;"></canvas>
+      </div>
+      <div class="chart-panel">
+        <div class="chart-panel-title">Instruments Traded</div>
+        <div class="donut-wrap">
+          <canvas id="donut-canvas" width="200" height="200"></canvas>
+          <div class="donut-legend" id="donut-legend"></div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Resize equity canvas to actual pixel size
+  const eq = document.getElementById('equity-canvas');
+  eq.width = eq.offsetWidth;
+  eq.height = 300;
+
+  renderEquityChart(filtered);
+  renderDonut(filtered);
+}
+
+document.querySelectorAll('.period-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.period-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    currentPeriod = tab.dataset.period;
+    renderAll();
+  });
+});
+
+document.addEventListener('DOMContentLoaded', () => initNav('analytics'));
+fetchTrades();
+</script>
+</body>
+</html>
