@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trading Rules — FTJ</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="nav.js"></script>
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --surface: #111111;
+    --surface2: #181818;
+    --border: #1a1a1a;
+    --border2: #2a2a2a;
+    --text: #e8e8e8;
+    --text2: #888;
+    --text3: #444;
+    --green: #00e676;
+    --red: #ff4444;
+    --accent: #c8ff00;
+    --mono: 'Space Mono', monospace;
+    --sans: 'DM Sans', sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 14px; min-height: 100vh; }
+
+  .page { max-width: 900px; margin: 0 auto; padding: 3rem 2rem; }
+
+  .page-header { margin-bottom: 3rem; }
+  .page-eyebrow {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .page-title {
+    font-family: var(--mono);
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.1;
+  }
+  .page-sub {
+    font-size: 13px;
+    color: var(--text2);
+    margin-top: 8px;
+    line-height: 1.6;
+  }
+
+  .rules-grid { display: flex; flex-direction: column; gap: 1px; background: var(--border); }
+
+  .rule {
+    background: var(--surface);
+    padding: 1.5rem;
+    display: grid;
+    grid-template-columns: 48px 1fr;
+    gap: 0 1.25rem;
+    transition: background 0.15s;
+  }
+  .rule:hover { background: var(--surface2); }
+
+  .rule-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    padding-top: 2px;
+    letter-spacing: 0.05em;
+  }
+
+  .rule-content {}
+
+  .rule-title {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 8px;
+    letter-spacing: 0.03em;
+  }
+
+  .rule-body {
+    font-size: 13px;
+    color: var(--text2);
+    line-height: 1.7;
+  }
+
+  .rule-body ul {
+    list-style: none;
+    margin-top: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .rule-body ul li::before {
+    content: '—';
+    color: var(--accent);
+    margin-right: 8px;
+    font-family: var(--mono);
+    font-size: 11px;
+  }
+
+  .rule-tag {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    padding: 2px 8px;
+    border: 1px solid;
+    text-transform: uppercase;
+    margin-top: 8px;
+  }
+  .tag-required { color: var(--red); border-color: rgba(255,68,68,0.3); background: rgba(255,68,68,0.05); }
+  .tag-preferred { color: #ffab40; border-color: rgba(255,171,64,0.3); background: rgba(255,171,64,0.05); }
+  .tag-wip { color: var(--text3); border-color: var(--border2); }
+
+  .divider-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    color: var(--text3);
+    text-transform: uppercase;
+    padding: 1rem 1.5rem 0.5rem;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+  }
+
+  @media (max-width: 600px) {
+    .page { padding: 2rem 1rem; }
+    .rule { grid-template-columns: 36px 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="page-header">
+    <div class="page-eyebrow">// Rulebook v1.0</div>
+    <div class="page-title">Trading Rules</div>
+    <div class="page-sub">Based on ICT concepts & Dodgy's iFVG Ultimate+ model. These rules exist to protect your capital and keep you consistent.</div>
+  </div>
+
+  <div class="rules-grid">
+
+    <div class="divider-label">Pre-Trade</div>
+
+    <div class="rule">
+      <div class="rule-num">01</div>
+      <div class="rule-content">
+        <div class="rule-title">Sessions</div>
+        <div class="rule-body">
+          Trade all sessions, with primary focus on London and NY AM. Other sessions are permitted but treated with extra scrutiny.
+        </div>
+        <span class="rule-tag tag-required">Required</span>
+      </div>
+    </div>
+
+    <div class="rule">
+      <div class="rule-num">02</div>
+      <div class="rule-content">
+        <div class="rule-title">Top Down Analysis</div>
+        <div class="rule-body">
+          Must complete top-down analysis from Daily → 4H → 1H → 15m → 5m before any entry. Identify HTF bias, key PDA arrays, and liquidity targets before the session opens.
+        </div>
+        <span class="rule-tag tag-required">Required</span>
+      </div>
+    </div>
+
+    <div class="divider-label">Entry</div>
+
+    <div class="rule">
+      <div class="rule-num">03</div>
+      <div class="rule-content">
+        <div class="rule-title">Entry Model</div>
+        <div class="rule-body">
+          Primary entry is any PDA array (IFVG, FVG, Order Block, Breaker Block, Mitigation Block). Preferred entry is IFVG or FVG for tightest stop placement.
+        </div>
+        <span class="rule-tag tag-required">Required</span>
+      </div>
+    </div>
+
+    <div class="rule">
+      <div class="rule-num">04</div>
+      <div class="rule-content">
+        <div class="rule-title">Liquidity Sweep</div>
+        <div class="rule-body">
+          A BSL or SSL sweep before entry is preferred but not required. If no sweep has occurred, confluence must be stronger to justify the entry.
+        </div>
+        <span class="rule-tag tag-preferred">Preferred</span>
+      </div>
+    </div>
+
+    <div class="rule">
+      <div class="rule-num">05</div>
+      <div class="rule-content">
+        <div class="rule-title">Stop Loss Placement</div>
+        <div class="rule-body">
+          <ul>
+            <li>Preferred: Above/below the IFVG or FVG for the tightest stop</li>
+            <li>Alternative: Above/below the nearest swing high/low, only if close enough to keep risk acceptable. If the swing is too far, revert to IFVG/FVG or skip the trade</li>
+            <li>Never take a trade where no tight stop option exists</li>
+          </ul>
+        </div>
+        <span class="rule-tag tag-required">Required</span>
+      </div>
+    </div>
+
+    <div class="rule">
+      <div class="rule-num">06</div>
+      <div class="rule-content">
+        <div class="rule-title">Clear Target</div>
+        <div class="rule-body">
+          Having a clear liquidity or PDA target before entry is preferred. Avoid entering into a void with no obvious target.
+        </div>
+        <span class="rule-tag tag-preferred">Preferred</span>
+      </div>
+    </div>
+
+    <div class="divider-label">Trade Management</div>
+
+    <div class="rule">
+      <div class="rule-num">07</div>
+      <div class="rule-content">
+        <div class="rule-title">Take Profit & Exit Management</div>
+        <div class="rule-body">
+          <ul>
+            <li>If a significant high/low exists: Take partial at TP1, trail the remainder</li>
+            <li>If no significant level: Full exit at the liquidity target or PDA</li>
+            <li>Do not move TP once set unless price gives a clear reason</li>
+          </ul>
+        </div>
+        <span class="rule-tag tag-required">Required</span>
+      </div>
+    </div>
+
+    <div class="rule">
+      <div class="rule-num">08</div>
+      <div class="rule-content">
+        <div class="rule-title">Scaling In</div>
+        <div class="rule-body">
+          A second contract may be added on A+ setups when price retraces into a PDA array. Do not scale in on B-grade or lower setups.
+        </div>
+        <span class="rule-tag tag-preferred">Preferred</span>
+      </div>
+    </div>
+
+    <div class="rule">
+      <div class="rule-num">09</div>
+      <div class="rule-content">
+        <div class="rule-title">News Events</div>
+        <div class="rule-body">
+          Avoid trading during high impact news if the setup is weak (B grade or lower). A+ setups may still be taken but with caution and tighter management.
+        </div>
+        <span class="rule-tag tag-preferred">Preferred</span>
+      </div>
+    </div>
+
+    <div class="divider-label">Risk & Psychology</div>
+
+    <div class="rule">
+      <div class="rule-num">10</div>
+      <div class="rule-content">
+        <div class="rule-title">Max Loss Per Trade / Day</div>
+        <div class="rule-body">
+          <ul>
+            <li>Max risk per trade: 1–2% of account</li>
+            <li>Stop trading for the day after 2 consecutive losses</li>
+          </ul>
+        </div>
+        <span class="rule-tag tag-required">Required</span>
+      </div>
+    </div>
+
+    <div class="rule">
+      <div class="rule-num">11</div>
+      <div class="rule-content">
+        <div class="rule-title">When To Stop Trading</div>
+        <div class="rule-body">
+          Stop for the day when any of the following are met:
+          <ul>
+            <li>2 consecutive losses hit</li>
+            <li>1 big win achieved</li>
+            <li>2–3 good wins achieved</li>
+          </ul>
+          Do not chase after stopping.
+        </div>
+        <span class="rule-tag tag-required">Required</span>
+      </div>
+    </div>
+
+    <div class="rule">
+      <div class="rule-num">12</div>
+      <div class="rule-content">
+        <div class="rule-title">Mental State & Discipline</div>
+        <div class="rule-body">
+          <ul>
+            <li>Do not trade when emotional, frustrated, or sleep-deprived — work in progress</li>
+            <li>No revenge trading after a loss</li>
+            <li>No FOMO entries — if the move is missed, wait for the next setup</li>
+            <li>Do not overtrade — max 2–4 trades per day</li>
+          </ul>
+        </div>
+        <span class="rule-tag tag-wip">Work In Progress</span>
+      </div>
+    </div>
+
+    <div class="divider-label">Accountability</div>
+
+    <div class="rule">
+      <div class="rule-num">13</div>
+      <div class="rule-content">
+        <div class="rule-title">Journaling</div>
+        <div class="rule-body">
+          Every trade must be journaled on the same day it is taken. No exceptions.
+        </div>
+        <span class="rule-tag tag-required">Required</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => initNav('rules'));
+</script>
+</body>
+</html>
