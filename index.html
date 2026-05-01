@@ -312,6 +312,97 @@
     line-height: 1.8;
   }
 
+  .card-meta-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .grade-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    padding: 3px 8px;
+    border: 1px solid;
+    text-transform: uppercase;
+  }
+  .grade-app { color: #c8ff00; border-color: rgba(200,255,0,0.4); background: rgba(200,255,0,0.07); }
+  .grade-ap  { color: #00e676; border-color: rgba(0,230,118,0.4); background: rgba(0,230,118,0.07); }
+  .grade-a   { color: #40c4ff; border-color: rgba(64,196,255,0.4); background: rgba(64,196,255,0.07); }
+  .grade-b   { color: #ffd740; border-color: rgba(255,215,64,0.4); background: rgba(255,215,64,0.07); }
+  .grade-c   { color: #ff6d00; border-color: rgba(255,109,0,0.4); background: rgba(255,109,0,0.07); }
+  .grade-d   { color: #ff4444; border-color: rgba(255,68,68,0.4); background: rgba(255,68,68,0.07); }
+
+  .rules-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    padding: 3px 8px;
+    border: 1px solid var(--border2);
+    color: var(--text3);
+  }
+
+  .verify-btn {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    background: none;
+    border: 1px solid var(--border2);
+    color: var(--text3);
+    cursor: pointer;
+    transition: all 0.15s;
+    margin-left: auto;
+  }
+  .verify-btn:hover { color: var(--accent); border-color: var(--accent); }
+  .verify-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .verification-panel {
+    border: 1px solid var(--border2);
+    background: var(--surface2);
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .verification-title {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 2px;
+  }
+
+  .verification-result {
+    font-size: 12px;
+    color: var(--text2);
+    line-height: 1.7;
+  }
+
+  .verification-verdict {
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 6px 12px;
+    display: inline-block;
+    border: 1px solid;
+  }
+  .verdict-yes { color: #00e676; border-color: rgba(0,230,118,0.3); background: rgba(0,230,118,0.07); }
+  .verdict-partial { color: #ffd740; border-color: rgba(255,215,64,0.3); background: rgba(255,215,64,0.07); }
+  .verdict-no { color: #ff4444; border-color: rgba(255,68,68,0.3); background: rgba(255,68,68,0.07); }
+
+  .verify-loading {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--text3);
+    text-transform: uppercase;
+    animation: blink 1s infinite;
+  }
+
   @media (max-width: 600px) {
     .container { padding: 1rem; }
     .stats-row { grid-template-columns: repeat(2, 1fr); }
@@ -417,6 +508,8 @@ function parseProps(page) {
     notes: extractText(props["Notes"]?.rich_text),
     mistakes: extractText(props["Mistakes"]?.rich_text),
     lessons: extractText(props["Lessons Learned"]?.rich_text),
+    grade: props["Setup Grade"]?.select?.name || "",
+    followedRules: props["Followed Rules"]?.select?.name || "",
   };
 }
 
@@ -547,7 +640,11 @@ function renderCard(t) {
     t.lessons ? `<div class="note-item"><div class="field-label">Lessons</div><div class="field-value">${t.lessons}</div></div>` : ""
   ].filter(Boolean).join("");
 
-  return `<div class="card">
+  const gradeClass = {'A++':'app','A+':'ap','A':'a','B':'b','C':'c','D':'d'}[t.grade] || '';
+  const gradeBadge = t.grade ? `<span class="grade-badge grade-${gradeClass}">${t.grade}</span>` : '';
+  const rulesBadge = t.followedRules ? `<span class="rules-badge">${t.followedRules}</span>` : '';
+
+  return `<div class="card" id="card-${t.id}">
     <div class="card-top">
       <div>
         <div class="card-instrument">${t.instrument || "—"}</div>
@@ -560,6 +657,8 @@ function renderCard(t) {
         </div>
       </div>
     </div>
+    ${(gradeBadge || rulesBadge) ? `<div class="card-meta-row">${gradeBadge}${rulesBadge}<button class="verify-btn" onclick="verifyTrade('${t.id}', this)">⚡ Verify Rules</button></div>` : `<div class="card-meta-row"><button class="verify-btn" onclick="verifyTrade('${t.id}', this)">⚡ Verify Rules</button></div>`}
+    <div id="verify-panel-${t.id}"></div>
     <div class="divider"></div>
     <div class="card-grid">
       <div><div class="field-label">Date</div><div class="field-value">${t.date || "—"}</div></div>
@@ -582,6 +681,104 @@ function renderCard(t) {
     ${chartHtml}
     ${notesHtml ? `<div class="divider"></div><div class="notes-block">${notesHtml}</div>` : ""}
   </div>`;
+}
+
+const RULES_CONTEXT = `You are a trading rule verification assistant for an ICT/Dodgy iFVG futures trader. 
+Here are their trading rules:
+1. Sessions: All sessions ok, primary focus London & NY AM. Others allowed with extra scrutiny.
+2. Top Down Analysis: Daily -> 4H -> 1H -> 15m -> 5m before entry. Must know HTF bias.
+3. Entry Model: Any PDA array. Preferred: IFVG or FVG.
+4. Liquidity Sweep: BSL/SSL preferred before entry. If none, need stronger confluences.
+5. Stop Loss: Preferred above/below IFVG/FVG. Alt: nearest swing H/L only if tight. If neither works, skip trade.
+6. Clear Target: Preferred to have liquidity or PDA target before entering. Don't trade into void.
+7. Take Profit: Partial at TP1 + trail if significant H/L exists. Full exit at target if not. Don't move TP without reason.
+8. Scaling In: 2nd contract on A+ setups only, on retracement into PDA.
+9. Risk: Max 1-2% per trade.
+10. Stop Trading: After 2 losses OR 1 big win OR 2-3 good wins. No chasing.
+11. News: Avoid on weak setups (B or lower). A+ ok with caution.
+12. Discipline: No trading tired/emotional. No revenge. No FOMO. Max 2-4 trades/day.
+13. Journaling: Every trade journaled same day.
+
+Given the trade details below, verify if the trader followed their rules. Be specific about which rules were followed, which were broken, and which cannot be determined from the data. End with a clear verdict: YES (followed rules), PARTIALLY (some rules broken or unclear), or NO (clear rule violations).
+
+Keep your response concise — 4-6 bullet points max, then the verdict.`;
+
+async function verifyTrade(tradeId, btn) {
+  const panel = document.getElementById('verify-panel-' + tradeId);
+  const trade = allTrades.find(t => t.id === tradeId);
+  if (!trade) return;
+
+  btn.disabled = true;
+  btn.textContent = '...';
+  panel.innerHTML = `<div class="verification-panel"><div class="verify-loading">Analysing trade against your rules...</div></div>`;
+
+  const tradeData = `
+Instrument: ${trade.instrument}
+Direction: ${trade.direction}
+Session: ${trade.session}
+Timeframe: ${trade.timeframe}
+Entry: ${trade.entryPrice} at ${trade.entryTime || 'unknown time'}
+Exit: ${trade.exitPrice} at ${trade.exitTime || 'unknown time'}
+Stop Loss: ${trade.stopLoss}
+Take Profit: ${trade.takeProfit}
+Contracts: ${trade.contracts}
+P&L: $${trade.pnl}
+Confluences: ${trade.confluences.join(', ') || 'none listed'}
+Setup Grade: ${trade.grade || 'not graded'}
+Outcome: ${trade.status}
+Notes: ${trade.notes || 'none'}
+Mistakes noted: ${trade.mistakes || 'none'}
+Lessons: ${trade.lessons || 'none'}
+  `.trim();
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 600,
+        system: RULES_CONTEXT,
+        messages: [{ role: 'user', content: 'Verify this trade:\n\n' + tradeData }]
+      })
+    });
+
+    const data = await res.json();
+    const text = data.content?.filter(b => b.type === 'text').map(b => b.text).join('') || 'No response.';
+
+    // Detect verdict
+    const upperText = text.toUpperCase();
+    let verdictClass = 'verdict-partial';
+    let verdictLabel = 'PARTIALLY ⚠️';
+    if (upperText.includes('VERDICT: YES') || upperText.match(/\bVERDICT:\s*YES\b/)) {
+      verdictClass = 'verdict-yes'; verdictLabel = 'FOLLOWED RULES ✅';
+    } else if (upperText.includes('VERDICT: NO') || upperText.match(/\bVERDICT:\s*NO\b/)) {
+      verdictClass = 'verdict-no'; verdictLabel = 'RULES BROKEN ❌';
+    } else if (upperText.includes('VERDICT: PARTIALLY') || upperText.includes('PARTIALLY')) {
+      verdictClass = 'verdict-partial'; verdictLabel = 'PARTIALLY ⚠️';
+    }
+
+    // Format text — convert bullet points
+    const formatted = text
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/^[•\-\*] /gm, '→ ')
+      .replace(/\n/g, '<br>');
+
+    panel.innerHTML = `
+      <div class="verification-panel">
+        <div class="verification-title">⚡ Rule Verification</div>
+        <div class="verification-result">${formatted}</div>
+        <div><span class="verification-verdict ${verdictClass}">${verdictLabel}</span></div>
+      </div>`;
+
+    btn.textContent = '↺ Re-verify';
+    btn.disabled = false;
+
+  } catch(e) {
+    panel.innerHTML = `<div class="verification-panel"><div class="verification-result" style="color:var(--red)">Error: ${e.message}</div></div>`;
+    btn.textContent = '⚡ Verify Rules';
+    btn.disabled = false;
+  }
 }
 
 function renderAll() {
