@@ -312,6 +312,80 @@
     line-height: 1.8;
   }
 
+  .conf-filter-wrap { position: relative; flex: 1; min-width: 200px; }
+  .conf-filter-btn {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    color: var(--text2);
+    padding: 8px 12px;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    height: 34px;
+    transition: border-color 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .conf-filter-btn:focus, .conf-filter-btn.open { border-color: var(--accent); color: var(--text); }
+  .conf-filter-btn .arrow { font-size: 10px; transition: transform 0.15s; }
+  .conf-filter-btn.open .arrow { transform: rotate(180deg); }
+  .conf-dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--surface);
+    border: 1px solid var(--accent);
+    border-top: none;
+    z-index: 999;
+    max-height: 280px;
+    overflow-y: auto;
+  }
+  .conf-dropdown.open { display: block; }
+  .conf-group-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    color: var(--text3);
+    text-transform: uppercase;
+    padding: 8px 10px 4px;
+    border-top: 1px solid var(--border2);
+  }
+  .conf-group-label:first-child { border-top: none; }
+  .conf-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    cursor: pointer;
+    transition: background 0.1s;
+    font-size: 12px;
+    color: var(--text2);
+  }
+  .conf-option:hover { background: var(--surface2); }
+  .conf-option input[type=checkbox] { accent-color: var(--accent); width: 12px; height: 12px; flex-shrink: 0; }
+  .conf-option.checked { color: var(--text); }
+  .conf-clear-btn {
+    width: 100%;
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    color: var(--text3);
+    background: none;
+    border: none;
+    border-top: 1px solid var(--border2);
+    padding: 8px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: color 0.15s;
+  }
+  .conf-clear-btn:hover { color: var(--accent); }
+
   .conf-filter-wrap { position: relative; flex: 1; min-width: 180px; }
   .conf-filter-btn {
     font-family: var(--mono);
@@ -546,6 +620,16 @@
       <option value="Yes ✅">Followed ✅</option>
       <option value="Partially ⚠️">Partially ⚠️</option>
       <option value="No ❌">Broken ❌</option>
+    </select>
+    <select id="f-tf" onchange="renderAll()">
+      <option value="">All timeframes</option>
+      <option>1m</option><option>3m</option><option>5m</option><option>15m</option><option>1h</option><option>4h</option><option>Daily</option>
+    </select>
+    <select id="f-sort" onchange="renderAll()">
+      <option value="newest">Newest first</option>
+      <option value="oldest">Oldest first</option>
+      <option value="pnl-high">Highest P&L</option>
+      <option value="pnl-low">Lowest P&L</option>
     </select>
     <select id="f-date" onchange="renderAll()"><option value="">All dates</option></select>
   </div>
@@ -949,6 +1033,42 @@ document.addEventListener('click', e => {
     document.getElementById('conf-filter-btn').classList.remove('open');
   }
 });
+
+let confDropdownOpen = false;
+
+function toggleConfDropdown() {
+  confDropdownOpen = !confDropdownOpen;
+  document.getElementById('conf-dropdown').classList.toggle('open', confDropdownOpen);
+  document.getElementById('conf-filter-btn').classList.toggle('open', confDropdownOpen);
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(e) {
+  const wrap = document.querySelector('.conf-filter-wrap');
+  if (wrap && !wrap.contains(e.target)) {
+    confDropdownOpen = false;
+    document.getElementById('conf-dropdown').classList.remove('open');
+    document.getElementById('conf-filter-btn').classList.remove('open');
+  }
+});
+
+function updateConfFilter() {
+  const checked = Array.from(document.querySelectorAll('#conf-dropdown input[type=checkbox]:checked')).map(cb => cb.value);
+  const label = document.getElementById('conf-btn-label');
+  if (checked.length === 0) label.textContent = 'All confluences';
+  else if (checked.length === 1) label.textContent = checked[0];
+  else label.textContent = `${checked.length} confluences selected`;
+  // Update checked styling
+  document.querySelectorAll('.conf-option').forEach(opt => {
+    opt.classList.toggle('checked', opt.querySelector('input').checked);
+  });
+  renderAll();
+}
+
+function clearConfFilter() {
+  document.querySelectorAll('#conf-dropdown input[type=checkbox]').forEach(cb => cb.checked = false);
+  updateConfFilter();
+}
 
 function renderAll() {
   const filtered = getFiltered();
