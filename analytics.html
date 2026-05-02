@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Analytics — FTJ</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="https://i.imgur.com/ZP2pTk2.png">
 <script src="nav.js"></script>
 <style>
   :root {
@@ -120,6 +121,10 @@
     .cal-cell { min-height: 50px; }
     .cal-pnl { font-size: 10px; }
   }
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
 </style>
 </head>
 <body>
@@ -163,6 +168,7 @@
   </div>
 </div>
 
+<link rel="icon" type="image/png" href="https://i.imgur.com/ZP2pTk2.png">
 <script src="nav.js"></script>
 <script>
 const WORKER_URL = "https://trade-journal-proxy.daniel-mouldd.workers.dev";
@@ -203,6 +209,10 @@ async function fetchTrades() {
         pnl: p['P&L ($)']?.number || 0,
         status: p['Status']?.select?.name || '',
         date: p['Date']?.date?.start || '',
+        session: p['Session']?.select?.name || '',
+        grade: p['Setup Grade']?.select?.name || '',
+        direction: p['Direction']?.select?.name || '',
+        timeframe: p['Timeframe']?.select?.name || '',
       };
     }).filter(t => t.date).sort((a,b) => a.date.localeCompare(b.date));
 
@@ -222,23 +232,47 @@ function filterByPeriod(trades, period) {
   return trades.filter(t => new Date(t.date) >= cutoff);
 }
 
+function setText(id, text, cls) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = text;
+  if (cls) el.className = cls;
+}
+
 function updateStats(trades) {
   const total = trades.length;
   const wins = trades.filter(t => t.status === 'Closed - Win').length;
+  const losses = trades.filter(t => t.status === 'Closed - Loss').length;
   const pnl = trades.reduce((s,t) => s + t.pnl, 0);
   const avg = total ? Math.round(pnl / total) : 0;
   const best = total ? Math.max(...trades.map(t => t.pnl)) : 0;
 
-  document.getElementById('s-total').textContent = total;
-  document.getElementById('s-wr').textContent = total ? Math.round((wins/total)*100) + '%' : '—';
+  // Streaks
+  let curWin=0,curLoss=0,maxWin=0,maxLoss=0;
+  const sorted = [...trades].sort((a,b)=>a.date.localeCompare(b.date));
+  sorted.forEach(t => {
+    if (t.status === 'Closed - Win') { curWin++; maxWin=Math.max(maxWin,curWin); curLoss=0; }
+    else if (t.status === 'Closed - Loss') { curLoss++; maxLoss=Math.max(maxLoss,curLoss); curWin=0; }
+  });
 
-  const pnlEl = document.getElementById('s-pnl');
-  pnlEl.textContent = total ? (pnl >= 0 ? '+' : '-') + '$' + Math.abs(pnl).toLocaleString() : '—';
-  pnlEl.className = 'stat-value' + (pnl > 0 ? ' pos' : pnl < 0 ? ' neg' : '');
+  // Best session
+  const sessionMap = {};
+  trades.forEach(t => {
+    if (!t.session) return;
+    if (!sessionMap[t.session]) sessionMap[t.session] = { pnl:0, count:0 };
+    sessionMap[t.session].pnl += t.pnl;
+    sessionMap[t.session].count++;
+  });
+  const bestSession = Object.entries(sessionMap).sort((a,b)=>b[1].pnl-a[1].pnl)[0];
 
-  const avgEl = document.getElementById('s-avg');
-  avgEl.textContent = total ? (avg >= 0 ? '+' : '-') + '$' + Math.abs(avg).toLocaleString() : '—';
-  avgEl.className = 'stat-value' + (avg > 0 ? ' pos' : avg < 0 ? ' neg' : '');
+  setText('s-total', total);
+  setText('s-wr', total ? Math.round((wins/total)*100)+'%' : '—');
+  setText('s-pnl', total ? (pnl>=0?'+':'-')+'$'+Math.abs(pnl).toLocaleString() : '—', 'stat-value'+(pnl>0?' pos':pnl<0?' neg':''));
+  setText('s-avg', total ? (avg>=0?'+':'-')+'$'+Math.abs(avg).toLocaleString() : '—', 'stat-value'+(avg>0?' pos':avg<0?' neg':''));
+  setText('s-best', best ? '+$'+best.toLocaleString() : '—');
+  setText('s-wstreak', maxWin ? maxWin+'W' : '—', 'stat-value pos');
+  setText('s-lstreak', maxLoss ? maxLoss+'L' : '—', 'stat-value neg');
+  setText('s-session', bestSession ? bestSession[0] : '—');
 
   document.getElementById('s-best').textContent = best ? '+$' + best.toLocaleString() : '—';
 
