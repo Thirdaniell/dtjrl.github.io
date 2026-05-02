@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About — FTJ</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="nav.js"></script>
+<style>
+  :root {
+    --bg: #0a0a0a; --surface: #111111; --surface2: #181818;
+    --border: #1a1a1a; --border2: #2a2a2a;
+    --text: #e8e8e8; --text2: #888; --text3: #444;
+    --green: #00e676; --red: #ff4444; --accent: #c8ff00;
+    --mono: 'Space Mono', monospace; --sans: 'DM Sans', sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 14px; min-height: 100vh; }
+  .page { max-width: 900px; margin: 0 auto; padding: 3rem 2rem; }
+
+  .hero { margin-bottom: 3.5rem; padding-bottom: 2rem; border-bottom: 1px solid var(--border); }
+  .hero-eyebrow { font-family: var(--mono); font-size: 10px; letter-spacing: 0.2em; color: var(--accent); text-transform: uppercase; margin-bottom: 12px; }
+  .hero-title { font-family: var(--mono); font-size: 32px; font-weight: 700; color: var(--text); line-height: 1.1; margin-bottom: 16px; }
+  .hero-sub { font-size: 15px; color: var(--text2); line-height: 1.8; max-width: 620px; }
+
+  .section { margin-bottom: 3rem; }
+  .section-label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.2em; color: var(--accent); text-transform: uppercase; margin-bottom: 1rem; }
+  .section-title { font-family: var(--mono); font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 1rem; }
+  .section-body { font-size: 13px; color: var(--text2); line-height: 1.8; }
+  .section-body p { margin-bottom: 0.75rem; }
+  .section-body ul { list-style: none; display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+  .section-body ul li::before { content: '—'; color: var(--accent); margin-right: 8px; font-family: var(--mono); font-size: 11px; }
+
+  .grades-grid { display: grid; grid-template-columns: 1fr; gap: 1px; background: var(--border); margin-top: 1rem; }
+  .grade-row { background: var(--surface); padding: 1.25rem 1.5rem; display: grid; grid-template-columns: 80px 1fr; gap: 1rem; align-items: start; transition: background 0.15s; }
+  .grade-row:hover { background: var(--surface2); }
+  .grade-pill { font-family: var(--mono); font-size: 13px; font-weight: 700; padding: 6px 14px; border: 1px solid; text-align: center; }
+  .pill-app { color: #c8ff00; border-color: rgba(200,255,0,0.4); background: rgba(200,255,0,0.07); }
+  .pill-ap  { color: #00e676; border-color: rgba(0,230,118,0.4); background: rgba(0,230,118,0.07); }
+  .pill-a   { color: #40c4ff; border-color: rgba(64,196,255,0.4); background: rgba(64,196,255,0.07); }
+  .pill-b   { color: #ffd740; border-color: rgba(255,215,64,0.4); background: rgba(255,215,64,0.07); }
+  .pill-c   { color: #ff6d00; border-color: rgba(255,109,0,0.4); background: rgba(255,109,0,0.07); }
+  .pill-d   { color: #ff4444; border-color: rgba(255,68,68,0.4); background: rgba(255,68,68,0.07); }
+  .grade-name { font-family: var(--mono); font-size: 12px; color: var(--text); margin-bottom: 4px; }
+  .grade-desc { font-size: 12px; color: var(--text2); line-height: 1.6; }
+  .grade-reqs { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
+  .grade-req { font-family: var(--mono); font-size: 9px; padding: 2px 7px; border: 1px solid var(--border2); color: var(--text3); text-transform: uppercase; }
+  .grade-req.req { color: #c8ff00; border-color: rgba(200,255,0,0.2); }
+
+  .pages-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); margin-top: 1rem; }
+  .page-card { background: var(--surface); padding: 1.25rem 1.5rem; transition: background 0.15s; }
+  .page-card:hover { background: var(--surface2); }
+  .page-card-icon { font-size: 20px; margin-bottom: 8px; }
+  .page-card-title { font-family: var(--mono); font-size: 12px; color: var(--accent); margin-bottom: 8px; letter-spacing: 0.05em; }
+  .page-card-body { font-size: 12px; color: var(--text2); line-height: 1.7; }
+  .page-card-body ul { list-style: none; display: flex; flex-direction: column; gap: 4px; margin-top: 6px; }
+  .page-card-body ul li::before { content: '→'; color: var(--text3); margin-right: 6px; font-family: var(--mono); font-size: 10px; }
+
+  .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); margin-top: 1rem; }
+  .info-cell { background: var(--surface); padding: 1rem 1.25rem; }
+  .info-label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em; color: var(--text3); text-transform: uppercase; margin-bottom: 6px; }
+  .info-val { font-size: 12px; color: var(--text2); line-height: 1.6; }
+
+  .divider { height: 1px; background: var(--border); margin: 2.5rem 0; }
+
+  @media (max-width: 600px) {
+    .page { padding: 2rem 1rem; }
+    .pages-grid, .info-grid { grid-template-columns: 1fr; }
+    .grade-row { grid-template-columns: 60px 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="hero">
+    <div class="hero-eyebrow">// Documentation</div>
+    <div class="hero-title">Futures Trade Journal</div>
+    <div class="hero-sub">A personal trade journaling system built on ICT concepts and Dodgy's iFVG Ultimate+ model. Every trade is logged, graded, and verified against a strict rulebook — designed to build consistency and accountability over time.</div>
+  </div>
+
+  <!-- PAGES OVERVIEW -->
+  <div class="section">
+    <div class="section-label">// 01</div>
+    <div class="section-title">Pages Overview</div>
+    <div class="pages-grid">
+      <div class="page-card">
+        <div class="page-card-icon">◈</div>
+        <div class="page-card-title">Journal</div>
+        <div class="page-card-body">
+          The main trade log. Every trade is displayed as a card showing all relevant data.
+          <ul>
+            <li>Filter by session, instrument, direction, grade, confluences, outcome, rule status and date</li>
+            <li>Each card shows entry/exit, SL/TP, P&L, confluences, notes, mistakes and lessons</li>
+            <li>Setup grade and rule status badges on every card</li>
+            <li>⚡ Verify Rules button runs AI analysis against your rulebook</li>
+            <li>TradingView chart links or inline Imgur images per trade</li>
+          </ul>
+        </div>
+      </div>
+      <div class="page-card">
+        <div class="page-card-icon">◉</div>
+        <div class="page-card-title">Rules</div>
+        <div class="page-card-body">
+          Your full trading rulebook. 13 rules organised into Pre-Trade, Entry, Trade Management, Risk & Psychology, and Accountability sections.
+          <ul>
+            <li>Required rules must always be followed</li>
+            <li>Preferred rules are best practice but flexible</li>
+            <li>Work In Progress rules are acknowledged weaknesses</li>
+            <li>Used as the basis for AI trade verification</li>
+          </ul>
+        </div>
+      </div>
+      <div class="page-card">
+        <div class="page-card-icon">◐</div>
+        <div class="page-card-title">Analytics</div>
+        <div class="page-card-body">
+          Performance dashboard showing how your trading is evolving over time.
+          <ul>
+            <li>Stats bar — total trades, win rate, total P&L, avg P&L, best trade</li>
+            <li>Equity curve — cumulative P&L growth over time</li>
+            <li>Donut chart — instrument breakdown by trade count</li>
+            <li>Daily P&L calendar — colour coded green/red by day</li>
+            <li>Filter by All / Week / Month / 3 Months</li>
+          </ul>
+        </div>
+      </div>
+      <div class="page-card">
+        <div class="page-card-icon">◎</div>
+        <div class="page-card-title">About (This Page)</div>
+        <div class="page-card-body">
+          Documentation explaining everything about the journal system — grading, badges, filters, and how to read each page.
+          <ul>
+            <li>Grade system explained (A++ to D)</li>
+            <li>Badge legend and what each means</li>
+            <li>How to read journal cards</li>
+            <li>How verification works</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- GRADE SYSTEM -->
+  <div class="section">
+    <div class="section-label">// 02</div>
+    <div class="section-title">Setup Grading System</div>
+    <div class="section-body">
+      <p>Every trade is graded based on ICT principles and Dodgy's iFVG Ultimate+ model. Grades reflect the quality of the setup — not the outcome. A D-grade trade can still win, and an A++ can still lose. The goal is to only be taking A and above setups consistently.</p>
+    </div>
+    <div class="grades-grid">
+
+      <div class="grade-row">
+        <div><div class="grade-pill pill-app">A++</div></div>
+        <div>
+          <div class="grade-name">Elite Setup</div>
+          <div class="grade-desc">The highest quality setup possible. Every major confluence aligns perfectly. HTF bias confirmed, liquidity swept, IFVG/FVG entry, MSS/CHoCH confirmed, clear PDA target, inside a kill zone, SMT divergence present. These are rare — if you see one, take it without hesitation.</div>
+          <div class="grade-reqs">
+            <span class="grade-req req">HTF Bias Confirmed</span>
+            <span class="grade-req req">Liquidity Swept</span>
+            <span class="grade-req req">IFVG or FVG Entry</span>
+            <span class="grade-req req">MSS or CHoCH</span>
+            <span class="grade-req req">Clear PDA Target</span>
+            <span class="grade-req req">Kill Zone</span>
+            <span class="grade-req req">SMT Divergence</span>
+            <span class="grade-req req">HTF PDA Delivery</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="grade-row">
+        <div><div class="grade-pill pill-ap">A+</div></div>
+        <div>
+          <div class="grade-name">Strong Setup</div>
+          <div class="grade-desc">High conviction setup. Most major confluences present. HTF bias aligned, IFVG/FVG or strong OB entry, clear target visible, likely in or near a kill zone. Missing 1 major confluence (e.g. no SMT or no explicit liquidity sweep) but overall a high quality trade worth taking.</div>
+          <div class="grade-reqs">
+            <span class="grade-req req">HTF Bias Confirmed</span>
+            <span class="grade-req req">IFVG/FVG or OB Entry</span>
+            <span class="grade-req req">Clear Target</span>
+            <span class="grade-req req">4-5 Confluences</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="grade-row">
+        <div><div class="grade-pill pill-a">A</div></div>
+        <div>
+          <div class="grade-name">Good Setup</div>
+          <div class="grade-desc">Solid setup with good confluence but missing 2 or more key elements. HTF bias is present but perhaps not fully confirmed top-down. Entry is on a valid PDA but may not be the tightest option. Target is visible. Still a tradeable setup but requires more caution on sizing.</div>
+          <div class="grade-reqs">
+            <span class="grade-req req">HTF Bias Aligned</span>
+            <span class="grade-req req">Valid PDA Entry</span>
+            <span class="grade-req req">3-4 Confluences</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="grade-row">
+        <div><div class="grade-pill pill-b">B</div></div>
+        <div>
+          <div class="grade-name">Average Setup</div>
+          <div class="grade-desc">Some confluences present but the overall picture is incomplete. HTF bias may be unclear or entry is not on the preferred PDA. Target exists but is not clean. These trades should be taken at reduced size or avoided during a losing streak. A B-grade during a drawdown is a pass.</div>
+          <div class="grade-reqs">
+            <span class="grade-req">2-3 Confluences</span>
+            <span class="grade-req">Unclear HTF Bias</span>
+            <span class="grade-req">Reduce Size</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="grade-row">
+        <div><div class="grade-pill pill-c">C</div></div>
+        <div>
+          <div class="grade-name">Weak Setup</div>
+          <div class="grade-desc">Minimal confluences. Entry is not on a clean PDA, HTF bias is not clearly confirmed, or the target is vague. This is the type of trade typically taken out of boredom or FOMO. Avoid these entirely. If you find yourself taking C-grade trades regularly, step back and review your process.</div>
+          <div class="grade-reqs">
+            <span class="grade-req">1-2 Confluences</span>
+            <span class="grade-req">No Clear Target</span>
+            <span class="grade-req">Avoid</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="grade-row">
+        <div><div class="grade-pill pill-d">D</div></div>
+        <div>
+          <div class="grade-name">Do Not Take</div>
+          <div class="grade-desc">No meaningful confluence. This is a random, emotional, or revenge trade. No HTF bias, no clean entry model, no clear target. Taking D-grade trades consistently will destroy an account. If this grade appears in your journal more than once, it is a serious red flag that requires immediate attention.</div>
+          <div class="grade-reqs">
+            <span class="grade-req">No Confluences</span>
+            <span class="grade-req">Emotional Entry</span>
+            <span class="grade-req">Do Not Take</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- JOURNAL GUIDE -->
+  <div class="section">
+    <div class="section-label">// 03</div>
+    <div class="section-title">Understanding the Journal</div>
+    <div class="section-body">
+      <p>Each trade card shows a complete picture of the trade. Here is what each field means and how to read the cards.</p>
+    </div>
+    <div class="info-grid">
+      <div class="info-cell"><div class="info-label">Grade Badge</div><div class="info-val">A++ to D — quality of the setup based on ICT + Dodgy iFVG model confluences. See Section 02 above.</div></div>
+      <div class="info-cell"><div class="info-label">Rule Status Badge</div><div class="info-val">✅ Followed all rules · ⚠️ Partially followed · ❌ Rules broken. Assessed manually or via ⚡ Verify.</div></div>
+      <div class="info-cell"><div class="info-label">P&L</div><div class="info-val">Realised profit or loss in USD. For ES: points × $50. For NQ: points × $20. Shown in green (profit) or red (loss).</div></div>
+      <div class="info-cell"><div class="info-label">Confluences</div><div class="info-val">ICT/Dodgy concepts that supported the trade. More high-quality confluences = higher grade. Tags shown on each card.</div></div>
+      <div class="info-cell"><div class="info-label">Entry / Exit Time</div><div class="info-val">Time the trade was entered and exited. Helps identify which part of the session the trade was taken in.</div></div>
+      <div class="info-cell"><div class="info-label">SL / TP</div><div class="info-val">Stop Loss and Take Profit levels. SL preferred above/below IFVG or FVG. TP at a clear liquidity or PDA target.</div></div>
+      <div class="info-cell"><div class="info-label">Notes</div><div class="info-val">General observations about the trade — market context, delivery quality, confluences seen in real time.</div></div>
+      <div class="info-cell"><div class="info-label">Mistakes</div><div class="info-val">What went wrong or could have been better. Reviewed against the rulebook during verification.</div></div>
+      <div class="info-cell"><div class="info-label">Lessons</div><div class="info-val">Key takeaway from the trade. Used to build better habits over time.</div></div>
+      <div class="info-cell"><div class="info-label">⚡ Verify Rules</div><div class="info-val">Runs an AI analysis of the trade against all 13 rules. Shows faults, what was done right, and a final verdict.</div></div>
+      <div class="info-cell"><div class="info-label">Chart</div><div class="info-val">Imgur image shows inline. TradingView link opens in a new tab. Both can be added per trade.</div></div>
+      <div class="info-cell"><div class="info-label">Filters</div><div class="info-val">Filter by session, instrument, direction, grade, rule status, confluences, outcome, and date to study specific scenarios.</div></div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ANALYTICS GUIDE -->
+  <div class="section">
+    <div class="section-label">// 04</div>
+    <div class="section-title">Understanding Analytics</div>
+    <div class="section-body">
+      <p>The analytics page gives a bird's eye view of performance over time. All data is pulled live from Notion and filtered by the selected time period.</p>
+      <ul>
+        <li><strong>Equity Curve</strong> — shows cumulative P&L from your first trade to now. A rising curve means you're growing. Use this to spot drawdown periods and recovery patterns.</li>
+        <li><strong>Instruments Traded</strong> — donut chart showing what percentage of your trades were on each instrument (NQ, ES etc). Helps identify if you're overexposed to one market.</li>
+        <li><strong>Daily P&L Calendar</strong> — each trading day is colour coded. Green = profitable day, red = losing day. Navigate months using the arrows. Use this to spot patterns — are you losing on Mondays? Winning during London?</li>
+        <li><strong>Period Filter</strong> — switch between All Time, This Week, This Month, and Last 3 Months to analyse different windows of performance.</li>
+        <li><strong>Stats Bar</strong> — total trades, win rate, total P&L, average P&L per trade, and your best single trade.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- RULES GUIDE -->
+  <div class="section">
+    <div class="section-label">// 05</div>
+    <div class="section-title">Understanding the Rules Page</div>
+    <div class="section-body">
+      <p>The rules page is the foundation of the journal. Every trade is verified against these 13 rules. Rules are tagged as:</p>
+      <ul>
+        <li><strong>Required</strong> — non-negotiable. Breaking these is a clear rule violation and will flag as ❌ on a trade.</li>
+        <li><strong>Preferred</strong> — best practice. Not breaking them is ideal, but flexibility is allowed with stronger confluences.</li>
+        <li><strong>Work In Progress</strong> — acknowledged weaknesses. Tracked but not penalised as harshly in verification.</li>
+      </ul>
+      <p style="margin-top:12px;">The rules are based on ICT's methodology and Dodgy's iFVG Ultimate+ model. They exist to create a repeatable, consistent process — not to restrict creativity, but to ensure every trade taken has a logical reason behind it.</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => initNav('about'));
+</script>
+</body>
+</html>
