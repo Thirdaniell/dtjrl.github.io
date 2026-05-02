@@ -15,6 +15,10 @@ const NAV_HTML = `
       <span class="nav-icon">◐</span>
       <span class="nav-label">Analytics</span>
     </a>
+    <a href="about.html" class="nav-link" data-page="about">
+      <span class="nav-icon">◎</span>
+      <span class="nav-label">About</span>
+    </a>
   </div>
   <div class="nav-bottom">
     <a href="https://www.youtube.com/@DTJRL" target="_blank" rel="noopener" class="nav-yt">
