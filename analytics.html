@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Analytics — FTJ</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="icon" type="image/png" href="https://i.imgur.com/ZP2pTk2.png">
 <script src="nav.js"></script>
 <style>
   :root {
@@ -48,7 +47,7 @@
   .period-tab:hover { color: var(--text2); }
   .period-tab.active { background: var(--surface2); color: var(--accent); }
 
-  .stats-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); margin-bottom: 2rem; }
+  .stats-row { display: grid; grid-template-columns: repeat(8, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); margin-bottom: 2rem; }
   .stat { background: var(--surface); padding: 1.25rem 1.5rem; }
   .stat-label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em; color: var(--text3); text-transform: uppercase; margin-bottom: 8px; }
   .stat-value { font-family: var(--mono); font-size: 20px; font-weight: 700; color: var(--text); }
@@ -95,11 +94,11 @@
 
   @media (max-width: 900px) {
     .charts-grid { grid-template-columns: 1fr; }
-    .stats-row { grid-template-columns: repeat(3, 1fr); }
+    .stats-row { grid-template-columns: repeat(4, 1fr); }
   }
   @media (max-width: 600px) {
     .page { padding: 2rem 1rem; }
-    .stats-row { grid-template-columns: repeat(2, 1fr); }
+    .stats-row { grid-template-columns: repeat(2, 1fr); font-size:11px; }
     .cal-cell { min-height: 50px; }
     .cal-pnl { font-size: 10px; }
   }
@@ -126,6 +125,9 @@
     <div class="stat"><div class="stat-label">Total P&L</div><div class="stat-value" id="s-pnl">—</div></div>
     <div class="stat"><div class="stat-label">Avg P&L</div><div class="stat-value" id="s-avg">—</div></div>
     <div class="stat"><div class="stat-label">Best Trade</div><div class="stat-value pos" id="s-best">—</div></div>
+    <div class="stat"><div class="stat-label">Win Streak</div><div class="stat-value pos" id="s-wstreak">—</div></div>
+    <div class="stat"><div class="stat-label">Loss Streak</div><div class="stat-value neg" id="s-lstreak">—</div></div>
+    <div class="stat"><div class="stat-label">Best Session</div><div class="stat-value" id="s-session">—</div></div>
   </div>
 
   <div id="main-content"><div class="loading-state">Loading analytics <span>...</span></div></div>
@@ -221,6 +223,26 @@ function updateStats(trades) {
   avgEl.className = 'stat-value' + (avg > 0 ? ' pos' : avg < 0 ? ' neg' : '');
 
   document.getElementById('s-best').textContent = best ? '+$' + best.toLocaleString() : '—';
+
+  // Win/Loss streaks
+  let curWin = 0, maxWin = 0, curLoss = 0, maxLoss = 0;
+  trades.forEach(t => {
+    if (t.status === 'Closed - Win') { curWin++; maxWin = Math.max(maxWin, curWin); curLoss = 0; }
+    else if (t.status === 'Closed - Loss') { curLoss++; maxLoss = Math.max(maxLoss, curLoss); curWin = 0; }
+  });
+  document.getElementById('s-wstreak').textContent = maxWin ? maxWin + ' in a row' : '—';
+  document.getElementById('s-lstreak').textContent = maxLoss ? maxLoss + ' in a row' : '—';
+
+  // Best session by avg P&L
+  const sessionMap = {};
+  trades.forEach(t => {
+    if (!t.session) return;
+    if (!sessionMap[t.session]) sessionMap[t.session] = { pnl: 0, count: 0 };
+    sessionMap[t.session].pnl += t.pnl;
+    sessionMap[t.session].count++;
+  });
+  const bestSession = Object.entries(sessionMap).sort((a,b) => (b[1].pnl/b[1].count) - (a[1].pnl/a[1].count))[0];
+  document.getElementById('s-session').textContent = bestSession ? bestSession[0] : '—';
 }
 
 function renderEquityChart(trades) {
@@ -393,6 +415,101 @@ function renderDonut(trades) {
   `).join('');
 }
 
+function renderGradeChart(trades) {
+  const canvas = document.getElementById('grade-canvas');
+  if (!canvas) return;
+  canvas.width = canvas.offsetWidth; canvas.height = 180;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+
+  const grades = ['A++','A+','A','B','C','D'];
+  const colors = ['#c8ff00','#00e676','#40c4ff','#ffd740','#ff6d00','#ff4444'];
+  const counts = {};
+  grades.forEach(g => counts[g] = 0);
+  trades.forEach(t => { if (t.grade && counts[t.grade] !== undefined) counts[t.grade]++; });
+
+  const max = Math.max(...Object.values(counts), 1);
+  const pad = { top: 10, right: 16, bottom: 30, left: 30 };
+  const cW = W - pad.left - pad.right;
+  const cH = H - pad.top - pad.bottom;
+  const barW = cW / grades.length * 0.6;
+  const gap = cW / grades.length;
+
+  grades.forEach((g, i) => {
+    const count = counts[g];
+    const x = pad.left + i * gap + gap * 0.2;
+    const barH = count ? (count / max) * cH : 0;
+    const y = pad.top + cH - barH;
+    ctx.fillStyle = colors[i];
+    ctx.globalAlpha = 0.85;
+    ctx.fillRect(x, y, barW, barH);
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = '#444';
+    ctx.font = '9px Space Mono';
+    ctx.textAlign = 'center';
+    ctx.fillText(g, x + barW/2, H - pad.bottom + 14);
+    if (count) {
+      ctx.fillStyle = colors[i];
+      ctx.fillText(count, x + barW/2, y - 4);
+    }
+  });
+}
+
+function renderSessionChart(trades) {
+  const canvas = document.getElementById('session-canvas');
+  if (!canvas) return;
+  canvas.width = canvas.offsetWidth; canvas.height = 180;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+
+  const sessions = ['Asia','London','NY AM','NY Lunch','NY PM','Overnight'];
+  const pnlMap = {};
+  sessions.forEach(s => pnlMap[s] = 0);
+  trades.forEach(t => { if (t.session && pnlMap[t.session] !== undefined) pnlMap[t.session] += t.pnl; });
+
+  const vals = Object.values(pnlMap);
+  const max = Math.max(...vals.map(Math.abs), 1);
+  const pad = { top: 10, right: 16, bottom: 30, left: 50 };
+  const cW = W - pad.left - pad.right;
+  const cH = H - pad.top - pad.bottom;
+  const barW = cW / sessions.length * 0.6;
+  const gap = cW / sessions.length;
+  const zeroY = pad.top + cH / 2;
+
+  ctx.beginPath();
+  ctx.strokeStyle = '#2a2a2a';
+  ctx.lineWidth = 1;
+  ctx.moveTo(pad.left, zeroY);
+  ctx.lineTo(W - pad.right, zeroY);
+  ctx.stroke();
+
+  sessions.forEach((s, i) => {
+    const val = pnlMap[s];
+    const x = pad.left + i * gap + gap * 0.2;
+    const barH = (Math.abs(val) / max) * (cH / 2);
+    const isPos = val >= 0;
+    const y = isPos ? zeroY - barH : zeroY;
+    ctx.fillStyle = isPos ? '#00e676' : '#ff4444';
+    ctx.globalAlpha = 0.8;
+    ctx.fillRect(x, y, barW, barH);
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = '#444';
+    ctx.font = '8px Space Mono';
+    ctx.textAlign = 'center';
+    const label = s.length > 6 ? s.replace('NY ','NY
+') : s;
+    ctx.fillText(s.substring(0,6), x + barW/2, H - pad.bottom + 14);
+    if (val !== 0) {
+      ctx.fillStyle = isPos ? '#00e676' : '#ff4444';
+      ctx.font = '8px Space Mono';
+      const pStr = (isPos?'+':'') + '$' + Math.abs(Math.round(val/1000)) + 'k';
+      ctx.fillText(val > 999 || val < -999 ? pStr : (isPos?'+':'') + '$' + Math.abs(val), x + barW/2, isPos ? y - 4 : y + barH + 10);
+    }
+  });
+}
+
 let calYear = new Date().getFullYear();
 let calMonth = new Date().getMonth();
 
@@ -471,6 +588,16 @@ function renderAll() {
         </div>
       </div>
     </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);margin-bottom:2rem;">
+      <div class="chart-panel">
+        <div class="chart-panel-title">Grade Distribution</div>
+        <canvas id="grade-canvas" style="width:100%;height:180px;"></canvas>
+      </div>
+      <div class="chart-panel">
+        <div class="chart-panel-title">P&L by Session</div>
+        <canvas id="session-canvas" style="width:100%;height:180px;"></canvas>
+      </div>
+    </div>
   `;
 
   const eq = document.getElementById('equity-canvas');
@@ -479,6 +606,8 @@ function renderAll() {
 
   renderEquityChart(filtered);
   renderDonut(filtered);
+  renderGradeChart(filtered);
+  renderSessionChart(filtered);
   renderCalendar(filtered);
 }
 
