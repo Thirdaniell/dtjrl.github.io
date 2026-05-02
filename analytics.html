@@ -168,8 +168,6 @@
   </div>
 </div>
 
-<link rel="icon" type="image/png" href="https://i.imgur.com/ZP2pTk2.png">
-<script src="nav.js"></script>
 <script>
 const WORKER_URL = "https://trade-journal-proxy.daniel-mouldd.workers.dev";
 const DATABASE_ID = "5398f956345943b7b12b2298bbb6e127";
@@ -276,14 +274,7 @@ function updateStats(trades) {
 
   document.getElementById('s-best').textContent = best ? '+$' + best.toLocaleString() : '—';
 
-  // Win/Loss streaks
-  let curWin = 0, maxWin = 0, curLoss = 0, maxLoss = 0;
-  trades.forEach(t => {
-    if (t.status === 'Closed - Win') { curWin++; maxWin = Math.max(maxWin, curWin); curLoss = 0; }
-    else if (t.status === 'Closed - Loss') { curLoss++; maxLoss = Math.max(maxLoss, curLoss); curWin = 0; }
-  });
-  document.getElementById('s-wstreak').textContent = maxWin ? maxWin + ' in a row' : '—';
-  document.getElementById('s-lstreak').textContent = maxLoss ? maxLoss + ' in a row' : '—';
+
 
   // Best session by avg P&L
   const sessionMap = {};
