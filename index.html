@@ -32,6 +32,19 @@
     font-family: var(--sans);
     font-size: 14px;
     min-height: 100vh;
+    transition: background 0.2s, color 0.2s;
+  }
+  body.light {
+    --bg: #f5f5f5;
+    --surface: #ffffff;
+    --surface2: #efefef;
+    --border: #e0e0e0;
+    --border2: #cccccc;
+    --text: #111111;
+    --text2: #555555;
+    --text3: #999999;
+    --red-dim: rgba(220,38,38,0.08);
+    --green-dim: rgba(0,180,80,0.08);
   }
 
   header {
@@ -562,13 +575,18 @@
     .cards { grid-template-columns: 1fr; }
   }
 </style>
+<link rel="icon" type="image/png" href="https://i.imgur.com/ZP2pTk2.png">
 <script src="nav.js"></script>
 </head>
 <body>
 
 <header>
   <div class="logo">// Trade Journal</div>
-  <button class="refresh-btn" onclick="loadTrades()">↻ Refresh</button>
+  <div style="display:flex;gap:8px;align-items:center;">
+    <button class="refresh-btn" onclick="exportCSV()">↓ CSV</button>
+    <button class="refresh-btn" onclick="toggleTheme()" id="theme-btn">☀ Light</button>
+    <button class="refresh-btn" onclick="loadTrades()">↻ Refresh</button>
+  </div>
 </header>
 
 <div class="container">
@@ -634,6 +652,10 @@
     <select id="f-date" onchange="renderAll()"><option value="">All dates</option></select>
   </div>
 
+  <div id="rule-breacher" style="display:none;margin-bottom:1.5rem;background:var(--surface);border:1px solid var(--border2);padding:1rem 1.25rem;">
+    <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--accent);text-transform:uppercase;margin-bottom:10px;">⚠ Rule Breach Tracker</div>
+    <div id="rule-breacher-content" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+  </div>
   <div class="results-count" id="results-count"></div>
   <div class="badge-legend">
     <span class="badge-legend-title">Legend:</span>
@@ -713,6 +735,8 @@ function parseProps(page) {
     lessons: extractText(props["Lessons Learned"]?.rich_text),
     grade: props["Setup Grade"]?.select?.name || "",
     followedRules: props["Followed Rules"]?.select?.name || "",
+    htfTimeframe: extractText(props["HTF Timeframe"]?.rich_text),
+    entryModel: extractText(props["Entry Model"]?.rich_text),
   };
 }
 
@@ -779,26 +803,36 @@ function populateDateFilter() {
 }
 
 function getFiltered() {
-  const selectedConfs = Array.from(document.querySelectorAll('.conf-option.selected')).map(el => el.dataset.conf);
+  const selectedConfs = Array.from(document.querySelectorAll('#conf-dropdown input[type=checkbox]:checked')).map(cb => cb.value);
   const session = document.getElementById("f-session").value;
   const dir = document.getElementById("f-dir").value;
   const inst = document.getElementById("f-inst").value;
   const outcome = document.getElementById("f-outcome").value;
   const grade = document.getElementById("f-grade").value;
   const rules = document.getElementById("f-rules").value;
+  const tf = document.getElementById("f-tf").value;
+  const sort = document.getElementById("f-sort").value;
   const date = document.getElementById("f-date").value;
 
-  return allTrades.filter(t => {
-    if (selectedConfs.length > 0 && !selectedConfs.every(sc => t.confluences.some(c => c.toLowerCase() === sc.toLowerCase()))) return false;
+  let filtered = allTrades.filter(t => {
+    if (selectedConfs.length > 0 && !selectedConfs.every(sc => t.confluences.includes(sc))) return false;
     if (session && t.session !== session) return false;
     if (dir && t.direction !== dir) return false;
     if (inst && t.instrument !== inst) return false;
     if (outcome && t.status !== outcome) return false;
     if (grade && t.grade !== grade) return false;
     if (rules && t.followedRules !== rules) return false;
+    if (tf && t.timeframe !== tf) return false;
     if (date && t.date !== date) return false;
     return true;
   });
+
+  if (sort === 'oldest') filtered.sort((a,b) => a.date.localeCompare(b.date));
+  else if (sort === 'pnl-high') filtered.sort((a,b) => (b.pnl||0) - (a.pnl||0));
+  else if (sort === 'pnl-low') filtered.sort((a,b) => (a.pnl||0) - (b.pnl||0));
+  else filtered.sort((a,b) => b.date.localeCompare(a.date));
+
+  return filtered;
 }
 
 function updateStats(trades) {
@@ -1034,6 +1068,69 @@ document.addEventListener('click', e => {
   }
 });
 
+// ---- Theme Toggle ----
+function toggleTheme() {
+  document.body.classList.toggle('light');
+  const btn = document.getElementById('theme-btn');
+  btn.textContent = document.body.classList.contains('light') ? '☾ Dark' : '☀ Light';
+  localStorage.setItem('ftj-theme', document.body.classList.contains('light') ? 'light' : 'dark');
+}
+if (localStorage.getItem('ftj-theme') === 'light') {
+  document.body.classList.add('light');
+  document.addEventListener('DOMContentLoaded', () => {
+    const btn = document.getElementById('theme-btn');
+    if (btn) btn.textContent = '☾ Dark';
+  });
+}
+
+// ---- CSV Export ----
+function exportCSV() {
+  if (!allTrades.length) return;
+  const headers = ['Date','Instrument','Direction','Session','Timeframe','Entry Time','Entry','Exit Time','Exit','Stop Loss','Take Profit','Contracts','P&L','Confluences','Grade','Followed Rules','Notes','Mistakes','Lessons'];
+  const rows = allTrades.map(t => [
+    t.date, t.instrument, t.direction, t.session, t.timeframe,
+    t.entryTime, t.entryPrice, t.exitTime, t.exitPrice,
+    t.stopLoss, t.takeProfit, t.contracts, t.pnl,
+    '"' + t.confluences.join(', ') + '"',
+    t.grade, t.followedRules,
+    '"' + (t.notes||'').replace(/"/g,"'") + '"',
+    '"' + (t.mistakes||'').replace(/"/g,"'") + '"',
+    '"' + (t.lessons||'').replace(/"/g,"'") + '"'
+  ].join(','));
+  const csv = [headers.join(','), ...rows].join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'trade-journal.csv'; a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ---- Rule Breacher Tracker ----
+function getRuleBreaches() {
+  const breaches = {
+    'Stop Loss Management': 0,
+    'HTF Bias Alignment': 0,
+    'Trailing Too Soon': 0,
+    'Overtrading': 0,
+    'FOMO / Impatient Entry': 0,
+    'Scale-in on Non A+ Setup': 0,
+    'No Clear Target': 0,
+    'News Avoidance': 0,
+  };
+  allTrades.forEach(t => {
+    const text = ((t.mistakes||'') + ' ' + (t.notes||'') + ' ' + (t.lessons||'')).toLowerCase();
+    if (text.includes('stop') && (text.includes('be') || text.includes('breakeven') || text.includes('moved'))) breaches['Stop Loss Management']++;
+    if (text.includes('bias') || text.includes('htf') || text.includes('against')) breaches['HTF Bias Alignment']++;
+    if (text.includes('trail') && (text.includes('soon') || text.includes('tight') || text.includes('tsl'))) breaches['Trailing Too Soon']++;
+    if (text.includes('overtrad') || text.includes('too many')) breaches['Overtrading']++;
+    if (text.includes('fomo') || text.includes('impatient') || text.includes('patient') || text.includes('chased')) breaches['FOMO / Impatient Entry']++;
+    if (text.includes('scale') || text.includes('second contract') || text.includes('2nd')) breaches['Scale-in on Non A+ Setup']++;
+    if (text.includes('no target') || text.includes('void') || text.includes('target')) breaches['No Clear Target']++;
+    if (text.includes('news')) breaches['News Avoidance']++;
+  });
+  return Object.entries(breaches).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]);
+}
+
 let confDropdownOpen = false;
 
 function toggleConfDropdown() {
@@ -1074,6 +1171,21 @@ function renderAll() {
   const filtered = getFiltered();
   updateStats(filtered);
   document.getElementById("results-count").textContent = `${filtered.length} trade${filtered.length !== 1 ? "s" : ""}`;
+
+  // Rule breacher
+  const breaches = getRuleBreaches();
+  const bPanel = document.getElementById('rule-breacher');
+  const bContent = document.getElementById('rule-breacher-content');
+  if (breaches.length) {
+    bPanel.style.display = 'block';
+    bContent.innerHTML = breaches.map(([rule, count]) =>
+      `<div style="font-family:var(--mono);font-size:10px;padding:4px 10px;border:1px solid rgba(255,68,68,0.3);background:rgba(255,68,68,0.05);color:#ff4444;">
+        ${rule} <span style="color:var(--text3);margin-left:6px;">${count}x</span>
+      </div>`
+    ).join('');
+  } else {
+    bPanel.style.display = 'none';
+  }
   if (!filtered.length) {
     document.getElementById("main").innerHTML = `<div class="empty-state">No trades match your filters</div>`;
     return;
