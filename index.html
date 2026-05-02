@@ -312,6 +312,56 @@
     line-height: 1.8;
   }
 
+  .conf-filter-wrap { position: relative; flex: 1; min-width: 180px; }
+  .conf-filter-btn {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    color: var(--text);
+    padding: 8px 12px;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: border-color 0.15s;
+    height: 34px;
+  }
+  .conf-filter-btn:focus, .conf-filter-btn.open { border-color: var(--accent); color: var(--accent); }
+  .conf-dropdown {
+    display: none;
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    width: 320px;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    z-index: 200;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+  }
+  .conf-dropdown.open { display: block; }
+  .conf-dropdown-header { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; border-bottom: 1px solid var(--border2); }
+  .conf-dropdown-title { font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em; color: var(--text3); text-transform: uppercase; }
+  .conf-clear-btn { font-family: var(--mono); font-size: 9px; letter-spacing: 0.08em; color: var(--accent); background: none; border: none; cursor: pointer; text-transform: uppercase; }
+  .conf-options { display: flex; flex-wrap: wrap; gap: 4px; padding: 10px; max-height: 240px; overflow-y: auto; }
+  .conf-option {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.06em;
+    padding: 4px 9px;
+    border: 1px solid var(--border2);
+    color: var(--text3);
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.1s;
+    user-select: none;
+  }
+  .conf-option:hover { color: var(--text2); border-color: var(--text3); }
+  .conf-option.selected { color: var(--accent); border-color: var(--accent); background: rgba(200,255,0,0.07); }
+
   .card-meta-row {
     display: flex;
     align-items: center;
@@ -456,7 +506,19 @@
   </div>
 
   <div class="filters">
-    <input type="text" id="f-conf" placeholder="Search confluences..." oninput="renderAll()" />
+    <div class="conf-filter-wrap" id="conf-filter-wrap">
+      <button class="conf-filter-btn" id="conf-filter-btn" onclick="toggleConfDropdown()">
+        <span id="conf-filter-label">All confluences</span>
+        <span style="font-size:10px;margin-left:6px;">▾</span>
+      </button>
+      <div class="conf-dropdown" id="conf-dropdown">
+        <div class="conf-dropdown-header">
+          <span class="conf-dropdown-title">Select confluences</span>
+          <button class="conf-clear-btn" onclick="clearConfs()">Clear</button>
+        </div>
+        <div class="conf-options" id="conf-options"></div>
+      </div>
+    </div>
     <select id="f-session" onchange="renderAll()">
       <option value="">All sessions</option>
       <option>Asia</option><option>London</option><option>NY AM</option><option>NY Lunch</option><option>NY PM</option><option>Overnight</option>
@@ -633,7 +695,7 @@ function populateDateFilter() {
 }
 
 function getFiltered() {
-  const conf = document.getElementById("f-conf").value.toLowerCase().trim();
+  const selectedConfs = Array.from(document.querySelectorAll('.conf-option.selected')).map(el => el.dataset.conf);
   const session = document.getElementById("f-session").value;
   const dir = document.getElementById("f-dir").value;
   const inst = document.getElementById("f-inst").value;
@@ -643,7 +705,7 @@ function getFiltered() {
   const date = document.getElementById("f-date").value;
 
   return allTrades.filter(t => {
-    if (conf && !t.confluences.some(c => c.toLowerCase().includes(conf))) return false;
+    if (selectedConfs.length > 0 && !selectedConfs.every(sc => t.confluences.some(c => c.toLowerCase() === sc.toLowerCase()))) return false;
     if (session && t.session !== session) return false;
     if (dir && t.direction !== dir) return false;
     if (inst && t.instrument !== inst) return false;
@@ -837,6 +899,57 @@ Lessons: ${trade.lessons || 'none'}
   }
 }
 
+const ALL_CONFLUENCES = [
+  'MSS','BOS','CHoCH','FVG','IFVG','Order Block','Breaker Block','Mitigation Block',
+  'HTF PDA Delivery','Retracement','SMT Divergence','Liquidity Sweep','BSL Taken','SSL Taken',
+  'Equal Highs/Lows','NWOG','NDOG','Asian Range','Kill Zone','HTF Trend','Power of 3',
+  'Judas Swing','Market Maker Model','PDA Array','Displacement','Clear Targets','Volume',
+  'ATH','ATL','Fib Target (-0.5)'
+];
+
+function initConfDropdown() {
+  const container = document.getElementById('conf-options');
+  container.innerHTML = ALL_CONFLUENCES.map(c =>
+    `<div class="conf-option" data-conf="${c}" onclick="toggleConf(this)">${c}</div>`
+  ).join('');
+}
+
+function toggleConf(el) {
+  el.classList.toggle('selected');
+  updateConfLabel();
+  renderAll();
+}
+
+function clearConfs() {
+  document.querySelectorAll('.conf-option.selected').forEach(el => el.classList.remove('selected'));
+  updateConfLabel();
+  renderAll();
+}
+
+function updateConfLabel() {
+  const selected = Array.from(document.querySelectorAll('.conf-option.selected')).map(el => el.dataset.conf);
+  const label = document.getElementById('conf-filter-label');
+  if (selected.length === 0) label.textContent = 'All confluences';
+  else if (selected.length === 1) label.textContent = selected[0];
+  else label.textContent = `${selected.length} confluences`;
+}
+
+function toggleConfDropdown() {
+  const dd = document.getElementById('conf-dropdown');
+  const btn = document.getElementById('conf-filter-btn');
+  dd.classList.toggle('open');
+  btn.classList.toggle('open');
+}
+
+// Close dropdown on outside click
+document.addEventListener('click', e => {
+  const wrap = document.getElementById('conf-filter-wrap');
+  if (wrap && !wrap.contains(e.target)) {
+    document.getElementById('conf-dropdown').classList.remove('open');
+    document.getElementById('conf-filter-btn').classList.remove('open');
+  }
+});
+
 function renderAll() {
   const filtered = getFiltered();
   updateStats(filtered);
@@ -849,6 +962,7 @@ function renderAll() {
 }
 
 document.addEventListener("DOMContentLoaded", () => initNav("index"));
+initConfDropdown();
 loadTrades();
 </script>
 </body>
