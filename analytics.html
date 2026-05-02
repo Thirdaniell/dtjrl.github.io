@@ -4,154 +4,167 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Analytics — FTJ</title>
-
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="icon" type="image/png" href="https://i.imgur.com/ZP2pTk2.png">
-
 <script src="nav.js"></script>
-
 <style>
-:root {
-  --bg: #0a0a0a;
-  --surface: #111111;
-  --surface2: #181818;
-  --border: #1a1a1a;
-  --border2: #2a2a2a;
-  --text: #e8e8e8;
-  --text2: #888;
-  --text3: #444;
-  --green: #00e676;
-  --red: #ff4444;
-  --accent: #c8ff00;
-  --mono: 'Space Mono', monospace;
-  --sans: 'DM Sans', sans-serif;
-}
+  :root {
+    --bg: #0a0a0a;
+    --surface: #111111;
+    --surface2: #181818;
+    --border: #1a1a1a;
+    --border2: #2a2a2a;
+    --text: #e8e8e8;
+    --text2: #888;
+    --text3: #444;
+    --green: #00e676;
+    --red: #ff4444;
+    --accent: #c8ff00;
+    --mono: 'Space Mono', monospace;
+    --sans: 'DM Sans', sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 14px; min-height: 100vh; }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
+  .page { max-width: 1200px; margin: 0 auto; padding: 3rem 2rem; }
 
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: var(--sans);
-  font-size: 14px;
-  min-height: 100vh;
-}
+  .page-header { margin-bottom: 2.5rem; display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+  .page-eyebrow { font-family: var(--mono); font-size: 10px; letter-spacing: 0.2em; color: var(--accent); text-transform: uppercase; margin-bottom: 10px; }
+  .page-title { font-family: var(--mono); font-size: 28px; font-weight: 700; color: var(--text); line-height: 1.1; }
 
-.page { max-width: 1200px; margin: 0 auto; padding: 3rem 2rem; }
+  .period-tabs { display: flex; gap: 1px; background: var(--border); }
+  .period-tab {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 8px 16px;
+    background: var(--surface);
+    color: var(--text3);
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s;
+  }
+  .period-tab:hover { color: var(--text2); }
+  .period-tab.active { background: var(--surface2); color: var(--accent); }
 
-.page-header {
-  margin-bottom: 2.5rem;
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-}
+  .stats-row { display: grid; grid-template-columns: repeat(8, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); margin-bottom: 2rem; }
+  .stat { background: var(--surface); padding: 1.25rem 1.5rem; }
+  .stat-label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em; color: var(--text3); text-transform: uppercase; margin-bottom: 8px; }
+  .stat-value { font-family: var(--mono); font-size: 20px; font-weight: 700; color: var(--text); }
+  .stat-value.pos { color: var(--green); }
+  .stat-value.neg { color: var(--red); }
 
-.page-eyebrow {
-  font-family: var(--mono);
-  font-size: 10px;
-  letter-spacing: 0.2em;
-  color: var(--accent);
-  margin-bottom: 10px;
-}
+  .charts-grid { display: grid; grid-template-columns: 1fr 340px; gap: 1px; background: var(--border); margin-bottom: 2rem; }
+  .chart-panel { background: var(--surface); padding: 1.5rem; }
+  .chart-panel-title { font-family: var(--mono); font-size: 10px; letter-spacing: 0.15em; color: var(--text3); text-transform: uppercase; margin-bottom: 1.25rem; }
 
-.page-title {
-  font-family: var(--mono);
-  font-size: 28px;
-  font-weight: 700;
-}
+  canvas { display: block; }
 
-.period-tabs {
-  display: flex;
-  gap: 1px;
-  background: var(--border);
-}
+  .donut-wrap { display: flex; flex-direction: column; align-items: center; gap: 1.5rem; }
+  .donut-canvas { position: relative; }
+  .donut-legend { width: 100%; display: flex; flex-direction: column; gap: 8px; }
+  .legend-item { display: flex; align-items: center; justify-content: space-between; font-family: var(--mono); font-size: 11px; }
+  .legend-left { display: flex; align-items: center; gap: 8px; }
+  .legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .legend-name { color: var(--text2); }
+  .legend-pct { color: var(--text3); }
 
-.period-tab {
-  font-family: var(--mono);
-  font-size: 10px;
-  padding: 8px 16px;
-  background: var(--surface);
-  color: var(--text3);
-  cursor: pointer;
-  border: none;
-}
+  .loading-state { text-align: center; padding: 5rem 2rem; font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; color: var(--text3); text-transform: uppercase; }
+  .loading-state span { animation: blink 1s infinite; display: inline-block; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+  .error-state { padding: 2rem; font-family: var(--mono); font-size: 11px; color: var(--red); background: rgba(255,68,68,0.05); border: 1px solid rgba(255,68,68,0.2); }
+  .insights-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); margin-bottom: 1rem; }
+  .insight-card { background: var(--surface); padding: 1rem 1.25rem; }
+  .insight-label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em; color: var(--text3); text-transform: uppercase; margin-bottom: 6px; }
+  .insight-value { font-family: var(--mono); font-size: 18px; font-weight: 700; color: var(--text); }
+  .insight-value.pos { color: var(--green); }
+  .insight-value.neg { color: var(--red); }
+  .insight-sub { font-family: var(--mono); font-size: 11px; color: var(--text3); margin-top: 2px; }
+  .grade-dist { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+  .gdist-item { display: flex; align-items: center; gap: 4px; }
+  .gdist-grade { font-family: var(--mono); font-size: 9px; padding: 2px 6px; border: 1px solid; }
+  .gdist-App { color:#c8ff00; border-color:rgba(200,255,0,0.4); }
+  .gdist-Ap { color:#00e676; border-color:rgba(0,230,118,0.4); }
+  .gdist-A { color:#40c4ff; border-color:rgba(64,196,255,0.4); }
+  .gdist-B { color:#ffd740; border-color:rgba(255,215,64,0.4); }
+  .gdist-C { color:#ff6d00; border-color:rgba(255,109,0,0.4); }
+  .gdist-D { color:#ff4444; border-color:rgba(255,68,68,0.4); }
+  .gdist-count { font-family: var(--mono); font-size: 10px; color: var(--text3); }
+  @media(max-width:900px){ .insights-row { grid-template-columns: repeat(2,1fr); } }
 
-.period-tab.active {
-  background: var(--surface2);
-  color: var(--accent);
-}
+  .cal-panel { background: var(--surface); padding: 1.5rem; margin-bottom: 2rem; border: 1px solid var(--border); }
+  .cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; }
+  .cal-nav { display: flex; align-items: center; gap: 12px; }
+  .cal-nav-btn { font-family: var(--mono); font-size: 14px; background: none; border: 1px solid var(--border2); color: var(--text2); width: 28px; height: 28px; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; justify-content: center; }
+  .cal-nav-btn:hover { color: var(--accent); border-color: var(--accent); }
+  .cal-month-label { font-family: var(--mono); font-size: 12px; letter-spacing: 0.1em; color: var(--text); text-transform: uppercase; min-width: 140px; text-align: center; }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; background: var(--border); }
+  .cal-day-header { background: var(--bg); font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; color: var(--text3); text-transform: uppercase; text-align: center; padding: 6px 0; }
+  .cal-cell { background: var(--surface); min-height: 70px; padding: 6px 8px; display: flex; flex-direction: column; gap: 3px; }
+  .cal-cell.empty { background: var(--bg); }
+  .cal-cell.today { background: var(--surface2); outline: 1px solid var(--border2); }
+  .cal-date { font-family: var(--mono); font-size: 10px; color: var(--text3); }
+  .cal-pnl { font-family: var(--mono); font-size: 12px; font-weight: 700; margin-top: auto; }
+  .cal-pnl.pos { color: var(--green); }
+  .cal-pnl.neg { color: var(--red); }
+  .cal-trades { font-family: var(--mono); font-size: 9px; color: var(--text3); }
+  .cal-cell.has-trades { background: var(--surface2); }
 
-.stats-row {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1px;
-  background: var(--border);
-  border: 1px solid var(--border);
-  margin-bottom: 2rem;
-}
-
-.stat {
-  background: var(--surface);
-  padding: 1rem;
-}
-
-.stat-label {
-  font-family: var(--mono);
-  font-size: 10px;
-  color: var(--text3);
-}
-
-.stat-value {
-  font-family: var(--mono);
-  font-size: 18px;
-  font-weight: 700;
-}
-
-.loading-state {
-  text-align: center;
-  padding: 4rem;
-  font-family: var(--mono);
-  color: var(--text3);
-}
-
-.error-state {
-  padding: 2rem;
-  color: var(--red);
-  border: 1px solid rgba(255,68,68,0.3);
-}
-
-canvas { display: block; width: 100%; }
-
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-thumb { background: var(--border2); }
+  @media (max-width: 900px) {
+    .charts-grid { grid-template-columns: 1fr; }
+    .stats-row { grid-template-columns: repeat(4, 1fr); }
+  }
+  @media (max-width: 600px) {
+    .page { padding: 2rem 1rem; }
+    .stats-row { grid-template-columns: repeat(2, 1fr); font-size:11px; }
+    .cal-cell { min-height: 50px; }
+    .cal-pnl { font-size: 10px; }
+  }
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
 </style>
 </head>
-
 <body>
-
 <div class="page">
   <div class="page-header">
     <div>
       <div class="page-eyebrow">// Performance</div>
       <div class="page-title">Analytics</div>
     </div>
-
     <div class="period-tabs">
       <button class="period-tab active" data-period="all">All</button>
       <button class="period-tab" data-period="week">Week</button>
       <button class="period-tab" data-period="month">Month</button>
+      <button class="period-tab" data-period="3month">3M</button>
     </div>
   </div>
 
-  <div class="stats-row">
+  <div id="stats-row" class="stats-row">
     <div class="stat"><div class="stat-label">Trades</div><div class="stat-value" id="s-total">—</div></div>
     <div class="stat"><div class="stat-label">Win Rate</div><div class="stat-value" id="s-wr">—</div></div>
-    <div class="stat"><div class="stat-label">P&L</div><div class="stat-value" id="s-pnl">—</div></div>
+    <div class="stat"><div class="stat-label">Total P&L</div><div class="stat-value" id="s-pnl">—</div></div>
+    <div class="stat"><div class="stat-label">Avg P&L</div><div class="stat-value" id="s-avg">—</div></div>
+    <div class="stat"><div class="stat-label">Best Trade</div><div class="stat-value pos" id="s-best">—</div></div>
+    <div class="stat"><div class="stat-label">Win Streak</div><div class="stat-value pos" id="s-wstreak">—</div></div>
+    <div class="stat"><div class="stat-label">Loss Streak</div><div class="stat-value neg" id="s-lstreak">—</div></div>
     <div class="stat"><div class="stat-label">Best Session</div><div class="stat-value" id="s-session">—</div></div>
   </div>
 
-  <div id="main-content">
-    <div class="loading-state">Loading analytics...</div>
+  <div id="main-content"><div class="loading-state">Loading analytics <span>...</span></div></div>
+
+  <div class="cal-panel" id="cal-panel" style="display:none;">
+    <div class="cal-header">
+      <div class="chart-panel-title" style="margin:0;">Daily P&L Calendar</div>
+      <div class="cal-nav">
+        <button class="cal-nav-btn" onclick="changeMonth(-1)">&#8592;</button>
+        <div class="cal-month-label" id="cal-month-label"></div>
+        <button class="cal-nav-btn" onclick="changeMonth(1)">&#8594;</button>
+      </div>
+    </div>
+    <div class="cal-grid" id="cal-grid"></div>
   </div>
 </div>
 
@@ -159,75 +172,499 @@ canvas { display: block; width: 100%; }
 const WORKER_URL = "https://trade-journal-proxy.daniel-mouldd.workers.dev";
 const DATABASE_ID = "5398f956345943b7b12b2298bbb6e127";
 
+const INSTRUMENT_COLORS = {
+  'NQ': '#c8ff00', 'ES': '#00e676', 'MNQ': '#40c4ff',
+  'MES': '#ff6d00', 'CL': '#ea80fc', 'GC': '#ffd740',
+  'RTY': '#ff4444', 'Other': '#888'
+};
+
 let allTrades = [];
+let currentPeriod = 'all';
+let equityChart = null;
+let donutChart = null;
 
 async function fetchTrades() {
   try {
-    const res = await fetch(`${WORKER_URL}/notion/databases/${DATABASE_ID}/query`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ page_size: 100 })
-    });
+    let pages = [], cursor = null;
+    do {
+      const body = { page_size: 100 };
+      if (cursor) body.start_cursor = cursor;
+      const res = await fetch(`${WORKER_URL}/notion/databases/${DATABASE_ID}/query`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      if (!res.ok) throw new Error(`Worker error: ${res.status}`);
+      const data = await res.json();
+      pages = pages.concat(data.results || []);
+      cursor = data.has_more ? data.next_cursor : null;
+    } while (cursor);
 
-    if (!res.ok) throw new Error("Worker failed");
+    allTrades = pages.map(page => {
+      const p = page.properties;
+      return {
+        instrument: p['Instrument']?.select?.name || 'Other',
+        pnl: p['P&L ($)']?.number || 0,
+        status: p['Status']?.select?.name || '',
+        date: p['Date']?.date?.start || '',
+        session: p['Session']?.select?.name || '',
+        grade: p['Setup Grade']?.select?.name || '',
+        direction: p['Direction']?.select?.name || '',
+        timeframe: p['Timeframe']?.select?.name || '',
+      };
+    }).filter(t => t.date).sort((a,b) => a.date.localeCompare(b.date));
 
-    const data = await res.json();
-
-    allTrades = (data.results || []).map(p => ({
-      pnl: p.properties['P&L ($)']?.number || 0,
-      status: p.properties['Status']?.select?.name || '',
-      session: p.properties['Session']?.select?.name || ''
-    }));
-
-    render();
-
+    renderAll();
   } catch(e) {
-    document.getElementById('main-content').innerHTML =
-      `<div class="error-state">${e.message}</div>`;
+    document.getElementById('main-content').innerHTML = `<div class="error-state">Error: ${e.message}</div>`;
   }
 }
 
-function render() {
-  const total = allTrades.length;
-  const wins = allTrades.filter(t => t.status === 'Closed - Win').length;
-  const pnl = allTrades.reduce((s,t)=>s+t.pnl,0);
+function filterByPeriod(trades, period) {
+  if (period === 'all') return trades;
+  const now = new Date();
+  const cutoff = new Date();
+  if (period === 'week') cutoff.setDate(now.getDate() - 7);
+  else if (period === 'month') cutoff.setMonth(now.getMonth() - 1);
+  else if (period === '3month') cutoff.setMonth(now.getMonth() - 3);
+  return trades.filter(t => new Date(t.date) >= cutoff);
+}
 
+function setText(id, text, cls) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = text;
+  if (cls) el.className = cls;
+}
+
+function updateStats(trades) {
+  const total = trades.length;
+  const wins = trades.filter(t => t.status === 'Closed - Win').length;
+  const losses = trades.filter(t => t.status === 'Closed - Loss').length;
+  const pnl = trades.reduce((s,t) => s + t.pnl, 0);
+  const avg = total ? Math.round(pnl / total) : 0;
+  const best = total ? Math.max(...trades.map(t => t.pnl)) : 0;
+
+  // Streaks
+  let curWin=0,curLoss=0,maxWin=0,maxLoss=0;
+  const sorted = [...trades].sort((a,b)=>a.date.localeCompare(b.date));
+  sorted.forEach(t => {
+    if (t.status === 'Closed - Win') { curWin++; maxWin=Math.max(maxWin,curWin); curLoss=0; }
+    else if (t.status === 'Closed - Loss') { curLoss++; maxLoss=Math.max(maxLoss,curLoss); curWin=0; }
+  });
+
+  // Best session
   const sessionMap = {};
-  allTrades.forEach(t => {
+  trades.forEach(t => {
     if (!t.session) return;
-    if (!sessionMap[t.session]) sessionMap[t.session] = { pnl:0,count:0 };
+    if (!sessionMap[t.session]) sessionMap[t.session] = { pnl:0, count:0 };
     sessionMap[t.session].pnl += t.pnl;
     sessionMap[t.session].count++;
   });
+  const bestSession = Object.entries(sessionMap).sort((a,b)=>b[1].pnl-a[1].pnl)[0];
 
-  const bestSession = Object.entries(sessionMap)
-    .sort((a,b)=> (b[1].pnl/b[1].count)-(a[1].pnl/a[1].count))[0];
+  setText('s-total', total);
+  setText('s-wr', total ? Math.round((wins/total)*100)+'%' : '—');
+  setText('s-pnl', total ? (pnl>=0?'+':'-')+'$'+Math.abs(pnl).toLocaleString() : '—', 'stat-value'+(pnl>0?' pos':pnl<0?' neg':''));
+  setText('s-avg', total ? (avg>=0?'+':'-')+'$'+Math.abs(avg).toLocaleString() : '—', 'stat-value'+(avg>0?' pos':avg<0?' neg':''));
+  setText('s-best', best ? '+$'+best.toLocaleString() : '—');
+  setText('s-wstreak', maxWin ? maxWin+'W' : '—', 'stat-value pos');
+  setText('s-lstreak', maxLoss ? maxLoss+'L' : '—', 'stat-value neg');
+  setText('s-session', bestSession ? bestSession[0] : '—');
 
-  document.getElementById('s-total').textContent = total;
-  document.getElementById('s-wr').textContent = total ? Math.round((wins/total)*100)+'%' : '—';
-  document.getElementById('s-pnl').textContent = '$'+pnl;
+  document.getElementById('s-best').textContent = best ? '+$' + best.toLocaleString() : '—';
+
+
+
+  // Best session by avg P&L
+  const sessionMap = {};
+  trades.forEach(t => {
+    if (!t.session) return;
+    if (!sessionMap[t.session]) sessionMap[t.session] = { pnl: 0, count: 0 };
+    sessionMap[t.session].pnl += t.pnl;
+    sessionMap[t.session].count++;
+  });
+  const bestSession = Object.entries(sessionMap).sort((a,b) => (b[1].pnl/b[1].count) - (a[1].pnl/a[1].count))[0];
   document.getElementById('s-session').textContent = bestSession ? bestSession[0] : '—';
+}
 
-  document.getElementById('main-content').innerHTML =
-    `<canvas id="chart"></canvas>`;
+function renderEquityChart(trades) {
+  const canvas = document.getElementById('equity-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
 
-  const c = document.getElementById('chart');
+  if (!trades.length) {
+    ctx.fillStyle = '#444';
+    ctx.font = '11px Space Mono';
+    ctx.textAlign = 'center';
+    ctx.fillText('NO DATA', W/2, H/2);
+    return;
+  }
 
-  requestAnimationFrame(()=>{
-    c.width = c.offsetWidth || 600;
-    c.height = 300;
+  // Build cumulative equity
+  let cumulative = 0;
+  const points = [{ date: '', value: 0 }];
+  trades.forEach(t => { cumulative += t.pnl; points.push({ date: t.date, value: cumulative }); });
 
-    const ctx = c.getContext('2d');
-    ctx.fillStyle = "#00e676";
-    ctx.fillText("Data Loaded",20,40);
+  const values = points.map(p => p.value);
+  const minV = Math.min(...values);
+  const maxV = Math.max(...values);
+  const range = maxV - minV || 1;
+
+  const pad = { top: 20, right: 20, bottom: 40, left: 60 };
+  const cW = W - pad.left - pad.right;
+  const cH = H - pad.top - pad.bottom;
+
+  const toX = i => pad.left + (i / (points.length - 1)) * cW;
+  const toY = v => pad.top + cH - ((v - minV) / range) * cH;
+
+  // Grid lines
+  const gridLines = 5;
+  for (let i = 0; i <= gridLines; i++) {
+    const y = pad.top + (i / gridLines) * cH;
+    const val = maxV - (i / gridLines) * range;
+    ctx.beginPath();
+    ctx.strokeStyle = '#1a1a1a';
+    ctx.lineWidth = 1;
+    ctx.moveTo(pad.left, y);
+    ctx.lineTo(W - pad.right, y);
+    ctx.stroke();
+    ctx.fillStyle = '#444';
+    ctx.font = '9px Space Mono';
+    ctx.textAlign = 'right';
+    ctx.fillText((val >= 0 ? '+' : '') + '$' + Math.round(val).toLocaleString(), pad.left - 8, y + 3);
+  }
+
+  // Zero line
+  if (minV < 0 && maxV > 0) {
+    const zeroY = toY(0);
+    ctx.beginPath();
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 4]);
+    ctx.moveTo(pad.left, zeroY);
+    ctx.lineTo(W - pad.right, zeroY);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  // Gradient fill
+  const grad = ctx.createLinearGradient(0, pad.top, 0, H - pad.bottom);
+  const isPositive = cumulative >= 0;
+  grad.addColorStop(0, isPositive ? 'rgba(0,230,118,0.3)' : 'rgba(255,68,68,0.3)');
+  grad.addColorStop(1, 'rgba(0,0,0,0)');
+
+  ctx.beginPath();
+  ctx.moveTo(toX(0), toY(0));
+  points.forEach((p, i) => ctx.lineTo(toX(i), toY(p.value)));
+  ctx.lineTo(toX(points.length - 1), H - pad.bottom);
+  ctx.lineTo(toX(0), H - pad.bottom);
+  ctx.closePath();
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  // Line
+  ctx.beginPath();
+  ctx.strokeStyle = isPositive ? '#00e676' : '#ff4444';
+  ctx.lineWidth = 2;
+  points.forEach((p, i) => {
+    if (i === 0) ctx.moveTo(toX(i), toY(p.value));
+    else ctx.lineTo(toX(i), toY(p.value));
+  });
+  ctx.stroke();
+
+  // Dots on data points
+  points.forEach((p, i) => {
+    if (i === 0) return;
+    ctx.beginPath();
+    ctx.arc(toX(i), toY(p.value), 3, 0, Math.PI * 2);
+    ctx.fillStyle = isPositive ? '#00e676' : '#ff4444';
+    ctx.fill();
+  });
+
+  // Date labels
+  const labelStep = Math.max(1, Math.floor(points.length / 6));
+  ctx.fillStyle = '#444';
+  ctx.font = '9px Space Mono';
+  ctx.textAlign = 'center';
+  points.forEach((p, i) => {
+    if (i === 0 || i % labelStep !== 0 || !p.date) return;
+    ctx.fillText(p.date.slice(5), toX(i), H - pad.bottom + 16);
   });
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  initNav('analytics');
-  fetchTrades();
-});
-</script>
+function renderDonut(trades) {
+  const canvas = document.getElementById('donut-canvas');
+  const legendEl = document.getElementById('donut-legend');
+  if (!canvas || !legendEl) return;
 
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+
+  // Count by instrument
+  const counts = {};
+  trades.forEach(t => { counts[t.instrument] = (counts[t.instrument] || 0) + 1; });
+  const total = trades.length;
+  if (!total) {
+    ctx.fillStyle = '#444';
+    ctx.font = '11px Space Mono';
+    ctx.textAlign = 'center';
+    ctx.fillText('NO DATA', W/2, H/2);
+    legendEl.innerHTML = '';
+    return;
+  }
+
+  const entries = Object.entries(counts).sort((a,b) => b[1]-a[1]);
+  const cx = W/2, cy = H/2, r = Math.min(W,H)/2 - 10, inner = r * 0.58;
+
+  let startAngle = -Math.PI / 2;
+  entries.forEach(([inst, count]) => {
+    const slice = (count / total) * Math.PI * 2;
+    const color = INSTRUMENT_COLORS[inst] || '#888';
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, r, startAngle, startAngle + slice);
+    ctx.closePath();
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(cx, cy, inner, 0, Math.PI * 2);
+    ctx.fillStyle = '#111';
+    ctx.fill();
+    startAngle += slice;
+  });
+
+  // Center text
+  ctx.fillStyle = '#e8e8e8';
+  ctx.font = 'bold 20px Space Mono';
+  ctx.textAlign = 'center';
+  ctx.fillText(total, cx, cy + 4);
+  ctx.fillStyle = '#444';
+  ctx.font = '9px Space Mono';
+  ctx.fillText('TRADES', cx, cy + 18);
+
+  // Legend
+  legendEl.innerHTML = entries.map(([inst, count]) => `
+    <div class="legend-item">
+      <div class="legend-left">
+        <div class="legend-dot" style="background:${INSTRUMENT_COLORS[inst] || '#888'}"></div>
+        <span class="legend-name">${inst}</span>
+      </div>
+      <span class="legend-pct">${count} · ${Math.round((count/total)*100)}%</span>
+    </div>
+  `).join('');
+}
+
+function renderGradeChart(trades) {
+  const canvas = document.getElementById('grade-canvas');
+  if (!canvas) return;
+  canvas.width = canvas.offsetWidth; canvas.height = 180;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+
+  const grades = ['A++','A+','A','B','C','D'];
+  const colors = ['#c8ff00','#00e676','#40c4ff','#ffd740','#ff6d00','#ff4444'];
+  const counts = {};
+  grades.forEach(g => counts[g] = 0);
+  trades.forEach(t => { if (t.grade && counts[t.grade] !== undefined) counts[t.grade]++; });
+
+  const max = Math.max(...Object.values(counts), 1);
+  const pad = { top: 10, right: 16, bottom: 30, left: 30 };
+  const cW = W - pad.left - pad.right;
+  const cH = H - pad.top - pad.bottom;
+  const barW = cW / grades.length * 0.6;
+  const gap = cW / grades.length;
+
+  grades.forEach((g, i) => {
+    const count = counts[g];
+    const x = pad.left + i * gap + gap * 0.2;
+    const barH = count ? (count / max) * cH : 0;
+    const y = pad.top + cH - barH;
+    ctx.fillStyle = colors[i];
+    ctx.globalAlpha = 0.85;
+    ctx.fillRect(x, y, barW, barH);
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = '#444';
+    ctx.font = '9px Space Mono';
+    ctx.textAlign = 'center';
+    ctx.fillText(g, x + barW/2, H - pad.bottom + 14);
+    if (count) {
+      ctx.fillStyle = colors[i];
+      ctx.fillText(count, x + barW/2, y - 4);
+    }
+  });
+}
+
+function renderSessionChart(trades) {
+  const canvas = document.getElementById('session-canvas');
+  if (!canvas) return;
+  canvas.width = canvas.offsetWidth; canvas.height = 180;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+
+  const sessions = ['Asia','London','NY AM','NY Lunch','NY PM','Overnight'];
+  const pnlMap = {};
+  sessions.forEach(s => pnlMap[s] = 0);
+  trades.forEach(t => { if (t.session && pnlMap[t.session] !== undefined) pnlMap[t.session] += t.pnl; });
+
+  const vals = Object.values(pnlMap);
+  const max = Math.max(...vals.map(Math.abs), 1);
+  const pad = { top: 10, right: 16, bottom: 30, left: 50 };
+  const cW = W - pad.left - pad.right;
+  const cH = H - pad.top - pad.bottom;
+  const barW = cW / sessions.length * 0.6;
+  const gap = cW / sessions.length;
+  const zeroY = pad.top + cH / 2;
+
+  ctx.beginPath();
+  ctx.strokeStyle = '#2a2a2a';
+  ctx.lineWidth = 1;
+  ctx.moveTo(pad.left, zeroY);
+  ctx.lineTo(W - pad.right, zeroY);
+  ctx.stroke();
+
+  sessions.forEach((s, i) => {
+    const val = pnlMap[s];
+    const x = pad.left + i * gap + gap * 0.2;
+    const barH = (Math.abs(val) / max) * (cH / 2);
+    const isPos = val >= 0;
+    const y = isPos ? zeroY - barH : zeroY;
+    ctx.fillStyle = isPos ? '#00e676' : '#ff4444';
+    ctx.globalAlpha = 0.8;
+    ctx.fillRect(x, y, barW, barH);
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = '#444';
+    ctx.font = '8px Space Mono';
+    ctx.textAlign = 'center';
+    const label = s.length > 6 ? s.replace('NY ','NY
+') : s;
+    ctx.fillText(s.substring(0,6), x + barW/2, H - pad.bottom + 14);
+    if (val !== 0) {
+      ctx.fillStyle = isPos ? '#00e676' : '#ff4444';
+      ctx.font = '8px Space Mono';
+      const pStr = (isPos?'+':'') + '$' + Math.abs(Math.round(val/1000)) + 'k';
+      ctx.fillText(val > 999 || val < -999 ? pStr : (isPos?'+':'') + '$' + Math.abs(val), x + barW/2, isPos ? y - 4 : y + barH + 10);
+    }
+  });
+}
+
+let calYear = new Date().getFullYear();
+let calMonth = new Date().getMonth();
+
+function changeMonth(dir) {
+  calMonth += dir;
+  if (calMonth > 11) { calMonth = 0; calYear++; }
+  if (calMonth < 0) { calMonth = 11; calYear--; }
+  renderCalendar(allTrades);
+}
+
+function renderCalendar(trades) {
+  const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+  document.getElementById('cal-month-label').textContent = `${MONTHS[calMonth]} ${calYear}`;
+
+  // Build daily P&L map
+  const dailyMap = {};
+  trades.forEach(t => {
+    if (!t.date) return;
+    if (!dailyMap[t.date]) dailyMap[t.date] = { pnl: 0, count: 0 };
+    dailyMap[t.date].pnl += t.pnl;
+    dailyMap[t.date].count++;
+  });
+
+  const firstDay = new Date(calYear, calMonth, 1).getDay();
+  const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+  const today = new Date();
+
+  let html = DAYS.map(d => `<div class="cal-day-header">${d}</div>`).join('');
+
+  // Empty cells before first day
+  for (let i = 0; i < firstDay; i++) {
+    html += `<div class="cal-cell empty"></div>`;
+  }
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isToday = today.getFullYear() === calYear && today.getMonth() === calMonth && today.getDate() === d;
+    const data = dailyMap[dateStr];
+
+    let cellClass = 'cal-cell';
+    if (isToday) cellClass += ' today';
+    if (data) cellClass += ' has-trades';
+
+    let inner = `<div class="cal-date">${d}</div>`;
+    if (data) {
+      const pnlClass = data.pnl >= 0 ? 'pos' : 'neg';
+      const pnlStr = (data.pnl >= 0 ? '+' : '-') + '$' + Math.abs(data.pnl).toLocaleString();
+      inner += `<div class="cal-trades">${data.count} trade${data.count > 1 ? 's' : ''}</div>`;
+      inner += `<div class="cal-pnl ${pnlClass}">${pnlStr}</div>`;
+    }
+
+    html += `<div class="${cellClass}">${inner}</div>`;
+  }
+
+  document.getElementById('cal-grid').innerHTML = html;
+  document.getElementById('cal-panel').style.display = 'block';
+}
+
+function renderAll() {
+  const filtered = filterByPeriod(allTrades, currentPeriod);
+  updateStats(filtered);
+
+  document.getElementById('main-content').innerHTML = `
+    <div class="charts-grid">
+      <div class="chart-panel">
+        <div class="chart-panel-title">Equity Curve</div>
+        <canvas id="equity-canvas" width="700" height="300" style="width:100%;height:300px;"></canvas>
+      </div>
+      <div class="chart-panel">
+        <div class="chart-panel-title">Instruments Traded</div>
+        <div class="donut-wrap">
+          <canvas id="donut-canvas" width="200" height="200"></canvas>
+          <div class="donut-legend" id="donut-legend"></div>
+        </div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);margin-bottom:2rem;">
+      <div class="chart-panel">
+        <div class="chart-panel-title">Grade Distribution</div>
+        <canvas id="grade-canvas" style="width:100%;height:180px;"></canvas>
+      </div>
+      <div class="chart-panel">
+        <div class="chart-panel-title">P&L by Session</div>
+        <canvas id="session-canvas" style="width:100%;height:180px;"></canvas>
+      </div>
+    </div>
+  `;
+
+  const eq = document.getElementById('equity-canvas');
+  eq.width = eq.offsetWidth;
+  eq.height = 300;
+
+  renderEquityChart(filtered);
+  renderDonut(filtered);
+  renderGradeChart(filtered);
+  renderSessionChart(filtered);
+  renderCalendar(filtered);
+}
+
+document.querySelectorAll('.period-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.period-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    currentPeriod = tab.dataset.period;
+    renderAll();
+  });
+});
+
+document.addEventListener('DOMContentLoaded', () => initNav('analytics'));
+fetchTrades();
+</script>
 </body>
 </html>
