@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guide — FTJ</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="nav.js"></script>
+<style>
+  :root {
+    --bg: #0a0a0a; --surface: #111; --surface2: #181818;
+    --border: #1a1a1a; --border2: #2a2a2a;
+    --text: #e8e8e8; --text2: #888; --text3: #444;
+    --green: #00e676; --red: #ff4444; --accent: #c8ff00;
+    --mono: 'Space Mono', monospace; --sans: 'DM Sans', sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 14px; min-height: 100vh; }
+  .page { max-width: 900px; margin: 0 auto; padding: 3rem 2rem; }
+
+  .hero { margin-bottom: 3rem; border-bottom: 1px solid var(--border); padding-bottom: 2rem; }
+  .eyebrow { font-family: var(--mono); font-size: 10px; letter-spacing: 0.2em; color: var(--accent); text-transform: uppercase; margin-bottom: 10px; }
+  .hero-title { font-family: var(--mono); font-size: 32px; font-weight: 700; line-height: 1.1; margin-bottom: 12px; }
+  .hero-sub { font-size: 14px; color: var(--text2); line-height: 1.8; max-width: 600px; }
+
+  .section { margin-bottom: 3rem; }
+  .section-title { font-family: var(--mono); font-size: 11px; letter-spacing: 0.2em; color: var(--accent); text-transform: uppercase; margin-bottom: 1.25rem; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+
+  .info-block { background: var(--surface); border: 1px solid var(--border); padding: 1.25rem 1.5rem; margin-bottom: 1px; }
+  .info-block-title { font-family: var(--mono); font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+  .info-block-body { font-size: 13px; color: var(--text2); line-height: 1.8; }
+  .info-block-body ul { list-style: none; margin-top: 6px; display: flex; flex-direction: column; gap: 4px; }
+  .info-block-body ul li::before { content: '—'; color: var(--accent); margin-right: 8px; font-family: var(--mono); font-size: 11px; }
+
+  /* Grade cards */
+  .grades-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1px; background: var(--border); }
+  .grade-card { background: var(--surface); padding: 1.25rem; display: flex; flex-direction: column; gap: 8px; }
+  .grade-card:hover { background: var(--surface2); }
+  .grade-pill { font-family: var(--mono); font-size: 13px; font-weight: 700; padding: 4px 12px; border: 1px solid; display: inline-block; margin-bottom: 4px; }
+  .pill-app { color: #c8ff00; border-color: rgba(200,255,0,0.4); background: rgba(200,255,0,0.07); }
+  .pill-ap  { color: #00e676; border-color: rgba(0,230,118,0.4); background: rgba(0,230,118,0.07); }
+  .pill-a   { color: #40c4ff; border-color: rgba(64,196,255,0.4); background: rgba(64,196,255,0.07); }
+  .pill-b   { color: #ffd740; border-color: rgba(255,215,64,0.4); background: rgba(255,215,64,0.07); }
+  .pill-c   { color: #ff6d00; border-color: rgba(255,109,0,0.4); background: rgba(255,109,0,0.07); }
+  .pill-d   { color: #ff4444; border-color: rgba(255,68,68,0.4); background: rgba(255,68,68,0.07); }
+  .grade-label { font-family: var(--mono); font-size: 11px; color: var(--text); margin-bottom: 2px; }
+  .grade-desc { font-size: 12px; color: var(--text2); line-height: 1.6; }
+  .grade-reqs { list-style: none; display: flex; flex-direction: column; gap: 3px; margin-top: 6px; }
+  .grade-reqs li { font-size: 11px; color: var(--text3); display: flex; gap: 6px; }
+  .grade-reqs li::before { content: '✓'; color: var(--accent); font-family: var(--mono); flex-shrink: 0; }
+
+  /* Page cards */
+  .page-cards { display: grid; grid-template-columns: 1fr; gap: 1px; background: var(--border); }
+  .page-card { background: var(--surface); padding: 1.5rem; }
+  .page-card:hover { background: var(--surface2); }
+  .page-card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .page-icon { font-size: 20px; }
+  .page-card-title { font-family: var(--mono); font-size: 14px; font-weight: 700; color: var(--text); }
+  .page-card-sub { font-size: 12px; color: var(--text3); margin-top: 2px; }
+  .page-card-body { font-size: 13px; color: var(--text2); line-height: 1.8; }
+  .page-card-body ul { list-style: none; display: flex; flex-direction: column; gap: 5px; margin-top: 8px; }
+  .page-card-body ul li { display: flex; gap: 8px; }
+  .page-card-body ul li::before { content: '→'; color: var(--accent); font-family: var(--mono); font-size: 11px; flex-shrink: 0; margin-top: 2px; }
+
+  .divider { height: 1px; background: var(--border); margin: 2.5rem 0; }
+
+  .tip-box { background: rgba(200,255,0,0.04); border: 1px solid rgba(200,255,0,0.15); padding: 1rem 1.25rem; display: flex; gap: 12px; align-items: flex-start; margin-top: 1rem; }
+  .tip-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+  .tip-text { font-size: 12px; color: var(--text2); line-height: 1.7; }
+
+  @media (max-width: 600px) { .page { padding: 2rem 1rem; } .grades-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="hero">
+    <div class="eyebrow">// Futures Trade Journal</div>
+    <div class="hero-title">Welcome to FTJ</div>
+    <div class="hero-sub">This is a personal trade journaling system built around ICT concepts and Dodgy's iFVG Ultimate+ model. Every trade logged here is analysed, graded, and verified against a strict rulebook to help build consistency and discipline over time.</div>
+    <div class="tip-box" style="margin-top:1.25rem;">
+      <div class="tip-icon">💡</div>
+      <div class="tip-text">This site is live and connected directly to a Notion database. Every trade logged in Notion automatically appears here. Use the nav on the left to move between pages.</div>
+    </div>
+  </div>
+
+  <!-- SETUP GRADES -->
+  <div class="section">
+    <div class="section-title">Setup Grades — What Each Grade Means</div>
+    <p style="font-size:13px;color:var(--text2);line-height:1.8;margin-bottom:1.25rem;">Every trade is graded based on how many ICT and Dodgy iFVG confluences align at the time of entry. Grading is strict — the goal is to only be taking A+ and above setups consistently.</p>
+
+    <div class="grades-grid">
+      <div class="grade-card">
+        <div class="grade-pill pill-app">A++</div>
+        <div class="grade-label">Elite Setup</div>
+        <div class="grade-desc">The highest possible grade. Everything aligned perfectly — HTF bias, liquidity sweep, PDA entry, MSS/CHoCH, clear target, kill zone timing, and volume confirmation.</div>
+        <ul class="grade-reqs">
+          <li>HTF bias confirmed top-down</li>
+          <li>Liquidity sweep (BSL/SSL) present</li>
+          <li>IFVG or FVG entry</li>
+          <li>MSS or CHoCH confirmation</li>
+          <li>Clear liquidity target</li>
+          <li>Kill zone timing</li>
+          <li>SMT divergence or volume</li>
+        </ul>
+      </div>
+
+      <div class="grade-card">
+        <div class="grade-pill pill-ap">A+</div>
+        <div class="grade-label">Strong Setup</div>
+        <div class="grade-desc">Nearly perfect. All major confluences present but missing one minor element (e.g. no kill zone, or no volume confirmation). These are high-confidence trades.</div>
+        <ul class="grade-reqs">
+          <li>HTF bias confirmed</li>
+          <li>Liquidity sweep preferred</li>
+          <li>IFVG/FVG or OB entry</li>
+          <li>At least 4-5 strong confluences</li>
+          <li>Clear target identified</li>
+        </ul>
+      </div>
+
+      <div class="grade-card">
+        <div class="grade-pill pill-a">A</div>
+        <div class="grade-label">Good Setup</div>
+        <div class="grade-desc">Solid trade with good confluences but missing 2 key elements or HTF alignment is not perfect. Still a tradeable setup but with more caution.</div>
+        <ul class="grade-reqs">
+          <li>General bias known</li>
+          <li>PDA array entry present</li>
+          <li>3-4 confluences aligned</li>
+          <li>Target is somewhat clear</li>
+        </ul>
+      </div>
+
+      <div class="grade-card">
+        <div class="grade-pill pill-b">B</div>
+        <div class="grade-label">Average Setup</div>
+        <div class="grade-desc">Decent setup but missing several key confluences or entered without full top-down confirmation. These trades often work but are not ideal and should be reviewed carefully.</div>
+        <ul class="grade-reqs">
+          <li>Some bias present</li>
+          <li>Entry on a PDA but not preferred</li>
+          <li>2-3 confluences only</li>
+          <li>Target unclear or assumed</li>
+        </ul>
+      </div>
+
+      <div class="grade-card">
+        <div class="grade-pill pill-c">C</div>
+        <div class="grade-label">Weak Setup</div>
+        <div class="grade-desc">Low quality trade. Entered without proper analysis or against the model. Often results in poor RR or stops being hit. These trades should be avoided entirely.</div>
+        <ul class="grade-reqs">
+          <li>Bias unclear or ignored</li>
+          <li>Entry not on a clear PDA</li>
+          <li>1-2 confluences only</li>
+          <li>No clear target</li>
+        </ul>
+      </div>
+
+      <div class="grade-card">
+        <div class="grade-pill pill-d">D</div>
+        <div class="grade-label">Poor Setup — Avoid</div>
+        <div class="grade-desc">No business being in this trade. Emotional entry, revenge trade, FOMO, or complete disregard for the model. These trades damage the account and the mindset.</div>
+        <ul class="grade-reqs">
+          <li>No HTF bias considered</li>
+          <li>Random entry with no PDA</li>
+          <li>Emotional or impulsive</li>
+          <li>Rule violations present</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- PAGE GUIDES -->
+  <div class="section">
+    <div class="section-title">Page Guide — How To Use Each Page</div>
+    <div class="page-cards">
+
+      <div class="page-card">
+        <div class="page-card-header">
+          <div class="page-icon">◈</div>
+          <div>
+            <div class="page-card-title">Journal</div>
+            <div class="page-card-sub">index.html — Your trade logbook</div>
+          </div>
+        </div>
+        <div class="page-card-body">
+          Every trade logged in Notion appears here as a card. Each card shows all trade details at a glance.
+          <ul>
+            <li>Use the filters at the top to search by session, instrument, grade, confluences, outcome, rule status, or date</li>
+            <li>The <strong>Setup Grade</strong> badge (A++ to D) shows how strong the setup was at entry</li>
+            <li>The <strong>Followed Rules</strong> badge (✅ / ⚠️ / ❌) shows whether your trading rules were respected</li>
+            <li>Click <strong>⚡ Verify Rules</strong> on any card to run an AI analysis of the trade against your rulebook — it will highlight faults and what you did right</li>
+            <li>If a TradingView screenshot link was logged, it appears as a clickable button. Imgur image links display inline on the card</li>
+            <li>The stats bar at the top updates live based on your active filters</li>
+          </ul>
+          <div class="tip-box">
+            <div class="tip-icon">💡</div>
+            <div class="tip-text">The confluence filter lets you select multiple confluences at once to find all trades where those setups appeared.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page-card" style="margin-top:1px;">
+        <div class="page-card-header">
+          <div class="page-icon">◉</div>
+          <div>
+            <div class="page-card-title">Rules</div>
+            <div class="page-card-sub">rules.html — Your trading rulebook</div>
+          </div>
+        </div>
+        <div class="page-card-body">
+          A clean reference for all 13 trading rules built around the ICT model and Dodgy's iFVG Ultimate+ system.
+          <ul>
+            <li>Rules tagged <span style="color:#ff4444;font-family:var(--mono);font-size:10px;">REQUIRED</span> are non-negotiable — breaking these will flag your trade as ❌</li>
+            <li>Rules tagged <span style="color:#ffab40;font-family:var(--mono);font-size:10px;">PREFERRED</span> are best practice — missing these may flag as ⚠️</li>
+            <li>Rules tagged <span style="color:var(--text3);font-family:var(--mono);font-size:10px;">WORK IN PROGRESS</span> are areas still being developed (e.g. mental discipline)</li>
+            <li>The AI verification on the journal page uses these exact rules to grade every trade</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="page-card" style="margin-top:1px;">
+        <div class="page-card-header">
+          <div class="page-icon">◐</div>
+          <div>
+            <div class="page-card-title">Analytics</div>
+            <div class="page-card-sub">analytics.html — Performance dashboard</div>
+          </div>
+        </div>
+        <div class="page-card-body">
+          A visual overview of trading performance over time. All charts update automatically from your Notion data.
+          <ul>
+            <li>Use the <strong>period tabs</strong> (All / Week / Month / 3M) to filter the entire dashboard to a time range</li>
+            <li>The <strong>equity curve</strong> shows your cumulative P&L growing or falling over time — the shape of this line tells you everything about your consistency</li>
+            <li>The <strong>donut chart</strong> shows which instruments you trade most and what percentage of your trades each represents</li>
+            <li>The <strong>P&L calendar</strong> shows your daily profit or loss for each day — green days are profitable, red days are losses. Use the arrows to navigate between months</li>
+            <li>The stats bar shows total trades, win rate, total P&L, average P&L per trade, and your best single trade</li>
+          </ul>
+          <div class="tip-box">
+            <div class="tip-icon">💡</div>
+            <div class="tip-text">A rising equity curve with small drawdowns means you are being consistent. A jagged curve with large swings means position sizing or rule adherence needs work.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- WHAT TO KNOW -->
+  <div class="section">
+    <div class="section-title">Key Terms & Concepts</div>
+    <div style="display:flex;flex-direction:column;gap:1px;background:var(--border);">
+
+      <div class="info-block">
+        <div class="info-block-title">PDA Array (Premium / Discount Array)</div>
+        <div class="info-block-body">A zone on the chart where price is likely to react. Examples: FVG, IFVG, Order Block, Breaker Block, Mitigation Block. These are the core entry tools in ICT methodology.</div>
+      </div>
+      <div class="info-block">
+        <div class="info-block-title">IFVG — Inverse Fair Value Gap</div>
+        <div class="info-block-body">A previously filled FVG that has been "inverted" and now acts as a support or resistance zone. Central to Dodgy's iFVG Ultimate+ model. Preferred entry for tightest stop placement.</div>
+      </div>
+      <div class="info-block">
+        <div class="info-block-title">FVG — Fair Value Gap</div>
+        <div class="info-block-body">A 3-candle imbalance where the middle candle's body leaves a gap between the wicks of the first and third candle. Price tends to return to fill these gaps before continuing.</div>
+      </div>
+      <div class="info-block">
+        <div class="info-block-title">MSS — Market Structure Shift</div>
+        <div class="info-block-body">A change in the direction of market structure. A bullish MSS occurs when price breaks above a prior swing high after a downtrend. A bearish MSS breaks a prior swing low. Used to confirm bias change.</div>
+      </div>
+      <div class="info-block">
+        <div class="info-block-title">SMT — Smart Money Tool / Divergence</div>
+        <div class="info-block-body">When two correlated instruments (e.g. NQ and ES) fail to make the same high or low together. This divergence signals that one market is being manipulated and a reversal is likely.</div>
+      </div>
+      <div class="info-block">
+        <div class="info-block-title">Liquidity Sweep / BSL & SSL</div>
+        <div class="info-block-body">BSL (Buy-Side Liquidity) sits above swing highs where stop losses cluster. SSL (Sell-Side Liquidity) sits below swing lows. Smart money sweeps these levels before reversing — this sweep is a preferred entry signal.</div>
+      </div>
+      <div class="info-block">
+        <div class="info-block-title">HTF PDA Delivery</div>
+        <div class="info-block-body">Price delivering into a higher timeframe (Daily, 4H, 1H) Premium or Discount Array. This gives the trade a strong institutional reason for the reaction, greatly increasing confluence.</div>
+      </div>
+      <div class="info-block">
+        <div class="info-block-title">Kill Zone</div>
+        <div class="info-block-body">Specific session windows where institutional order flow is highest. London Open (2–5 AM EST) and NY AM (9:30–11 AM EST) are the primary kill zones used in this journal.</div>
+      </div>
+      <div class="info-block">
+        <div class="info-block-title">Power of 3 (PO3)</div>
+        <div class="info-block-body">ICT's model of Accumulation → Manipulation → Distribution within a session. Price first moves one way to grab liquidity (the Judas Swing), then reverses to deliver to the real target.</div>
+      </div>
+      <div class="info-block">
+        <div class="info-block-title">R:R — Risk to Reward</div>
+        <div class="info-block-body">The ratio of potential loss (stop loss distance) to potential gain (take profit distance). A 1:3 R:R means risking $1 to make $3. Higher R:R setups are preferred, especially on A+ and above grades.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+<script>
+  document.addEventListener('DOMContentLoaded', () => initNav('info'));
+</script>
+</body>
+</html>
