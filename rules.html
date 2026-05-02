@@ -331,10 +331,93 @@
     </div>
 
   </div>
+
+  <div style="margin-top:2rem;">
+    <div class="section-title" style="font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:#ff4444;text-transform:uppercase;margin-bottom:1.25rem;padding-bottom:8px;border-bottom:1px solid var(--border);">⚠ Rule Breach Tracker</div>
+    <div id="breach-empty" style="font-family:var(--mono);font-size:11px;color:var(--text3);letter-spacing:0.08em;">Loading breach data...</div>
+    <div id="breach-list" style="display:flex;flex-direction:column;gap:1px;background:var(--border);"></div>
+  </div>
 </div>
 
 <script>
-  document.addEventListener('DOMContentLoaded', () => initNav('rules'));
+const WORKER_URL = "https://trade-journal-proxy.daniel-mouldd.workers.dev";
+const DATABASE_ID = "5398f956345943b7b12b2298bbb6e127";
+
+async function loadBreaches() {
+  try {
+    const res = await fetch(`${WORKER_URL}/notion/databases/${DATABASE_ID}/query`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ page_size: 100 })
+    });
+    const data = await res.json();
+    const trades = (data.results || []).map(p => ({
+      notes: (p.properties['Notes']?.rich_text||[]).map(r=>r.plain_text).join(''),
+      mistakes: (p.properties['Mistakes']?.rich_text||[]).map(r=>r.plain_text).join(''),
+      lessons: (p.properties['Lessons Learned']?.rich_text||[]).map(r=>r.plain_text).join(''),
+    }));
+
+    const breaches = {
+      'Stop Loss Management': { count: 0, desc: 'Moving SL to BE without close above, or removing SL prematurely' },
+      'HTF Bias Alignment': { count: 0, desc: 'Trading against HTF bias or not confirming bias top-down before entry' },
+      'Trailing Too Soon': { count: 0, desc: 'Trailing stop too early or too tight, hitting TSL before reaching TP' },
+      'Impatient / FOMO Entry': { count: 0, desc: 'Entering before confirmation or chasing missed moves' },
+      'Overtrading': { count: 0, desc: 'Taking more trades than allowed or trading after stop conditions met' },
+      'Scale-in Discipline': { count: 0, desc: 'Adding contracts on non A+ setups or without proper retracement into PDA' },
+      'No Clear Target': { count: 0, desc: 'Entering without a defined liquidity or PDA target' },
+      'News Discipline': { count: 0, desc: 'Trading high impact news on weak setups' },
+    };
+
+    trades.forEach(t => {
+      const text = (t.mistakes + ' ' + t.notes + ' ' + t.lessons).toLowerCase();
+      if (text.match(/stop.*(be|breakeven|moved|early)/)||text.match(/(be|breakeven).*stop/)) breaches['Stop Loss Management'].count++;
+      if (text.match(/bias|htf|against|bearish.*long|bullish.*short/)) breaches['HTF Bias Alignment'].count++;
+      if (text.match(/trail.*(soon|tight|early|tsl)|tsl.*(early|soon)/)) breaches['Trailing Too Soon'].count++;
+      if (text.match(/fomo|impatient|patient|chased|missed|too early/)) breaches['Impatient / FOMO Entry'].count++;
+      if (text.match(/overtrad|too many|extra trade/)) breaches['Overtrading'].count++;
+      if (text.match(/scale|second contract|2nd contract/)) breaches['Scale-in Discipline'].count++;
+      if (text.match(/no target|into void|no clear/)) breaches['No Clear Target'].count++;
+      if (text.match(/news/)) breaches['News Discipline'].count++;
+    });
+
+    const sorted = Object.entries(breaches).filter(([,v])=>v.count>0).sort((a,b)=>b[1].count-a[1].count);
+    const emptyEl = document.getElementById('breach-empty');
+    const listEl = document.getElementById('breach-list');
+
+    if (!sorted.length) {
+      emptyEl.textContent = 'No rule breaches detected in your trade data yet. Keep logging!';
+      return;
+    }
+
+    emptyEl.style.display = 'none';
+    const max = sorted[0][1].count;
+
+    listEl.innerHTML = sorted.map(([rule, data]) => {
+      const pct = Math.round((data.count / trades.length) * 100);
+      const barW = Math.round((data.count / max) * 100);
+      return `<div style="background:var(--surface);padding:1.25rem 1.5rem;display:grid;grid-template-columns:200px 1fr auto;gap:0 1.5rem;align-items:center;">
+        <div>
+          <div style="font-family:var(--mono);font-size:12px;font-weight:700;color:var(--text);margin-bottom:3px;">${rule}</div>
+          <div style="font-size:11px;color:var(--text3);line-height:1.5;">${data.desc}</div>
+        </div>
+        <div>
+          <div style="height:4px;background:var(--border2);border-radius:2px;overflow:hidden;margin-bottom:4px;">
+            <div style="height:100%;width:${barW}%;background:#ff4444;border-radius:2px;transition:width 0.4s;"></div>
+          </div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--text3);">${pct}% of trades</div>
+        </div>
+        <div style="font-family:var(--mono);font-size:20px;font-weight:700;color:#ff4444;">${data.count}x</div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    document.getElementById('breach-empty').textContent = 'Could not load breach data: ' + e.message;
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  initNav('rules');
+  loadBreaches();
+});
 </script>
 </body>
 </html>
