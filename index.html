@@ -652,10 +652,6 @@
     <select id="f-date" onchange="renderAll()"><option value="">All dates</option></select>
   </div>
 
-  <div id="rule-breacher" style="display:none;margin-bottom:1.5rem;background:var(--surface);border:1px solid var(--border2);padding:1rem 1.25rem;">
-    <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--accent);text-transform:uppercase;margin-bottom:10px;">⚠ Rule Breach Tracker</div>
-    <div id="rule-breacher-content" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
-  </div>
   <div class="results-count" id="results-count"></div>
   <div class="badge-legend">
     <span class="badge-legend-title">Legend:</span>
@@ -1172,20 +1168,6 @@ function renderAll() {
   updateStats(filtered);
   document.getElementById("results-count").textContent = `${filtered.length} trade${filtered.length !== 1 ? "s" : ""}`;
 
-  // Rule breacher
-  const breaches = getRuleBreaches();
-  const bPanel = document.getElementById('rule-breacher');
-  const bContent = document.getElementById('rule-breacher-content');
-  if (breaches.length) {
-    bPanel.style.display = 'block';
-    bContent.innerHTML = breaches.map(([rule, count]) =>
-      `<div style="font-family:var(--mono);font-size:10px;padding:4px 10px;border:1px solid rgba(255,68,68,0.3);background:rgba(255,68,68,0.05);color:#ff4444;">
-        ${rule} <span style="color:var(--text3);margin-left:6px;">${count}x</span>
-      </div>`
-    ).join('');
-  } else {
-    bPanel.style.display = 'none';
-  }
   if (!filtered.length) {
     document.getElementById("main").innerHTML = `<div class="empty-state">No trades match your filters</div>`;
     return;
