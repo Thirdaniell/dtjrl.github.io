@@ -475,6 +475,16 @@
       <option value="Closed - Loss">Loss</option>
       <option value="Breakeven">Breakeven</option>
     </select>
+    <select id="f-grade" onchange="renderAll()">
+      <option value="">All grades</option>
+      <option>A++</option><option>A+</option><option>A</option><option>B</option><option>C</option><option>D</option>
+    </select>
+    <select id="f-rules" onchange="renderAll()">
+      <option value="">All rule status</option>
+      <option value="Yes ✅">Followed ✅</option>
+      <option value="Partially ⚠️">Partially ⚠️</option>
+      <option value="No ❌">Broken ❌</option>
+    </select>
     <select id="f-date" onchange="renderAll()"><option value="">All dates</option></select>
   </div>
 
@@ -628,6 +638,8 @@ function getFiltered() {
   const dir = document.getElementById("f-dir").value;
   const inst = document.getElementById("f-inst").value;
   const outcome = document.getElementById("f-outcome").value;
+  const grade = document.getElementById("f-grade").value;
+  const rules = document.getElementById("f-rules").value;
   const date = document.getElementById("f-date").value;
 
   return allTrades.filter(t => {
@@ -636,6 +648,8 @@ function getFiltered() {
     if (dir && t.direction !== dir) return false;
     if (inst && t.instrument !== inst) return false;
     if (outcome && t.status !== outcome) return false;
+    if (grade && t.grade !== grade) return false;
+    if (rules && t.followedRules !== rules) return false;
     if (date && t.date !== date) return false;
     return true;
   });
