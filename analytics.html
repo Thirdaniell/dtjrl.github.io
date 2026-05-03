@@ -48,10 +48,11 @@
   .period-tab:hover { color: var(--text2); }
   .period-tab.active { background: var(--surface2); color: var(--accent); }
 
-  .stats-row { display: grid; grid-template-columns: repeat(8, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); margin-bottom: 2rem; }
+  .stats-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); margin-bottom: 2rem; }
   .stat { background: var(--surface); padding: 1.25rem 1.5rem; }
   .stat-label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em; color: var(--text3); text-transform: uppercase; margin-bottom: 8px; }
-  .stat-value { font-family: var(--mono); font-size: 20px; font-weight: 700; color: var(--text); }
+  .stat-value { font-family: var(--mono); font-size: 18px; font-weight: 700; color: var(--text); line-height: 1.2; }
+  .stat-sub { font-family: var(--mono); font-size: 9px; color: var(--text3); margin-top: 3px; letter-spacing: 0.08em; }
   .stat-value.pos { color: var(--green); }
   .stat-value.neg { color: var(--red); }
 
@@ -113,7 +114,7 @@
 
   @media (max-width: 900px) {
     .charts-grid { grid-template-columns: 1fr; }
-    .stats-row { grid-template-columns: repeat(4, 1fr); }
+    .stats-row { grid-template-columns: repeat(3, 1fr); }
   }
   @media (max-width: 600px) {
     .page { padding: 2rem 1rem; }
@@ -151,8 +152,8 @@
     <div class="stat"><div class="stat-label">Win Streak</div><div class="stat-value pos" id="s-wstreak">—</div></div>
     <div class="stat"><div class="stat-label">Loss Streak</div><div class="stat-value neg" id="s-lstreak">—</div></div>
     <div class="stat"><div class="stat-label">Best Session</div><div class="stat-value" id="s-session">—</div></div>
-    <div class="stat"><div class="stat-label">Avg R:R</div><div class="stat-value" id="s-rr">—</div></div>
-    <div class="stat"><div class="stat-label">Avg Duration</div><div class="stat-value" id="s-dur">—</div></div>
+    <div class="stat"><div class="stat-label">Avg R:R</div><div class="stat-value" id="s-rr">—</div><div class="stat-sub">risk to reward</div></div>
+    <div class="stat"><div class="stat-label">Avg Duration</div><div class="stat-value" id="s-dur">—</div><div class="stat-sub">time in trade</div></div>
   </div>
 
   <div id="main-content"><div class="loading-state">Loading analytics <span>...</span></div></div>
@@ -204,9 +205,45 @@ async function fetchTrades() {
         direction: p['Direction']?.select?.name || '',
         timeframe: p['Timeframe']?.select?.name || '',
         confluences: p['Confluences']?.multi_select?.map(o => o.name) || [],
-        rr: p['R:R']?.number,
-        duration: p['Duration (mins)']?.number,
+        rrStored: p['R:R']?.number,
+        durationStored: p['Duration (mins)']?.number,
+        entryPrice: p['Entry Price']?.number,
+        exitPrice: p['Exit Price']?.number,
+        stopLoss: p['Stop Loss']?.number,
+        takeProfit: p['Take Profit']?.number,
+        entryTime: (p['Entry Time']?.rich_text||[]).map(r=>r.plain_text).join(''),
+        exitTime: (p['Exit Time']?.rich_text||[]).map(r=>r.plain_text).join(''),
       };
+    }).map(t => {
+      // Auto-calculate R:R from entry/SL/TP if not stored
+      if (t.rrStored != null) {
+        t.rr = t.rrStored;
+      } else if (t.entryPrice != null && t.stopLoss != null && t.takeProfit != null) {
+        const risk = Math.abs(t.entryPrice - t.stopLoss);
+        const reward = Math.abs(t.takeProfit - t.entryPrice);
+        t.rr = risk > 0 ? Math.round((reward / risk) * 100) / 100 : null;
+      } else {
+        t.rr = null;
+      }
+      // Auto-calculate duration from entry/exit time if not stored
+      if (t.durationStored != null) {
+        t.duration = t.durationStored;
+      } else if (t.entryTime && t.exitTime) {
+        const parseTime = s => {
+          const m = s.match(/(\d{1,2}):(\d{2})\s*(AM|PM)?/i);
+          if (!m) return null;
+          let h = parseInt(m[1]), min = parseInt(m[2]);
+          const ap = (m[3]||'').toUpperCase();
+          if (ap === 'PM' && h < 12) h += 12;
+          if (ap === 'AM' && h === 12) h = 0;
+          return h * 60 + min;
+        };
+        const eMin = parseTime(t.entryTime), xMin = parseTime(t.exitTime);
+        t.duration = (eMin != null && xMin != null && xMin > eMin) ? xMin - eMin : null;
+      } else {
+        t.duration = null;
+      }
+      return t;
     }).filter(t => t.date).sort((a,b) => a.date.localeCompare(b.date));
 
     renderAll();
@@ -276,6 +313,13 @@ function updateStats(trades) {
   const durs = trades.filter(t => t.duration != null).map(t => t.duration);
   const avgDur = durs.length ? Math.round(durs.reduce((a,b)=>a+b,0)/durs.length) : null;
   setText('s-dur', avgDur ? (avgDur < 60 ? avgDur + 'm' : Math.floor(avgDur/60) + 'h ' + (avgDur%60) + 'm') : '—');
+
+  // Update stat font size for long values
+  ['s-rr','s-dur','s-wstreak','s-lstreak'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el && el.textContent.length > 5) el.style.fontSize = '14px';
+    else if (el) el.style.fontSize = '';
+  });
 
 
 }
