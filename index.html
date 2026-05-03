@@ -649,8 +649,11 @@
       <option value="pnl-high">Highest P&L</option>
       <option value="pnl-low">Lowest P&L</option>
     </select>
-    <input type="date" id="f-date-from" onchange="renderAll()" style="font-family:var(--mono);font-size:11px;background:var(--surface);border:1px solid var(--border2);color:var(--text);padding:8px 12px;outline:none;flex:1;min-width:130px;transition:border-color 0.15s;" title="From date">
-    <input type="date" id="f-date-to" onchange="renderAll()" style="font-family:var(--mono);font-size:11px;background:var(--surface);border:1px solid var(--border2);color:var(--text);padding:8px 12px;outline:none;flex:1;min-width:130px;transition:border-color 0.15s;" title="To date">
+    <div style="display:flex;align-items:center;gap:4px;flex:1;min-width:240px;">
+      <input type="date" id="f-date-from" onchange="renderAll()" title="From date" style="font-family:var(--mono);font-size:11px;background:var(--surface);border:1px solid var(--border2);color:var(--text);padding:8px 10px;outline:none;flex:1;transition:border-color 0.15s;">
+      <span style="font-family:var(--mono);font-size:10px;color:var(--text3);flex-shrink:0;">→</span>
+      <input type="date" id="f-date-to" onchange="renderAll()" title="To date" style="font-family:var(--mono);font-size:11px;background:var(--surface);border:1px solid var(--border2);color:var(--text);padding:8px 10px;outline:none;flex:1;transition:border-color 0.15s;">
+    </div>
   </div>
 
   <div class="results-count" id="results-count"></div>
