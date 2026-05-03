@@ -157,17 +157,7 @@
 
   <div id="main-content"><div class="loading-state">Loading analytics <span>...</span></div></div>
 
-  <div class="cal-panel" id="cal-panel" style="display:none;">
-    <div class="cal-header">
-      <div class="chart-panel-title" style="margin:0;">Daily P&L Calendar</div>
-      <div class="cal-nav">
-        <button class="cal-nav-btn" onclick="changeMonth(-1)">&#8592;</button>
-        <div class="cal-month-label" id="cal-month-label"></div>
-        <button class="cal-nav-btn" onclick="changeMonth(1)">&#8594;</button>
-      </div>
-    </div>
-    <div class="cal-grid" id="cal-grid"></div>
-  </div>
+<!-- calendar rendered dynamically inside main-content -->
 </div>
 
 <script>
@@ -758,10 +748,36 @@ function changeMonth(dir) {
 }
 
 function renderCalendar(trades) {
+  // Insert calendar after monthly-panel if not already there
+  const monthly = document.getElementById('monthly-panel');
+  if (monthly && !document.getElementById('cal-panel-inner')) {
+    const calDiv = document.createElement('div');
+    calDiv.id = 'cal-panel-inner';
+    calDiv.className = 'cal-panel';
+    calDiv.style.cssText = 'margin-top:1px;border:none;';
+    calDiv.innerHTML = `
+      <div class="cal-header">
+        <div class="chart-panel-title" style="margin:0;">Daily P&L Calendar</div>
+        <div class="cal-nav">
+          <button class="cal-nav-btn" onclick="changeMonth(-1)">&#8592;</button>
+          <div class="cal-month-label" id="cal-month-label-inner"></div>
+          <button class="cal-nav-btn" onclick="changeMonth(1)">&#8594;</button>
+        </div>
+      </div>
+      <div class="cal-grid" id="cal-grid-inner"></div>`;
+    monthly.insertAdjacentElement('afterend', calDiv);
+  }
+  // Use inner elements if available
+  const monthLabelEl = document.getElementById('cal-month-label-inner') || document.getElementById('cal-month-label');
+  const gridEl = document.getElementById('cal-grid-inner') || document.getElementById('cal-grid');
+  if (!monthLabelEl || !gridEl) return;
+  _renderCalendarInto(trades, monthLabelEl, gridEl);
+}
+function _renderCalendarInto(trades, monthLabelEl, gridEl) {
   const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
   const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
-  document.getElementById('cal-month-label').textContent = `${MONTHS[calMonth]} ${calYear}`;
+  monthLabelEl.textContent = `${MONTHS[calMonth]} ${calYear}`;
 
   // Build daily P&L map
   const dailyMap = {};
@@ -803,8 +819,7 @@ function renderCalendar(trades) {
     html += `<div class="${cellClass}">${inner}</div>`;
   }
 
-  document.getElementById('cal-grid').innerHTML = html;
-  document.getElementById('cal-panel').style.display = 'block';
+  gridEl.innerHTML = html;
 }
 
 function renderAll() {
@@ -815,7 +830,7 @@ function renderAll() {
     <div class="charts-grid">
       <div class="chart-panel">
         <div class="chart-panel-title">Equity Curve</div>
-        <canvas id="equity-canvas" width="700" height="300" style="width:100%;height:300px;"></canvas>
+        <canvas id="equity-canvas" style="width:100%;height:300px;"></canvas>
       </div>
       <div class="chart-panel">
         <div class="chart-panel-title">Instruments Traded</div>
@@ -825,36 +840,39 @@ function renderAll() {
         </div>
       </div>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);margin-bottom:2rem;">
+    <div id="monthly-panel" class="chart-panel" style="margin-top:1px;">
+      <div class="chart-panel-title">Monthly P&L Summary</div>
+      <div id="monthly-table" style="overflow-x:auto;"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);margin-top:1px;">
       <div class="chart-panel">
         <div class="chart-panel-title">Grade Distribution</div>
-        <canvas id="grade-canvas" style="width:100%;height:180px;"></canvas>
+        <canvas id="grade-canvas" style="width:100%;height:220px;"></canvas>
       </div>
       <div class="chart-panel">
         <div class="chart-panel-title">P&L by Session</div>
-        <canvas id="session-canvas" style="width:100%;height:180px;"></canvas>
+        <canvas id="session-canvas" style="width:100%;height:220px;"></canvas>
       </div>
     </div>
-      <div class="chart-panel">
-        <div class="chart-panel-title">Confluence Win Rate</div>
-        <canvas id="conf-canvas" width="700" height="280" style="width:100%;height:280px;"></canvas>
-      </div>
-      <div class="chart-panel">
-        <div class="chart-panel-title">Monthly P&L Summary</div>
-        <div id="monthly-table" style="overflow-x:auto;"></div>
-      </div>
+    <div class="chart-panel" style="margin-top:1px;">
+      <div class="chart-panel-title">Confluence Win Rate</div>
+      <canvas id="conf-canvas" style="width:100%;height:280px;"></canvas>
     </div>
   `;
 
-  const eq = document.getElementById('equity-canvas');
-  eq.width = eq.offsetWidth;
-  eq.height = 300;
-
-  renderEquityChart(filtered);
-  renderDonut(filtered);
-  renderGradeChart(filtered);
-  renderSessionChart(filtered);
-  renderCalendar(filtered);
+  requestAnimationFrame(() => {
+    const eq = document.getElementById('equity-canvas');
+    if (eq) { eq.width = eq.offsetWidth; eq.height = 300; renderEquityChart(filtered); }
+    renderDonut(filtered);
+    renderMonthly(filtered);
+    renderCalendar(filtered);
+    const gradeC = document.getElementById('grade-canvas');
+    if (gradeC) { gradeC.width = gradeC.offsetWidth; gradeC.height = 220; renderGradeDist(filtered); }
+    const sessC = document.getElementById('session-canvas');
+    if (sessC) { sessC.width = sessC.offsetWidth; sessC.height = 220; renderSessionPnl(filtered); }
+    const confC = document.getElementById('conf-canvas');
+    if (confC) { confC.width = confC.offsetWidth; confC.height = 280; renderConfWinRate(filtered); }
+  });
 }
 
 document.querySelectorAll('.period-tab').forEach(tab => {
