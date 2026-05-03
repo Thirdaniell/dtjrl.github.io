@@ -649,7 +649,8 @@
       <option value="pnl-high">Highest P&L</option>
       <option value="pnl-low">Lowest P&L</option>
     </select>
-    <select id="f-date" onchange="renderAll()"><option value="">All dates</option></select>
+    <input type="date" id="f-date-from" onchange="renderAll()" style="font-family:var(--mono);font-size:11px;background:var(--surface);border:1px solid var(--border2);color:var(--text);padding:8px 12px;outline:none;flex:1;min-width:130px;transition:border-color 0.15s;" title="From date">
+    <input type="date" id="f-date-to" onchange="renderAll()" style="font-family:var(--mono);font-size:11px;background:var(--surface);border:1px solid var(--border2);color:var(--text);padding:8px 12px;outline:none;flex:1;min-width:130px;transition:border-color 0.15s;" title="To date">
   </div>
 
   <div class="results-count" id="results-count"></div>
@@ -790,15 +791,7 @@ async function loadTrades() {
   }
 }
 
-function populateDateFilter() {
-  const dates = [...new Set(allTrades.map(t => t.date).filter(Boolean))].sort().reverse();
-  const sel = document.getElementById("f-date");
-  sel.innerHTML = '<option value="">All dates</option>';
-  dates.forEach(d => {
-    const o = document.createElement("option");
-    o.value = d; o.textContent = d; sel.appendChild(o);
-  });
-}
+function populateDateFilter() { /* date range inputs — no population needed */ }
 
 function getFiltered() {
   const selectedConfs = Array.from(document.querySelectorAll('#conf-dropdown input[type=checkbox]:checked')).map(cb => cb.value);
@@ -810,7 +803,8 @@ function getFiltered() {
   const rules = document.getElementById("f-rules").value;
   const tf = document.getElementById("f-tf").value;
   const sort = document.getElementById("f-sort").value;
-  const date = document.getElementById("f-date").value;
+  const dateFrom = document.getElementById("f-date-from")?.value || '';
+  const dateTo = document.getElementById("f-date-to")?.value || '';
 
   let filtered = allTrades.filter(t => {
     if (selectedConfs.length > 0 && !selectedConfs.every(sc => t.confluences.includes(sc))) return false;
@@ -821,7 +815,8 @@ function getFiltered() {
     if (grade && t.grade !== grade) return false;
     if (rules && t.followedRules !== rules) return false;
     if (tf && t.timeframe !== tf) return false;
-    if (date && t.date !== date) return false;
+    if (dateFrom && t.date < dateFrom) return false;
+    if (dateTo && t.date > dateTo) return false;
     return true;
   });
 
