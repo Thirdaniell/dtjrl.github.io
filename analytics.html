@@ -554,6 +554,94 @@ function renderSessionChart(trades) {
   });
 }
 
+function renderGradeDist(trades) {
+  const canvas = document.getElementById('grade-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+  const grades = ['A++','A+','A','B','C','D'];
+  const colors = {'A++':'#c8ff00','A+':'#00e676','A':'#40c4ff','B':'#ffd740','C':'#ff6d00','D':'#ff4444'};
+  const counts = {};
+  grades.forEach(g => counts[g] = 0);
+  trades.forEach(t => { if (t.grade && counts[t.grade] !== undefined) counts[t.grade]++; });
+  const total = trades.length || 1;
+  const pad = {top:20,right:20,bottom:40,left:40};
+  const cW = W - pad.left - pad.right;
+  const cH = H - pad.top - pad.bottom;
+  const barW = Math.floor(cW / grades.length) - 8;
+  const maxCount = Math.max(...Object.values(counts), 1);
+  grades.forEach((g, i) => {
+    const x = pad.left + i * (cW / grades.length);
+    const bH = (counts[g] / maxCount) * cH;
+    const y = pad.top + cH - bH;
+    ctx.fillStyle = colors[g] + '33';
+    ctx.fillRect(x, pad.top, barW, cH);
+    ctx.fillStyle = colors[g];
+    ctx.fillRect(x, y, barW, bH);
+    ctx.fillStyle = '#888';
+    ctx.font = '10px Space Mono';
+    ctx.textAlign = 'center';
+    ctx.fillText(g, x + barW/2, H - pad.bottom + 14);
+    if (counts[g] > 0) {
+      ctx.fillStyle = colors[g];
+      ctx.font = 'bold 11px Space Mono';
+      ctx.fillText(counts[g], x + barW/2, y - 5);
+    }
+  });
+}
+
+function renderSessionPnl(trades) {
+  const canvas = document.getElementById('session-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+  const sessions = {};
+  trades.forEach(t => {
+    if (!t.session) return;
+    if (!sessions[t.session]) sessions[t.session] = 0;
+    sessions[t.session] += t.pnl;
+  });
+  const entries = Object.entries(sessions).sort((a,b) => b[1]-a[1]);
+  if (!entries.length) {
+    ctx.fillStyle = '#444'; ctx.font = '11px Space Mono'; ctx.textAlign = 'center';
+    ctx.fillText('NO DATA', W/2, H/2); return;
+  }
+  const pad = {top:20,right:20,bottom:50,left:60};
+  const cW = W - pad.left - pad.right;
+  const cH = H - pad.top - pad.bottom;
+  const barW = Math.floor(cW / entries.length) - 8;
+  const vals = entries.map(([,v]) => v);
+  const maxAbs = Math.max(...vals.map(Math.abs), 1);
+  const midY = pad.top + cH / 2;
+  entries.forEach(([sess, val], i) => {
+    const x = pad.left + i * (cW / entries.length);
+    const isPos = val >= 0;
+    const bH = (Math.abs(val) / maxAbs) * (cH / 2);
+    const y = isPos ? midY - bH : midY;
+    ctx.fillStyle = isPos ? 'rgba(0,230,118,0.15)' : 'rgba(255,68,68,0.15)';
+    ctx.fillRect(x, pad.top, barW, cH);
+    ctx.fillStyle = isPos ? '#00e676' : '#ff4444';
+    ctx.fillRect(x, y, barW, bH);
+    ctx.fillStyle = '#666';
+    ctx.font = '9px Space Mono';
+    ctx.textAlign = 'center';
+    ctx.fillText(sess.replace('NY ', 'NY\n'), x + barW/2, H - pad.bottom + 14);
+    const pStr = (isPos?'+':'-') + '$' + Math.abs(Math.round(val/1000)) + (Math.abs(val)>=1000?'k':'');
+    ctx.fillStyle = isPos ? '#00e676' : '#ff4444';
+    ctx.font = 'bold 9px Space Mono';
+    ctx.fillText(Math.abs(val) >= 1000 ? pStr : (isPos?'+':'-')+'$'+Math.abs(val), x + barW/2, isPos ? y-5 : y+bH+12);
+  });
+  // Zero line
+  ctx.beginPath();
+  ctx.strokeStyle = '#333';
+  ctx.lineWidth = 1;
+  ctx.moveTo(pad.left, midY);
+  ctx.lineTo(W - pad.right, midY);
+  ctx.stroke();
+}
+
 function renderConfWinRate(trades) {
   const canvas = document.getElementById('conf-canvas');
   if (!canvas) return;
