@@ -733,6 +733,8 @@ function parseProps(page) {
     followedRules: props["Followed Rules"]?.select?.name || "",
     htfTimeframe: extractText(props["HTF Timeframe"]?.rich_text),
     entryModel: extractText(props["Entry Model"]?.rich_text),
+    rr: props["R:R"]?.number,
+    duration: props["Duration (mins)"]?.number,
   };
 }
 
