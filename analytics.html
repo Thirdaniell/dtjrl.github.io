@@ -530,8 +530,7 @@ function renderSessionChart(trades) {
     ctx.fillStyle = '#444';
     ctx.font = '8px Space Mono';
     ctx.textAlign = 'center';
-    const label = s.length > 6 ? s.replace('NY ','NY
-') : s;
+    const label = s.length > 6 ? s.replace('NY ', 'NY\n') : s;
     ctx.fillText(s.substring(0,6), x + barW/2, H - pad.bottom + 14);
     if (val !== 0) {
       ctx.fillStyle = isPos ? '#00e676' : '#ff4444';
