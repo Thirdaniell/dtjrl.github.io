@@ -275,17 +275,6 @@ function updateStats(trades) {
   document.getElementById('s-best').textContent = best ? '+$' + best.toLocaleString() : '—';
 
 
-
-  // Best session by avg P&L
-  const sessionMap = {};
-  trades.forEach(t => {
-    if (!t.session) return;
-    if (!sessionMap[t.session]) sessionMap[t.session] = { pnl: 0, count: 0 };
-    sessionMap[t.session].pnl += t.pnl;
-    sessionMap[t.session].count++;
-  });
-  const bestSession = Object.entries(sessionMap).sort((a,b) => (b[1].pnl/b[1].count) - (a[1].pnl/a[1].count))[0];
-  document.getElementById('s-session').textContent = bestSession ? bestSession[0] : '—';
 }
 
 function renderEquityChart(trades) {
