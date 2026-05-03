@@ -151,6 +151,8 @@
     <div class="stat"><div class="stat-label">Win Streak</div><div class="stat-value pos" id="s-wstreak">—</div></div>
     <div class="stat"><div class="stat-label">Loss Streak</div><div class="stat-value neg" id="s-lstreak">—</div></div>
     <div class="stat"><div class="stat-label">Best Session</div><div class="stat-value" id="s-session">—</div></div>
+    <div class="stat"><div class="stat-label">Avg R:R</div><div class="stat-value" id="s-rr">—</div></div>
+    <div class="stat"><div class="stat-label">Avg Duration</div><div class="stat-value" id="s-dur">—</div></div>
   </div>
 
   <div id="main-content"><div class="loading-state">Loading analytics <span>...</span></div></div>
@@ -211,6 +213,9 @@ async function fetchTrades() {
         grade: p['Setup Grade']?.select?.name || '',
         direction: p['Direction']?.select?.name || '',
         timeframe: p['Timeframe']?.select?.name || '',
+        confluences: p['Confluences']?.multi_select?.map(o => o.name) || [],
+        rr: p['R:R']?.number,
+        duration: p['Duration (mins)']?.number,
       };
     }).filter(t => t.date).sort((a,b) => a.date.localeCompare(b.date));
 
@@ -273,6 +278,14 @@ function updateStats(trades) {
   setText('s-session', bestSession ? bestSession[0] : '—');
 
   document.getElementById('s-best').textContent = best ? '+$' + best.toLocaleString() : '—';
+
+  const rrs = trades.filter(t => t.rr != null).map(t => t.rr);
+  const avgRR = rrs.length ? (rrs.reduce((a,b)=>a+b,0)/rrs.length).toFixed(2) : null;
+  setText('s-rr', avgRR ? '1:' + avgRR : '—');
+
+  const durs = trades.filter(t => t.duration != null).map(t => t.duration);
+  const avgDur = durs.length ? Math.round(durs.reduce((a,b)=>a+b,0)/durs.length) : null;
+  setText('s-dur', avgDur ? (avgDur < 60 ? avgDur + 'm' : Math.floor(avgDur/60) + 'h ' + (avgDur%60) + 'm') : '—');
 
 
 }
@@ -541,6 +554,111 @@ function renderSessionChart(trades) {
   });
 }
 
+function renderConfWinRate(trades) {
+  const canvas = document.getElementById('conf-canvas');
+  if (!canvas) return;
+  canvas.width = canvas.offsetWidth;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+
+  // Build confluence stats
+  const confStats = {};
+  trades.forEach(t => {
+    (t.confluences || []).forEach(c => {
+      if (!confStats[c]) confStats[c] = { wins: 0, total: 0 };
+      confStats[c].total++;
+      if (t.status === 'Closed - Win') confStats[c].wins++;
+    });
+  });
+
+  const entries = Object.entries(confStats)
+    .filter(([,v]) => v.total >= 1)
+    .map(([name, v]) => ({ name, wr: Math.round((v.wins/v.total)*100), total: v.total }))
+    .sort((a,b) => b.wr - a.wr)
+    .slice(0, 12);
+
+  if (!entries.length) {
+    ctx.fillStyle = '#444'; ctx.font = '11px Space Mono'; ctx.textAlign = 'center';
+    ctx.fillText('NO DATA', W/2, H/2); return;
+  }
+
+  const pad = { top: 20, right: 20, bottom: 60, left: 20 };
+  const barW = Math.floor((W - pad.left - pad.right) / entries.length) - 4;
+  const maxH = H - pad.top - pad.bottom;
+
+  entries.forEach((e, i) => {
+    const x = pad.left + i * ((W - pad.left - pad.right) / entries.length);
+    const bH = Math.max(2, (e.wr / 100) * maxH);
+    const y = pad.top + maxH - bH;
+    const color = e.wr >= 70 ? '#00e676' : e.wr >= 50 ? '#ffd740' : '#ff4444';
+
+    ctx.fillStyle = color + '33';
+    ctx.fillRect(x, pad.top, barW, maxH);
+    ctx.fillStyle = color;
+    ctx.fillRect(x, y, barW, bH);
+
+    ctx.fillStyle = '#888';
+    ctx.font = '9px Space Mono';
+    ctx.textAlign = 'center';
+    const label = e.name.length > 8 ? e.name.slice(0, 8) : e.name;
+    ctx.fillText(label, x + barW/2, H - pad.bottom + 14);
+    ctx.fillText(`(${e.total})`, x + barW/2, H - pad.bottom + 26);
+
+    ctx.fillStyle = color;
+    ctx.font = 'bold 10px Space Mono';
+    ctx.fillText(e.wr + '%', x + barW/2, y - 4);
+  });
+}
+
+function renderMonthly(trades) {
+  const el = document.getElementById('monthly-table');
+  if (!el) return;
+
+  const monthly = {};
+  trades.forEach(t => {
+    if (!t.date) return;
+    const key = t.date.slice(0, 7); // YYYY-MM
+    if (!monthly[key]) monthly[key] = { pnl: 0, wins: 0, losses: 0, count: 0 };
+    monthly[key].pnl += t.pnl;
+    monthly[key].count++;
+    if (t.status === 'Closed - Win') monthly[key].wins++;
+    else if (t.status === 'Closed - Loss') monthly[key].losses++;
+  });
+
+  const rows = Object.entries(monthly).sort((a,b) => b[0].localeCompare(a[0]));
+  if (!rows.length) { el.innerHTML = '<div style="font-family:var(--mono);font-size:11px;color:var(--text3);padding:1rem;">No data</div>'; return; }
+
+  const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+  el.innerHTML = `<table style="width:100%;border-collapse:collapse;font-family:var(--mono);font-size:11px;">
+    <thead>
+      <tr style="border-bottom:1px solid var(--border2);">
+        <th style="text-align:left;padding:6px 8px;color:var(--text3);letter-spacing:0.1em;font-weight:400;">MONTH</th>
+        <th style="text-align:right;padding:6px 8px;color:var(--text3);letter-spacing:0.1em;font-weight:400;">TRADES</th>
+        <th style="text-align:right;padding:6px 8px;color:var(--text3);letter-spacing:0.1em;font-weight:400;">W/L</th>
+        <th style="text-align:right;padding:6px 8px;color:var(--text3);letter-spacing:0.1em;font-weight:400;">WIN %</th>
+        <th style="text-align:right;padding:6px 8px;color:var(--text3);letter-spacing:0.1em;font-weight:400;">P&L</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${rows.map(([key, d]) => {
+        const [yr, mo] = key.split('-');
+        const wr = Math.round((d.wins / d.count) * 100);
+        const pnlStr = (d.pnl >= 0 ? '+' : '-') + '$' + Math.abs(d.pnl).toLocaleString();
+        const pnlColor = d.pnl >= 0 ? '#00e676' : '#ff4444';
+        return `<tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:8px;color:var(--text);">${MONTHS[parseInt(mo)-1]} ${yr}</td>
+          <td style="padding:8px;text-align:right;color:var(--text2);">${d.count}</td>
+          <td style="padding:8px;text-align:right;color:var(--text2);">${d.wins}W / ${d.losses}L</td>
+          <td style="padding:8px;text-align:right;color:${wr >= 60 ? '#00e676' : wr >= 40 ? '#ffd740' : '#ff4444'};">${wr}%</td>
+          <td style="padding:8px;text-align:right;font-weight:700;color:${pnlColor};">${pnlStr}</td>
+        </tr>`;
+      }).join('')}
+    </tbody>
+  </table>`;
+}
+
 let calYear = new Date().getFullYear();
 let calMonth = new Date().getMonth();
 
@@ -627,6 +745,15 @@ function renderAll() {
       <div class="chart-panel">
         <div class="chart-panel-title">P&L by Session</div>
         <canvas id="session-canvas" style="width:100%;height:180px;"></canvas>
+      </div>
+    </div>
+      <div class="chart-panel">
+        <div class="chart-panel-title">Confluence Win Rate</div>
+        <canvas id="conf-canvas" width="700" height="280" style="width:100%;height:280px;"></canvas>
+      </div>
+      <div class="chart-panel">
+        <div class="chart-panel-title">Monthly P&L Summary</div>
+        <div id="monthly-table" style="overflow-x:auto;"></div>
       </div>
     </div>
   `;
