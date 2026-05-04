@@ -34,18 +34,7 @@
     min-height: 100vh;
     transition: background 0.2s, color 0.2s;
   }
-  body.light {
-    --bg: #f5f5f5;
-    --surface: #ffffff;
-    --surface2: #efefef;
-    --border: #e0e0e0;
-    --border2: #cccccc;
-    --text: #111111;
-    --text2: #555555;
-    --text3: #999999;
-    --red-dim: rgba(220,38,38,0.08);
-    --green-dim: rgba(0,180,80,0.08);
-  }
+
 
   header {
     border-bottom: 1px solid var(--border);
@@ -584,7 +573,6 @@
   <div class="logo">// Trade Journal</div>
   <div style="display:flex;gap:8px;align-items:center;">
     <button class="refresh-btn" onclick="exportCSV()">↓ CSV</button>
-    <button class="refresh-btn" onclick="toggleTheme()" id="theme-btn">☀ Light</button>
     <button class="refresh-btn" onclick="loadTrades()">↻ Refresh</button>
   </div>
 </header>
@@ -1064,20 +1052,7 @@ document.addEventListener('click', e => {
   }
 });
 
-// ---- Theme Toggle ----
-function toggleTheme() {
-  document.body.classList.toggle('light');
-  const btn = document.getElementById('theme-btn');
-  btn.textContent = document.body.classList.contains('light') ? '☾ Dark' : '☀ Light';
-  localStorage.setItem('ftj-theme', document.body.classList.contains('light') ? 'light' : 'dark');
-}
-if (localStorage.getItem('ftj-theme') === 'light') {
-  document.body.classList.add('light');
-  document.addEventListener('DOMContentLoaded', () => {
-    const btn = document.getElementById('theme-btn');
-    if (btn) btn.textContent = '☾ Dark';
-  });
-}
+// Theme handled by nav.js
 
 // ---- CSV Export ----
 function exportCSV() {
