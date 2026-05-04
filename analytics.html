@@ -594,97 +594,109 @@ function renderGradeDist(trades) {
   const ctx = canvas.getContext('2d');
   const W = canvas.width, H = canvas.height;
   ctx.clearRect(0, 0, W, H);
+
   const grades = ['A++','A+','A','B','C','D'];
   const colors = {'A++':'#c8ff00','A+':'#00e676','A':'#40c4ff','B':'#ffd740','C':'#ff6d00','D':'#ff4444'};
   const counts = {};
   grades.forEach(g => counts[g] = 0);
   trades.forEach(t => { if (t.grade && counts[t.grade] !== undefined) counts[t.grade]++; });
-  const total = trades.length || 1;
-  const pad = {top:20,right:20,bottom:40,left:40};
-  const cW = W - pad.left - pad.right;
-  const cH = H - pad.top - pad.bottom;
-  const barW = Math.floor(cW / grades.length) - 8;
-  const maxCount = Math.max(...Object.values(counts), 1);
-  grades.forEach((g, i) => {
-    const x = pad.left + i * (cW / grades.length);
-    const bH = (counts[g] / maxCount) * cH;
-    const y = pad.top + cH - bH;
-    ctx.fillStyle = colors[g] + '33';
-    ctx.fillRect(x, pad.top, barW, cH);
+  const total = Object.values(counts).reduce((a,b)=>a+b,0);
+
+  if (!total) {
+    ctx.fillStyle = '#444'; ctx.font = '11px Space Mono'; ctx.textAlign = 'center';
+    ctx.fillText('NO DATA', W/2, H/2); return;
+  }
+
+  const cx = W * 0.38, cy = H / 2;
+  const r = Math.min(cx, cy) - 16;
+  const inner = r * 0.55;
+  let startAngle = -Math.PI / 2;
+
+  const slices = grades.filter(g => counts[g] > 0);
+
+  slices.forEach(g => {
+    const slice = (counts[g] / total) * Math.PI * 2;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, r, startAngle, startAngle + slice);
+    ctx.closePath();
     ctx.fillStyle = colors[g];
-    ctx.fillRect(x, y, barW, bH);
-    ctx.fillStyle = '#888';
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(cx, cy, inner, 0, Math.PI * 2);
+    ctx.fillStyle = '#111';
+    ctx.fill();
+    startAngle += slice;
+  });
+
+  // Center label
+  ctx.fillStyle = '#e8e8e8';
+  ctx.font = 'bold 22px Space Mono';
+  ctx.textAlign = 'center';
+  ctx.fillText(total, cx, cy + 6);
+  ctx.fillStyle = '#444';
+  ctx.font = '9px Space Mono';
+  ctx.fillText('TRADES', cx, cy + 20);
+
+  // Legend on the right
+  const legendX = W * 0.62;
+  let legendY = cy - (slices.length * 22) / 2;
+  slices.forEach(g => {
+    const pct = Math.round((counts[g] / total) * 100);
+    ctx.fillStyle = colors[g];
+    ctx.fillRect(legendX, legendY - 9, 10, 10);
+    ctx.fillStyle = '#e8e8e8';
+    ctx.font = 'bold 11px Space Mono';
+    ctx.textAlign = 'left';
+    ctx.fillText(g, legendX + 16, legendY);
+    ctx.fillStyle = '#666';
     ctx.font = '10px Space Mono';
-    ctx.textAlign = 'center';
-    ctx.fillText(g, x + barW/2, H - pad.bottom + 14);
-    if (counts[g] > 0) {
-      ctx.fillStyle = colors[g];
-      ctx.font = 'bold 11px Space Mono';
-      ctx.fillText(counts[g], x + barW/2, y - 5);
-    }
+    ctx.fillText(`${counts[g]} · ${pct}%`, legendX + 16, legendY + 13);
+    legendY += 32;
   });
 }
 
 function renderSessionPnl(trades) {
-  const canvas = document.getElementById('session-canvas');
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  const W = canvas.width, H = canvas.height;
-  ctx.clearRect(0, 0, W, H);
+  const el = document.getElementById('session-cards');
+  if (!el) return;
+
   const sessions = {};
   trades.forEach(t => {
     if (!t.session) return;
-    if (!sessions[t.session]) sessions[t.session] = 0;
-    sessions[t.session] += t.pnl;
+    if (!sessions[t.session]) sessions[t.session] = { pnl: 0, wins: 0, total: 0 };
+    sessions[t.session].pnl += t.pnl;
+    sessions[t.session].total++;
+    if (t.status === 'Closed - Win') sessions[t.session].wins++;
   });
-  const entries = Object.entries(sessions).sort((a,b) => b[1]-a[1]);
+
+  const entries = Object.entries(sessions).sort((a,b) => b[1].pnl - a[1].pnl);
+
   if (!entries.length) {
-    ctx.fillStyle = '#444'; ctx.font = '11px Space Mono'; ctx.textAlign = 'center';
-    ctx.fillText('NO DATA', W/2, H/2); return;
+    el.innerHTML = '<div style="font-family:var(--mono);font-size:11px;color:var(--text3);padding:1rem;">No data</div>';
+    return;
   }
-  const pad = {top:20,right:20,bottom:50,left:60};
-  const cW = W - pad.left - pad.right;
-  const cH = H - pad.top - pad.bottom;
-  const barW = Math.floor(cW / entries.length) - 8;
-  const vals = entries.map(([,v]) => v);
-  const maxAbs = Math.max(...vals.map(Math.abs), 1);
-  const midY = pad.top + cH / 2;
-  entries.forEach(([sess, val], i) => {
-    const x = pad.left + i * (cW / entries.length);
-    const isPos = val >= 0;
-    const bH = (Math.abs(val) / maxAbs) * (cH / 2);
-    const y = isPos ? midY - bH : midY;
-    ctx.fillStyle = isPos ? 'rgba(0,230,118,0.15)' : 'rgba(255,68,68,0.15)';
-    ctx.fillRect(x, pad.top, barW, cH);
-    ctx.fillStyle = isPos ? '#00e676' : '#ff4444';
-    ctx.fillRect(x, y, barW, bH);
-    ctx.fillStyle = '#666';
-    ctx.font = '9px Space Mono';
-    ctx.textAlign = 'center';
-    ctx.fillText(sess.replace('NY ', 'NY\n'), x + barW/2, H - pad.bottom + 14);
-    const pStr = (isPos?'+':'-') + '$' + Math.abs(Math.round(val/1000)) + (Math.abs(val)>=1000?'k':'');
-    ctx.fillStyle = isPos ? '#00e676' : '#ff4444';
-    ctx.font = 'bold 9px Space Mono';
-    ctx.fillText(Math.abs(val) >= 1000 ? pStr : (isPos?'+':'-')+'$'+Math.abs(val), x + barW/2, isPos ? y-5 : y+bH+12);
-  });
-  // Zero line
-  ctx.beginPath();
-  ctx.strokeStyle = '#333';
-  ctx.lineWidth = 1;
-  ctx.moveTo(pad.left, midY);
-  ctx.lineTo(W - pad.right, midY);
-  ctx.stroke();
+
+  el.innerHTML = entries.map(([sess, d]) => {
+    const isPos = d.pnl >= 0;
+    const pnlStr = (isPos ? '+' : '-') + '$' + Math.abs(d.pnl).toLocaleString();
+    const wr = Math.round((d.wins / d.total) * 100);
+    return `<div style="background:var(--surface);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <div style="font-family:var(--mono);font-size:11px;color:var(--text);letter-spacing:0.08em;">${sess}</div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:3px;">${d.total} trade${d.total>1?'s':''} · ${wr}% win</div>
+      </div>
+      <div style="font-family:var(--mono);font-size:20px;font-weight:700;color:${isPos?'#00e676':'#ff4444'};">${pnlStr}</div>
+    </div>`;
+  }).join('');
 }
 
 function renderConfWinRate(trades) {
   const canvas = document.getElementById('conf-canvas');
   if (!canvas) return;
-  canvas.width = canvas.offsetWidth;
   const ctx = canvas.getContext('2d');
   const W = canvas.width, H = canvas.height;
   ctx.clearRect(0, 0, W, H);
 
-  // Build confluence stats
   const confStats = {};
   trades.forEach(t => {
     (t.confluences || []).forEach(c => {
@@ -697,39 +709,72 @@ function renderConfWinRate(trades) {
   const entries = Object.entries(confStats)
     .filter(([,v]) => v.total >= 1)
     .map(([name, v]) => ({ name, wr: Math.round((v.wins/v.total)*100), total: v.total }))
-    .sort((a,b) => b.wr - a.wr)
-    .slice(0, 12);
+    .sort((a,b) => b.wr - a.wr);
 
   if (!entries.length) {
     ctx.fillStyle = '#444'; ctx.font = '11px Space Mono'; ctx.textAlign = 'center';
     ctx.fillText('NO DATA', W/2, H/2); return;
   }
 
-  const pad = { top: 20, right: 20, bottom: 60, left: 20 };
-  const barW = Math.floor((W - pad.left - pad.right) / entries.length) - 4;
-  const maxH = H - pad.top - pad.bottom;
+  const pad = { top: 16, right: 60, bottom: 16, left: 140 };
+  const rowH = Math.min(32, Math.floor((H - pad.top - pad.bottom) / entries.length));
+  const trackW = W - pad.left - pad.right;
+
+  // Resize canvas height to fit all entries
+  const neededH = pad.top + pad.bottom + entries.length * rowH;
+  if (canvas.height < neededH) {
+    canvas.height = neededH;
+    canvas.style.height = neededH + 'px';
+  }
+  ctx.clearRect(0, 0, W, canvas.height);
 
   entries.forEach((e, i) => {
-    const x = pad.left + i * ((W - pad.left - pad.right) / entries.length);
-    const bH = Math.max(2, (e.wr / 100) * maxH);
-    const y = pad.top + maxH - bH;
+    const y = pad.top + i * rowH + rowH / 2;
     const color = e.wr >= 70 ? '#00e676' : e.wr >= 50 ? '#ffd740' : '#ff4444';
+    const fillW = (e.wr / 100) * trackW;
 
-    ctx.fillStyle = color + '33';
-    ctx.fillRect(x, pad.top, barW, maxH);
-    ctx.fillStyle = color;
-    ctx.fillRect(x, y, barW, bH);
+    // Row bg
+    ctx.fillStyle = i % 2 === 0 ? 'rgba(255,255,255,0.02)' : 'transparent';
+    ctx.fillRect(0, pad.top + i * rowH, W, rowH);
 
+    // Label
     ctx.fillStyle = '#888';
-    ctx.font = '9px Space Mono';
-    ctx.textAlign = 'center';
-    const label = e.name.length > 8 ? e.name.slice(0, 8) : e.name;
-    ctx.fillText(label, x + barW/2, H - pad.bottom + 14);
-    ctx.fillText(`(${e.total})`, x + barW/2, H - pad.bottom + 26);
+    ctx.font = '10px Space Mono';
+    ctx.textAlign = 'right';
+    const label = e.name.length > 16 ? e.name.slice(0,15)+'…' : e.name;
+    ctx.fillText(label, pad.left - 10, y + 4);
 
+    // Track bg
+    ctx.fillStyle = '#1a1a1a';
+    ctx.fillRect(pad.left, y - 4, trackW, 8);
+
+    // Fill
+    const grad = ctx.createLinearGradient(pad.left, 0, pad.left + fillW, 0);
+    grad.addColorStop(0, color + '88');
+    grad.addColorStop(1, color);
+    ctx.fillStyle = grad;
+    ctx.fillRect(pad.left, y - 4, fillW, 8);
+
+    // Dot at end
+    ctx.beginPath();
+    ctx.arc(pad.left + fillW, y, 6, 0, Math.PI * 2);
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(pad.left + fillW, y, 3, 0, Math.PI * 2);
+    ctx.fillStyle = '#111';
+    ctx.fill();
+
+    // % label
     ctx.fillStyle = color;
     ctx.font = 'bold 10px Space Mono';
-    ctx.fillText(e.wr + '%', x + barW/2, y - 4);
+    ctx.textAlign = 'left';
+    ctx.fillText(e.wr + '%', W - pad.right + 8, y + 4);
+
+    // Count
+    ctx.fillStyle = '#444';
+    ctx.font = '9px Space Mono';
+    ctx.fillText('(' + e.total + ')', W - pad.right + 8, y + 15);
   });
 }
 
@@ -895,12 +940,12 @@ function renderAll() {
       </div>
       <div class="chart-panel">
         <div class="chart-panel-title">P&L by Session</div>
-        <canvas id="session-canvas" style="width:100%;height:220px;"></canvas>
+        <div id="session-cards" style="display:flex;flex-direction:column;gap:1px;background:var(--border);margin-top:4px;"></div>
       </div>
     </div>
     <div class="chart-panel" style="margin-top:1px;">
       <div class="chart-panel-title">Confluence Win Rate</div>
-      <canvas id="conf-canvas" style="width:100%;height:280px;"></canvas>
+      <canvas id="conf-canvas" style="width:100%;min-height:280px;"></canvas>
     </div>
   `;
 
@@ -912,10 +957,9 @@ function renderAll() {
     renderCalendar(filtered);
     const gradeC = document.getElementById('grade-canvas');
     if (gradeC) { gradeC.width = gradeC.offsetWidth; gradeC.height = 220; renderGradeDist(filtered); }
-    const sessC = document.getElementById('session-canvas');
-    if (sessC) { sessC.width = sessC.offsetWidth; sessC.height = 220; renderSessionPnl(filtered); }
+    renderSessionPnl(filtered);
     const confC = document.getElementById('conf-canvas');
-    if (confC) { confC.width = confC.offsetWidth; confC.height = 280; renderConfWinRate(filtered); }
+    if (confC) { confC.width = confC.offsetWidth; confC.height = 400; renderConfWinRate(filtered); }
   });
 }
 
