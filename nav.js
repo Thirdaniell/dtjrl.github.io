@@ -24,6 +24,7 @@ const NAV_HTML = `
     <a href="https://www.youtube.com/@DTJRL" target="_blank" rel="noopener" class="nav-yt">
       <svg viewBox="0 0 24 24" width="18" height="18" fill="#ff0000"><path d="M23.5 6.19a3.02 3.02 0 0 0-2.12-2.14C19.53 3.5 12 3.5 12 3.5s-7.53 0-9.38.55A3.02 3.02 0 0 0 .5 6.19C0 8.05 0 12 0 12s0 3.95.5 5.81a3.02 3.02 0 0 0 2.12 2.14C4.47 20.5 12 20.5 12 20.5s7.53 0 9.38-.55a3.02 3.02 0 0 0 2.12-2.14C24 15.95 24 12 24 12s0-3.95-.5-5.81zM9.75 15.52V8.48L15.86 12l-6.11 3.52z"/></svg>
     </a>
+    <button class="nav-theme-btn" id="nav-theme-btn" onclick="navToggleTheme()" title="Toggle light/dark mode">☀</button>
     <div class="nav-status">LIVE</div>
   </div>
 </nav>`;
@@ -104,7 +105,36 @@ const NAV_CSS = `
     transition: opacity 0.15s;
   }
   .nav-yt:hover { opacity: 1; }
-  body { padding-left: 64px; }
+  .nav-theme-btn {
+    background: none;
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+    color: var(--text3, #444);
+    margin-bottom: 10px;
+    transition: color 0.15s;
+    padding: 0;
+    line-height: 1;
+  }
+  .nav-theme-btn:hover { color: var(--accent, #c8ff00); }
+  body { padding-left: 64px; transition: background 0.2s, color 0.2s; }
+  body.light {
+    --bg: #f4f4f4;
+    --surface: #ffffff;
+    --surface2: #ececec;
+    --border: #e0e0e0;
+    --border2: #cccccc;
+    --text: #111111;
+    --text2: #555555;
+    --text3: #999999;
+    --red-dim: rgba(220,38,38,0.08);
+    --green-dim: rgba(0,180,80,0.08);
+  }
+  body.light .sidenav { background: #ffffff; border-right-color: #e0e0e0; }
+  body.light .nav-link { color: #999; }
+  body.light .nav-link:hover, body.light .nav-link.active { color: #111; }
+  body.light .nav-link.active::before { background: #111; }
+  body.light .nav-logo { color: #111; }
   @media (max-width: 600px) {
     .sidenav {
       top: auto; bottom: 0; left: 0; right: 0;
@@ -132,4 +162,19 @@ function initNav(activePage) {
   document.querySelectorAll('.nav-link').forEach(link => {
     if (link.dataset.page === activePage) link.classList.add('active');
   });
+
+  // Apply saved theme on load
+  if (localStorage.getItem('ftj-theme') === 'light') {
+    document.body.classList.add('light');
+    const btn = document.getElementById('nav-theme-btn');
+    if (btn) btn.textContent = '☾';
+  }
+}
+
+function navToggleTheme() {
+  document.body.classList.toggle('light');
+  const isLight = document.body.classList.contains('light');
+  localStorage.setItem('ftj-theme', isLight ? 'light' : 'dark');
+  const btn = document.getElementById('nav-theme-btn');
+  if (btn) btn.textContent = isLight ? '☾' : '☀';
 }
