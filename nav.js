@@ -15,7 +15,7 @@ const NAV_HTML = `
       <span class="nav-icon">◐</span>
       <span class="nav-label">Analytics</span>
     </a>
-    <a href="about.html" class="nav-link" data-page="info">
+    <a href="info.html" class="nav-link" data-page="info">
       <span class="nav-icon">◎</span>
       <span class="nav-label">Guide</span>
     </a>
