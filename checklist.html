@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pre-Trade Checklist — FTJ</title>
+<link rel="icon" type="image/png" href="https://i.imgur.com/ZP2pTk2.png">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="nav.js"></script>
+<style>
+  :root {
+    --bg: #0a0a0a; --surface: #111; --surface2: #181818;
+    --border: #1a1a1a; --border2: #2a2a2a;
+    --text: #e8e8e8; --text2: #888; --text3: #444;
+    --green: #00e676; --red: #ff4444; --yellow: #ffd740;
+    --accent: #c8ff00;
+    --mono: 'Space Mono', monospace; --sans: 'DM Sans', sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 14px; min-height: 100vh; }
+  ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: var(--bg); } ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+  .page { max-width: 700px; margin: 0 auto; padding: 3rem 2rem 5rem; }
+
+  .page-header { margin-bottom: 2.5rem; }
+  .eyebrow { font-family: var(--mono); font-size: 10px; letter-spacing: 0.2em; color: var(--accent); text-transform: uppercase; margin-bottom: 10px; }
+  .page-title { font-family: var(--mono); font-size: 28px; font-weight: 700; line-height: 1.1; margin-bottom: 8px; }
+  .page-sub { font-size: 13px; color: var(--text2); line-height: 1.7; }
+
+  .progress-wrap { margin-bottom: 2rem; }
+  .progress-bar { height: 2px; background: var(--border2); border-radius: 2px; overflow: hidden; margin-bottom: 6px; }
+  .progress-fill { height: 100%; border-radius: 2px; background: var(--accent); transition: width 0.3s; }
+  .progress-label { font-family: var(--mono); font-size: 10px; color: var(--text3); letter-spacing: 0.08em; }
+
+  .section { margin-bottom: 1.75rem; }
+  .section-label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.2em; color: var(--text3); text-transform: uppercase; margin-bottom: 8px; padding-left: 2px; }
+  .items { display: flex; flex-direction: column; gap: 1px; background: var(--border); }
+
+  .item { display: flex; align-items: flex-start; gap: 14px; padding: 14px 16px; background: var(--surface); cursor: pointer; transition: background 0.12s; user-select: none; position: relative; }
+  .item:hover { background: var(--surface2); }
+  .item.checked { background: rgba(0,230,118,0.06); }
+  .item.blocker { background: rgba(255,68,68,0.06); cursor: default; }
+  .item.blocker-confirmed { background: rgba(0,230,118,0.06); }
+
+  .check-circle { width: 20px; height: 20px; border-radius: 50%; border: 1px solid var(--border2); background: var(--surface2); flex-shrink: 0; display: flex; align-items: center; justify-content: center; margin-top: 1px; transition: all 0.15s; }
+  .item.checked .check-circle { background: var(--green); border-color: var(--green); }
+  .item.blocker .check-circle { background: var(--red); border-color: var(--red); }
+  .item.blocker-confirmed .check-circle { background: var(--green); border-color: var(--green); }
+
+  .check-svg { display: none; }
+  .item.checked .check-svg, .item.blocker-confirmed .check-svg { display: block; }
+  .item.blocker .check-svg { display: block; }
+  .item.blocker.blocker-confirmed .check-svg-x { display: none; }
+  .check-svg-x { display: none; }
+  .item.blocker:not(.blocker-confirmed) .check-svg-x { display: block; }
+  .item.blocker:not(.blocker-confirmed) .check-svg { display: none; }
+
+  .item-body { flex: 1; }
+  .item-title { font-family: var(--mono); font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 3px; letter-spacing: 0.02em; }
+  .item.checked .item-title { color: var(--green); }
+  .item.blocker:not(.blocker-confirmed) .item-title { color: var(--red); }
+  .item.blocker-confirmed .item-title { color: var(--green); }
+  .item-sub { font-size: 12px; color: var(--text2); line-height: 1.6; }
+
+  .hard-stop-tag { font-family: var(--mono); font-size: 9px; padding: 2px 8px; border: 1px solid rgba(255,68,68,0.4); color: var(--red); background: rgba(255,68,68,0.08); letter-spacing: 0.06em; text-transform: uppercase; flex-shrink: 0; align-self: center; }
+  .item.blocker-confirmed .hard-stop-tag { border-color: rgba(0,230,118,0.4); color: var(--green); background: rgba(0,230,118,0.08); }
+  .optional-tag { font-family: var(--mono); font-size: 9px; padding: 2px 8px; border: 1px solid var(--border2); color: var(--text3); letter-spacing: 0.06em; text-transform: uppercase; flex-shrink: 0; align-self: center; }
+
+  .verdict-box { border: 1px solid var(--border2); padding: 1.5rem; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; gap: 16px; transition: all 0.2s; }
+  .verdict-box.go { border-color: rgba(0,230,118,0.4); background: rgba(0,230,118,0.06); }
+  .verdict-box.caution { border-color: rgba(255,215,64,0.4); background: rgba(255,215,64,0.06); }
+  .verdict-box.stop { border-color: rgba(255,68,68,0.4); background: rgba(255,68,68,0.06); }
+  .verdict-box.wait { border-color: var(--border2); background: var(--surface); }
+
+  .verdict-info { flex: 1; }
+  .verdict-title { font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 4px; color: var(--text3); }
+  .verdict-desc { font-size: 13px; color: var(--text2); line-height: 1.6; }
+
+  .verdict-badge { font-family: var(--mono); font-size: 16px; font-weight: 700; white-space: nowrap; }
+  .verdict-badge.go { color: var(--green); }
+  .verdict-badge.caution { color: var(--yellow); }
+  .verdict-badge.stop { color: var(--red); }
+  .verdict-badge.wait { color: var(--text3); }
+
+  .actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .btn { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; padding: 8px 16px; border: 1px solid var(--border2); background: none; color: var(--text2); cursor: pointer; transition: all 0.15s; }
+  .btn:hover { color: var(--accent); border-color: var(--accent); }
+  .btn.primary { border-color: rgba(0,230,118,0.4); color: var(--green); }
+  .btn.primary:hover { background: rgba(0,230,118,0.08); }
+
+  .reminder { margin-top: 2.5rem; border-top: 1px solid var(--border); padding-top: 2rem; }
+  .reminder-label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.2em; color: var(--text3); text-transform: uppercase; margin-bottom: 1rem; }
+  .reminder-text { font-size: 13px; color: var(--text2); line-height: 2; font-style: italic; }
+  .reminder-text p { margin-bottom: 0.75rem; }
+  .reminder-text p:last-child { margin-bottom: 0; }
+
+  body.light .item { background: #fff; }
+  body.light .item:hover { background: #f5f5f5; }
+  body.light .item.checked { background: rgba(0,180,80,0.06); }
+  body.light .item.blocker { background: rgba(220,38,38,0.06); }
+  body.light .check-circle { background: #f0f0f0; border-color: #ccc; }
+  body.light .items { background: #e0e0e0; }
+
+  @media (max-width: 600px) { .page { padding: 2rem 1rem 5rem; } }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="page-header">
+    <div class="eyebrow">// Pre-Trade</div>
+    <div class="page-title">Checklist</div>
+    <div class="page-sub">Complete every step before entering a trade. Two hard stops must be confirmed first — if either fails, do not trade.</div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-bar"><div class="progress-fill" id="progress" style="width:0%"></div></div>
+    <div class="progress-label" id="progress-label">0 / 13 confirmed</div>
+  </div>
+
+  <!-- HARD STOPS FIRST -->
+  <div class="section">
+    <div class="section-label">Hard stops — confirm these first</div>
+    <div class="items">
+      <div class="item blocker" data-id="against" data-blocker="true">
+        <div class="check-circle">
+          <svg class="check-svg" width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <svg class="check-svg-x" width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M3 3l4 4M7 3l-4 4" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>
+        <div class="item-body">
+          <div class="item-title">This trade is NOT against HTF bias</div>
+          <div class="item-sub">Daily/4H bearish = shorts only. Daily/4H bullish = longs only. No exceptions.</div>
+        </div>
+        <div class="hard-stop-tag">hard stop</div>
+      </div>
+      <div class="item blocker" data-id="fomo" data-blocker="true">
+        <div class="check-circle">
+          <svg class="check-svg" width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <svg class="check-svg-x" width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M3 3l4 4M7 3l-4 4" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>
+        <div class="item-body">
+          <div class="item-title">You are NOT emotional, tired, or in FOMO</div>
+          <div class="item-sub">Not chasing a missed move. Not revenge trading after a loss. Not sleep-deprived.</div>
+        </div>
+        <div class="hard-stop-tag">hard stop</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 1 -->
+  <div class="section">
+    <div class="section-label">Step 1 — HTF Bias</div>
+    <div class="items">
+      <div class="item" data-id="daily" onclick="toggle(this)">
+        <div class="check-circle"><svg class="check-svg" width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="item-body">
+          <div class="item-title">Daily bias is clear — premium or discount?</div>
+          <div class="item-sub">Mark the weekly high/low. Is price in a premium (look for shorts) or discount (look for longs)?</div>
+        </div>
+      </div>
+      <div class="item" data-id="h4" onclick="toggle(this)">
+        <div class="check-circle"><svg class="check-svg" width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="item-body">
+          <div class="item-title">4H / 1H confirms the same direction</div>
+          <div class="item-sub">4H and 1H structure agree with Daily bias — no conflict between timeframes</div>
+        </div>
+      </div>
+      <div class="item" data-id="htf_pda" onclick="toggle(this)">
+        <div class="check-circle"><svg class="check-svg" width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="item-body">
+          <div class="item-title">HTF PDA is present at current price</div>
+          <div class="item-sub">Price is at or delivering from a 4H / 1H unmitigated FVG, IFVG, or Order Block</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="section">
+    <div class="section-label">Step 2 — Market Context</div>
+    <div class="items">
+      <div class="item" data-id="no_consolidation" onclick="toggle(this)">
+        <div class="check-circle"><svg class="check-svg" width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="item-body">
+          <div class="item-title">Market is NOT in consolidation</div>
+          <div class="item-sub">Price is trending or reacting at a key level — not chopping sideways with no direction</div>
+        </div>
+      </div>
+      <div class="item" data-id="target" onclick="toggle(this)">
+        <div class="check-circle"><svg class="check-svg" width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="item-body">
+          <div class="item-title">Liquidity target is identified</div>
+          <div class="item-sub">You know exactly where price is going — EQH, EQL, previous high/low, or next HTF PDA</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="section">
+    <div class="section-label">Step 3 — Entry Model</div>
+    <div class="items">
+      <div class="item" data-id="sweep" onclick="toggle(this)" data-optional="true">
+        <div class="check-circle"><svg class="check-svg" width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="item-body">
+          <div class="item-title">Liquidity has been swept (BSL or SSL taken)</div>
+          <div class="item-sub">Price grabbed liquidity before your entry zone — strong signal that the move is real</div>
+        </div>
+        <div class="optional-tag">preferred</div>
+      </div>
+      <div class="item" data-id="mss" onclick="toggle(this)" data-optional="true">
+        <div class="check-circle"><svg class="check-svg" width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="item-body">
+          <div class="item-title">MSS or CHoCH visible on entry timeframe</div>
+          <div class="item-sub">Structure has shifted on 1m/3m — confirming the reversal is beginning</div>
+        </div>
+        <div class="optional-tag">preferred</div>
+      </div>
+      <div class="item" data-id="ltf_pda" onclick="toggle(this)">
+        <div class="check-circle"><svg class="check-svg" width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="item-body">
+          <div class="item-title">LTF PDA identified for entry</div>
+          <div class="item-sub">1m/3m IFVG or FVG is your entry zone — not a random candle or gut feel</div>
+        </div>
+      </div>
+      <div class="item" data-id="stop_loss" onclick="toggle(this)">
+        <div class="check-circle"><svg class="check-svg" width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="item-body">
+          <div class="item-title">Stop loss is placed and tight</div>
+          <div class="item-sub">Above/below the IFVG or FVG — not wide, not arbitrary</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 4 -->
+  <div class="section">
+    <div class="section-label">Step 4 — Risk Management</div>
+    <div class="items">
+      <div class="item" data-id="risk" onclick="toggle(this)">
+        <div class="check-circle"><svg class="check-svg" width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="item-body">
+          <div class="item-title">Risk is within 1–2% of account</div>
+          <div class="item-sub">Position size is calculated — not guessed. You know your max loss on this trade.</div>
+        </div>
+      </div>
+      <div class="item" data-id="daily_limit" onclick="toggle(this)">
+        <div class="check-circle"><svg class="check-svg" width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="item-body">
+          <div class="item-title">Daily loss limit not reached</div>
+          <div class="item-sub">Less than 2 losses today — you are still within your stop-trading rules</div>
+        </div>
+      </div>
+      <div class="item" data-id="tp_defined" onclick="toggle(this)">
+        <div class="check-circle"><svg class="check-svg" width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="item-body">
+          <div class="item-title">Take profit level is defined before entry</div>
+          <div class="item-sub">You know your TP1 and final target — not figuring it out while in the trade</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VERDICT -->
+  <div class="verdict-box wait" id="verdict-box">
+    <div class="verdict-info">
+      <div class="verdict-title">Verdict</div>
+      <div class="verdict-desc" id="verdict-desc">Complete the checklist to get your entry verdict</div>
+    </div>
+    <div class="verdict-badge wait" id="verdict-badge">—</div>
+  </div>
+
+  <div class="actions">
+    <button class="btn" onclick="resetAll()">↺ Reset</button>
+  </div>
+
+  <!-- POST-TRADE REMINDER -->
+  <div class="reminder">
+    <div class="reminder-label">// After you enter — read this</div>
+    <div class="reminder-text">
+      <p>You've done your analysis. The trade is placed. Your job is now over.</p>
+      <p>Do not watch every tick. Price does not move faster because you're watching it.</p>
+      <p>Your stop is placed for a reason. Do not move it closer out of fear, or further out of hope.</p>
+      <p>Your target is placed for a reason. Let price reach it. Trailing early is just fear in disguise.</p>
+      <p>If the trade stops you out — that's the cost of doing business. You followed the process. The process is what matters, not one trade.</p>
+      <p>If the trade wins — do not immediately look for the next one. You've done enough today.</p>
+      <p>Close the chart. Trust the work you did before the entry. That's where the real trading happened.</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const ALL_IDS = ['against','fomo','daily','h4','htf_pda','no_consolidation','target','sweep','mss','ltf_pda','stop_loss','risk','daily_limit','tp_defined'];
+const BLOCKERS = ['against','fomo'];
+const OPTIONAL = ['sweep','mss'];
+const REQUIRED = ALL_IDS.filter(id => !OPTIONAL.includes(id));
+const state = {};
+ALL_IDS.forEach(id => state[id] = false);
+
+function toggle(el) {
+  const id = el.dataset.id;
+  state[id] = !state[id];
+  el.classList.toggle('checked', state[id]);
+  updateVerdict();
+}
+
+document.querySelectorAll('.item.blocker').forEach(el => {
+  el.addEventListener('click', function() {
+    const id = this.dataset.id;
+    state[id] = !state[id];
+    if (state[id]) {
+      this.classList.remove('blocker');
+      this.classList.add('blocker-confirmed');
+    } else {
+      this.classList.remove('blocker-confirmed');
+      this.classList.add('blocker');
+    }
+    updateVerdict();
+  });
+});
+
+function updateVerdict() {
+  const total = ALL_IDS.length;
+  const checked = ALL_IDS.filter(id => state[id]).length;
+  const pct = Math.round((checked / total) * 100);
+  document.getElementById('progress').style.width = pct + '%';
+  document.getElementById('progress-label').textContent = `${checked} / ${total} confirmed`;
+
+  const box = document.getElementById('verdict-box');
+  const desc = document.getElementById('verdict-desc');
+  const badge = document.getElementById('verdict-badge');
+
+  const blockersOk = BLOCKERS.every(id => state[id]);
+  const requiredChecked = REQUIRED.filter(id => state[id]).length;
+  const requiredTotal = REQUIRED.length;
+
+  box.className = 'verdict-box';
+  badge.className = 'verdict-badge';
+
+  if (!blockersOk) {
+    box.classList.add('stop');
+    badge.classList.add('stop');
+    badge.textContent = 'DO NOT TRADE';
+    desc.textContent = 'Hard stop conditions not confirmed. Confirm both red items above before proceeding.';
+  } else if (requiredChecked === requiredTotal) {
+    box.classList.add('go');
+    badge.classList.add('go');
+    badge.textContent = 'GO ✓';
+    desc.textContent = 'All conditions met. This is a high-confidence entry. Execute your plan and trust the process.';
+  } else if (requiredChecked >= Math.floor(requiredTotal * 0.75)) {
+    box.classList.add('caution');
+    badge.classList.add('caution');
+    badge.textContent = 'CAUTION';
+    desc.textContent = `${requiredTotal - requiredChecked} required condition${requiredTotal - requiredChecked > 1 ? 's' : ''} not confirmed. Proceed only if the setup is very strong.`;
+  } else if (checked > 2) {
+    box.classList.add('wait');
+    badge.classList.add('wait');
+    badge.textContent = 'WAIT';
+    desc.textContent = `${checked} of ${total} confirmed. The setup is not ready — be patient.`;
+  } else {
+    box.classList.add('wait');
+    badge.classList.add('wait');
+    badge.textContent = '—';
+    desc.textContent = 'Complete the checklist to get your entry verdict.';
+  }
+}
+
+function resetAll() {
+  ALL_IDS.forEach(id => state[id] = false);
+  document.querySelectorAll('.item').forEach(el => {
+    el.classList.remove('checked','blocker-confirmed');
+    if (BLOCKERS.includes(el.dataset.id)) el.classList.add('blocker');
+  });
+  document.getElementById('progress').style.width = '0%';
+  document.getElementById('progress-label').textContent = '0 / 13 confirmed';
+  const box = document.getElementById('verdict-box');
+  const badge = document.getElementById('verdict-badge');
+  box.className = 'verdict-box wait';
+  badge.className = 'verdict-badge wait';
+  badge.textContent = '—';
+  document.getElementById('verdict-desc').textContent = 'Complete the checklist to get your entry verdict.';
+}
+
+document.addEventListener('DOMContentLoaded', () => initNav('checklist'));
+</script>
+</body>
+</html>
