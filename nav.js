@@ -23,13 +23,17 @@ const NAV_HTML = `
       <span class="nav-icon">◻</span>
       <span class="nav-label">Check</span>
     </a>
+    <a href="bias.html" class="nav-link" data-page="bias">
+      <span class="nav-icon">◑</span>
+      <span class="nav-label">Bias</span>
+    </a>
   </div>
   <div class="nav-bottom">
     <a href="https://www.youtube.com/@DTJRL" target="_blank" rel="noopener" class="nav-yt">
       <svg viewBox="0 0 24 24" width="18" height="18" fill="#ff0000"><path d="M23.5 6.19a3.02 3.02 0 0 0-2.12-2.14C19.53 3.5 12 3.5 12 3.5s-7.53 0-9.38.55A3.02 3.02 0 0 0 .5 6.19C0 8.05 0 12 0 12s0 3.95.5 5.81a3.02 3.02 0 0 0 2.12 2.14C4.47 20.5 12 20.5 12 20.5s7.53 0 9.38-.55a3.02 3.02 0 0 0 2.12-2.14C24 15.95 24 12 24 12s0-3.95-.5-5.81zM9.75 15.52V8.48L15.86 12l-6.11 3.52z"/></svg>
     </a>
     <button class="nav-theme-btn" id="nav-theme-btn" onclick="navToggleTheme()" title="Toggle light/dark mode">☀</button>
-    <div class="nav-status">LIVE</div>
+    <div class="nav-status" id="nav-live" ondblclick="navAdminAccess()" title="" style="cursor:default;">LIVE</div>
   </div>
 </nav>`;
 
@@ -181,4 +185,8 @@ function navToggleTheme() {
   localStorage.setItem('ftj-theme', isLight ? 'light' : 'dark');
   const btn = document.getElementById('nav-theme-btn');
   if (btn) btn.textContent = isLight ? '☾' : '☀';
+}
+
+function navAdminAccess() {
+  window.location.href = 'admin.html';
 }
