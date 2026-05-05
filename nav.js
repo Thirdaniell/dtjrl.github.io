@@ -15,9 +15,13 @@ const NAV_HTML = `
       <span class="nav-icon">◐</span>
       <span class="nav-label">Analytics</span>
     </a>
-    <a href="about.html" class="nav-link" data-page="about">
+    <a href="about.html" class="nav-link" data-page="info">
       <span class="nav-icon">◎</span>
-      <span class="nav-label">About</span>
+      <span class="nav-label">Guide</span>
+    </a>
+    <a href="checklist.html" class="nav-link" data-page="checklist">
+      <span class="nav-icon">◻</span>
+      <span class="nav-label">Check</span>
     </a>
   </div>
   <div class="nav-bottom">
