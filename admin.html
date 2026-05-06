@@ -34,6 +34,52 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
 #main-screen{display:none;padding-left:64px;}
 .page{max-width:800px;margin:0 auto;padding:3rem 2rem 5rem;}
 
+/* TABS */
+.tabs{display:flex;gap:1px;background:var(--border);margin-bottom:2rem;}
+.tab-btn{font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;padding:10px 20px;background:var(--surface);color:var(--text3);border:none;cursor:pointer;transition:all 0.15s;flex:1;}
+.tab-btn:hover{color:var(--text2);}
+.tab-btn.active{background:var(--surface2);color:var(--accent);}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+
+/* BIAS BOARD (inside admin) */
+.bias-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);margin-bottom:2rem;}
+.bias-card{background:var(--surface);padding:1.5rem;}
+.bias-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;}
+.inst-badge{font-family:var(--mono);font-size:11px;letter-spacing:0.1em;padding:3px 10px;border:1px solid;}
+.inst-nq{color:#c8ff00;border-color:rgba(200,255,0,0.3);}
+.inst-es{color:#40c4ff;border-color:rgba(64,196,255,0.3);}
+.bias-val{font-family:var(--mono);font-size:28px;font-weight:700;line-height:1;margin-bottom:4px;}
+.b-bull{color:var(--green);} .b-bear{color:var(--red);} .b-range{color:var(--yellow);} .b-wait{color:var(--text3);} .b-none{color:var(--border2);}
+.bias-sublabel{font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--text3);text-transform:uppercase;margin-bottom:6px;}
+.switch-row{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10px;color:var(--yellow);margin-top:6px;}
+.bbtn-group{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin:12px 0 8px;}
+.bbtn{font-family:var(--mono);font-size:9px;letter-spacing:0.06em;text-transform:uppercase;padding:8px 4px;background:var(--surface2);border:1px solid var(--border2);color:var(--text3);cursor:pointer;transition:all 0.15s;}
+.bbtn:hover{border-color:var(--text2);color:var(--text);}
+.bbtn.bull.active,.bbtn.bull:hover{border-color:var(--green);color:var(--green);background:rgba(0,230,118,0.08);}
+.bbtn.bear.active,.bbtn.bear:hover{border-color:var(--red);color:var(--red);background:rgba(255,68,68,0.08);}
+.bbtn.range.active,.bbtn.range:hover{border-color:var(--yellow);color:var(--yellow);background:rgba(255,215,64,0.08);}
+.bbtn.wait.active,.bbtn.wait:hover{border-color:var(--text2);color:var(--text2);background:rgba(136,136,136,0.08);}
+.bbtn:disabled{opacity:0.3;cursor:not-allowed;}
+.bnotes{font-family:var(--sans);font-size:12px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:8px 10px;width:100%;outline:none;resize:none;min-height:50px;margin-bottom:8px;line-height:1.5;transition:border-color 0.15s;}
+.bnotes:focus{border-color:var(--accent);}
+.bnotes:disabled{opacity:0.4;}
+.bset-btn{font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;padding:10px;background:var(--accent);color:#000;border:none;cursor:pointer;font-weight:700;width:100%;transition:opacity 0.15s;}
+.bset-btn:hover{opacity:0.85;}
+.bset-btn:disabled{opacity:0.3;cursor:not-allowed;}
+.bset-btn.sw{background:var(--surface2);color:var(--text2);border:1px solid var(--border2);}
+.bset-btn.sw:hover{border-color:var(--yellow);color:var(--yellow);}
+.blocked-msg{font-family:var(--mono);font-size:9px;color:var(--text3);text-align:center;padding:5px;margin-top:3px;letter-spacing:0.05em;}
+
+/* BIAS HISTORY inside admin */
+.bhistory{display:flex;flex-direction:column;gap:1px;background:var(--border);}
+.brow{background:var(--surface);display:grid;grid-template-columns:100px 60px 1fr 1fr;gap:12px;align-items:center;padding:10px 14px;}
+.brow:hover{background:var(--surface2);}
+.bh-date{font-family:var(--mono);font-size:10px;color:var(--text2);}
+.bh-inst{font-family:var(--mono);font-size:10px;color:var(--text3);}
+.bh-bias{font-family:var(--mono);font-size:11px;font-weight:700;}
+.bh-notes{font-size:11px;color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
 /* NAV (inline mini nav for admin) */
 .top-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:2.5rem;}
 .back-btn{font-family:var(--mono);font-size:10px;letter-spacing:0.1em;color:var(--text3);background:none;border:1px solid var(--border2);padding:6px 14px;cursor:pointer;text-transform:uppercase;transition:all 0.15s;text-decoration:none;display:inline-block;}
@@ -141,8 +187,16 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
       <a href="index.html" class="back-btn">← Back to Journal</a>
     </div>
     <div class="page-eyebrow">// Admin</div>
-    <div class="page-title">Log a Trade</div>
-    <p style="font-size:13px;color:var(--text2);margin:8px 0 2rem;line-height:1.7;">Fill in your trade details. The AI will grade, verify, and calculate all values — then show you a preview before submitting to Notion.</p>
+    <div class="page-title">Admin Panel</div>
+
+    <div class="tabs" style="margin-top:1.5rem;">
+      <button class="tab-btn active" onclick="switchTab('trade',this)">◈ Log Trade</button>
+      <button class="tab-btn" onclick="switchTab('bias',this)">◑ Bias Board</button>
+    </div>
+
+    <!-- TRADE TAB -->
+    <div class="tab-panel active" id="tab-trade">
+    <p style="font-size:13px;color:var(--text2);margin:0 0 2rem;line-height:1.7;">Fill in your trade details. The AI will grade, verify, and calculate all values — then show you a preview before submitting to Notion.</p>
 
     <div class="form-grid">
       <!-- Row 1 -->
@@ -320,6 +374,51 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
     </div>
 
     <div class="success-msg" id="success-msg">✓ Trade logged successfully to Notion!</div>
+    </div><!-- end tab-trade -->
+
+    <!-- BIAS TAB -->
+    <div class="tab-panel" id="tab-bias">
+      <p style="font-size:13px;color:var(--text2);margin:0 0 1.5rem;line-height:1.7;">Set your daily HTF bias. Locked once set — one switch allowed per instrument per day.</p>
+      <div class="bias-grid" id="bias-grid">
+        <div class="bias-card">
+          <div class="bias-card-header">
+            <span class="inst-badge inst-nq">NQ</span>
+            <span style="font-family:var(--mono);font-size:10px;color:var(--text3);" id="bias-date-label"></span>
+          </div>
+          <div class="bias-sublabel">Current Bias</div>
+          <div class="bias-val b-none" id="bval-NQ">—</div>
+          <div id="bswitch-NQ" style="display:none;" class="switch-row"><span>→ Switched from</span><span id="bswitch-from-NQ"></span></div>
+          <div class="bbtn-group" id="bbtns-NQ">
+            <button class="bbtn bull" onclick="bSelectBias('NQ','Bullish')">Bullish</button>
+            <button class="bbtn bear" onclick="bSelectBias('NQ','Bearish')">Bearish</button>
+            <button class="bbtn range" onclick="bSelectBias('NQ','Ranging')">Ranging</button>
+            <button class="bbtn wait" onclick="bSelectBias('NQ','Waiting')">Waiting</button>
+          </div>
+          <textarea class="bnotes" id="bnotes-NQ" placeholder="Notes — key levels, reasoning..."></textarea>
+          <button class="bset-btn" id="bset-NQ" onclick="bSubmit('NQ')">Set NQ Bias</button>
+          <div class="blocked-msg" id="blocked-NQ" style="display:none;"></div>
+        </div>
+        <div class="bias-card">
+          <div class="bias-card-header">
+            <span class="inst-badge inst-es">ES</span>
+          </div>
+          <div class="bias-sublabel">Current Bias</div>
+          <div class="bias-val b-none" id="bval-ES">—</div>
+          <div id="bswitch-ES" style="display:none;" class="switch-row"><span>→ Switched from</span><span id="bswitch-from-ES"></span></div>
+          <div class="bbtn-group" id="bbtns-ES">
+            <button class="bbtn bull" onclick="bSelectBias('ES','Bullish')">Bullish</button>
+            <button class="bbtn bear" onclick="bSelectBias('ES','Bearish')">Bearish</button>
+            <button class="bbtn range" onclick="bSelectBias('ES','Ranging')">Ranging</button>
+            <button class="bbtn wait" onclick="bSelectBias('ES','Waiting')">Waiting</button>
+          </div>
+          <textarea class="bnotes" id="bnotes-ES" placeholder="Notes — key levels, reasoning..."></textarea>
+          <button class="bset-btn" id="bset-ES" onclick="bSubmit('ES')">Set ES Bias</button>
+          <div class="blocked-msg" id="blocked-ES" style="display:none;"></div>
+        </div>
+      </div>
+      <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.2em;color:var(--text3);text-transform:uppercase;margin-bottom:10px;">Bias History</div>
+      <div id="bhistory-container"><div style="font-family:var(--mono);font-size:11px;color:var(--text3);padding:2rem;text-align:center;">Loading...</div></div>
+    </div><!-- end tab-bias -->
   </div>
 </div>
 
@@ -604,6 +703,184 @@ async function submitTrade() {
 
   btn.disabled = false;
   btn.textContent = '✓ Confirm & Submit to Notion';
+}
+
+// ---- TAB SWITCHING ----
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+  if (name === 'bias') initBiasBoard();
+}
+
+// ---- BIAS BOARD ----
+const BIAS_DB = 'c163f7373bb44be19ae4f4a886384ddf';
+const BTODAY = new Date().toISOString().split('T')[0];
+const bSelected = { NQ: null, ES: null };
+const bState = { NQ: null, ES: null };
+let biasLoaded = false;
+
+function bBiasClass(b) {
+  return {'Bullish':'b-bull','Bearish':'b-bear','Ranging':'b-range','Waiting':'b-wait'}[b] || 'b-none';
+}
+
+function bSelectBias(inst, bias) {
+  bSelected[inst] = bias;
+  document.querySelectorAll(`#bbtns-${inst} .bbtn`).forEach(b => b.classList.remove('active'));
+  const map = {'Bullish':'bull','Bearish':'bear','Ranging':'range','Waiting':'wait'};
+  document.querySelector(`#bbtns-${inst} .${map[bias]}`).classList.add('active');
+}
+
+async function bQuery() {
+  const res = await fetch(`${WORKER}/notion/databases/${BIAS_DB}/query`, {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ filter:{ and:[{ property:'Date', date:{ equals: BTODAY } }] }, page_size:100 })
+  });
+  return res.json();
+}
+
+async function bCreate(props) {
+  const res = await fetch(`${WORKER}/notion/pages`, {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ parent:{ database_id: BIAS_DB }, properties: props })
+  });
+  return res.json();
+}
+
+function bLockCard(inst, bias, switchBias, hasSwitched) {
+  const valEl = document.getElementById(`bval-${inst}`);
+  const swEl = document.getElementById(`bswitch-${inst}`);
+  const swFrom = document.getElementById(`bswitch-from-${inst}`);
+  const btn = document.getElementById(`bset-${inst}`);
+  const locked = document.getElementById(`blocked-${inst}`);
+  const notes = document.getElementById(`bnotes-${inst}`);
+  const effective = switchBias || bias;
+  valEl.className = 'bias-val ' + bBiasClass(effective);
+  valEl.textContent = effective || '—';
+  if (switchBias) { swEl.style.display='flex'; swFrom.textContent = bias; }
+  document.querySelectorAll(`#bbtns-${inst} .bbtn`).forEach(b => b.disabled = true);
+  notes.disabled = true; notes.placeholder = '';
+  if (hasSwitched) {
+    btn.disabled = true; btn.textContent = 'Locked for today';
+    locked.style.display='block'; locked.textContent='Bias + switch used — locked until tomorrow';
+  } else {
+    btn.classList.add('sw'); btn.textContent = `↺ Switch ${inst} Bias`;
+    btn.onclick = () => bOpenSwitch(inst, bias);
+    locked.style.display='block'; locked.textContent='Bias locked · 1 switch remaining';
+  }
+}
+
+function bOpenSwitch(inst, original) {
+  document.querySelectorAll(`#bbtns-${inst} .bbtn`).forEach(b => {
+    b.disabled = false;
+    const map2 = {'Bullish':'Bullish','Bearish':'Bearish','Ranging':'Ranging','Waiting':'Waiting'};
+    b.onclick = () => bSelectBias(inst, b.textContent.trim());
+  });
+  const notes = document.getElementById(`bnotes-${inst}`);
+  notes.disabled = false; notes.value = ''; notes.placeholder = 'Why are you switching?';
+  const btn = document.getElementById(`bset-${inst}`);
+  btn.classList.remove('sw'); btn.textContent = `Confirm ${inst} Switch`;
+  btn.onclick = () => bSubmitSwitch(inst, original);
+  document.getElementById(`blocked-${inst}`).textContent = 'Select new bias then confirm';
+}
+
+async function bSubmit(inst) {
+  if (!bSelected[inst]) { alert(`Select a bias for ${inst}`); return; }
+  const btn = document.getElementById(`bset-${inst}`);
+  btn.disabled = true; btn.textContent = 'Saving...';
+  const bias = bSelected[inst];
+  const notes = document.getElementById(`bnotes-${inst}`).value.trim();
+  const props = {
+    "Title":{ title:[{ text:{ content:`${inst} ${bias} — ${BTODAY}` } }] },
+    "Instrument":{ select:{ name:inst } },
+    "Bias":{ select:{ name:bias } },
+    "Date":{ date:{ start: BTODAY } },
+    "switched":{ checkbox:false }
+  };
+  if (notes) props["Notes"] = { rich_text:[{ text:{ content:notes } }] };
+  try {
+    const data = await bCreate(props);
+    if (data.id) { bState[inst] = { bias, switchBias:null, pageId:data.id }; bLockCard(inst, bias, null, false); bLoadHistory(); }
+    else { btn.disabled=false; btn.textContent=`Set ${inst} Bias`; alert('Error: ' + JSON.stringify(data)); }
+  } catch(e) { btn.disabled=false; btn.textContent=`Set ${inst} Bias`; alert('Error: '+e.message); }
+}
+
+async function bSubmitSwitch(inst, original) {
+  const newBias = bSelected[inst];
+  if (!newBias) { alert(`Select a new bias for ${inst}`); return; }
+  if (newBias === original) { alert('Pick a different bias to switch to'); return; }
+  const btn = document.getElementById(`bset-${inst}`);
+  btn.disabled=true; btn.textContent='Saving switch...';
+  const notes = document.getElementById(`bnotes-${inst}`).value.trim();
+  const props = {
+    "Title":{ title:[{ text:{ content:`${inst} Switch → ${newBias} — ${BTODAY}` } }] },
+    "Instrument":{ select:{ name:inst } },
+    "Bias":{ select:{ name:newBias } },
+    "Date":{ date:{ start: BTODAY } },
+    "switched":{ checkbox:true }
+  };
+  if (notes) props["Notes"] = { rich_text:[{ text:{ content:notes } }] };
+  try {
+    const data = await bCreate(props);
+    if (data.id) { bState[inst].switchBias=newBias; bLockCard(inst, original, newBias, true); bLoadHistory(); }
+    else { btn.disabled=false; btn.textContent=`Confirm ${inst} Switch`; alert('Error: '+JSON.stringify(data)); }
+  } catch(e) { btn.disabled=false; btn.textContent=`Confirm ${inst} Switch`; alert('Error: '+e.message); }
+}
+
+async function bLoadHistory() {
+  const container = document.getElementById('bhistory-container');
+  try {
+    const res = await fetch(`${WORKER}/notion/databases/${BIAS_DB}/query`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ page_size:50 })
+    });
+    const data = await res.json();
+    const pages = (data.results||[]).sort((a,b) => {
+      return (b.properties['Date']?.date?.start||'').localeCompare(a.properties['Date']?.date?.start||'');
+    });
+    if (!pages.length) { container.innerHTML='<div style="font-family:var(--mono);font-size:11px;color:var(--text3);padding:2rem;text-align:center;background:var(--surface);">No bias entries yet</div>'; return; }
+    const rows = pages.map(p => {
+      const inst = p.properties['Instrument']?.select?.name||'—';
+      const bias = p.properties['Bias']?.select?.name||'—';
+      const isSw = p.properties['switched']?.checkbox;
+      const notes = (p.properties['Notes']?.rich_text||[]).map(r=>r.plain_text||'').join('');
+      const date = p.properties['Date']?.date?.start||'—';
+      const d2 = new Date(date+'T12:00:00');
+      const ds = d2.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+      const bCls = bBiasClass(bias);
+      return `<div class="brow">
+        <div class="bh-date">${ds}</div>
+        <div class="bh-inst" style="color:${inst==='NQ'?'#c8ff00':'#40c4ff'}">${inst}</div>
+        <div class="bh-bias ${bCls}">${isSw?'↺ ':''} ${bias}</div>
+        <div class="bh-notes">${notes||'—'}</div>
+      </div>`;
+    }).join('');
+    container.innerHTML = `<div class="bhistory">${rows}</div>`;
+  } catch(e) { container.innerHTML=`<div style="font-family:var(--mono);font-size:11px;color:var(--red);padding:1rem;">Error: ${e.message}</div>`; }
+}
+
+async function initBiasBoard() {
+  if (biasLoaded) return;
+  biasLoaded = true;
+  const d = new Date();
+  const lbl = document.getElementById('bias-date-label');
+  if (lbl) lbl.textContent = d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+  try {
+    const data = await bQuery();
+    ['NQ','ES'].forEach(inst => {
+      const entries = (data.results||[]).filter(p=>p.properties['Instrument']?.select?.name===inst);
+      const original = entries.find(p=>!p.properties['switched']?.checkbox);
+      const switched = entries.find(p=>p.properties['switched']?.checkbox);
+      if (original) {
+        const bias = original.properties['Bias']?.select?.name;
+        const switchBias = switched?.properties['Bias']?.select?.name||null;
+        bState[inst] = { bias, switchBias, pageId:original.id };
+        bLockCard(inst, bias, switchBias, !!switched);
+      }
+    });
+  } catch(e) { console.error('bias load error',e); }
+  await bLoadHistory();
 }
 
 function resetForm() {
