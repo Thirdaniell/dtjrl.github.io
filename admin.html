@@ -333,6 +333,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
             <label class="conf-opt"><input type="checkbox" value="NWOG" onchange="updateConf()"> NWOG</label>
             <label class="conf-opt"><input type="checkbox" value="NDOG" onchange="updateConf()"> NDOG</label>
             <label class="conf-opt"><input type="checkbox" value="Asian Range" onchange="updateConf()"> Asian Range</label>
+            <label class="conf-opt"><input type="checkbox" value="CISD" onchange="updateConf()"> CISD — Change in State of Delivery</label>
+            <label class="conf-opt"><input type="checkbox" value="LRLR" onchange="updateConf()"> LRLR — Low Resistance Liquidity Run</label>
             <button class="conf-clear" onclick="clearConf()">✕ Clear</button>
           </div>
         </div>
@@ -606,24 +608,31 @@ function calcDuration(entryTime, exitTime) {
 function autoGrade(confluences, mistakes, notes) {
   const hasIFVG = confluences.includes('IFVG');
   const hasFVG = confluences.includes('FVG');
+  const hasCISD = confluences.includes('CISD');
+  const hasLRLR = confluences.includes('LRLR');
   const hasSweep = confluences.includes('Liquidity Sweep') || confluences.includes('BSL Taken') || confluences.includes('SSL Taken');
   const hasHTF = confluences.includes('HTF PDA Delivery') || confluences.includes('HTF Trend');
   const hasSMT = confluences.includes('SMT Divergence');
   const hasMSS = confluences.includes('MSS') || confluences.includes('BOS') || confluences.includes('CHoCH');
   const hasKZ = confluences.includes('Kill Zone');
-  const text = (mistakes + notes).toLowerCase();
-  const hasMistakes = text.length > 5;
-  const against = text.includes('against') || text.includes('bias') || text.includes('consolidat') || text.includes('htf');
+  const hasMMM = confluences.includes('Market Maker Model');
+  // Only use MISTAKES field for "against bias" flag — not notes (notes may mention bearish/bullish in context)
+  const mistakesOnly = mistakes.toLowerCase();
+  const hasMistakes = mistakesOnly.length > 5;
+  const against = mistakesOnly.includes('against') || mistakesOnly.includes('no htf') || mistakesOnly.includes('consolidat') || mistakesOnly.includes('wrong bias');
 
   if (against) return 'D';
   let score = 0;
   if (hasIFVG || hasFVG) score += 2;
+  if (hasCISD) score += 1;
+  if (hasLRLR) score += 1;
   if (hasSweep) score += 2;
   if (hasHTF) score += 2;
   if (hasSMT) score += 1;
   if (hasMSS) score += 1;
   if (hasKZ) score += 1;
-  if (confluences.length >= 5) score += 1;
+  if (hasMMM) score += 1;
+  if (confluences.length >= 7) score += 1;
   if (hasMistakes) score -= 1;
   if (score >= 9) return 'A++';
   if (score >= 7) return 'A+';
