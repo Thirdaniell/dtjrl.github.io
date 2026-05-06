@@ -644,7 +644,10 @@
     </div>
   </div>
 
-  <div class="results-count" id="results-count"></div>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem;">
+    <div class="results-count" id="results-count"></div>
+    <button onclick="clearAllFilters()" style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;padding:5px 12px;background:none;border:1px solid var(--border2);color:var(--text3);cursor:pointer;transition:all 0.15s;" onmouseover="this.style.color='var(--accent)';this.style.borderColor='var(--accent)'" onmouseout="this.style.color='var(--text3)';this.style.borderColor='var(--border2)'">✕ Clear filters</button>
+  </div>
   <div class="badge-legend">
     <span class="badge-legend-title">Legend:</span>
     <span class="badge-legend-item"><span class="grade-badge grade-app" style="font-family:var(--mono);font-size:9px;padding:2px 6px;border:1px solid;color:#c8ff00;border-color:rgba(200,255,0,0.4);">A++</span> Elite setup</span>
@@ -1100,6 +1103,21 @@ function getRuleBreaches() {
     if (text.includes('news')) breaches['News Avoidance']++;
   });
   return Object.entries(breaches).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]);
+}
+
+function clearAllFilters() {
+  document.getElementById('f-session').value = '';
+  document.getElementById('f-dir').value = '';
+  document.getElementById('f-inst').value = '';
+  document.getElementById('f-outcome').value = '';
+  document.getElementById('f-grade').value = '';
+  document.getElementById('f-rules').value = '';
+  document.getElementById('f-tf').value = '';
+  document.getElementById('f-sort').value = 'newest';
+  document.getElementById('f-date-from').value = '';
+  document.getElementById('f-date-to').value = '';
+  clearConfFilter();
+  renderAll();
 }
 
 let confDropdownOpen = false;
