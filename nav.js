@@ -23,10 +23,7 @@ const NAV_HTML = `
       <span class="nav-icon">◻</span>
       <span class="nav-label">Check</span>
     </a>
-    <a href="bias.html" class="nav-link" data-page="bias">
-      <span class="nav-icon">◑</span>
-      <span class="nav-label">Bias</span>
-    </a>
+
   </div>
   <div class="nav-bottom">
     <a href="https://www.youtube.com/@DTJRL" target="_blank" rel="noopener" class="nav-yt">
