@@ -283,7 +283,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
       <!-- Row 8 -->
       <div class="field">
         <label>Contracts</label>
-        <input type="number" id="f-contracts" placeholder="e.g. 2" min="1">
+        <input type="number" id="f-contracts" placeholder="e.g. 2" min="1" oninput="togglePartialRow()">
       </div>
       <div class="field">
         <label>Screenshot Link</label>
@@ -425,107 +425,140 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
 
     <!-- WEEKLY REVIEW TAB -->
     <div class="tab-panel" id="tab-weekly">
-      <p style="font-size:13px;color:var(--text2);margin:0 0 1.5rem;line-height:1.7;">Review your week, rate your performance, and get personalised AI coaching with video resources.</p>
-      <div style="font-family:var(--mono);font-size:11px;color:var(--accent);letter-spacing:0.06em;margin-bottom:1.25rem;" id="w-week-label">Loading week...</div>
 
-      <!-- AUTO STATS -->
-      <div class="wsection">
-        <div class="wsection-title">This week's performance</div>
-        <div class="wstats" id="w-stats">
-          <div class="wstat"><div class="wstat-label">Trades</div><div class="wstat-val">—</div></div>
-          <div class="wstat"><div class="wstat-label">Win Rate</div><div class="wstat-val">—</div></div>
-          <div class="wstat"><div class="wstat-label">Total P&L</div><div class="wstat-val">—</div></div>
-          <div class="wstat"><div class="wstat-label">Best</div><div class="wstat-val">—</div></div>
-          <div class="wstat"><div class="wstat-label">Worst</div><div class="wstat-val">—</div></div>
+      <!-- WEEK HEADER -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;padding-bottom:1rem;border-bottom:1px solid var(--border);">
+        <div>
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.2em;color:var(--accent);text-transform:uppercase;margin-bottom:6px;">// Current Week</div>
+          <div style="font-family:var(--mono);font-size:16px;font-weight:700;color:var(--text);" id="w-week-label">Loading...</div>
         </div>
-        <div class="wsection-title">Grade breakdown</div>
-        <div id="w-grades" style="margin-bottom:1rem;"></div>
-        <div class="wsection-title">Top confluences used</div>
-        <div id="w-confs" style="margin-bottom:1rem;"></div>
-        <div class="wsection-title">Rule breaches detected</div>
-        <div id="w-breaches" style="margin-bottom:0.5rem;"></div>
+      </div>
+
+      <!-- STATS ROW -->
+      <div class="wstats" id="w-stats">
+        <div class="wstat"><div class="wstat-label">Trades</div><div class="wstat-val">—</div></div>
+        <div class="wstat"><div class="wstat-label">Win Rate</div><div class="wstat-val">—</div></div>
+        <div class="wstat"><div class="wstat-label">Total P&L</div><div class="wstat-val">—</div></div>
+        <div class="wstat"><div class="wstat-label">Best Trade</div><div class="wstat-val">—</div></div>
+        <div class="wstat"><div class="wstat-label">Worst Trade</div><div class="wstat-val">—</div></div>
+      </div>
+
+      <!-- DATA GRID -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);margin-bottom:2rem;">
+        <div style="background:var(--surface);padding:1.25rem;">
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--accent);text-transform:uppercase;margin-bottom:10px;">Grade Breakdown</div>
+          <div id="w-grades" style="display:flex;flex-wrap:wrap;gap:6px;min-height:24px;"></div>
+        </div>
+        <div style="background:var(--surface);padding:1.25rem;">
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--accent);text-transform:uppercase;margin-bottom:10px;">Top Confluences</div>
+          <div id="w-confs" style="display:flex;flex-wrap:wrap;gap:6px;min-height:24px;"></div>
+        </div>
+        <div style="background:var(--surface);padding:1.25rem;grid-column:1/-1;">
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--accent);text-transform:uppercase;margin-bottom:10px;">Rule Breaches Detected</div>
+          <div id="w-breaches"></div>
+        </div>
       </div>
 
       <!-- LOCKED VIEW -->
       <div id="w-locked" style="display:none;">
-        <div class="w-locked-box" id="w-locked-content"></div>
-        <div class="w-note-box" id="w-addnote" style="display:none;">
-          <div class="wsection-title">Add a note</div>
-          <textarea class="wtextarea" id="w-extra-note" placeholder="Add any extra thoughts or notes for this week..." style="min-height:60px;"></textarea>
-          <button class="set-btn" id="w-note-btn" onclick="wSaveNote()" style="margin-top:8px;width:auto;padding:8px 20px;">Save Note</button>
+        <div style="background:rgba(0,230,118,0.04);border:1px solid rgba(0,230,118,0.2);margin-bottom:1.5rem;">
+          <div style="padding:10px 16px;border-bottom:1px solid rgba(0,230,118,0.15);display:flex;align-items:center;gap:8px;">
+            <span style="color:var(--green);font-size:12px;">✓</span>
+            <span style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--green);text-transform:uppercase;">Weekly review submitted & locked</span>
+          </div>
+          <div style="padding:1.25rem;" id="w-locked-content"></div>
+        </div>
+        <div id="w-addnote" style="display:none;background:var(--surface);border:1px solid var(--border2);padding:1.25rem;margin-bottom:1rem;">
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--text3);text-transform:uppercase;margin-bottom:8px;">Add a note</div>
+          <textarea class="wtextarea" id="w-extra-note" placeholder="Add extra thoughts for this week..." style="min-height:60px;"></textarea>
+          <button class="set-btn" id="w-note-btn" onclick="wSaveNote()" style="margin-top:8px;width:auto;padding:8px 20px;font-size:10px;">Save Note</button>
         </div>
       </div>
 
       <!-- FORM -->
       <div id="w-form">
-        <div class="wsection">
-          <div class="wsection-title">Your reflection</div>
-          <div class="wfield-label" style="margin-bottom:4px;">What went well this week?</div>
-          <textarea class="wtextarea" id="w-went-well" placeholder="Trades you executed well, setups you read correctly, discipline wins..."></textarea>
-          <div class="wfield-label" style="margin-top:12px;margin-bottom:4px;">What needs improvement?</div>
-          <textarea class="wtextarea" id="w-improve" placeholder="Mistakes made, rules broken, things you struggled with..."></textarea>
-          <div class="wfield-label" style="margin-top:12px;margin-bottom:4px;">Goal for next week</div>
-          <textarea class="wtextarea" id="w-goal" placeholder="One clear, specific goal for next week..." style="min-height:60px;"></textarea>
-          <div class="wfield-label" style="margin-top:12px;margin-bottom:4px;">Confluences/setups to focus on next week</div>
-          <textarea class="wtextarea" id="w-focus" placeholder="e.g. Only take trades with IFVG + HTF PDA Delivery. Wait for liquidity sweep before entry..." style="min-height:60px;"></textarea>
+
+        <!-- REFLECTION -->
+        <div style="background:var(--surface);border:1px solid var(--border2);margin-bottom:1px;">
+          <div style="padding:10px 16px;border-bottom:1px solid var(--border2);background:var(--surface2);">
+            <span style="font-family:var(--mono);font-size:9px;letter-spacing:0.18em;color:var(--accent);text-transform:uppercase;">Your Reflection</span>
+          </div>
+          <div style="padding:1.25rem;display:flex;flex-direction:column;gap:14px;">
+            <div>
+              <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.14em;color:var(--text3);text-transform:uppercase;margin-bottom:5px;">What went well this week?</div>
+              <textarea class="wtextarea" id="w-went-well" placeholder="Trades you executed well, setups you read correctly, discipline wins..."></textarea>
+            </div>
+            <div>
+              <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.14em;color:var(--text3);text-transform:uppercase;margin-bottom:5px;">What needs improvement?</div>
+              <textarea class="wtextarea" id="w-improve" placeholder="Mistakes made, rules broken, things you struggled with..."></textarea>
+            </div>
+            <div>
+              <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.14em;color:var(--text3);text-transform:uppercase;margin-bottom:5px;">Goal for next week</div>
+              <textarea class="wtextarea" id="w-goal" placeholder="One clear, specific goal for next week..." style="min-height:60px;"></textarea>
+            </div>
+            <div>
+              <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.14em;color:var(--text3);text-transform:uppercase;margin-bottom:5px;">Confluences / setups to focus on next week</div>
+              <textarea class="wtextarea" id="w-focus" placeholder="e.g. Only take IFVG + HTF PDA Delivery. Wait for liquidity sweep before entry..." style="min-height:60px;"></textarea>
+            </div>
+          </div>
         </div>
 
-        <div class="wsection">
-          <div class="wsection-title">Self ratings</div>
-          <div class="wrating-grid">
-            <div class="wrating-cell">
-              <div class="wrating-title">Mental State</div>
-              <div class="wstar-row" id="w-stars-mental">
-                <span class="wstar" data-val="0.5" onclick="wSetStar('mental',0.5)">⯨</span>
-                <span class="wstar" data-val="1" onclick="wSetStar('mental',1)">★</span>
-                <span class="wstar" data-val="1.5" onclick="wSetStar('mental',1.5)">⯨</span>
-                <span class="wstar" data-val="2" onclick="wSetStar('mental',2)">★</span>
-                <span class="wstar" data-val="2.5" onclick="wSetStar('mental',2.5)">⯨</span>
-                <span class="wstar" data-val="3" onclick="wSetStar('mental',3)">★</span>
-                <span class="wstar" data-val="3.5" onclick="wSetStar('mental',3.5)">⯨</span>
-                <span class="wstar" data-val="4" onclick="wSetStar('mental',4)">★</span>
-                <span class="wstar" data-val="4.5" onclick="wSetStar('mental',4.5)">⯨</span>
-                <span class="wstar" data-val="5" onclick="wSetStar('mental',5)">★</span>
-                <span class="wstar-label" id="w-mental-val">0/5</span>
-              </div>
+        <!-- RATINGS -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);margin-bottom:1px;">
+          <div style="background:var(--surface);padding:1.25rem;">
+            <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--accent);text-transform:uppercase;margin-bottom:12px;">Mental State</div>
+            <div class="wstar-row" id="w-stars-mental">
+              <span class="wstar" data-val="0.5" onclick="wSetStar('mental',0.5)">⯨</span>
+              <span class="wstar" data-val="1" onclick="wSetStar('mental',1)">★</span>
+              <span class="wstar" data-val="1.5" onclick="wSetStar('mental',1.5)">⯨</span>
+              <span class="wstar" data-val="2" onclick="wSetStar('mental',2)">★</span>
+              <span class="wstar" data-val="2.5" onclick="wSetStar('mental',2.5)">⯨</span>
+              <span class="wstar" data-val="3" onclick="wSetStar('mental',3)">★</span>
+              <span class="wstar" data-val="3.5" onclick="wSetStar('mental',3.5)">⯨</span>
+              <span class="wstar" data-val="4" onclick="wSetStar('mental',4)">★</span>
+              <span class="wstar" data-val="4.5" onclick="wSetStar('mental',4.5)">⯨</span>
+              <span class="wstar" data-val="5" onclick="wSetStar('mental',5)">★</span>
+              <span class="wstar-label" id="w-mental-val">0 / 5</span>
             </div>
-            <div class="wrating-cell">
-              <div class="wrating-title">Discipline</div>
-              <div class="wstar-row" id="w-stars-discipline">
-                <span class="wstar" data-val="0.5" onclick="wSetStar('discipline',0.5)">⯨</span>
-                <span class="wstar" data-val="1" onclick="wSetStar('discipline',1)">★</span>
-                <span class="wstar" data-val="1.5" onclick="wSetStar('discipline',1.5)">⯨</span>
-                <span class="wstar" data-val="2" onclick="wSetStar('discipline',2)">★</span>
-                <span class="wstar" data-val="2.5" onclick="wSetStar('discipline',2.5)">⯨</span>
-                <span class="wstar" data-val="3" onclick="wSetStar('discipline',3)">★</span>
-                <span class="wstar" data-val="3.5" onclick="wSetStar('discipline',3.5)">⯨</span>
-                <span class="wstar" data-val="4" onclick="wSetStar('discipline',4)">★</span>
-                <span class="wstar" data-val="4.5" onclick="wSetStar('discipline',4.5)">⯨</span>
-                <span class="wstar" data-val="5" onclick="wSetStar('discipline',5)">★</span>
-                <span class="wstar-label" id="w-discipline-val">0/5</span>
-              </div>
+          </div>
+          <div style="background:var(--surface);padding:1.25rem;">
+            <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--accent);text-transform:uppercase;margin-bottom:12px;">Discipline</div>
+            <div class="wstar-row" id="w-stars-discipline">
+              <span class="wstar" data-val="0.5" onclick="wSetStar('discipline',0.5)">⯨</span>
+              <span class="wstar" data-val="1" onclick="wSetStar('discipline',1)">★</span>
+              <span class="wstar" data-val="1.5" onclick="wSetStar('discipline',1.5)">⯨</span>
+              <span class="wstar" data-val="2" onclick="wSetStar('discipline',2)">★</span>
+              <span class="wstar" data-val="2.5" onclick="wSetStar('discipline',2.5)">⯨</span>
+              <span class="wstar" data-val="3" onclick="wSetStar('discipline',3)">★</span>
+              <span class="wstar" data-val="3.5" onclick="wSetStar('discipline',3.5)">⯨</span>
+              <span class="wstar" data-val="4" onclick="wSetStar('discipline',4)">★</span>
+              <span class="wstar" data-val="4.5" onclick="wSetStar('discipline',4.5)">⯨</span>
+              <span class="wstar" data-val="5" onclick="wSetStar('discipline',5)">★</span>
+              <span class="wstar-label" id="w-discipline-val">0 / 5</span>
             </div>
           </div>
         </div>
 
         <button class="w-analyze-btn" id="w-analyze-btn" onclick="wAnalyze()">⚡ Get AI Coaching</button>
 
-        <div class="w-ai-box" id="w-ai-section" style="display:none;">
-          <div class="w-ai-header">
+        <!-- AI RESULT -->
+        <div id="w-ai-section" style="display:none;margin-top:1px;background:var(--surface);border:1px solid var(--border2);">
+          <div style="padding:10px 16px;border-bottom:1px solid var(--border2);background:var(--surface2);display:flex;align-items:center;gap:8px;">
             <span style="color:var(--accent);">⚡</span>
-            <div class="w-ai-title">AI Coach Feedback</div>
+            <span style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--accent);text-transform:uppercase;">AI Coach Feedback</span>
           </div>
-          <div class="w-ai-body" id="w-ai-content"></div>
+          <div style="padding:1.25rem;" id="w-ai-content"></div>
         </div>
 
-        <button class="w-submit-btn" id="w-submit-btn" style="display:none;" onclick="wSubmit()">✓ Submit Weekly Review</button>
+        <button class="w-submit-btn" id="w-submit-btn" style="display:none;margin-top:1px;" onclick="wSubmit()">✓ Submit & Lock Weekly Review</button>
       </div>
 
       <!-- HISTORY -->
-      <div class="wsection" style="margin-top:2.5rem;">
-        <div class="wsection-title">Past weekly reviews</div>
-        <div id="w-history" style="border:1px solid var(--border);"><div style="font-family:var(--mono);font-size:11px;color:var(--text3);padding:2rem;text-align:center;">Loading history...</div></div>
+      <div style="margin-top:2.5rem;">
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.2em;color:var(--text3);text-transform:uppercase;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border);">Past Weekly Reviews</div>
+        <div id="w-history" style="border:1px solid var(--border);"><div style="font-family:var(--mono);font-size:11px;color:var(--text3);padding:2rem;text-align:center;background:var(--surface);">Loading history...</div></div>
       </div>
+
     </div><!-- end tab-weekly -->
   </div>
 </div>
@@ -581,9 +614,10 @@ function clearConf() {
 }
 
 // CALCULATIONS
-function calcPnL(entry, exit, contracts, instrument) {
-  const pts = exit - entry;
+function calcPnL(entry, exit, contracts, instrument, direction) {
   const tickVal = {'NQ':20,'MNQ':2,'ES':50,'MES':5,'CL':1000,'GC':100,'RTY':50}[instrument] || 20;
+  // For longs: profit = exit - entry. For shorts: profit = entry - exit
+  const pts = (direction === 'Short') ? (entry - exit) : (exit - entry);
   return Math.round(pts * contracts * tickVal);
 }
 
@@ -673,13 +707,28 @@ async function analyzeTrade() {
   const date = getField('f-date') || new Date().toISOString().split('T')[0];
   const screenshot = getField('f-screenshot');
 
-  const pnl = (entry && exit) ? calcPnL(entry, exit, contracts, instrument) : 0;
+  const partialPrice = getNum('f-partial-price');
+  const partialContracts = getNum('f-partial-contracts');
+  const partialTime = getField('f-partial-time');
+  const remainingContracts = (partialContracts && contracts > 1) ? contracts - partialContracts : contracts;
+
+  let pnl = 0;
+  if (entry && exit) {
+    if (partialPrice && partialContracts && contracts > 1) {
+      // Partial: TP1 P&L + remaining contracts at final exit
+      const tp1Pnl = calcPnL(entry, partialPrice, partialContracts, instrument, direction);
+      const remainPnl = calcPnL(entry, exit, remainingContracts, instrument, direction);
+      pnl = tp1Pnl + remainPnl;
+    } else {
+      pnl = calcPnL(entry, exit, contracts, instrument, direction);
+    }
+  }
   const rr = calcRR(entry, sl, tp);
   const duration = calcDuration(entryTime, exitTime);
   const grade = autoGrade(confluences, mistakes, notes);
   const followedRules = autoFollowedRules(mistakes, notes, lessons);
 
-  tradeData = { instrument, direction, session, timeframe, htf, model, date, entry, exit, sl, tp, contracts, entryTime, exitTime, pnl, rr, duration, confluences, grade, followedRules, outcome, notes, mistakes, lessons, screenshot };
+  tradeData = { instrument, direction, session, timeframe, htf, model, date, entry, exit, sl, tp, contracts, entryTime, exitTime, pnl, rr, duration, confluences, grade, followedRules, outcome, notes, mistakes, lessons, screenshot, partialPrice, partialContracts, partialTime, remainingContracts };
 
   // Show review panel
   document.getElementById('analyze-btn').disabled = true;
@@ -777,7 +826,11 @@ async function submitTrade() {
   if (t.duration) props["Duration (mins)"] = { number: t.duration };
   if (t.entryTime) props["Entry Time"] = { rich_text: [{ text: { content: t.entryTime } }] };
   if (t.exitTime) props["Exit Time"] = { rich_text: [{ text: { content: t.exitTime } }] };
-  if (t.notes) props["Notes"] = { rich_text: [{ text: { content: t.notes } }] };
+  const fullNotes = [
+    t.notes,
+    (t.partialPrice && t.partialContracts) ? `TP1: ${t.partialContracts} contract${t.partialContracts>1?'s':''} @ ${t.partialPrice}${t.partialTime?' at '+t.partialTime:''} · Remaining ${t.remainingContracts} contract${t.remainingContracts>1?'s':''} trailed to ${t.exit}` : null
+  ].filter(Boolean).join('\n');
+  if (fullNotes) props["Notes"] = { rich_text: [{ text: { content: fullNotes } }] };
   if (t.mistakes) props["Mistakes"] = { rich_text: [{ text: { content: t.mistakes } }] };
   if (t.lessons) props["Lessons Learned"] = { rich_text: [{ text: { content: t.lessons } }] };
   if (t.htf) props["HTF Timeframe"] = { rich_text: [{ text: { content: t.htf } }] };
@@ -1447,9 +1500,52 @@ function wToggleExpand(i) {
   arrow.textContent = open ? '▼' : '▲';
 }
 
+function togglePartialRow() {
+  const contracts = getNum('f-contracts') || 1;
+  const row = document.getElementById('partial-row');
+  if (contracts > 1) {
+    row.style.display = 'block';
+  } else {
+    row.style.display = 'none';
+    document.getElementById('f-partial-price').value = '';
+    document.getElementById('f-partial-time').value = '';
+    document.getElementById('f-partial-contracts').value = '';
+  }
+}
+
+// Live partial P&L preview
+['f-partial-price','f-partial-contracts','f-entry','f-exit','f-direction','f-instrument'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('input', updatePartialPreview);
+});
+
+function updatePartialPreview() {
+  const preview = document.getElementById('partial-pnl-preview');
+  if (!preview) return;
+  const entry = getNum('f-entry');
+  const partialPrice = getNum('f-partial-price');
+  const partialContracts = getNum('f-partial-contracts');
+  const exit = getNum('f-exit');
+  const contracts = getNum('f-contracts') || 1;
+  const instrument = getField('f-instrument');
+  const direction = getField('f-direction');
+  if (!entry || !partialPrice || !partialContracts || !instrument || !direction) { preview.textContent = ''; return; }
+  const tp1Pnl = calcPnL(entry, partialPrice, partialContracts, instrument, direction);
+  const remaining = contracts - partialContracts;
+  let txt = `TP1: +$${Math.abs(tp1Pnl).toLocaleString()} (${partialContracts} contract${partialContracts>1?'s':''})`;
+  if (exit && remaining > 0) {
+    const remPnl = calcPnL(entry, exit, remaining, instrument, direction);
+    txt += ` · Remaining: +$${Math.abs(remPnl).toLocaleString()} (${remaining} contract${remaining>1?'s':''}) · Total: +$${Math.abs(tp1Pnl + remPnl).toLocaleString()}`;
+  }
+  preview.textContent = txt;
+  preview.style.color = (tp1Pnl >= 0) ? 'var(--green)' : 'var(--red)';
+}
+
 function resetForm() {
   ['f-instrument','f-direction','f-session','f-timeframe','f-outcome'].forEach(id => document.getElementById(id).value = '');
-  ['f-htf','f-model','f-entry','f-exit','f-sl','f-tp','f-contracts','f-entry-time','f-exit-time','f-notes','f-mistakes','f-lessons','f-screenshot'].forEach(id => document.getElementById(id).value = '');
+  ['f-htf','f-model','f-entry','f-exit','f-sl','f-tp','f-contracts','f-entry-time','f-exit-time','f-notes','f-mistakes','f-lessons','f-screenshot','f-partial-price','f-partial-time','f-partial-contracts'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('partial-row').style.display = 'none';
+  document.getElementById('partial-pnl-preview').textContent = '';
   document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
   clearConf();
 }
