@@ -472,9 +472,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
 
         <div class="wsection">
           <div class="wsection-title">Self ratings</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
-            <div>
-              <div class="wfield-label" style="margin-bottom:8px;">Mental State</div>
+          <div class="wrating-grid">
+            <div class="wrating-cell">
+              <div class="wrating-title">Mental State</div>
               <div class="wstar-row" id="w-stars-mental">
                 <span class="wstar" data-val="0.5" onclick="wSetStar('mental',0.5)">⯨</span>
                 <span class="wstar" data-val="1" onclick="wSetStar('mental',1)">★</span>
@@ -489,8 +489,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
                 <span class="wstar-label" id="w-mental-val">0/5</span>
               </div>
             </div>
-            <div>
-              <div class="wfield-label" style="margin-bottom:8px;">Discipline</div>
+            <div class="wrating-cell">
+              <div class="wrating-title">Discipline</div>
               <div class="wstar-row" id="w-stars-discipline">
                 <span class="wstar" data-val="0.5" onclick="wSetStar('discipline',0.5)">⯨</span>
                 <span class="wstar" data-val="1" onclick="wSetStar('discipline',1)">★</span>
@@ -511,8 +511,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
         <button class="w-analyze-btn" id="w-analyze-btn" onclick="wAnalyze()">⚡ Get AI Coaching</button>
 
         <div class="w-ai-box" id="w-ai-section" style="display:none;">
-          <div class="w-ai-title">⚡ AI Coach Feedback</div>
-          <div id="w-ai-content"></div>
+          <div class="w-ai-header">
+            <span style="color:var(--accent);">⚡</span>
+            <div class="w-ai-title">AI Coach Feedback</div>
+          </div>
+          <div class="w-ai-body" id="w-ai-content"></div>
         </div>
 
         <button class="w-submit-btn" id="w-submit-btn" style="display:none;" onclick="wSubmit()">✓ Submit Weekly Review</button>
