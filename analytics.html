@@ -3,1556 +3,977 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin — FTJ</title>
-<link rel="icon" type="image/png" href="https://i.imgur.com/ZP2pTk2.png">
+<title>Analytics — FTJ</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="https://i.imgur.com/ZP2pTk2.png">
+<script src="nav.js"></script>
 <style>
-:root {
-  --bg:#0a0a0a;--surface:#111;--surface2:#181818;
-  --border:#1a1a1a;--border2:#2a2a2a;
-  --text:#e8e8e8;--text2:#888;--text3:#444;
-  --green:#00e676;--red:#ff4444;--yellow:#ffd740;--accent:#c8ff00;
-  --mono:'Space Mono',monospace;--sans:'DM Sans',sans-serif;
-}
-*{box-sizing:border-box;margin:0;padding:0;}
-body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;min-height:100vh;}
-::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+  :root {
+    --bg: #0a0a0a;
+    --surface: #111111;
+    --surface2: #181818;
+    --border: #1a1a1a;
+    --border2: #2a2a2a;
+    --text: #e8e8e8;
+    --text2: #888;
+    --text3: #444;
+    --green: #00e676;
+    --red: #ff4444;
+    --accent: #c8ff00;
+    --mono: 'Space Mono', monospace;
+    --sans: 'DM Sans', sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 14px; min-height: 100vh; }
 
-/* AUTH SCREEN */
-#auth-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:999;flex-direction:column;gap:16px;}
-.auth-box{background:var(--surface);border:1px solid var(--border2);padding:2.5rem;width:360px;display:flex;flex-direction:column;gap:16px;}
-.auth-logo{font-family:var(--mono);font-size:11px;letter-spacing:0.15em;color:var(--accent);margin-bottom:4px;}
-.auth-title{font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text);}
-.auth-sub{font-size:12px;color:var(--text3);}
-.auth-input{font-family:var(--mono);font-size:13px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:10px 12px;width:100%;outline:none;letter-spacing:0.1em;transition:border-color 0.15s;}
-.auth-input:focus{border-color:var(--accent);}
-.auth-btn{font-family:var(--mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;padding:10px;background:var(--accent);color:#000;border:none;cursor:pointer;font-weight:700;transition:opacity 0.15s;}
-.auth-btn:hover{opacity:0.85;}
-.auth-error{font-family:var(--mono);font-size:10px;color:var(--red);letter-spacing:0.05em;display:none;}
+  .page { max-width: 1200px; margin: 0 auto; padding: 3rem 2rem; }
 
-/* MAIN LAYOUT */
-#main-screen{display:none;padding-left:64px;}
-.page{max-width:800px;margin:0 auto;padding:3rem 2rem 5rem;}
+  .page-header { margin-bottom: 2.5rem; display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+  .page-eyebrow { font-family: var(--mono); font-size: 10px; letter-spacing: 0.2em; color: var(--accent); text-transform: uppercase; margin-bottom: 10px; }
+  .page-title { font-family: var(--mono); font-size: 28px; font-weight: 700; color: var(--text); line-height: 1.1; }
 
-/* TABS */
-.tabs{display:flex;gap:1px;background:var(--border);margin-bottom:2rem;}
-.tab-btn{font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;padding:10px 20px;background:var(--surface);color:var(--text3);border:none;cursor:pointer;transition:all 0.15s;flex:1;}
-.tab-btn:hover{color:var(--text2);}
-.tab-btn.active{background:var(--surface2);color:var(--accent);}
-.tab-panel{display:none;}
-.tab-panel.active{display:block;}
+  .period-tabs { display: flex; gap: 1px; background: var(--border); }
+  .period-tab {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 8px 16px;
+    background: var(--surface);
+    color: var(--text3);
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s;
+  }
+  .period-tab:hover { color: var(--text2); }
+  .period-tab.active { background: var(--surface2); color: var(--accent); }
 
-/* BIAS BOARD (inside admin) */
-.bias-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);margin-bottom:2rem;}
-.bias-card{background:var(--surface);padding:1.5rem;}
-.bias-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;}
-.inst-badge{font-family:var(--mono);font-size:11px;letter-spacing:0.1em;padding:3px 10px;border:1px solid;}
-.inst-nq{color:#c8ff00;border-color:rgba(200,255,0,0.3);}
-.inst-es{color:#40c4ff;border-color:rgba(64,196,255,0.3);}
-.bias-val{font-family:var(--mono);font-size:28px;font-weight:700;line-height:1;margin-bottom:4px;}
-.b-bull{color:var(--green);} .b-bear{color:var(--red);} .b-range{color:var(--yellow);} .b-wait{color:var(--text3);} .b-none{color:var(--border2);}
-.bias-sublabel{font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--text3);text-transform:uppercase;margin-bottom:6px;}
-.switch-row{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10px;color:var(--yellow);margin-top:6px;}
-.bbtn-group{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin:12px 0 8px;}
-.bbtn{font-family:var(--mono);font-size:9px;letter-spacing:0.06em;text-transform:uppercase;padding:8px 4px;background:var(--surface2);border:1px solid var(--border2);color:var(--text3);cursor:pointer;transition:all 0.15s;}
-.bbtn:hover{border-color:var(--text2);color:var(--text);}
-.bbtn.bull.active,.bbtn.bull:hover{border-color:var(--green);color:var(--green);background:rgba(0,230,118,0.08);}
-.bbtn.bear.active,.bbtn.bear:hover{border-color:var(--red);color:var(--red);background:rgba(255,68,68,0.08);}
-.bbtn.range.active,.bbtn.range:hover{border-color:var(--yellow);color:var(--yellow);background:rgba(255,215,64,0.08);}
-.bbtn.wait.active,.bbtn.wait:hover{border-color:var(--text2);color:var(--text2);background:rgba(136,136,136,0.08);}
-.bbtn:disabled{opacity:0.3;cursor:not-allowed;}
-.bnotes{font-family:var(--sans);font-size:12px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:8px 10px;width:100%;outline:none;resize:none;min-height:50px;margin-bottom:8px;line-height:1.5;transition:border-color 0.15s;}
-.bnotes:focus{border-color:var(--accent);}
-.bnotes:disabled{opacity:0.4;}
-.bset-btn{font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;padding:10px;background:var(--accent);color:#000;border:none;cursor:pointer;font-weight:700;width:100%;transition:opacity 0.15s;}
-.bset-btn:hover{opacity:0.85;}
-.bset-btn:disabled{opacity:0.3;cursor:not-allowed;}
-.bset-btn.sw{background:var(--surface2);color:var(--text2);border:1px solid var(--border2);}
-.bset-btn.sw:hover{border-color:var(--yellow);color:var(--yellow);}
-.blocked-msg{font-family:var(--mono);font-size:9px;color:var(--text3);text-align:center;padding:5px;margin-top:3px;letter-spacing:0.05em;}
+  .stats-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); margin-bottom: 2rem; }
+  .stat { background: var(--surface); padding: 1.25rem 1.5rem; }
+  .stat-label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em; color: var(--text3); text-transform: uppercase; margin-bottom: 8px; }
+  .stat-value { font-family: var(--mono); font-size: 18px; font-weight: 700; color: var(--text); line-height: 1.2; }
+  .stat-sub { font-family: var(--mono); font-size: 9px; color: var(--text3); margin-top: 3px; letter-spacing: 0.08em; }
+  .stat-value.pos { color: var(--green); }
+  .stat-value.neg { color: var(--red); }
 
-/* BIAS HISTORY inside admin */
-.bhistory{display:flex;flex-direction:column;gap:1px;background:var(--border);}
-.brow{background:var(--surface);display:grid;grid-template-columns:100px 60px 1fr 1fr;gap:12px;align-items:center;padding:10px 14px;}
-.brow:hover{background:var(--surface2);}
-.bh-date{font-family:var(--mono);font-size:10px;color:var(--text2);}
-.bh-inst{font-family:var(--mono);font-size:10px;color:var(--text3);}
-.bh-bias{font-family:var(--mono);font-size:11px;font-weight:700;}
-.bh-notes{font-size:11px;color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .charts-grid { display: grid; grid-template-columns: 1fr 340px; gap: 1px; background: var(--border); margin-bottom: 2rem; }
+  .chart-panel { background: var(--surface); padding: 1.5rem; }
+  .chart-panel-title { font-family: var(--mono); font-size: 10px; letter-spacing: 0.15em; color: var(--text3); text-transform: uppercase; margin-bottom: 1.25rem; }
 
-/* NAV (inline mini nav for admin) */
-.top-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:2.5rem;}
-.back-btn{font-family:var(--mono);font-size:10px;letter-spacing:0.1em;color:var(--text3);background:none;border:1px solid var(--border2);padding:6px 14px;cursor:pointer;text-transform:uppercase;transition:all 0.15s;text-decoration:none;display:inline-block;}
-.back-btn:hover{color:var(--accent);border-color:var(--accent);}
-.page-eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:0.2em;color:var(--accent);text-transform:uppercase;margin-bottom:8px;}
-.page-title{font-family:var(--mono);font-size:28px;font-weight:700;line-height:1.1;}
+  canvas { display: block; }
 
-/* FORM */
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);margin-bottom:2rem;}
-.form-full{grid-column:1/-1;}
-.field{background:var(--surface);padding:1rem 1.25rem;}
-.field label{font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--text3);text-transform:uppercase;display:block;margin-bottom:6px;}
-.field input,.field select,.field textarea{font-family:var(--mono);font-size:12px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:8px 10px;width:100%;outline:none;transition:border-color 0.15s;appearance:none;}
-.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent);}
-.field textarea{resize:vertical;min-height:70px;font-family:var(--sans);font-size:13px;line-height:1.6;}
-.field select option{background:var(--surface2);}
+  .donut-wrap { display: flex; flex-direction: column; align-items: center; gap: 1.5rem; }
+  .donut-canvas { position: relative; }
+  .donut-legend { width: 100%; display: flex; flex-direction: column; gap: 8px; }
+  .legend-item { display: flex; align-items: center; justify-content: space-between; font-family: var(--mono); font-size: 11px; }
+  .legend-left { display: flex; align-items: center; gap: 8px; }
+  .legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .legend-name { color: var(--text2); }
+  .legend-pct { color: var(--text3); }
 
-/* CONFLUENCE MULTI SELECT */
-.conf-wrap{position:relative;}
-.conf-btn{font-family:var(--mono);font-size:11px;background:var(--surface2);border:1px solid var(--border2);color:var(--text2);padding:8px 10px;width:100%;text-align:left;cursor:pointer;transition:border-color 0.15s;display:flex;justify-content:space-between;align-items:center;}
-.conf-btn.open,.conf-btn:focus{border-color:var(--accent);outline:none;}
-.conf-dropdown{display:none;position:absolute;top:100%;left:0;right:0;background:var(--surface);border:1px solid var(--accent);border-top:none;z-index:100;max-height:260px;overflow-y:auto;}
-.conf-dropdown.open{display:block;}
-.conf-group-lbl{font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--text3);text-transform:uppercase;padding:7px 10px 3px;border-top:1px solid var(--border2);}
-.conf-group-lbl:first-child{border-top:none;}
-.conf-opt{display:flex;align-items:center;gap:8px;padding:6px 10px;cursor:pointer;font-size:12px;color:var(--text2);transition:background 0.1s;}
-.conf-opt:hover{background:var(--surface2);}
-.conf-opt input{accent-color:var(--accent);width:12px;height:12px;flex-shrink:0;}
-.conf-opt.selected{color:var(--text);}
-.conf-clear{width:100%;font-family:var(--mono);font-size:9px;color:var(--text3);background:none;border:none;border-top:1px solid var(--border2);padding:7px;cursor:pointer;text-transform:uppercase;transition:color 0.15s;}
-.conf-clear:hover{color:var(--accent);}
+  .loading-state { text-align: center; padding: 5rem 2rem; font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; color: var(--text3); text-transform: uppercase; }
+  .loading-state span { animation: blink 1s infinite; display: inline-block; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+  .error-state { padding: 2rem; font-family: var(--mono); font-size: 11px; color: var(--red); background: rgba(255,68,68,0.05); border: 1px solid rgba(255,68,68,0.2); }
+  .insights-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); margin-bottom: 1rem; }
+  .insight-card { background: var(--surface); padding: 1rem 1.25rem; }
+  .insight-label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em; color: var(--text3); text-transform: uppercase; margin-bottom: 6px; }
+  .insight-value { font-family: var(--mono); font-size: 18px; font-weight: 700; color: var(--text); }
+  .insight-value.pos { color: var(--green); }
+  .insight-value.neg { color: var(--red); }
+  .insight-sub { font-family: var(--mono); font-size: 11px; color: var(--text3); margin-top: 2px; }
+  .grade-dist { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+  .gdist-item { display: flex; align-items: center; gap: 4px; }
+  .gdist-grade { font-family: var(--mono); font-size: 9px; padding: 2px 6px; border: 1px solid; }
+  .gdist-App { color:#c8ff00; border-color:rgba(200,255,0,0.4); }
+  .gdist-Ap { color:#00e676; border-color:rgba(0,230,118,0.4); }
+  .gdist-A { color:#40c4ff; border-color:rgba(64,196,255,0.4); }
+  .gdist-B { color:#ffd740; border-color:rgba(255,215,64,0.4); }
+  .gdist-C { color:#ff6d00; border-color:rgba(255,109,0,0.4); }
+  .gdist-D { color:#ff4444; border-color:rgba(255,68,68,0.4); }
+  .gdist-count { font-family: var(--mono); font-size: 10px; color: var(--text3); }
+  @media(max-width:900px){ .insights-row { grid-template-columns: repeat(2,1fr); } }
 
-/* TAGS DISPLAY */
-.conf-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;min-height:24px;}
-.conf-tag{font-family:var(--mono);font-size:9px;padding:2px 8px;border:1px solid var(--border2);color:var(--text3);}
+  .cal-panel { background: var(--surface); padding: 1.5rem; margin-bottom: 2rem; border: 1px solid var(--border); }
+  .cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; }
+  .cal-nav { display: flex; align-items: center; gap: 12px; }
+  .cal-nav-btn { font-family: var(--mono); font-size: 14px; background: none; border: 1px solid var(--border2); color: var(--text2); width: 28px; height: 28px; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; justify-content: center; }
+  .cal-nav-btn:hover { color: var(--accent); border-color: var(--accent); }
+  .cal-month-label { font-family: var(--mono); font-size: 12px; letter-spacing: 0.1em; color: var(--text); text-transform: uppercase; min-width: 140px; text-align: center; }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; background: var(--border); }
+  .cal-day-header { background: var(--bg); font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; color: var(--text3); text-transform: uppercase; text-align: center; padding: 6px 0; }
+  .cal-cell { background: var(--surface); min-height: 70px; padding: 6px 8px; display: flex; flex-direction: column; gap: 3px; }
+  .cal-cell.empty { background: var(--bg); }
+  .cal-cell.today { background: var(--surface2); outline: 1px solid var(--border2); }
+  .cal-date { font-family: var(--mono); font-size: 10px; color: var(--text3); }
+  .cal-pnl { font-family: var(--mono); font-size: 12px; font-weight: 700; margin-top: auto; }
+  .cal-pnl.pos { color: var(--green); }
+  .cal-pnl.neg { color: var(--red); }
+  .cal-trades { font-family: var(--mono); font-size: 9px; color: var(--text3); }
+  .cal-cell.has-trades { background: var(--surface2); }
 
-/* SUBMIT BTN */
-.analyze-btn{font-family:var(--mono);font-size:12px;letter-spacing:0.1em;text-transform:uppercase;padding:14px 28px;background:var(--accent);color:#000;border:none;cursor:pointer;font-weight:700;transition:opacity 0.15s;width:100%;}
-.analyze-btn:hover{opacity:0.85;}
-.analyze-btn:disabled{opacity:0.4;cursor:not-allowed;}
-
-/* REVIEW PANEL */
-#review-panel{display:none;margin-top:2rem;border:1px solid var(--border2);}
-.review-header{background:var(--surface);padding:1rem 1.25rem;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;}
-.review-title{font-family:var(--mono);font-size:11px;letter-spacing:0.12em;color:var(--accent);text-transform:uppercase;}
-.review-body{padding:1.25rem;}
-.review-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 24px;margin-bottom:1.25rem;}
-.review-field{}
-.review-label{font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--text3);text-transform:uppercase;margin-bottom:2px;}
-.review-value{font-family:var(--mono);font-size:12px;color:var(--text2);}
-.review-value.accent{color:var(--accent);}
-.review-value.green{color:var(--green);}
-.review-value.red{color:var(--red);}
-.review-value.yellow{color:var(--yellow);}
-
-.ai-section{background:var(--surface2);padding:1rem;margin-bottom:1.25rem;border:1px solid var(--border2);}
-.ai-title{font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--accent);text-transform:uppercase;margin-bottom:8px;}
-.ai-result{font-size:13px;color:var(--text2);line-height:1.8;white-space:pre-wrap;}
-.ai-verdict{font-family:var(--mono);font-size:11px;padding:6px 12px;display:inline-block;border:1px solid;margin-top:8px;}
-.verdict-yes{color:var(--green);border-color:rgba(0,230,118,0.4);background:rgba(0,230,118,0.07);}
-.verdict-partial{color:var(--yellow);border-color:rgba(255,215,64,0.4);background:rgba(255,215,64,0.07);}
-.verdict-no{color:var(--red);border-color:rgba(255,68,68,0.4);background:rgba(255,68,68,0.07);}
-
-.review-actions{display:flex;gap:8px;}
-.confirm-btn{font-family:var(--mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;padding:10px 20px;background:var(--green);color:#000;border:none;cursor:pointer;font-weight:700;flex:1;transition:opacity 0.15s;}
-.confirm-btn:hover{opacity:0.85;}
-.confirm-btn:disabled{opacity:0.4;cursor:not-allowed;}
-.edit-btn{font-family:var(--mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;padding:10px 20px;background:none;color:var(--text2);border:1px solid var(--border2);cursor:pointer;transition:all 0.15s;}
-.edit-btn:hover{color:var(--accent);border-color:var(--accent);}
-
-.success-msg{display:none;background:rgba(0,230,118,0.08);border:1px solid rgba(0,230,118,0.3);padding:1rem 1.25rem;font-family:var(--mono);font-size:12px;color:var(--green);text-align:center;margin-top:1rem;letter-spacing:0.05em;}
-.loading-msg{font-family:var(--mono);font-size:11px;color:var(--text3);letter-spacing:0.1em;text-align:center;padding:1rem;animation:blink 1s infinite;}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
-
-.sidenav-admin{position:fixed;left:0;top:0;bottom:0;width:64px;background:var(--bg);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:1.5rem 0;z-index:200;}
-.nav-logo-a{font-family:var(--mono);font-size:9px;letter-spacing:0.1em;color:var(--accent);writing-mode:vertical-rl;margin-bottom:2rem;}
-.nav-admin-tag{font-family:var(--mono);font-size:8px;letter-spacing:0.12em;color:var(--red);writing-mode:vertical-rl;margin-top:auto;}
-
-@media(max-width:600px){.form-grid{grid-template-columns:1fr;}#main-screen{padding-left:0;}}
+  @media (max-width: 900px) {
+    .charts-grid { grid-template-columns: 1fr; }
+    .stats-row { grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (max-width: 600px) {
+    .page { padding: 2rem 1rem; }
+    .stats-row { grid-template-columns: repeat(2, 1fr); font-size:11px; }
+    .cal-cell { min-height: 50px; }
+    .cal-pnl { font-size: 10px; }
+  }
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
 </style>
 </head>
 <body>
-
-<!-- AUTH SCREEN -->
-<div id="auth-screen">
-  <div class="auth-box">
-    <div class="auth-logo">// FTJ</div>
-    <div class="auth-title">Admin Access</div>
-    <div class="auth-sub">Enter your password to access the trade log admin.</div>
-    <input class="auth-input" type="password" id="pw-input" placeholder="Password" onkeydown="if(event.key==='Enter')checkAuth()">
-    <div class="auth-error" id="auth-error">Incorrect password. Try again.</div>
-    <button class="auth-btn" onclick="checkAuth()">Unlock →</button>
+<div class="page">
+  <div class="page-header">
+    <div>
+      <div class="page-eyebrow">// Performance</div>
+      <div class="page-title">Analytics</div>
+    </div>
+    <div class="period-tabs">
+      <button class="period-tab active" data-period="all">All</button>
+      <button class="period-tab" data-period="week">Week</button>
+      <button class="period-tab" data-period="month">Month</button>
+      <button class="period-tab" data-period="3month">3M</button>
+    </div>
   </div>
-</div>
 
-<!-- MAIN SCREEN -->
-<div id="main-screen">
-  <nav class="sidenav-admin">
-    <div class="nav-logo-a">// FTJ</div>
-    <div class="nav-admin-tag">ADMIN</div>
-  </nav>
-
-  <div class="page">
-    <div class="top-bar">
-      <a href="index.html" class="back-btn">← Back to Journal</a>
-    </div>
-    <div class="page-eyebrow">// Admin</div>
-    <div class="page-title">Admin Panel</div>
-
-    <div class="tabs" style="margin-top:1.5rem;">
-      <button class="tab-btn active" onclick="switchTab('trade',this)">◈ Log Trade</button>
-      <button class="tab-btn" onclick="switchTab('bias',this)">◑ Bias Board</button>
-      <button class="tab-btn" onclick="switchTab('weekly',this)">◐ Weekly Review</button>
-    </div>
-
-    <!-- TRADE TAB -->
-    <div class="tab-panel active" id="tab-trade">
-    <p style="font-size:13px;color:var(--text2);margin:0 0 2rem;line-height:1.7;">Fill in your trade details. The AI will grade, verify, and calculate all values — then show you a preview before submitting to Notion.</p>
-
-    <div class="form-grid">
-      <!-- Row 1 -->
-      <div class="field">
-        <label>Instrument</label>
-        <select id="f-instrument">
-          <option value="">Select...</option>
-          <option>NQ</option><option>ES</option><option>MNQ</option><option>MES</option><option>CL</option><option>GC</option><option>RTY</option>
-        </select>
-      </div>
-      <div class="field">
-        <label>Direction</label>
-        <select id="f-direction">
-          <option value="">Select...</option>
-          <option>Long</option><option>Short</option>
-        </select>
-      </div>
-      <!-- Row 2 -->
-      <div class="field">
-        <label>Session</label>
-        <select id="f-session">
-          <option value="">Select...</option>
-          <option>Asia</option><option>London</option><option>NY AM</option><option>NY Lunch</option><option>NY PM</option><option>Overnight</option>
-        </select>
-      </div>
-      <div class="field">
-        <label>Timeframe</label>
-        <select id="f-timeframe">
-          <option value="">Select...</option>
-          <option>1m</option><option>3m</option><option>5m</option><option>15m</option><option>1h</option><option>4h</option><option>Daily</option>
-        </select>
-      </div>
-      <!-- Row 3 -->
-      <div class="field">
-        <label>HTF Timeframe</label>
-        <input type="text" id="f-htf" placeholder="e.g. 4H, 1H, 15m">
-      </div>
-      <div class="field">
-        <label>Entry Model</label>
-        <input type="text" id="f-model" placeholder="e.g. 1m IFVG retracement">
-      </div>
-      <!-- Row 4 -->
-      <div class="field">
-        <label>Date</label>
-        <input type="date" id="f-date">
-      </div>
-      <div class="field">
-        <label>Outcome</label>
-        <select id="f-outcome">
-          <option value="">Select...</option>
-          <option value="Closed - Win">Win</option>
-          <option value="Closed - Loss">Loss</option>
-          <option value="Breakeven">Breakeven</option>
-        </select>
-      </div>
-      <!-- Row 5 -->
-      <div class="field">
-        <label>Entry Price</label>
-        <input type="number" id="f-entry" placeholder="e.g. 27363.50" step="0.25">
-      </div>
-      <div class="field">
-        <label>Entry Time</label>
-        <input type="text" id="f-entry-time" placeholder="e.g. 9:40 AM">
-      </div>
-      <!-- Row 6 -->
-      <div class="field">
-        <label>Exit Price</label>
-        <input type="number" id="f-exit" placeholder="e.g. 27419.75" step="0.25">
-      </div>
-      <div class="field">
-        <label>Exit Time</label>
-        <input type="text" id="f-exit-time" placeholder="e.g. 10:01 AM">
-      </div>
-      <!-- Row 7 -->
-      <div class="field">
-        <label>Stop Loss</label>
-        <input type="number" id="f-sl" placeholder="e.g. 27336.75" step="0.25">
-      </div>
-      <div class="field">
-        <label>Take Profit</label>
-        <input type="number" id="f-tp" placeholder="e.g. 27453.75" step="0.25">
-      </div>
-      <!-- Row 8 -->
-      <div class="field">
-        <label>Contracts</label>
-        <input type="number" id="f-contracts" placeholder="e.g. 2" min="1" oninput="togglePartialRow()">
-      </div>
-      <div class="field">
-        <label>Screenshot Link</label>
-        <input type="text" id="f-screenshot" placeholder="imgur or TradingView URL">
-      </div>
-      <!-- Confluences -->
-      <div class="field form-full">
-        <label>Confluences</label>
-        <div class="conf-wrap">
-          <button class="conf-btn" id="conf-btn" onclick="toggleConf()" type="button">
-            <span id="conf-label">Select confluences...</span>
-            <span>▼</span>
-          </button>
-          <div class="conf-dropdown" id="conf-dropdown">
-            <div class="conf-group-lbl">Structure</div>
-            <label class="conf-opt"><input type="checkbox" value="MSS" onchange="updateConf()"> MSS — Market Structure Shift</label>
-            <label class="conf-opt"><input type="checkbox" value="BOS" onchange="updateConf()"> BOS — Break of Structure</label>
-            <label class="conf-opt"><input type="checkbox" value="CHoCH" onchange="updateConf()"> CHoCH — Change of Character</label>
-            <label class="conf-opt"><input type="checkbox" value="Displacement" onchange="updateConf()"> Displacement</label>
-            <div class="conf-group-lbl">Entry (PDA Arrays)</div>
-            <label class="conf-opt"><input type="checkbox" value="IFVG" onchange="updateConf()"> IFVG — Inverse Fair Value Gap</label>
-            <label class="conf-opt"><input type="checkbox" value="FVG" onchange="updateConf()"> FVG — Fair Value Gap</label>
-            <label class="conf-opt"><input type="checkbox" value="Order Block" onchange="updateConf()"> Order Block</label>
-            <label class="conf-opt"><input type="checkbox" value="Breaker Block" onchange="updateConf()"> Breaker Block</label>
-            <label class="conf-opt"><input type="checkbox" value="Mitigation Block" onchange="updateConf()"> Mitigation Block</label>
-            <label class="conf-opt"><input type="checkbox" value="PDA Array" onchange="updateConf()"> PDA Array</label>
-            <div class="conf-group-lbl">Liquidity</div>
-            <label class="conf-opt"><input type="checkbox" value="Liquidity Sweep" onchange="updateConf()"> Liquidity Sweep</label>
-            <label class="conf-opt"><input type="checkbox" value="BSL Taken" onchange="updateConf()"> BSL Taken</label>
-            <label class="conf-opt"><input type="checkbox" value="SSL Taken" onchange="updateConf()"> SSL Taken</label>
-            <label class="conf-opt"><input type="checkbox" value="Equal Highs/Lows" onchange="updateConf()"> Equal Highs / Lows</label>
-            <div class="conf-group-lbl">Confluence</div>
-            <label class="conf-opt"><input type="checkbox" value="SMT Divergence" onchange="updateConf()"> SMT Divergence</label>
-            <label class="conf-opt"><input type="checkbox" value="HTF PDA Delivery" onchange="updateConf()"> HTF PDA Delivery</label>
-            <label class="conf-opt"><input type="checkbox" value="HTF Trend" onchange="updateConf()"> HTF Trend</label>
-            <label class="conf-opt"><input type="checkbox" value="Retracement" onchange="updateConf()"> Retracement</label>
-            <label class="conf-opt"><input type="checkbox" value="Clear Targets" onchange="updateConf()"> Clear Targets</label>
-            <label class="conf-opt"><input type="checkbox" value="Volume" onchange="updateConf()"> Volume</label>
-            <label class="conf-opt"><input type="checkbox" value="ATH" onchange="updateConf()"> ATH — All Time High</label>
-            <label class="conf-opt"><input type="checkbox" value="ATL" onchange="updateConf()"> ATL — All Time Low</label>
-            <label class="conf-opt"><input type="checkbox" value="Fib Target (-0.5)" onchange="updateConf()"> Fib Target (-0.5)</label>
-            <div class="conf-group-lbl">Model</div>
-            <label class="conf-opt"><input type="checkbox" value="Market Maker Model" onchange="updateConf()"> Market Maker Model</label>
-            <label class="conf-opt"><input type="checkbox" value="Power of 3" onchange="updateConf()"> Power of 3</label>
-            <label class="conf-opt"><input type="checkbox" value="Judas Swing" onchange="updateConf()"> Judas Swing</label>
-            <label class="conf-opt"><input type="checkbox" value="Kill Zone" onchange="updateConf()"> Kill Zone</label>
-            <label class="conf-opt"><input type="checkbox" value="NWOG" onchange="updateConf()"> NWOG</label>
-            <label class="conf-opt"><input type="checkbox" value="NDOG" onchange="updateConf()"> NDOG</label>
-            <label class="conf-opt"><input type="checkbox" value="Asian Range" onchange="updateConf()"> Asian Range</label>
-            <label class="conf-opt"><input type="checkbox" value="CISD" onchange="updateConf()"> CISD — Change in State of Delivery</label>
-            <label class="conf-opt"><input type="checkbox" value="LRLR" onchange="updateConf()"> LRLR — Low Resistance Liquidity Run</label>
-            <button class="conf-clear" onclick="clearConf()">✕ Clear</button>
-          </div>
-        </div>
-        <div class="conf-tags" id="conf-tags"></div>
-      </div>
-      <!-- Notes -->
-      <div class="field form-full">
-        <label>Notes</label>
-        <textarea id="f-notes" placeholder="What happened during this trade?"></textarea>
-      </div>
-      <div class="field form-full">
-        <label>Mistakes</label>
-        <textarea id="f-mistakes" placeholder="What did you do wrong?"></textarea>
-      </div>
-      <div class="field form-full">
-        <label>Lessons Learned</label>
-        <textarea id="f-lessons" placeholder="What will you do differently?"></textarea>
-      </div>
-    </div>
-
-    <button class="analyze-btn" id="analyze-btn" onclick="analyzeTrade()">⚡ Analyze & Preview Trade</button>
-
-    <!-- REVIEW PANEL -->
-    <div id="review-panel">
-      <div class="review-header">
-        <div class="review-title">⚡ Trade Preview — Review Before Submitting</div>
-      </div>
-      <div class="review-body">
-        <div class="review-grid" id="review-grid"></div>
-        <div class="ai-section">
-          <div class="ai-title">AI Rule Verification</div>
-          <div class="ai-result" id="ai-result"></div>
-          <div id="ai-verdict-badge"></div>
-        </div>
-        <div class="review-actions">
-          <button class="confirm-btn" id="confirm-btn" onclick="submitTrade()">✓ Confirm & Submit to Notion</button>
-          <button class="edit-btn" onclick="editTrade()">← Edit Trade</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="success-msg" id="success-msg">✓ Trade logged successfully to Notion!</div>
-    </div><!-- end tab-trade -->
-
-    <!-- BIAS TAB -->
-    <div class="tab-panel" id="tab-bias">
-      <p style="font-size:13px;color:var(--text2);margin:0 0 1.5rem;line-height:1.7;">Set your daily HTF bias. Locked once set — one switch allowed per instrument per day.</p>
-      <div class="bias-grid" id="bias-grid">
-        <div class="bias-card">
-          <div class="bias-card-header">
-            <span class="inst-badge inst-nq">NQ</span>
-            <span style="font-family:var(--mono);font-size:10px;color:var(--text3);" id="bias-date-label"></span>
-          </div>
-          <div class="bias-sublabel">Current Bias</div>
-          <div class="bias-val b-none" id="bval-NQ">—</div>
-          <div id="bswitch-NQ" style="display:none;" class="switch-row"><span>→ Switched from</span><span id="bswitch-from-NQ"></span></div>
-          <div class="bbtn-group" id="bbtns-NQ">
-            <button class="bbtn bull" onclick="bSelectBias('NQ','Bullish')">Bullish</button>
-            <button class="bbtn bear" onclick="bSelectBias('NQ','Bearish')">Bearish</button>
-            <button class="bbtn range" onclick="bSelectBias('NQ','Ranging')">Ranging</button>
-            <button class="bbtn wait" onclick="bSelectBias('NQ','Waiting')">Waiting</button>
-          </div>
-          <textarea class="bnotes" id="bnotes-NQ" placeholder="Notes — key levels, reasoning..."></textarea>
-          <button class="bset-btn" id="bset-NQ" onclick="bSubmit('NQ')">Set NQ Bias</button>
-          <div class="blocked-msg" id="blocked-NQ" style="display:none;"></div>
-        </div>
-        <div class="bias-card">
-          <div class="bias-card-header">
-            <span class="inst-badge inst-es">ES</span>
-          </div>
-          <div class="bias-sublabel">Current Bias</div>
-          <div class="bias-val b-none" id="bval-ES">—</div>
-          <div id="bswitch-ES" style="display:none;" class="switch-row"><span>→ Switched from</span><span id="bswitch-from-ES"></span></div>
-          <div class="bbtn-group" id="bbtns-ES">
-            <button class="bbtn bull" onclick="bSelectBias('ES','Bullish')">Bullish</button>
-            <button class="bbtn bear" onclick="bSelectBias('ES','Bearish')">Bearish</button>
-            <button class="bbtn range" onclick="bSelectBias('ES','Ranging')">Ranging</button>
-            <button class="bbtn wait" onclick="bSelectBias('ES','Waiting')">Waiting</button>
-          </div>
-          <textarea class="bnotes" id="bnotes-ES" placeholder="Notes — key levels, reasoning..."></textarea>
-          <button class="bset-btn" id="bset-ES" onclick="bSubmit('ES')">Set ES Bias</button>
-          <div class="blocked-msg" id="blocked-ES" style="display:none;"></div>
-        </div>
-      </div>
-      <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.2em;color:var(--text3);text-transform:uppercase;margin-bottom:10px;">Bias History</div>
-      <div id="bhistory-container"><div style="font-family:var(--mono);font-size:11px;color:var(--text3);padding:2rem;text-align:center;">Loading...</div></div>
-    </div><!-- end tab-bias -->
-
-    <!-- WEEKLY REVIEW TAB -->
-    <div class="tab-panel" id="tab-weekly">
-
-      <!-- WEEK HEADER -->
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;padding-bottom:1rem;border-bottom:1px solid var(--border);">
-        <div>
-          <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.2em;color:var(--accent);text-transform:uppercase;margin-bottom:6px;">// Current Week</div>
-          <div style="font-family:var(--mono);font-size:16px;font-weight:700;color:var(--text);" id="w-week-label">Loading...</div>
-        </div>
-      </div>
-
-      <!-- STATS ROW -->
-      <div class="wstats" id="w-stats">
-        <div class="wstat"><div class="wstat-label">Trades</div><div class="wstat-val">—</div></div>
-        <div class="wstat"><div class="wstat-label">Win Rate</div><div class="wstat-val">—</div></div>
-        <div class="wstat"><div class="wstat-label">Total P&L</div><div class="wstat-val">—</div></div>
-        <div class="wstat"><div class="wstat-label">Best Trade</div><div class="wstat-val">—</div></div>
-        <div class="wstat"><div class="wstat-label">Worst Trade</div><div class="wstat-val">—</div></div>
-      </div>
-
-      <!-- DATA GRID -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);margin-bottom:2rem;">
-        <div style="background:var(--surface);padding:1.25rem;">
-          <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--accent);text-transform:uppercase;margin-bottom:10px;">Grade Breakdown</div>
-          <div id="w-grades" style="display:flex;flex-wrap:wrap;gap:6px;min-height:24px;"></div>
-        </div>
-        <div style="background:var(--surface);padding:1.25rem;">
-          <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--accent);text-transform:uppercase;margin-bottom:10px;">Top Confluences</div>
-          <div id="w-confs" style="display:flex;flex-wrap:wrap;gap:6px;min-height:24px;"></div>
-        </div>
-        <div style="background:var(--surface);padding:1.25rem;grid-column:1/-1;">
-          <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--accent);text-transform:uppercase;margin-bottom:10px;">Rule Breaches Detected</div>
-          <div id="w-breaches"></div>
-        </div>
-      </div>
-
-      <!-- LOCKED VIEW -->
-      <div id="w-locked" style="display:none;">
-        <div style="background:rgba(0,230,118,0.04);border:1px solid rgba(0,230,118,0.2);margin-bottom:1.5rem;">
-          <div style="padding:10px 16px;border-bottom:1px solid rgba(0,230,118,0.15);display:flex;align-items:center;gap:8px;">
-            <span style="color:var(--green);font-size:12px;">✓</span>
-            <span style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--green);text-transform:uppercase;">Weekly review submitted & locked</span>
-          </div>
-          <div style="padding:1.25rem;" id="w-locked-content"></div>
-        </div>
-        <div id="w-addnote" style="display:none;background:var(--surface);border:1px solid var(--border2);padding:1.25rem;margin-bottom:1rem;">
-          <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--text3);text-transform:uppercase;margin-bottom:8px;">Add a note</div>
-          <textarea class="wtextarea" id="w-extra-note" placeholder="Add extra thoughts for this week..." style="min-height:60px;"></textarea>
-          <button class="set-btn" id="w-note-btn" onclick="wSaveNote()" style="margin-top:8px;width:auto;padding:8px 20px;font-size:10px;">Save Note</button>
-        </div>
-      </div>
-
-      <!-- FORM -->
-      <div id="w-form">
-
-        <!-- REFLECTION -->
-        <div style="background:var(--surface);border:1px solid var(--border2);margin-bottom:1px;">
-          <div style="padding:10px 16px;border-bottom:1px solid var(--border2);background:var(--surface2);">
-            <span style="font-family:var(--mono);font-size:9px;letter-spacing:0.18em;color:var(--accent);text-transform:uppercase;">Your Reflection</span>
-          </div>
-          <div style="padding:1.25rem;display:flex;flex-direction:column;gap:14px;">
-            <div>
-              <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.14em;color:var(--text3);text-transform:uppercase;margin-bottom:5px;">What went well this week?</div>
-              <textarea class="wtextarea" id="w-went-well" placeholder="Trades you executed well, setups you read correctly, discipline wins..."></textarea>
-            </div>
-            <div>
-              <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.14em;color:var(--text3);text-transform:uppercase;margin-bottom:5px;">What needs improvement?</div>
-              <textarea class="wtextarea" id="w-improve" placeholder="Mistakes made, rules broken, things you struggled with..."></textarea>
-            </div>
-            <div>
-              <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.14em;color:var(--text3);text-transform:uppercase;margin-bottom:5px;">Goal for next week</div>
-              <textarea class="wtextarea" id="w-goal" placeholder="One clear, specific goal for next week..." style="min-height:60px;"></textarea>
-            </div>
-            <div>
-              <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.14em;color:var(--text3);text-transform:uppercase;margin-bottom:5px;">Confluences / setups to focus on next week</div>
-              <textarea class="wtextarea" id="w-focus" placeholder="e.g. Only take IFVG + HTF PDA Delivery. Wait for liquidity sweep before entry..." style="min-height:60px;"></textarea>
-            </div>
-          </div>
-        </div>
-
-        <!-- RATINGS -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);margin-bottom:1px;">
-          <div style="background:var(--surface);padding:1.25rem;">
-            <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--accent);text-transform:uppercase;margin-bottom:12px;">Mental State</div>
-            <div class="wstar-row" id="w-stars-mental">
-              <span class="wstar" data-val="0.5" onclick="wSetStar('mental',0.5)">⯨</span>
-              <span class="wstar" data-val="1" onclick="wSetStar('mental',1)">★</span>
-              <span class="wstar" data-val="1.5" onclick="wSetStar('mental',1.5)">⯨</span>
-              <span class="wstar" data-val="2" onclick="wSetStar('mental',2)">★</span>
-              <span class="wstar" data-val="2.5" onclick="wSetStar('mental',2.5)">⯨</span>
-              <span class="wstar" data-val="3" onclick="wSetStar('mental',3)">★</span>
-              <span class="wstar" data-val="3.5" onclick="wSetStar('mental',3.5)">⯨</span>
-              <span class="wstar" data-val="4" onclick="wSetStar('mental',4)">★</span>
-              <span class="wstar" data-val="4.5" onclick="wSetStar('mental',4.5)">⯨</span>
-              <span class="wstar" data-val="5" onclick="wSetStar('mental',5)">★</span>
-              <span class="wstar-label" id="w-mental-val">0 / 5</span>
-            </div>
-          </div>
-          <div style="background:var(--surface);padding:1.25rem;">
-            <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--accent);text-transform:uppercase;margin-bottom:12px;">Discipline</div>
-            <div class="wstar-row" id="w-stars-discipline">
-              <span class="wstar" data-val="0.5" onclick="wSetStar('discipline',0.5)">⯨</span>
-              <span class="wstar" data-val="1" onclick="wSetStar('discipline',1)">★</span>
-              <span class="wstar" data-val="1.5" onclick="wSetStar('discipline',1.5)">⯨</span>
-              <span class="wstar" data-val="2" onclick="wSetStar('discipline',2)">★</span>
-              <span class="wstar" data-val="2.5" onclick="wSetStar('discipline',2.5)">⯨</span>
-              <span class="wstar" data-val="3" onclick="wSetStar('discipline',3)">★</span>
-              <span class="wstar" data-val="3.5" onclick="wSetStar('discipline',3.5)">⯨</span>
-              <span class="wstar" data-val="4" onclick="wSetStar('discipline',4)">★</span>
-              <span class="wstar" data-val="4.5" onclick="wSetStar('discipline',4.5)">⯨</span>
-              <span class="wstar" data-val="5" onclick="wSetStar('discipline',5)">★</span>
-              <span class="wstar-label" id="w-discipline-val">0 / 5</span>
-            </div>
-          </div>
-        </div>
-
-        <button class="w-analyze-btn" id="w-analyze-btn" onclick="wAnalyze()">⚡ Get AI Coaching</button>
-
-        <!-- AI RESULT -->
-        <div id="w-ai-section" style="display:none;margin-top:1px;background:var(--surface);border:1px solid var(--border2);">
-          <div style="padding:10px 16px;border-bottom:1px solid var(--border2);background:var(--surface2);display:flex;align-items:center;gap:8px;">
-            <span style="color:var(--accent);">⚡</span>
-            <span style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--accent);text-transform:uppercase;">AI Coach Feedback</span>
-          </div>
-          <div style="padding:1.25rem;" id="w-ai-content"></div>
-        </div>
-
-        <button class="w-submit-btn" id="w-submit-btn" style="display:none;margin-top:1px;" onclick="wSubmit()">✓ Submit & Lock Weekly Review</button>
-      </div>
-
-      <!-- HISTORY -->
-      <div style="margin-top:2.5rem;">
-        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.2em;color:var(--text3);text-transform:uppercase;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border);">Past Weekly Reviews</div>
-        <div id="w-history" style="border:1px solid var(--border);"><div style="font-family:var(--mono);font-size:11px;color:var(--text3);padding:2rem;text-align:center;background:var(--surface);">Loading history...</div></div>
-      </div>
-
-    </div><!-- end tab-weekly -->
+  <div id="stats-row" class="stats-row">
+    <div class="stat"><div class="stat-label">Trades</div><div class="stat-value" id="s-total">—</div></div>
+    <div class="stat"><div class="stat-label">Win Rate</div><div class="stat-value" id="s-wr">—</div></div>
+    <div class="stat"><div class="stat-label">Total P&L</div><div class="stat-value" id="s-pnl">—</div></div>
+    <div class="stat"><div class="stat-label">Avg P&L</div><div class="stat-value" id="s-avg">—</div></div>
+    <div class="stat"><div class="stat-label">Best Trade</div><div class="stat-value pos" id="s-best">—</div></div>
+    <div class="stat"><div class="stat-label">Win Streak</div><div class="stat-value pos" id="s-wstreak">—</div></div>
+    <div class="stat"><div class="stat-label">Loss Streak</div><div class="stat-value neg" id="s-lstreak">—</div></div>
+    <div class="stat"><div class="stat-label">Best Session</div><div class="stat-value" id="s-session">—</div></div>
+    <div class="stat"><div class="stat-label">Avg R:R</div><div class="stat-value" id="s-rr">—</div><div class="stat-sub">risk to reward</div></div>
+    <div class="stat"><div class="stat-label">Avg Duration</div><div class="stat-value" id="s-dur">—</div><div class="stat-sub">time in trade</div></div>
   </div>
+
+  <div id="main-content"><div class="loading-state">Loading analytics <span>...</span></div></div>
+
+<!-- calendar rendered dynamically inside main-content -->
 </div>
 
 <script>
-const WORKER = 'https://trade-journal-proxy.daniel-mouldd.workers.dev';
-const DB_ID = '5398f956345943b7b12b2298bbb6e127';
-const PASS = 'Pammolad123#';
+const WORKER_URL = "https://trade-journal-proxy.daniel-mouldd.workers.dev";
+const DATABASE_ID = "5398f956345943b7b12b2298bbb6e127";
 
-let tradeData = {};
-
-// Set today's date as default
-document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
-
-// AUTH
-function checkAuth() {
-  const val = document.getElementById('pw-input').value;
-  if (val === PASS) {
-    document.getElementById('auth-screen').style.display = 'none';
-    document.getElementById('main-screen').style.display = 'block';
-  } else {
-    document.getElementById('auth-error').style.display = 'block';
-    document.getElementById('pw-input').value = '';
-    document.getElementById('pw-input').focus();
-  }
-}
-document.getElementById('pw-input').addEventListener('keydown', e => { if (e.key === 'Enter') checkAuth(); });
-
-// CONFLUENCE DROPDOWN
-let confOpen = false;
-function toggleConf() {
-  confOpen = !confOpen;
-  document.getElementById('conf-dropdown').classList.toggle('open', confOpen);
-  document.getElementById('conf-btn').classList.toggle('open', confOpen);
-}
-document.addEventListener('click', e => {
-  const wrap = document.querySelector('.conf-wrap');
-  if (wrap && !wrap.contains(e.target)) {
-    confOpen = false;
-    document.getElementById('conf-dropdown').classList.remove('open');
-    document.getElementById('conf-btn').classList.remove('open');
-  }
-});
-function updateConf() {
-  const checked = Array.from(document.querySelectorAll('#conf-dropdown input:checked')).map(cb => cb.value);
-  document.getElementById('conf-label').textContent = checked.length ? `${checked.length} selected` : 'Select confluences...';
-  document.getElementById('conf-tags').innerHTML = checked.map(c => `<span class="conf-tag">${c}</span>`).join('');
-  document.querySelectorAll('.conf-opt').forEach(o => o.classList.toggle('selected', o.querySelector('input').checked));
-}
-function clearConf() {
-  document.querySelectorAll('#conf-dropdown input').forEach(cb => cb.checked = false);
-  updateConf();
-}
-
-// CALCULATIONS
-function calcPnL(entry, exit, contracts, instrument, direction) {
-  const tickVal = {'NQ':20,'MNQ':2,'ES':50,'MES':5,'CL':1000,'GC':100,'RTY':50}[instrument] || 20;
-  // For longs: profit = exit - entry. For shorts: profit = entry - exit
-  const pts = (direction === 'Short') ? (entry - exit) : (exit - entry);
-  return Math.round(pts * contracts * tickVal);
-}
-
-function calcRR(entry, sl, tp) {
-  if (!entry || !sl || !tp) return null;
-  const risk = Math.abs(entry - sl);
-  const reward = Math.abs(tp - entry);
-  return risk > 0 ? Math.round((reward / risk) * 100) / 100 : null;
-}
-
-function calcDuration(entryTime, exitTime) {
-  const parse = s => {
-    const m = s.match(/(\d{1,2}):(\d{2})\s*(AM|PM)?/i);
-    if (!m) return null;
-    let h = parseInt(m[1]), min = parseInt(m[2]);
-    const ap = (m[3]||'').toUpperCase();
-    if (ap === 'PM' && h < 12) h += 12;
-    if (ap === 'AM' && h === 12) h = 0;
-    return h * 60 + min;
-  };
-  const e = parse(entryTime), x = parse(exitTime);
-  return (e != null && x != null && x > e) ? x - e : null;
-}
-
-function autoGrade(confluences, mistakes, notes) {
-  const hasIFVG = confluences.includes('IFVG');
-  const hasFVG = confluences.includes('FVG');
-  const hasCISD = confluences.includes('CISD');
-  const hasLRLR = confluences.includes('LRLR');
-  const hasSweep = confluences.includes('Liquidity Sweep') || confluences.includes('BSL Taken') || confluences.includes('SSL Taken');
-  const hasHTF = confluences.includes('HTF PDA Delivery') || confluences.includes('HTF Trend');
-  const hasSMT = confluences.includes('SMT Divergence');
-  const hasMSS = confluences.includes('MSS') || confluences.includes('BOS') || confluences.includes('CHoCH');
-  const hasKZ = confluences.includes('Kill Zone');
-  const hasMMM = confluences.includes('Market Maker Model');
-  // Only use MISTAKES field for "against bias" flag — not notes (notes may mention bearish/bullish in context)
-  const mistakesOnly = mistakes.toLowerCase();
-  const hasMistakes = mistakesOnly.length > 5;
-  const against = mistakesOnly.includes('against') || mistakesOnly.includes('no htf') || mistakesOnly.includes('consolidat') || mistakesOnly.includes('wrong bias');
-
-  if (against) return 'D';
-  let score = 0;
-  if (hasIFVG || hasFVG) score += 2;
-  if (hasCISD) score += 1;
-  if (hasLRLR) score += 1;
-  if (hasSweep) score += 2;
-  if (hasHTF) score += 2;
-  if (hasSMT) score += 1;
-  if (hasMSS) score += 1;
-  if (hasKZ) score += 1;
-  if (hasMMM) score += 1;
-  if (confluences.length >= 7) score += 1;
-  if (hasMistakes) score -= 1;
-  if (score >= 9) return 'A++';
-  if (score >= 7) return 'A+';
-  if (score >= 5) return 'A';
-  if (score >= 3) return 'B';
-  if (score >= 1) return 'C';
-  return 'D';
-}
-
-function autoFollowedRules(mistakes, notes, lessons) {
-  const text = (mistakes + notes + lessons).toLowerCase();
-  const breaks = ['against','bias','consolidat','fomo','revenge','emotional','impatient','moved stop','trail','tsl before'];
-  const broken = breaks.filter(b => text.includes(b));
-  if (broken.length === 0) return 'Yes ✅';
-  if (broken.length <= 2) return 'Partially ⚠️';
-  return 'No ❌';
-}
-
-function getField(id) { return document.getElementById(id)?.value?.trim() || ''; }
-function getNum(id) { const v = parseFloat(document.getElementById(id)?.value); return isNaN(v) ? null : v; }
-
-async function analyzeTrade() {
-  const instrument = getField('f-instrument');
-  const direction = getField('f-direction');
-  if (!instrument || !direction) { alert('Please fill in Instrument and Direction at minimum.'); return; }
-
-  const entry = getNum('f-entry'), exit = getNum('f-exit'), sl = getNum('f-sl'), tp = getNum('f-tp');
-  const contracts = getNum('f-contracts') || 1;
-  const entryTime = getField('f-entry-time'), exitTime = getField('f-exit-time');
-  const confluences = Array.from(document.querySelectorAll('#conf-dropdown input:checked')).map(cb => cb.value);
-  const notes = getField('f-notes'), mistakes = getField('f-mistakes'), lessons = getField('f-lessons');
-  const session = getField('f-session'), timeframe = getField('f-timeframe');
-  const htf = getField('f-htf'), model = getField('f-model');
-  const outcome = getField('f-outcome');
-  const date = getField('f-date') || new Date().toISOString().split('T')[0];
-  const screenshot = getField('f-screenshot');
-
-  const partialPrice = getNum('f-partial-price');
-  const partialContracts = getNum('f-partial-contracts');
-  const partialTime = getField('f-partial-time');
-  const remainingContracts = (partialContracts && contracts > 1) ? contracts - partialContracts : contracts;
-
-  let pnl = 0;
-  if (entry && exit) {
-    if (partialPrice && partialContracts && contracts > 1) {
-      // Partial: TP1 P&L + remaining contracts at final exit
-      const tp1Pnl = calcPnL(entry, partialPrice, partialContracts, instrument, direction);
-      const remainPnl = calcPnL(entry, exit, remainingContracts, instrument, direction);
-      pnl = tp1Pnl + remainPnl;
-    } else {
-      pnl = calcPnL(entry, exit, contracts, instrument, direction);
-    }
-  }
-  const rr = calcRR(entry, sl, tp);
-  const duration = calcDuration(entryTime, exitTime);
-  const grade = autoGrade(confluences, mistakes, notes);
-  const followedRules = autoFollowedRules(mistakes, notes, lessons);
-
-  tradeData = { instrument, direction, session, timeframe, htf, model, date, entry, exit, sl, tp, contracts, entryTime, exitTime, pnl, rr, duration, confluences, grade, followedRules, outcome, notes, mistakes, lessons, screenshot, partialPrice, partialContracts, partialTime, remainingContracts };
-
-  // Show review panel
-  document.getElementById('analyze-btn').disabled = true;
-  document.getElementById('analyze-btn').textContent = 'Analyzing...';
-  document.getElementById('review-panel').style.display = 'block';
-  document.getElementById('success-msg').style.display = 'none';
-
-  const gradeColor = {'A++':'accent','A+':'green','A':'accent','B':'yellow','C':'yellow','D':'red'}[grade] || '';
-  const pnlClass = pnl > 0 ? 'green' : pnl < 0 ? 'red' : '';
-
-  document.getElementById('review-grid').innerHTML = `
-    <div class="review-field"><div class="review-label">Instrument</div><div class="review-value">${instrument} ${direction}</div></div>
-    <div class="review-field"><div class="review-label">Session / TF</div><div class="review-value">${session} · ${timeframe}</div></div>
-    <div class="review-field"><div class="review-label">Entry</div><div class="review-value">${entry?.toLocaleString() || '—'} @ ${entryTime || '—'}</div></div>
-    <div class="review-field"><div class="review-label">Exit</div><div class="review-value">${exit?.toLocaleString() || '—'} @ ${exitTime || '—'}</div></div>
-    <div class="review-field"><div class="review-label">SL / TP</div><div class="review-value">${sl?.toLocaleString() || '—'} / ${tp?.toLocaleString() || '—'}</div></div>
-    <div class="review-field"><div class="review-label">Contracts</div><div class="review-value">${contracts}</div></div>
-    <div class="review-field"><div class="review-label">P&L</div><div class="review-value ${pnlClass}">${pnl >= 0 ? '+' : ''}$${Math.abs(pnl).toLocaleString()}</div></div>
-    <div class="review-field"><div class="review-label">R:R</div><div class="review-value">${rr ? '1:' + rr : '—'}</div></div>
-    <div class="review-field"><div class="review-label">Duration</div><div class="review-value">${duration ? duration + 'm' : '—'}</div></div>
-    <div class="review-field"><div class="review-label">Setup Grade</div><div class="review-value ${gradeColor}">${grade}</div></div>
-    <div class="review-field"><div class="review-label">Followed Rules</div><div class="review-value">${followedRules}</div></div>
-    <div class="review-field"><div class="review-label">Outcome</div><div class="review-value">${outcome || '—'}</div></div>
-    <div class="review-field" style="grid-column:1/-1"><div class="review-label">Confluences</div><div class="review-value">${confluences.join(', ') || '—'}</div></div>
-    ${htf ? `<div class="review-field"><div class="review-label">HTF TF</div><div class="review-value">${htf}</div></div>` : ''}
-    ${model ? `<div class="review-field"><div class="review-label">Entry Model</div><div class="review-value">${model}</div></div>` : ''}
-  `;
-
-  // AI Verification
-  document.getElementById('ai-result').innerHTML = '<span class="loading-msg">Verifying against your rules...</span>';
-  document.getElementById('ai-verdict-badge').innerHTML = '';
-
-  try {
-    const tradeStr = `Instrument: ${instrument}\nDirection: ${direction}\nSession: ${session}\nTimeframe: ${timeframe}\nEntry: ${entry} at ${entryTime}\nExit: ${exit} at ${exitTime}\nStop Loss: ${sl}\nTake Profit: ${tp}\nContracts: ${contracts}\nP&L: $${pnl}\nConfluences: ${confluences.join(', ')}\nSetup Grade: ${grade}\nOutcome: ${outcome}\nNotes: ${notes}\nMistakes: ${mistakes}\nLessons: ${lessons}`;
-
-    const res = await fetch(WORKER + '/verify', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ trade: tradeStr })
-    });
-    const data = await res.json();
-    const text = data.result || 'No response.';
-    const upper = text.toUpperCase();
-
-    let verdictClass = 'verdict-partial', verdictLabel = 'PARTIALLY ⚠️';
-    if (upper.includes('VERDICT: YES')) { verdictClass = 'verdict-yes'; verdictLabel = 'FOLLOWED RULES ✅'; tradeData.followedRules = 'Yes ✅'; }
-    else if (upper.includes('VERDICT: NO')) { verdictClass = 'verdict-no'; verdictLabel = 'RULES BROKEN ❌'; tradeData.followedRules = 'No ❌'; }
-    else { tradeData.followedRules = 'Partially ⚠️'; }
-
-    const formatted = text.replace(/\*\*(.*?)\*\*/g, '$1').replace(/\n/g, '<br>');
-    document.getElementById('ai-result').innerHTML = formatted;
-    document.getElementById('ai-verdict-badge').innerHTML = `<span class="ai-verdict ${verdictClass}">${verdictLabel}</span>`;
-    document.getElementById('review-grid').querySelector('[style*="Followed Rules"] + .review-value') ;
-
-  } catch(e) {
-    document.getElementById('ai-result').textContent = 'Verification failed: ' + e.message;
-  }
-
-  document.getElementById('analyze-btn').disabled = false;
-  document.getElementById('analyze-btn').textContent = '⚡ Analyze & Preview Trade';
-  document.getElementById('review-panel').scrollIntoView({ behavior: 'smooth' });
-}
-
-function editTrade() {
-  document.getElementById('review-panel').style.display = 'none';
-}
-
-async function submitTrade() {
-  const btn = document.getElementById('confirm-btn');
-  btn.disabled = true;
-  btn.textContent = 'Submitting...';
-
-  const t = tradeData;
-  const tradeName = `${t.instrument} ${t.direction} — ${t.session}`;
-
-  const props = {
-    "Trade Name": { title: [{ text: { content: tradeName } }] },
-    "Instrument": { select: { name: t.instrument } },
-    "Direction": { select: { name: t.direction } },
-    "Status": { select: { name: t.outcome } },
-    "Session": { select: { name: t.session } },
-    "Timeframe": { select: { name: t.timeframe } },
-    "Date": { date: { start: t.date } },
-    "Contracts": { number: t.contracts },
-    "P&L ($)": { number: t.pnl },
-    "Followed Rules": { select: { name: t.followedRules } },
-    "Setup Grade": { select: { name: t.grade } },
-  };
-
-  if (t.entry) props["Entry Price"] = { number: t.entry };
-  if (t.exit) props["Exit Price"] = { number: t.exit };
-  if (t.sl) props["Stop Loss"] = { number: t.sl };
-  if (t.tp) props["Take Profit"] = { number: t.tp };
-  if (t.rr) props["R:R"] = { number: t.rr };
-  if (t.duration) props["Duration (mins)"] = { number: t.duration };
-  if (t.entryTime) props["Entry Time"] = { rich_text: [{ text: { content: t.entryTime } }] };
-  if (t.exitTime) props["Exit Time"] = { rich_text: [{ text: { content: t.exitTime } }] };
-  const fullNotes = [
-    t.notes,
-    (t.partialPrice && t.partialContracts) ? `TP1: ${t.partialContracts} contract${t.partialContracts>1?'s':''} @ ${t.partialPrice}${t.partialTime?' at '+t.partialTime:''} · Remaining ${t.remainingContracts} contract${t.remainingContracts>1?'s':''} trailed to ${t.exit}` : null
-  ].filter(Boolean).join('\n');
-  if (fullNotes) props["Notes"] = { rich_text: [{ text: { content: fullNotes } }] };
-  if (t.mistakes) props["Mistakes"] = { rich_text: [{ text: { content: t.mistakes } }] };
-  if (t.lessons) props["Lessons Learned"] = { rich_text: [{ text: { content: t.lessons } }] };
-  if (t.htf) props["HTF Timeframe"] = { rich_text: [{ text: { content: t.htf } }] };
-  if (t.model) props["Entry Model"] = { rich_text: [{ text: { content: t.model } }] };
-  if (t.confluences.length) props["Confluences"] = { multi_select: t.confluences.map(c => ({ name: c })) };
-
-  const body = {
-    parent: { database_id: DB_ID },
-    properties: props,
-  };
-
-  // Add screenshot as page content if provided
-  if (t.screenshot) {
-    body.children = [{
-      object: 'block', type: 'paragraph',
-      paragraph: { rich_text: [{ type: 'text', text: { content: '📸 Screenshot: ' + t.screenshot, link: { url: t.screenshot } } }] }
-    }];
-  }
-
-  try {
-    const res = await fetch(WORKER + '/notion/pages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
-    });
-    const data = await res.json();
-    if (data.id) {
-      document.getElementById('success-msg').style.display = 'block';
-      document.getElementById('review-panel').style.display = 'none';
-      document.getElementById('success-msg').textContent = `✓ Trade logged! ${tradeName} · ${t.grade} · ${t.pnl >= 0 ? '+' : ''}$${Math.abs(t.pnl).toLocaleString()}`;
-      resetForm();
-    } else {
-      alert('Error submitting: ' + JSON.stringify(data));
-    }
-  } catch(e) {
-    alert('Submit failed: ' + e.message);
-  }
-
-  btn.disabled = false;
-  btn.textContent = '✓ Confirm & Submit to Notion';
-}
-
-// ---- TAB SWITCHING ----
-function switchTab(name, btn) {
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById('tab-' + name).classList.add('active');
-  if (name === 'bias') initBiasBoard();
-  if (name === 'weekly') initWeeklyReview();
-}
-
-// ---- BIAS BOARD ----
-const BIAS_DB = 'c163f7373bb44be19ae4f4a886384ddf';
-const BTODAY = new Date().toISOString().split('T')[0];
-const bSelected = { NQ: null, ES: null };
-const bState = { NQ: null, ES: null };
-let biasLoaded = false;
-
-function bBiasClass(b) {
-  return {'Bullish':'b-bull','Bearish':'b-bear','Ranging':'b-range','Waiting':'b-wait'}[b] || 'b-none';
-}
-
-function bSelectBias(inst, bias) {
-  bSelected[inst] = bias;
-  document.querySelectorAll(`#bbtns-${inst} .bbtn`).forEach(b => b.classList.remove('active'));
-  const map = {'Bullish':'bull','Bearish':'bear','Ranging':'range','Waiting':'wait'};
-  document.querySelector(`#bbtns-${inst} .${map[bias]}`).classList.add('active');
-}
-
-async function bQuery() {
-  const res = await fetch(`${WORKER}/notion/databases/${BIAS_DB}/query`, {
-    method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({ filter:{ and:[{ property:'Date', date:{ equals: BTODAY } }] }, page_size:100 })
-  });
-  return res.json();
-}
-
-async function bCreate(props) {
-  const res = await fetch(`${WORKER}/notion/pages`, {
-    method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({ parent:{ database_id: BIAS_DB }, properties: props })
-  });
-  return res.json();
-}
-
-function bLockCard(inst, bias, switchBias, hasSwitched) {
-  const valEl = document.getElementById(`bval-${inst}`);
-  const swEl = document.getElementById(`bswitch-${inst}`);
-  const swFrom = document.getElementById(`bswitch-from-${inst}`);
-  const btn = document.getElementById(`bset-${inst}`);
-  const locked = document.getElementById(`blocked-${inst}`);
-  const notes = document.getElementById(`bnotes-${inst}`);
-  const effective = switchBias || bias;
-  valEl.className = 'bias-val ' + bBiasClass(effective);
-  valEl.textContent = effective || '—';
-  if (switchBias) { swEl.style.display='flex'; swFrom.textContent = bias; }
-  document.querySelectorAll(`#bbtns-${inst} .bbtn`).forEach(b => b.disabled = true);
-  notes.disabled = true; notes.placeholder = '';
-  if (hasSwitched) {
-    btn.disabled = true; btn.textContent = 'Locked for today';
-    locked.style.display='block'; locked.textContent='Bias + switch used — locked until tomorrow';
-  } else {
-    btn.classList.add('sw'); btn.textContent = `↺ Switch ${inst} Bias`;
-    btn.onclick = () => bOpenSwitch(inst, bias);
-    locked.style.display='block'; locked.textContent='Bias locked · 1 switch remaining';
-  }
-}
-
-function bOpenSwitch(inst, original) {
-  document.querySelectorAll(`#bbtns-${inst} .bbtn`).forEach(b => {
-    b.disabled = false;
-    const map2 = {'Bullish':'Bullish','Bearish':'Bearish','Ranging':'Ranging','Waiting':'Waiting'};
-    b.onclick = () => bSelectBias(inst, b.textContent.trim());
-  });
-  const notes = document.getElementById(`bnotes-${inst}`);
-  notes.disabled = false; notes.value = ''; notes.placeholder = 'Why are you switching?';
-  const btn = document.getElementById(`bset-${inst}`);
-  btn.classList.remove('sw'); btn.textContent = `Confirm ${inst} Switch`;
-  btn.onclick = () => bSubmitSwitch(inst, original);
-  document.getElementById(`blocked-${inst}`).textContent = 'Select new bias then confirm';
-}
-
-async function bSubmit(inst) {
-  if (!bSelected[inst]) { alert(`Select a bias for ${inst}`); return; }
-  const btn = document.getElementById(`bset-${inst}`);
-  btn.disabled = true; btn.textContent = 'Saving...';
-  const bias = bSelected[inst];
-  const notes = document.getElementById(`bnotes-${inst}`).value.trim();
-  const props = {
-    "Title":{ title:[{ text:{ content:`${inst} ${bias} — ${BTODAY}` } }] },
-    "Instrument":{ select:{ name:inst } },
-    "Bias":{ select:{ name:bias } },
-    "Date":{ date:{ start: BTODAY } },
-    "switched":{ checkbox:false }
-  };
-  if (notes) props["Notes"] = { rich_text:[{ text:{ content:notes } }] };
-  try {
-    const data = await bCreate(props);
-    if (data.id) { bState[inst] = { bias, switchBias:null, pageId:data.id }; bLockCard(inst, bias, null, false); bLoadHistory(); }
-    else { btn.disabled=false; btn.textContent=`Set ${inst} Bias`; alert('Error: ' + JSON.stringify(data)); }
-  } catch(e) { btn.disabled=false; btn.textContent=`Set ${inst} Bias`; alert('Error: '+e.message); }
-}
-
-async function bSubmitSwitch(inst, original) {
-  const newBias = bSelected[inst];
-  if (!newBias) { alert(`Select a new bias for ${inst}`); return; }
-  if (newBias === original) { alert('Pick a different bias to switch to'); return; }
-  const btn = document.getElementById(`bset-${inst}`);
-  btn.disabled=true; btn.textContent='Saving switch...';
-  const notes = document.getElementById(`bnotes-${inst}`).value.trim();
-  const props = {
-    "Title":{ title:[{ text:{ content:`${inst} Switch → ${newBias} — ${BTODAY}` } }] },
-    "Instrument":{ select:{ name:inst } },
-    "Bias":{ select:{ name:newBias } },
-    "Date":{ date:{ start: BTODAY } },
-    "switched":{ checkbox:true }
-  };
-  if (notes) props["Notes"] = { rich_text:[{ text:{ content:notes } }] };
-  try {
-    const data = await bCreate(props);
-    if (data.id) { bState[inst].switchBias=newBias; bLockCard(inst, original, newBias, true); bLoadHistory(); }
-    else { btn.disabled=false; btn.textContent=`Confirm ${inst} Switch`; alert('Error: '+JSON.stringify(data)); }
-  } catch(e) { btn.disabled=false; btn.textContent=`Confirm ${inst} Switch`; alert('Error: '+e.message); }
-}
-
-async function bLoadHistory() {
-  const container = document.getElementById('bhistory-container');
-  try {
-    const res = await fetch(`${WORKER}/notion/databases/${BIAS_DB}/query`, {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ page_size:50 })
-    });
-    const data = await res.json();
-    const pages = (data.results||[]).sort((a,b) => {
-      return (b.properties['Date']?.date?.start||'').localeCompare(a.properties['Date']?.date?.start||'');
-    });
-    if (!pages.length) { container.innerHTML='<div style="font-family:var(--mono);font-size:11px;color:var(--text3);padding:2rem;text-align:center;background:var(--surface);">No bias entries yet</div>'; return; }
-    const rows = pages.map(p => {
-      const inst = p.properties['Instrument']?.select?.name||'—';
-      const bias = p.properties['Bias']?.select?.name||'—';
-      const isSw = p.properties['switched']?.checkbox;
-      const notes = (p.properties['Notes']?.rich_text||[]).map(r=>r.plain_text||'').join('');
-      const date = p.properties['Date']?.date?.start||'—';
-      const d2 = new Date(date+'T12:00:00');
-      const ds = d2.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
-      const bCls = bBiasClass(bias);
-      return `<div class="brow">
-        <div class="bh-date">${ds}</div>
-        <div class="bh-inst" style="color:${inst==='NQ'?'#c8ff00':'#40c4ff'}">${inst}</div>
-        <div class="bh-bias ${bCls}">${isSw?'↺ ':''} ${bias}</div>
-        <div class="bh-notes">${notes||'—'}</div>
-      </div>`;
-    }).join('');
-    container.innerHTML = `<div class="bhistory">${rows}</div>`;
-  } catch(e) { container.innerHTML=`<div style="font-family:var(--mono);font-size:11px;color:var(--red);padding:1rem;">Error: ${e.message}</div>`; }
-}
-
-async function initBiasBoard() {
-  if (biasLoaded) return;
-  biasLoaded = true;
-  const d = new Date();
-  const lbl = document.getElementById('bias-date-label');
-  if (lbl) lbl.textContent = d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
-  try {
-    const data = await bQuery();
-    ['NQ','ES'].forEach(inst => {
-      const entries = (data.results||[]).filter(p=>p.properties['Instrument']?.select?.name===inst);
-      const original = entries.find(p=>!p.properties['switched']?.checkbox);
-      const switched = entries.find(p=>p.properties['switched']?.checkbox);
-      if (original) {
-        const bias = original.properties['Bias']?.select?.name;
-        const switchBias = switched?.properties['Bias']?.select?.name||null;
-        bState[inst] = { bias, switchBias, pageId:original.id };
-        bLockCard(inst, bias, switchBias, !!switched);
-      }
-    });
-  } catch(e) { console.error('bias load error',e); }
-  await bLoadHistory();
-}
-
-// ============================================================
-// WEEKLY REVIEW TAB — injected into admin.html
-// ============================================================
-
-const WEEKLY_DB = '6d1309c6e6174f489e32293e253ae729';
-const TRADE_DB_W = '5398f956345943b7b12b2298bbb6e127';
-
-// YouTube resource map by topic
-const YT_RESOURCES = {
-  'htf_bias': [
-    { creator: 'ICT', title: 'HTF Bias & Top Down Analysis', url: 'https://www.youtube.com/@InnerCircleTrader' },
-    { creator: 'Dodgy', title: 'HTF Bias with iFVG Model', url: 'https://www.youtube.com/@DodgyFX' },
-    { creator: 'BionicNQ', title: 'Top Down Analysis NQ', url: 'https://www.youtube.com/@BionicNQ' },
-  ],
-  'entry_model': [
-    { creator: 'Dodgy', title: 'iFVG Ultimate+ Entry Model', url: 'https://www.youtube.com/@DodgyFX' },
-    { creator: 'Lumi Traders', title: 'FVG & IFVG Entries', url: 'https://www.youtube.com/@LumiTraders' },
-    { creator: 'Tizz Trades', title: 'ICT Entry Models Explained', url: 'https://www.youtube.com/@TizzTrades' },
-  ],
-  'stop_loss': [
-    { creator: 'BionicNQ', title: 'Stop Loss Placement & Management', url: 'https://www.youtube.com/@BionicNQ' },
-    { creator: 'PBTrades', title: 'SL Management ICT Style', url: 'https://www.youtube.com/@PBTrades' },
-    { creator: 'ICT', title: 'Stop Hunt & SL Concepts', url: 'https://www.youtube.com/@InnerCircleTrader' },
-  ],
-  'trailing': [
-    { creator: 'BionicNQ', title: 'Trade Management & Trailing', url: 'https://www.youtube.com/@BionicNQ' },
-    { creator: 'PBTrades', title: 'Exit Strategy & TSL', url: 'https://www.youtube.com/@PBTrades' },
-    { creator: 'Lumi Traders', title: 'Managing Winning Trades', url: 'https://www.youtube.com/@LumiTraders' },
-  ],
-  'discipline': [
-    { creator: 'ICT', title: 'Trading Psychology & Discipline', url: 'https://www.youtube.com/@InnerCircleTrader' },
-    { creator: 'Tizz Trades', title: 'Trader Mindset', url: 'https://www.youtube.com/@TizzTrades' },
-    { creator: 'BionicNQ', title: 'Consistency & Process', url: 'https://www.youtube.com/@BionicNQ' },
-  ],
-  'liquidity': [
-    { creator: 'ICT', title: 'Liquidity Concepts & Sweeps', url: 'https://www.youtube.com/@InnerCircleTrader' },
-    { creator: 'Dodgy', title: 'Liquidity in iFVG Model', url: 'https://www.youtube.com/@DodgyFX' },
-    { creator: 'Lumi Traders', title: 'BSL SSL Explained', url: 'https://www.youtube.com/@LumiTraders' },
-  ],
-  'smt': [
-    { creator: 'ICT', title: 'SMT Divergence Deep Dive', url: 'https://www.youtube.com/@InnerCircleTrader' },
-    { creator: 'BionicNQ', title: 'SMT NQ vs ES', url: 'https://www.youtube.com/@BionicNQ' },
-    { creator: 'Tizz Trades', title: 'Using SMT for Entries', url: 'https://www.youtube.com/@TizzTrades' },
-  ],
-  'consolidation': [
-    { creator: 'BionicNQ', title: 'Avoiding Consolidation Traps', url: 'https://www.youtube.com/@BionicNQ' },
-    { creator: 'PBTrades', title: 'Range vs Trend Identification', url: 'https://www.youtube.com/@PBTrades' },
-    { creator: 'Lumi Traders', title: 'Reading Market Structure', url: 'https://www.youtube.com/@LumiTraders' },
-  ],
-  'general': [
-    { creator: 'Dodgy', title: 'Full iFVG Model Breakdown', url: 'https://www.youtube.com/@DodgyFX' },
-    { creator: 'ICT', title: 'ICT Mentorship Series', url: 'https://www.youtube.com/@InnerCircleTrader' },
-    { creator: 'BionicNQ', title: 'NQ Futures Trading', url: 'https://www.youtube.com/@BionicNQ' },
-  ]
+const INSTRUMENT_COLORS = {
+  'NQ': '#c8ff00', 'ES': '#00e676', 'MNQ': '#40c4ff',
+  'MES': '#ff6d00', 'CL': '#ea80fc', 'GC': '#ffd740',
+  'RTY': '#ff4444', 'Other': '#888'
 };
 
-function getWeekRange(date) {
-  const d = date ? new Date(date) : new Date();
-  const day = d.getDay(); // 0=Sun
-  const diff = d.getDate() - day; // Sunday start
-  const start = new Date(d.setDate(diff));
-  const end = new Date(start);
-  end.setDate(end.getDate() + 6);
-  const fmt = d2 => d2.toISOString().split('T')[0];
-  return { start: fmt(start), end: fmt(end) };
-}
+let allTrades = [];
+let currentPeriod = 'all';
+let equityChart = null;
+let donutChart = null;
 
-function wExtractText(rt) { return (rt||[]).map(r=>r.plain_text||'').join(''); }
-
-let wState = { loaded: false, existing: null, trades: [], weekStart: null, weekEnd: null };
-let wSelected = { mental: 0, discipline: 0 };
-
-async function initWeeklyReview() {
-  if (wState.loaded) return;
-  wState.loaded = true;
-  const { start, end } = getWeekRange();
-  wState.weekStart = start;
-  wState.weekEnd = end;
-  document.getElementById('w-week-label').textContent = `Week of ${new Date(start+'T12:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric'})} – ${new Date(end+'T12:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}`;
-  await wLoadTrades();
-  await wCheckExisting();
-  await wLoadHistory();
-}
-
-async function wLoadTrades() {
+async function fetchTrades() {
   try {
-    const res = await fetch(`${WORKER}/notion/databases/${TRADE_DB_W}/query`, {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ page_size:100 })
-    });
-    const data = await res.json();
-    wState.trades = (data.results||[]).filter(p => {
-      const d = p.properties['Date']?.date?.start||'';
-      return d >= wState.weekStart && d <= wState.weekEnd;
-    });
-    wRenderStats();
-  } catch(e) { console.error('wLoadTrades',e); }
-}
+    let pages = [], cursor = null;
+    do {
+      const body = { page_size: 100 };
+      if (cursor) body.start_cursor = cursor;
+      const res = await fetch(`${WORKER_URL}/notion/databases/${DATABASE_ID}/query`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      if (!res.ok) throw new Error(`Worker error: ${res.status}`);
+      const data = await res.json();
+      pages = pages.concat(data.results || []);
+      cursor = data.has_more ? data.next_cursor : null;
+    } while (cursor);
 
-function wRenderStats() {
-  const trades = wState.trades;
-  const total = trades.length;
-  const wins = trades.filter(t=>t.properties['Status']?.select?.name==='Closed - Win').length;
-  const pnls = trades.map(t=>t.properties['P&L ($)']?.number||0);
-  const totalPnl = pnls.reduce((a,b)=>a+b,0);
-  const best = total ? Math.max(...pnls) : 0;
-  const worst = total ? Math.min(...pnls) : 0;
-  const wr = total ? Math.round((wins/total)*100) : 0;
-
-  wState.stats = { total, wins, totalPnl, best, worst, wr };
-
-  const pClass = totalPnl >= 0 ? 'color:var(--green)' : 'color:var(--red)';
-  const pStr = (totalPnl>=0?'+':'-')+'$'+Math.abs(totalPnl).toLocaleString();
-
-  document.getElementById('w-stats').innerHTML = `
-    <div class="wstat"><div class="wstat-label">Trades</div><div class="wstat-val">${total}</div></div>
-    <div class="wstat"><div class="wstat-label">Win Rate</div><div class="wstat-val">${wr}%</div></div>
-    <div class="wstat"><div class="wstat-label">Total P&L</div><div class="wstat-val" style="${pClass}">${pStr}</div></div>
-    <div class="wstat"><div class="wstat-label">Best Trade</div><div class="wstat-val" style="color:var(--green)">+$${best.toLocaleString()}</div></div>
-    <div class="wstat"><div class="wstat-label">Worst Trade</div><div class="wstat-val" style="color:var(--red)">${worst<=0?'-':''}$${Math.abs(worst).toLocaleString()}</div></div>
-  `;
-
-  // Grade breakdown
-  const grades = {};
-  trades.forEach(t => {
-    const g = t.properties['Setup Grade']?.select?.name;
-    if (g) grades[g] = (grades[g]||0)+1;
-  });
-  const gradeColors = {'A++':'#c8ff00','A+':'#00e676','A':'#40c4ff','B':'#ffd740','C':'#ff6d00','D':'#ff4444'};
-  document.getElementById('w-grades').innerHTML = Object.entries(grades).length
-    ? Object.entries(grades).map(([g,c])=>`<span style="font-family:var(--mono);font-size:10px;padding:3px 8px;border:1px solid;color:${gradeColors[g]||'#888'};border-color:${gradeColors[g]||'#888'}33;margin-right:4px;">${g}: ${c}</span>`).join('')
-    : '<span style="font-family:var(--mono);font-size:10px;color:var(--text3);">No trades this week</span>';
-
-  // Top confluences
-  const confs = {};
-  trades.forEach(t => {
-    (t.properties['Confluences']?.multi_select||[]).forEach(c => confs[c.name]=(confs[c.name]||0)+1);
-  });
-  const topConfs = Object.entries(confs).sort((a,b)=>b[1]-a[1]).slice(0,5);
-  document.getElementById('w-confs').innerHTML = topConfs.length
-    ? topConfs.map(([c,n])=>`<span style="font-family:var(--mono);font-size:10px;padding:2px 8px;border:1px solid var(--border2);color:var(--text3);margin-right:4px;">${c} (${n})</span>`).join('')
-    : '<span style="font-family:var(--mono);font-size:10px;color:var(--text3);">None</span>';
-
-  // Rule breaches
-  const breaks = [];
-  trades.forEach(t => {
-    const txt = [wExtractText(t.properties['Mistakes']?.rich_text), wExtractText(t.properties['Notes']?.rich_text)].join(' ').toLowerCase();
-    if (txt.match(/stop.*(be|breakeven|moved)/)||txt.match(/(be|breakeven).*stop/)) breaks.push('SL moved to BE early');
-    if (txt.match(/bias|against|htf/)) breaks.push('HTF bias not followed');
-    if (txt.match(/trail.*(soon|tight)|tsl/)) breaks.push('Trailed too soon/tight');
-    if (txt.match(/fomo|impatient|chased/)) breaks.push('FOMO / impatient entry');
-    if (txt.match(/consolidat/)) breaks.push('Traded in consolidation');
-  });
-  const uniqueBreaches = [...new Set(breaks)];
-  document.getElementById('w-breaches').innerHTML = uniqueBreaches.length
-    ? uniqueBreaches.map(b=>`<div style="font-family:var(--mono);font-size:10px;color:var(--red);padding:3px 0;">❌ ${b}</div>`).join('')
-    : '<div style="font-family:var(--mono);font-size:10px;color:var(--green);">✅ No clear breaches detected</div>';
-}
-
-async function wCheckExisting() {
-  try {
-    const res = await fetch(`${WORKER}/notion/databases/${WEEKLY_DB}/query`, {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ filter:{ property:'Week Start', date:{ equals: wState.weekStart } }, page_size:5 })
-    });
-    const data = await res.json();
-    const existing = (data.results||[])[0];
-    if (existing) {
-      wState.existing = existing;
-      const submitted = existing.properties['Submitted']?.checkbox;
-      if (submitted) {
-        wShowLocked(existing);
+    allTrades = pages.map(page => {
+      const p = page.properties;
+      return {
+        instrument: p['Instrument']?.select?.name || 'Other',
+        pnl: p['P&L ($)']?.number || 0,
+        status: p['Status']?.select?.name || '',
+        date: p['Date']?.date?.start || '',
+        session: p['Session']?.select?.name || '',
+        grade: p['Setup Grade']?.select?.name || '',
+        direction: p['Direction']?.select?.name || '',
+        timeframe: p['Timeframe']?.select?.name || '',
+        confluences: p['Confluences']?.multi_select?.map(o => o.name) || [],
+        rrStored: p['R:R']?.number,
+        durationStored: p['Duration (mins)']?.number,
+        entryPrice: p['Entry Price']?.number,
+        exitPrice: p['Exit Price']?.number,
+        stopLoss: p['Stop Loss']?.number,
+        takeProfit: p['Take Profit']?.number,
+        entryTime: (p['Entry Time']?.rich_text||[]).map(r=>r.plain_text).join(''),
+        exitTime: (p['Exit Time']?.rich_text||[]).map(r=>r.plain_text).join(''),
+      };
+    }).map(t => {
+      // Auto-calculate R:R from entry/SL/TP if not stored
+      if (t.rrStored != null) {
+        t.rr = t.rrStored;
+      } else if (t.entryPrice != null && t.stopLoss != null && t.takeProfit != null) {
+        const risk = Math.abs(t.entryPrice - t.stopLoss);
+        const reward = Math.abs(t.takeProfit - t.entryPrice);
+        t.rr = risk > 0 ? Math.round((reward / risk) * 100) / 100 : null;
       } else {
-        wPreFill(existing);
+        t.rr = null;
       }
-    }
-  } catch(e) { console.error('wCheckExisting',e); }
-}
+      // Auto-calculate duration from entry/exit time if not stored
+      if (t.durationStored != null) {
+        t.duration = t.durationStored;
+      } else if (t.entryTime && t.exitTime) {
+        const parseTime = s => {
+          const m = s.match(/(\d{1,2}):(\d{2})\s*(AM|PM)?/i);
+          if (!m) return null;
+          let h = parseInt(m[1]), min = parseInt(m[2]);
+          const ap = (m[3]||'').toUpperCase();
+          if (ap === 'PM' && h < 12) h += 12;
+          if (ap === 'AM' && h === 12) h = 0;
+          return h * 60 + min;
+        };
+        const eMin = parseTime(t.entryTime), xMin = parseTime(t.exitTime);
+        t.duration = (eMin != null && xMin != null && xMin > eMin) ? xMin - eMin : null;
+      } else {
+        t.duration = null;
+      }
+      return t;
+    }).filter(t => t.date).sort((a,b) => a.date.localeCompare(b.date));
 
-function wShowLocked(page) {
-  const props = page.properties;
-  document.getElementById('w-form').style.display = 'none';
-  document.getElementById('w-locked').style.display = 'block';
-  document.getElementById('w-locked-content').innerHTML = `
-    <div style="font-family:var(--mono);font-size:10px;color:var(--green);margin-bottom:1rem;">✓ Weekly review submitted — locked</div>
-    <div class="wfield-label">What went well</div><div class="wfield-val">${wExtractText(props['What Went Well']?.rich_text)||'—'}</div>
-    <div class="wfield-label" style="margin-top:12px;">Needs improvement</div><div class="wfield-val">${wExtractText(props['Needs Improvement']?.rich_text)||'—'}</div>
-    <div class="wfield-label" style="margin-top:12px;">Next week goal</div><div class="wfield-val">${wExtractText(props['Next Week Goal']?.rich_text)||'—'}</div>
-    <div class="wfield-label" style="margin-top:12px;">Focus confluences</div><div class="wfield-val">${wExtractText(props['Focus Confluences']?.rich_text)||'—'}</div>
-    <div class="wfield-label" style="margin-top:12px;">Mental State</div><div class="wfield-val">${wRenderStarsDisplay(props['Mental State']?.number||0)}</div>
-    <div class="wfield-label" style="margin-top:8px;">Discipline</div><div class="wfield-val">${wRenderStarsDisplay(props['Discipline']?.number||0)}</div>
-  `;
-  // Add note section
-  document.getElementById('w-addnote').style.display = 'block';
-}
-
-function wPreFill(page) {
-  const props = page.properties;
-  document.getElementById('w-went-well').value = wExtractText(props['What Went Well']?.rich_text)||'';
-  document.getElementById('w-improve').value = wExtractText(props['Needs Improvement']?.rich_text)||'';
-  document.getElementById('w-goal').value = wExtractText(props['Next Week Goal']?.rich_text)||'';
-  document.getElementById('w-focus').value = wExtractText(props['Focus Confluences']?.rich_text)||'';
-  const mental = props['Mental State']?.number||0;
-  const disc = props['Discipline']?.number||0;
-  if (mental) wSetStar('mental', mental);
-  if (disc) wSetStar('discipline', disc);
-}
-
-function wRenderStarsDisplay(val) {
-  let html = '';
-  for (let i = 1; i <= 5; i++) {
-    const full = val >= i;
-    const half = !full && val >= i - 0.5;
-    html += `<span style="color:${full||half?'#ffd740':'#333'};font-size:16px;">${half?'⯨':'★'}</span>`;
-  }
-  return html + ` <span style="font-family:var(--mono);font-size:10px;color:var(--text3);">${val}/5</span>`;
-}
-
-function wSetStar(type, val) {
-  wSelected[type] = val;
-  const container = document.getElementById(`w-stars-${type}`);
-  container.querySelectorAll('.wstar').forEach((s, i) => {
-    const starVal = parseFloat(s.dataset.val);
-    s.style.color = starVal <= val ? '#ffd740' : '#333';
-  });
-  document.getElementById(`w-${type}-val`).textContent = val + '/5';
-}
-
-async function wAnalyze() {
-  const wentWell = document.getElementById('w-went-well').value.trim();
-  const improve = document.getElementById('w-improve').value.trim();
-  const goal = document.getElementById('w-goal').value.trim();
-  const focus = document.getElementById('w-focus').value.trim();
-  const mental = wSelected.mental;
-  const discipline = wSelected.discipline;
-
-  if (!wentWell && !improve) { alert('Please fill in at least "What went well" and "Needs improvement"'); return; }
-  if (!mental || !discipline) { alert('Please set your mental state and discipline ratings'); return; }
-
-  const btn = document.getElementById('w-analyze-btn');
-  btn.disabled = true; btn.textContent = 'Analyzing...';
-  document.getElementById('w-ai-section').style.display = 'block';
-  document.getElementById('w-ai-content').innerHTML = '<div style="font-family:var(--mono);font-size:11px;color:var(--text3);animation:blink 1s infinite;">AI coach is reviewing your week...</div>';
-
-  const trades = wState.trades;
-  const stats = wState.stats;
-  const breaches = document.getElementById('w-breaches').innerText;
-
-  const prompt = `You are a professional ICT futures trading coach reviewing a trader's week. Give detailed, honest, actionable coaching — like a real coach would. Be specific to their data.
-
-Week summary:
-- Trades: ${stats?.total||0} | Wins: ${stats?.wins||0} | Win Rate: ${stats?.wr||0}% | Total P&L: $${stats?.totalPnl||0}
-- Best trade: $${stats?.best||0} | Worst trade: $${stats?.worst||0}
-- Rule breaches detected: ${breaches}
-- Mental state rating: ${mental}/5
-- Discipline rating: ${discipline}/5
-
-Trader's own notes:
-- What went well: ${wentWell}
-- Needs improvement: ${improve}
-- Next week goal: ${goal}
-- Focus confluences: ${focus}
-
-Their trading model: ICT concepts + Dodgy's iFVG Ultimate+ model. They trade NQ and ES futures on 1m/3m timeframes, primarily London and NY AM sessions.
-
-Provide:
-1. STRENGTHS (2-3 specific things they did well based on the data)
-2. AREAS TO WORK ON (3-4 specific, detailed coaching points with explanations — be a real coach, not generic)
-3. FOCUS FOR NEXT WEEK (2-3 concrete actionable tasks)
-4. MINDSET NOTE (1 paragraph on their mental state/discipline ratings)
-
-Be detailed and specific. Reference their actual data. Do not be generic. Format with clear headers.`;
-
-  try {
-    const res = await fetch(`${WORKER}/verify`, {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ trade: prompt })
-    });
-    const data = await res.json();
-    const text = data.result || 'No response.';
-
-    // Determine which YT resources to show based on content
-    const lower = (improve + breaches + text).toLowerCase();
-    let ytTopics = [];
-    if (lower.includes('bias') || lower.includes('htf')) ytTopics.push('htf_bias');
-    if (lower.includes('entry') || lower.includes('fvg') || lower.includes('ifvg')) ytTopics.push('entry_model');
-    if (lower.includes('stop') || lower.includes('sl') || lower.includes('breakeven')) ytTopics.push('stop_loss');
-    if (lower.includes('trail') || lower.includes('tsl') || lower.includes('exit')) ytTopics.push('trailing');
-    if (lower.includes('fomo') || lower.includes('emotion') || lower.includes('discipline')) ytTopics.push('discipline');
-    if (lower.includes('liquid') || lower.includes('bsl') || lower.includes('ssl')) ytTopics.push('liquidity');
-    if (lower.includes('smt')) ytTopics.push('smt');
-    if (lower.includes('consolid') || lower.includes('chop') || lower.includes('rang')) ytTopics.push('consolidation');
-    if (ytTopics.length === 0) ytTopics.push('general');
-    ytTopics = [...new Set(ytTopics)].slice(0, 3);
-
-    const resources = ytTopics.flatMap(t => YT_RESOURCES[t]||[]).slice(0, 6);
-    const ytHtml = resources.map(r => `
-      <a href="${r.url}" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--surface2);border:1px solid var(--border2);text-decoration:none;transition:border-color 0.15s;margin-bottom:4px;" onmouseover="this.style.borderColor='#ff0000'" onmouseout="this.style.borderColor='var(--border2)'">
-        <svg viewBox="0 0 24 24" width="14" height="14" fill="#ff4444" style="flex-shrink:0;"><path d="M23.5 6.19a3.02 3.02 0 0 0-2.12-2.14C19.53 3.5 12 3.5 12 3.5s-7.53 0-9.38.55A3.02 3.02 0 0 0 .5 6.19C0 8.05 0 12 0 12s0 3.95.5 5.81a3.02 3.02 0 0 0 2.12 2.14C4.47 20.5 12 20.5 12 20.5s7.53 0 9.38-.55a3.02 3.02 0 0 0 2.12-2.14C24 15.95 24 12 24 12s0-3.95-.5-5.81zM9.75 15.52V8.48L15.86 12l-6.11 3.52z"/></svg>
-        <div>
-          <div style="font-family:var(--mono);font-size:10px;color:var(--accent);letter-spacing:0.06em;">${r.creator}</div>
-          <div style="font-size:11px;color:var(--text2);">${r.title}</div>
-        </div>
-        <span style="margin-left:auto;font-family:var(--mono);font-size:9px;color:var(--text3);">↗</span>
-      </a>`).join('');
-
-    const formatted = text.replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
-    document.getElementById('w-ai-content').innerHTML = `
-      <div style="font-size:13px;color:var(--text2);line-height:1.9;margin-bottom:1.5rem;">${formatted}</div>
-      <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--text3);text-transform:uppercase;margin-bottom:8px;">Recommended watching this week</div>
-      ${ytHtml}`;
-
-    wState.aiCoaching = text;
-    document.getElementById('w-submit-btn').style.display = 'block';
+    renderAll();
   } catch(e) {
-    document.getElementById('w-ai-content').innerHTML = `<div style="color:var(--red);font-size:12px;">Error: ${e.message}</div>`;
-  }
-
-  btn.disabled = false; btn.textContent = '⚡ Get AI Coaching';
-}
-
-async function wSubmit() {
-  const btn = document.getElementById('w-submit-btn');
-  btn.disabled = true; btn.textContent = 'Submitting...';
-
-  const wentWell = document.getElementById('w-went-well').value.trim();
-  const improve = document.getElementById('w-improve').value.trim();
-  const goal = document.getElementById('w-goal').value.trim();
-  const focus = document.getElementById('w-focus').value.trim();
-  const stats = wState.stats || {};
-
-  const title = `Week of ${wState.weekStart}`;
-  const props = {
-    "Title":{ title:[{ text:{ content:title } }] },
-    "Week Start":{ date:{ start:wState.weekStart } },
-    "Week End":{ date:{ start:wState.weekEnd } },
-    "Trade Count":{ number: stats.total||0 },
-    "Win Rate":{ number: (stats.wr||0)/100 },
-    "Total P&L":{ number: stats.totalPnl||0 },
-    "Best Trade":{ number: stats.best||0 },
-    "Worst Trade":{ number: stats.worst||0 },
-    "Mental State":{ number: wSelected.mental },
-    "Discipline":{ number: wSelected.discipline },
-    "Submitted":{ checkbox: true },
-  };
-  if (wentWell) props["What Went Well"] = { rich_text:[{ text:{ content:wentWell } }] };
-  if (improve) props["Needs Improvement"] = { rich_text:[{ text:{ content:improve } }] };
-  if (goal) props["Next Week Goal"] = { rich_text:[{ text:{ content:goal } }] };
-  if (focus) props["Focus Confluences"] = { rich_text:[{ text:{ content:focus } }] };
-  if (wState.aiCoaching) props["AI Coaching"] = { rich_text:[{ text:{ content:wState.aiCoaching.substring(0,2000) } }] };
-
-  try {
-    let data;
-    if (wState.existing && !wState.existing.properties['Submitted']?.checkbox) {
-      // Update existing draft
-      const res = await fetch(`${WORKER}/notion/pages/${wState.existing.id}`, {
-        method:'PATCH', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ properties:props })
-      });
-      data = await res.json();
-    } else {
-      const res = await fetch(`${WORKER}/notion/pages`, {
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ parent:{ database_id:WEEKLY_DB }, properties:props })
-      });
-      data = await res.json();
-    }
-    if (data.id) {
-      wState.existing = data;
-      wShowLocked(data);
-      wLoadHistory();
-    }
-  } catch(e) { alert('Submit error: '+e.message); }
-
-  btn.disabled = false; btn.textContent = '✓ Submit Weekly Review';
-}
-
-async function wSaveNote() {
-  const note = document.getElementById('w-extra-note').value.trim();
-  if (!note || !wState.existing) return;
-  const btn = document.getElementById('w-note-btn');
-  btn.disabled=true; btn.textContent='Saving...';
-  try {
-    await fetch(`${WORKER}/notion/pages/${wState.existing.id}`, {
-      method:'PATCH', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ properties:{ "Extra Note":{ rich_text:[{ text:{ content:note } }] } } })
-    });
-    btn.textContent='Saved ✓';
-    setTimeout(()=>{btn.disabled=false;btn.textContent='Save Note';},2000);
-  } catch(e) { btn.disabled=false; btn.textContent='Save Note'; alert('Error: '+e.message); }
-}
-
-async function wLoadHistory() {
-  const container = document.getElementById('w-history');
-  try {
-    const res = await fetch(`${WORKER}/notion/databases/${WEEKLY_DB}/query`, {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ page_size:20 })
-    });
-    const data = await res.json();
-    const pages = (data.results||[]).sort((a,b)=>(b.properties['Week Start']?.date?.start||'').localeCompare(a.properties['Week Start']?.date?.start||''));
-    if (!pages.length) { container.innerHTML='<div style="font-family:var(--mono);font-size:11px;color:var(--text3);padding:1.5rem;background:var(--surface);text-align:center;">No weekly reviews yet</div>'; return; }
-
-    container.innerHTML = pages.map((p,i) => {
-      const props = p.properties;
-      const ws = props['Week Start']?.date?.start||'';
-      const we = props['Week End']?.date?.start||'';
-      const pnl = props['Total P&L']?.number||0;
-      const wr = Math.round((props['Win Rate']?.number||0)*100);
-      const tc = props['Trade Count']?.number||0;
-      const mental = props['Mental State']?.number||0;
-      const disc = props['Discipline']?.number||0;
-      const submitted = props['Submitted']?.checkbox;
-      const pClass = pnl>=0?'color:var(--green)':'color:var(--red)';
-      const pStr = (pnl>=0?'+':'-')+'$'+Math.abs(pnl).toLocaleString();
-      const wsFmt = ws ? new Date(ws+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'}) : '—';
-      const weFmt = we ? new Date(we+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '—';
-
-      return `<div style="background:var(--surface);border-bottom:1px solid var(--border);">
-        <div style="display:grid;grid-template-columns:160px 80px 80px 80px 1fr auto;gap:12px;align-items:center;padding:12px 16px;cursor:pointer;" onclick="wToggleExpand(${i})">
-          <div style="font-family:var(--mono);font-size:11px;color:var(--text2);">${wsFmt} – ${weFmt}</div>
-          <div style="font-family:var(--mono);font-size:12px;font-weight:700;${pClass}">${pStr}</div>
-          <div style="font-family:var(--mono);font-size:11px;color:var(--text2);">${wr}% WR</div>
-          <div style="font-family:var(--mono);font-size:11px;color:var(--text3);">${tc} trades</div>
-          <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">${wRenderStarsDisplay(mental)} · ${wRenderStarsDisplay(disc)}</div>
-          <div style="font-family:var(--mono);font-size:10px;color:var(--text3);" id="w-expand-arrow-${i}">▼</div>
-        </div>
-        <div id="w-expand-${i}" style="display:none;padding:0 16px 16px;border-top:1px solid var(--border);">
-          ${wExtractText(props['What Went Well']?.rich_text) ? `<div class="wfield-label" style="margin-top:12px;">What went well</div><div class="wfield-val">${wExtractText(props['What Went Well']?.rich_text)}</div>` : ''}
-          ${wExtractText(props['Needs Improvement']?.rich_text) ? `<div class="wfield-label" style="margin-top:10px;">Needs improvement</div><div class="wfield-val">${wExtractText(props['Needs Improvement']?.rich_text)}</div>` : ''}
-          ${wExtractText(props['Next Week Goal']?.rich_text) ? `<div class="wfield-label" style="margin-top:10px;">Goal</div><div class="wfield-val">${wExtractText(props['Next Week Goal']?.rich_text)}</div>` : ''}
-          ${wExtractText(props['Focus Confluences']?.rich_text) ? `<div class="wfield-label" style="margin-top:10px;">Focus confluences</div><div class="wfield-val">${wExtractText(props['Focus Confluences']?.rich_text)}</div>` : ''}
-          ${wExtractText(props['AI Coaching']?.rich_text) ? `<div class="wfield-label" style="margin-top:10px;">AI Coaching</div><div class="wfield-val" style="white-space:pre-wrap;">${wExtractText(props['AI Coaching']?.rich_text)}</div>` : ''}
-          ${wExtractText(props['Extra Note']?.rich_text) ? `<div class="wfield-label" style="margin-top:10px;">Extra note</div><div class="wfield-val">${wExtractText(props['Extra Note']?.rich_text)}</div>` : ''}
-        </div>
-      </div>`;
-    }).join('');
-  } catch(e) { container.innerHTML=`<div style="color:var(--red);font-size:12px;padding:1rem;">Error: ${e.message}</div>`; }
-}
-
-function wToggleExpand(i) {
-  const el = document.getElementById(`w-expand-${i}`);
-  const arrow = document.getElementById(`w-expand-arrow-${i}`);
-  const open = el.style.display !== 'none';
-  el.style.display = open ? 'none' : 'block';
-  arrow.textContent = open ? '▼' : '▲';
-}
-
-function togglePartialRow() {
-  const contracts = getNum('f-contracts') || 1;
-  const row = document.getElementById('partial-row');
-  if (!row) return;
-  if (contracts > 1) {
-    row.style.display = 'block';
-  } else {
-    row.style.display = 'none';
-    const pp = document.getElementById('f-partial-price');
-    const pt = document.getElementById('f-partial-time');
-    const pc = document.getElementById('f-partial-contracts');
-    if (pp) pp.value = '';
-    if (pt) pt.value = '';
-    if (pc) pc.value = '';
+    document.getElementById('main-content').innerHTML = `<div class="error-state">Error: ${e.message}</div>`;
   }
 }
 
-// Live partial P&L preview
-['f-partial-price','f-partial-contracts','f-entry','f-exit','f-direction','f-instrument'].forEach(id => {
+function filterByPeriod(trades, period) {
+  if (period === 'all') return trades;
+  const now = new Date();
+  const cutoff = new Date();
+  if (period === 'week') cutoff.setDate(now.getDate() - 7);
+  else if (period === 'month') cutoff.setMonth(now.getMonth() - 1);
+  else if (period === '3month') cutoff.setMonth(now.getMonth() - 3);
+  return trades.filter(t => new Date(t.date) >= cutoff);
+}
+
+function setText(id, text, cls) {
   const el = document.getElementById(id);
-  if (el) el.addEventListener('input', updatePartialPreview);
+  if (!el) return;
+  el.textContent = text;
+  if (cls) el.className = cls;
+}
+
+function updateStats(trades) {
+  const total = trades.length;
+  const wins = trades.filter(t => t.status === 'Closed - Win').length;
+  const losses = trades.filter(t => t.status === 'Closed - Loss').length;
+  const pnl = trades.reduce((s,t) => s + t.pnl, 0);
+  const avg = total ? Math.round(pnl / total) : 0;
+  const best = total ? Math.max(...trades.map(t => t.pnl)) : 0;
+
+  // Streaks
+  let curWin=0,curLoss=0,maxWin=0,maxLoss=0;
+  const sorted = [...trades].sort((a,b)=>a.date.localeCompare(b.date));
+  sorted.forEach(t => {
+    if (t.status === 'Closed - Win') { curWin++; maxWin=Math.max(maxWin,curWin); curLoss=0; }
+    else if (t.status === 'Closed - Loss') { curLoss++; maxLoss=Math.max(maxLoss,curLoss); curWin=0; }
+  });
+
+  // Best session
+  const sessionMap = {};
+  trades.forEach(t => {
+    if (!t.session) return;
+    if (!sessionMap[t.session]) sessionMap[t.session] = { pnl:0, count:0 };
+    sessionMap[t.session].pnl += t.pnl;
+    sessionMap[t.session].count++;
+  });
+  const bestSession = Object.entries(sessionMap).sort((a,b)=>b[1].pnl-a[1].pnl)[0];
+
+  setText('s-total', total);
+  setText('s-wr', total ? Math.round((wins/total)*100)+'%' : '—');
+  setText('s-pnl', total ? (pnl>=0?'+':'-')+'$'+Math.abs(pnl).toLocaleString() : '—', 'stat-value'+(pnl>0?' pos':pnl<0?' neg':''));
+  setText('s-avg', total ? (avg>=0?'+':'-')+'$'+Math.abs(avg).toLocaleString() : '—', 'stat-value'+(avg>0?' pos':avg<0?' neg':''));
+  setText('s-best', best ? '+$'+best.toLocaleString() : '—');
+  setText('s-wstreak', maxWin ? maxWin+'W' : '—', 'stat-value pos');
+  setText('s-lstreak', maxLoss ? maxLoss+'L' : '—', 'stat-value neg');
+  setText('s-session', bestSession ? bestSession[0] : '—');
+
+  document.getElementById('s-best').textContent = best ? '+$' + best.toLocaleString() : '—';
+
+  const rrs = trades.filter(t => t.rr != null).map(t => t.rr);
+  const avgRR = rrs.length ? (rrs.reduce((a,b)=>a+b,0)/rrs.length).toFixed(2) : null;
+  setText('s-rr', avgRR ? '1:' + avgRR : '—');
+
+  const durs = trades.filter(t => t.duration != null).map(t => t.duration);
+  const avgDur = durs.length ? Math.round(durs.reduce((a,b)=>a+b,0)/durs.length) : null;
+  setText('s-dur', avgDur ? (avgDur < 60 ? avgDur + 'm' : Math.floor(avgDur/60) + 'h ' + (avgDur%60) + 'm') : '—');
+
+  // Update stat font size for long values
+  ['s-rr','s-dur','s-wstreak','s-lstreak'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el && el.textContent.length > 5) el.style.fontSize = '14px';
+    else if (el) el.style.fontSize = '';
+  });
+
+
+}
+
+function renderEquityChart(trades) {
+  const canvas = document.getElementById('equity-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+
+  if (!trades.length) {
+    ctx.fillStyle = '#444';
+    ctx.font = '11px Space Mono';
+    ctx.textAlign = 'center';
+    ctx.fillText('NO DATA', W/2, H/2);
+    return;
+  }
+
+  // Build cumulative equity
+  let cumulative = 0;
+  const points = [{ date: '', value: 0 }];
+  trades.forEach(t => { cumulative += t.pnl; points.push({ date: t.date, value: cumulative }); });
+
+  const values = points.map(p => p.value);
+  const minV = Math.min(...values);
+  const maxV = Math.max(...values);
+  const range = maxV - minV || 1;
+
+  const pad = { top: 20, right: 20, bottom: 40, left: 60 };
+  const cW = W - pad.left - pad.right;
+  const cH = H - pad.top - pad.bottom;
+
+  const toX = i => pad.left + (i / (points.length - 1)) * cW;
+  const toY = v => pad.top + cH - ((v - minV) / range) * cH;
+
+  // Grid lines
+  const gridLines = 5;
+  for (let i = 0; i <= gridLines; i++) {
+    const y = pad.top + (i / gridLines) * cH;
+    const val = maxV - (i / gridLines) * range;
+    ctx.beginPath();
+    ctx.strokeStyle = '#1a1a1a';
+    ctx.lineWidth = 1;
+    ctx.moveTo(pad.left, y);
+    ctx.lineTo(W - pad.right, y);
+    ctx.stroke();
+    ctx.fillStyle = '#444';
+    ctx.font = '9px Space Mono';
+    ctx.textAlign = 'right';
+    ctx.fillText((val >= 0 ? '+' : '') + '$' + Math.round(val).toLocaleString(), pad.left - 8, y + 3);
+  }
+
+  // Zero line
+  if (minV < 0 && maxV > 0) {
+    const zeroY = toY(0);
+    ctx.beginPath();
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 4]);
+    ctx.moveTo(pad.left, zeroY);
+    ctx.lineTo(W - pad.right, zeroY);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  // Gradient fill
+  const grad = ctx.createLinearGradient(0, pad.top, 0, H - pad.bottom);
+  const isPositive = cumulative >= 0;
+  grad.addColorStop(0, isPositive ? 'rgba(0,230,118,0.3)' : 'rgba(255,68,68,0.3)');
+  grad.addColorStop(1, 'rgba(0,0,0,0)');
+
+  ctx.beginPath();
+  ctx.moveTo(toX(0), toY(0));
+  points.forEach((p, i) => ctx.lineTo(toX(i), toY(p.value)));
+  ctx.lineTo(toX(points.length - 1), H - pad.bottom);
+  ctx.lineTo(toX(0), H - pad.bottom);
+  ctx.closePath();
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  // Line
+  ctx.beginPath();
+  ctx.strokeStyle = isPositive ? '#00e676' : '#ff4444';
+  ctx.lineWidth = 2;
+  points.forEach((p, i) => {
+    if (i === 0) ctx.moveTo(toX(i), toY(p.value));
+    else ctx.lineTo(toX(i), toY(p.value));
+  });
+  ctx.stroke();
+
+  // Dots on data points
+  points.forEach((p, i) => {
+    if (i === 0) return;
+    ctx.beginPath();
+    ctx.arc(toX(i), toY(p.value), 3, 0, Math.PI * 2);
+    ctx.fillStyle = isPositive ? '#00e676' : '#ff4444';
+    ctx.fill();
+  });
+
+  // Date labels
+  const labelStep = Math.max(1, Math.floor(points.length / 6));
+  ctx.fillStyle = '#444';
+  ctx.font = '9px Space Mono';
+  ctx.textAlign = 'center';
+  points.forEach((p, i) => {
+    if (i === 0 || i % labelStep !== 0 || !p.date) return;
+    ctx.fillText(p.date.slice(5), toX(i), H - pad.bottom + 16);
+  });
+}
+
+function renderDonut(trades) {
+  const canvas = document.getElementById('donut-canvas');
+  const legendEl = document.getElementById('donut-legend');
+  if (!canvas || !legendEl) return;
+
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+
+  // Count by instrument
+  const counts = {};
+  trades.forEach(t => { counts[t.instrument] = (counts[t.instrument] || 0) + 1; });
+  const total = trades.length;
+  if (!total) {
+    ctx.fillStyle = '#444';
+    ctx.font = '11px Space Mono';
+    ctx.textAlign = 'center';
+    ctx.fillText('NO DATA', W/2, H/2);
+    legendEl.innerHTML = '';
+    return;
+  }
+
+  const entries = Object.entries(counts).sort((a,b) => b[1]-a[1]);
+  const cx = W/2, cy = H/2, r = Math.min(W,H)/2 - 10, inner = r * 0.58;
+
+  let startAngle = -Math.PI / 2;
+  entries.forEach(([inst, count]) => {
+    const slice = (count / total) * Math.PI * 2;
+    const color = INSTRUMENT_COLORS[inst] || '#888';
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, r, startAngle, startAngle + slice);
+    ctx.closePath();
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(cx, cy, inner, 0, Math.PI * 2);
+    ctx.fillStyle = '#111';
+    ctx.fill();
+    startAngle += slice;
+  });
+
+  // Center text
+  ctx.fillStyle = '#e8e8e8';
+  ctx.font = 'bold 20px Space Mono';
+  ctx.textAlign = 'center';
+  ctx.fillText(total, cx, cy + 4);
+  ctx.fillStyle = '#444';
+  ctx.font = '9px Space Mono';
+  ctx.fillText('TRADES', cx, cy + 18);
+
+  // Legend
+  legendEl.innerHTML = entries.map(([inst, count]) => `
+    <div class="legend-item">
+      <div class="legend-left">
+        <div class="legend-dot" style="background:${INSTRUMENT_COLORS[inst] || '#888'}"></div>
+        <span class="legend-name">${inst}</span>
+      </div>
+      <span class="legend-pct">${count} · ${Math.round((count/total)*100)}%</span>
+    </div>
+  `).join('');
+}
+
+function renderGradeChart(trades) {
+  const canvas = document.getElementById('grade-canvas');
+  if (!canvas) return;
+  canvas.width = canvas.offsetWidth; canvas.height = 180;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+
+  const grades = ['A++','A+','A','B','C','D'];
+  const colors = ['#c8ff00','#00e676','#40c4ff','#ffd740','#ff6d00','#ff4444'];
+  const counts = {};
+  grades.forEach(g => counts[g] = 0);
+  trades.forEach(t => { if (t.grade && counts[t.grade] !== undefined) counts[t.grade]++; });
+
+  const max = Math.max(...Object.values(counts), 1);
+  const pad = { top: 10, right: 16, bottom: 30, left: 30 };
+  const cW = W - pad.left - pad.right;
+  const cH = H - pad.top - pad.bottom;
+  const barW = cW / grades.length * 0.6;
+  const gap = cW / grades.length;
+
+  grades.forEach((g, i) => {
+    const count = counts[g];
+    const x = pad.left + i * gap + gap * 0.2;
+    const barH = count ? (count / max) * cH : 0;
+    const y = pad.top + cH - barH;
+    ctx.fillStyle = colors[i];
+    ctx.globalAlpha = 0.85;
+    ctx.fillRect(x, y, barW, barH);
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = '#444';
+    ctx.font = '9px Space Mono';
+    ctx.textAlign = 'center';
+    ctx.fillText(g, x + barW/2, H - pad.bottom + 14);
+    if (count) {
+      ctx.fillStyle = colors[i];
+      ctx.fillText(count, x + barW/2, y - 4);
+    }
+  });
+}
+
+function renderSessionChart(trades) {
+  const canvas = document.getElementById('session-canvas');
+  if (!canvas) return;
+  canvas.width = canvas.offsetWidth; canvas.height = 180;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+
+  const sessions = ['Asia','London','NY AM','NY Lunch','NY PM','Overnight'];
+  const pnlMap = {};
+  sessions.forEach(s => pnlMap[s] = 0);
+  trades.forEach(t => { if (t.session && pnlMap[t.session] !== undefined) pnlMap[t.session] += t.pnl; });
+
+  const vals = Object.values(pnlMap);
+  const max = Math.max(...vals.map(Math.abs), 1);
+  const pad = { top: 10, right: 16, bottom: 30, left: 50 };
+  const cW = W - pad.left - pad.right;
+  const cH = H - pad.top - pad.bottom;
+  const barW = cW / sessions.length * 0.6;
+  const gap = cW / sessions.length;
+  const zeroY = pad.top + cH / 2;
+
+  ctx.beginPath();
+  ctx.strokeStyle = '#2a2a2a';
+  ctx.lineWidth = 1;
+  ctx.moveTo(pad.left, zeroY);
+  ctx.lineTo(W - pad.right, zeroY);
+  ctx.stroke();
+
+  sessions.forEach((s, i) => {
+    const val = pnlMap[s];
+    const x = pad.left + i * gap + gap * 0.2;
+    const barH = (Math.abs(val) / max) * (cH / 2);
+    const isPos = val >= 0;
+    const y = isPos ? zeroY - barH : zeroY;
+    ctx.fillStyle = isPos ? '#00e676' : '#ff4444';
+    ctx.globalAlpha = 0.8;
+    ctx.fillRect(x, y, barW, barH);
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = '#444';
+    ctx.font = '8px Space Mono';
+    ctx.textAlign = 'center';
+    const label = s.length > 6 ? s.replace('NY ', 'NY\n') : s;
+    ctx.fillText(s.substring(0,6), x + barW/2, H - pad.bottom + 14);
+    if (val !== 0) {
+      ctx.fillStyle = isPos ? '#00e676' : '#ff4444';
+      ctx.font = '8px Space Mono';
+      const pStr = (isPos?'+':'') + '$' + Math.abs(Math.round(val/1000)) + 'k';
+      ctx.fillText(val > 999 || val < -999 ? pStr : (isPos?'+':'') + '$' + Math.abs(val), x + barW/2, isPos ? y - 4 : y + barH + 10);
+    }
+  });
+}
+
+function renderGradeDist(trades) {
+  const canvas = document.getElementById('grade-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+
+  const grades = ['A++','A+','A','B','C','D'];
+  const colors = {'A++':'#c8ff00','A+':'#00e676','A':'#40c4ff','B':'#ffd740','C':'#ff6d00','D':'#ff4444'};
+  const counts = {};
+  grades.forEach(g => counts[g] = 0);
+  trades.forEach(t => { if (t.grade && counts[t.grade] !== undefined) counts[t.grade]++; });
+  const total = Object.values(counts).reduce((a,b)=>a+b,0);
+
+  if (!total) {
+    ctx.fillStyle = '#444'; ctx.font = '11px Space Mono'; ctx.textAlign = 'center';
+    ctx.fillText('NO DATA', W/2, H/2); return;
+  }
+
+  const cx = W * 0.38, cy = H / 2;
+  const r = Math.min(cx, cy) - 16;
+  const inner = r * 0.55;
+  let startAngle = -Math.PI / 2;
+
+  const slices = grades.filter(g => counts[g] > 0);
+
+  slices.forEach(g => {
+    const slice = (counts[g] / total) * Math.PI * 2;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, r, startAngle, startAngle + slice);
+    ctx.closePath();
+    ctx.fillStyle = colors[g];
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(cx, cy, inner, 0, Math.PI * 2);
+    ctx.fillStyle = '#111';
+    ctx.fill();
+    startAngle += slice;
+  });
+
+  // Center label
+  ctx.fillStyle = '#e8e8e8';
+  ctx.font = 'bold 22px Space Mono';
+  ctx.textAlign = 'center';
+  ctx.fillText(total, cx, cy + 6);
+  ctx.fillStyle = '#444';
+  ctx.font = '9px Space Mono';
+  ctx.fillText('TRADES', cx, cy + 20);
+
+  // Legend on the right
+  const legendX = W * 0.62;
+  let legendY = cy - (slices.length * 22) / 2;
+  slices.forEach(g => {
+    const pct = Math.round((counts[g] / total) * 100);
+    ctx.fillStyle = colors[g];
+    ctx.fillRect(legendX, legendY - 9, 10, 10);
+    ctx.fillStyle = '#e8e8e8';
+    ctx.font = 'bold 11px Space Mono';
+    ctx.textAlign = 'left';
+    ctx.fillText(g, legendX + 16, legendY);
+    ctx.fillStyle = '#666';
+    ctx.font = '10px Space Mono';
+    ctx.fillText(`${counts[g]} · ${pct}%`, legendX + 16, legendY + 13);
+    legendY += 32;
+  });
+}
+
+function renderSessionPnl(trades) {
+  const el = document.getElementById('session-cards');
+  if (!el) return;
+
+  const sessions = {};
+  trades.forEach(t => {
+    if (!t.session) return;
+    if (!sessions[t.session]) sessions[t.session] = { pnl: 0, wins: 0, total: 0 };
+    sessions[t.session].pnl += t.pnl;
+    sessions[t.session].total++;
+    if (t.status === 'Closed - Win') sessions[t.session].wins++;
+  });
+
+  const entries = Object.entries(sessions).sort((a,b) => b[1].pnl - a[1].pnl);
+
+  if (!entries.length) {
+    el.innerHTML = '<div style="font-family:var(--mono);font-size:11px;color:var(--text3);padding:1rem;">No data</div>';
+    return;
+  }
+
+  el.innerHTML = entries.map(([sess, d]) => {
+    const isPos = d.pnl >= 0;
+    const pnlStr = (isPos ? '+' : '-') + '$' + Math.abs(d.pnl).toLocaleString();
+    const wr = Math.round((d.wins / d.total) * 100);
+    return `<div style="background:var(--surface);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <div style="font-family:var(--mono);font-size:11px;color:var(--text);letter-spacing:0.08em;">${sess}</div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:3px;">${d.total} trade${d.total>1?'s':''} · ${wr}% win</div>
+      </div>
+      <div style="font-family:var(--mono);font-size:20px;font-weight:700;color:${isPos?'#00e676':'#ff4444'};">${pnlStr}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderConfWinRate(trades) {
+  const canvas = document.getElementById('conf-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+
+  const confStats = {};
+  trades.forEach(t => {
+    (t.confluences || []).forEach(c => {
+      if (!confStats[c]) confStats[c] = { wins: 0, total: 0 };
+      confStats[c].total++;
+      if (t.status === 'Closed - Win') confStats[c].wins++;
+    });
+  });
+
+  const entries = Object.entries(confStats)
+    .filter(([,v]) => v.total >= 1)
+    .map(([name, v]) => ({ name, wr: Math.round((v.wins/v.total)*100), total: v.total }))
+    .sort((a,b) => b.wr - a.wr);
+
+  if (!entries.length) {
+    ctx.fillStyle = '#444'; ctx.font = '11px Space Mono'; ctx.textAlign = 'center';
+    ctx.fillText('NO DATA', W/2, H/2); return;
+  }
+
+  const pad = { top: 16, right: 60, bottom: 16, left: 140 };
+  const rowH = Math.min(32, Math.floor((H - pad.top - pad.bottom) / entries.length));
+  const trackW = W - pad.left - pad.right;
+
+  // Resize canvas height to fit all entries
+  const neededH = pad.top + pad.bottom + entries.length * rowH;
+  if (canvas.height < neededH) {
+    canvas.height = neededH;
+    canvas.style.height = neededH + 'px';
+  }
+  ctx.clearRect(0, 0, W, canvas.height);
+
+  entries.forEach((e, i) => {
+    const y = pad.top + i * rowH + rowH / 2;
+    const color = e.wr >= 70 ? '#00e676' : e.wr >= 50 ? '#ffd740' : '#ff4444';
+    const fillW = (e.wr / 100) * trackW;
+
+    // Row bg
+    ctx.fillStyle = i % 2 === 0 ? 'rgba(255,255,255,0.02)' : 'transparent';
+    ctx.fillRect(0, pad.top + i * rowH, W, rowH);
+
+    // Label
+    ctx.fillStyle = '#888';
+    ctx.font = '10px Space Mono';
+    ctx.textAlign = 'right';
+    const label = e.name.length > 16 ? e.name.slice(0,15)+'…' : e.name;
+    ctx.fillText(label, pad.left - 10, y + 4);
+
+    // Track bg
+    ctx.fillStyle = '#1a1a1a';
+    ctx.fillRect(pad.left, y - 4, trackW, 8);
+
+    // Fill
+    const grad = ctx.createLinearGradient(pad.left, 0, pad.left + fillW, 0);
+    grad.addColorStop(0, color + '88');
+    grad.addColorStop(1, color);
+    ctx.fillStyle = grad;
+    ctx.fillRect(pad.left, y - 4, fillW, 8);
+
+    // Dot at end
+    ctx.beginPath();
+    ctx.arc(pad.left + fillW, y, 6, 0, Math.PI * 2);
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(pad.left + fillW, y, 3, 0, Math.PI * 2);
+    ctx.fillStyle = '#111';
+    ctx.fill();
+
+    // % label
+    ctx.fillStyle = color;
+    ctx.font = 'bold 10px Space Mono';
+    ctx.textAlign = 'left';
+    ctx.fillText(e.wr + '%', W - pad.right + 8, y + 4);
+
+    // Count
+    ctx.fillStyle = '#444';
+    ctx.font = '9px Space Mono';
+    ctx.fillText('(' + e.total + ')', W - pad.right + 8, y + 15);
+  });
+}
+
+function renderMonthly(trades) {
+  const el = document.getElementById('monthly-table');
+  if (!el) return;
+
+  const monthly = {};
+  trades.forEach(t => {
+    if (!t.date) return;
+    const key = t.date.slice(0, 7); // YYYY-MM
+    if (!monthly[key]) monthly[key] = { pnl: 0, wins: 0, losses: 0, count: 0 };
+    monthly[key].pnl += t.pnl;
+    monthly[key].count++;
+    if (t.status === 'Closed - Win') monthly[key].wins++;
+    else if (t.status === 'Closed - Loss') monthly[key].losses++;
+  });
+
+  const rows = Object.entries(monthly).sort((a,b) => b[0].localeCompare(a[0]));
+  if (!rows.length) { el.innerHTML = '<div style="font-family:var(--mono);font-size:11px;color:var(--text3);padding:1rem;">No data</div>'; return; }
+
+  const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+  el.innerHTML = `<table style="width:100%;border-collapse:collapse;font-family:var(--mono);font-size:11px;">
+    <thead>
+      <tr style="border-bottom:1px solid var(--border2);">
+        <th style="text-align:left;padding:6px 8px;color:var(--text3);letter-spacing:0.1em;font-weight:400;">MONTH</th>
+        <th style="text-align:right;padding:6px 8px;color:var(--text3);letter-spacing:0.1em;font-weight:400;">TRADES</th>
+        <th style="text-align:right;padding:6px 8px;color:var(--text3);letter-spacing:0.1em;font-weight:400;">W/L</th>
+        <th style="text-align:right;padding:6px 8px;color:var(--text3);letter-spacing:0.1em;font-weight:400;">WIN %</th>
+        <th style="text-align:right;padding:6px 8px;color:var(--text3);letter-spacing:0.1em;font-weight:400;">P&L</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${rows.map(([key, d]) => {
+        const [yr, mo] = key.split('-');
+        const wr = Math.round((d.wins / d.count) * 100);
+        const pnlStr = (d.pnl >= 0 ? '+' : '-') + '$' + Math.abs(d.pnl).toLocaleString();
+        const pnlColor = d.pnl >= 0 ? '#00e676' : '#ff4444';
+        return `<tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:8px;color:var(--text);">${MONTHS[parseInt(mo)-1]} ${yr}</td>
+          <td style="padding:8px;text-align:right;color:var(--text2);">${d.count}</td>
+          <td style="padding:8px;text-align:right;color:var(--text2);">${d.wins}W / ${d.losses}L</td>
+          <td style="padding:8px;text-align:right;color:${wr >= 60 ? '#00e676' : wr >= 40 ? '#ffd740' : '#ff4444'};">${wr}%</td>
+          <td style="padding:8px;text-align:right;font-weight:700;color:${pnlColor};">${pnlStr}</td>
+        </tr>`;
+      }).join('')}
+    </tbody>
+  </table>`;
+}
+
+let calYear = new Date().getFullYear();
+let calMonth = new Date().getMonth();
+
+function changeMonth(dir) {
+  calMonth += dir;
+  if (calMonth > 11) { calMonth = 0; calYear++; }
+  if (calMonth < 0) { calMonth = 11; calYear--; }
+  renderCalendar(allTrades);
+}
+
+function renderCalendar(trades) {
+  // Insert calendar after monthly-panel if not already there
+  const monthly = document.getElementById('monthly-panel');
+  if (monthly && !document.getElementById('cal-panel-inner')) {
+    const calDiv = document.createElement('div');
+    calDiv.id = 'cal-panel-inner';
+    calDiv.className = 'cal-panel';
+    calDiv.style.cssText = 'margin-top:1px;border:none;';
+    calDiv.innerHTML = `
+      <div class="cal-header">
+        <div class="chart-panel-title" style="margin:0;">Daily P&L Calendar</div>
+        <div class="cal-nav">
+          <button class="cal-nav-btn" onclick="changeMonth(-1)">&#8592;</button>
+          <div class="cal-month-label" id="cal-month-label-inner"></div>
+          <button class="cal-nav-btn" onclick="changeMonth(1)">&#8594;</button>
+        </div>
+      </div>
+      <div class="cal-grid" id="cal-grid-inner"></div>`;
+    monthly.insertAdjacentElement('afterend', calDiv);
+  }
+  // Use inner elements if available
+  const monthLabelEl = document.getElementById('cal-month-label-inner') || document.getElementById('cal-month-label');
+  const gridEl = document.getElementById('cal-grid-inner') || document.getElementById('cal-grid');
+  if (!monthLabelEl || !gridEl) return;
+  _renderCalendarInto(trades, monthLabelEl, gridEl);
+}
+function _renderCalendarInto(trades, monthLabelEl, gridEl) {
+  const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+  monthLabelEl.textContent = `${MONTHS[calMonth]} ${calYear}`;
+
+  // Build daily P&L map
+  const dailyMap = {};
+  trades.forEach(t => {
+    if (!t.date) return;
+    if (!dailyMap[t.date]) dailyMap[t.date] = { pnl: 0, count: 0 };
+    dailyMap[t.date].pnl += t.pnl;
+    dailyMap[t.date].count++;
+  });
+
+  const firstDay = new Date(calYear, calMonth, 1).getDay();
+  const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+  const today = new Date();
+
+  let html = DAYS.map(d => `<div class="cal-day-header">${d}</div>`).join('');
+
+  // Empty cells before first day
+  for (let i = 0; i < firstDay; i++) {
+    html += `<div class="cal-cell empty"></div>`;
+  }
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isToday = today.getFullYear() === calYear && today.getMonth() === calMonth && today.getDate() === d;
+    const data = dailyMap[dateStr];
+
+    let cellClass = 'cal-cell';
+    if (isToday) cellClass += ' today';
+    if (data) cellClass += ' has-trades';
+
+    let inner = `<div class="cal-date">${d}</div>`;
+    if (data) {
+      const pnlClass = data.pnl >= 0 ? 'pos' : 'neg';
+      const pnlStr = (data.pnl >= 0 ? '+' : '-') + '$' + Math.abs(data.pnl).toLocaleString();
+      inner += `<div class="cal-trades">${data.count} trade${data.count > 1 ? 's' : ''}</div>`;
+      inner += `<div class="cal-pnl ${pnlClass}">${pnlStr}</div>`;
+    }
+
+    html += `<div class="${cellClass}">${inner}</div>`;
+  }
+
+  gridEl.innerHTML = html;
+}
+
+function renderAll() {
+  const filtered = filterByPeriod(allTrades, currentPeriod);
+  updateStats(filtered);
+
+  document.getElementById('main-content').innerHTML = `
+    <div class="charts-grid">
+      <div class="chart-panel">
+        <div class="chart-panel-title">Equity Curve</div>
+        <canvas id="equity-canvas" style="width:100%;height:300px;"></canvas>
+      </div>
+      <div class="chart-panel">
+        <div class="chart-panel-title">Instruments Traded</div>
+        <div class="donut-wrap">
+          <canvas id="donut-canvas" width="200" height="200"></canvas>
+          <div class="donut-legend" id="donut-legend"></div>
+        </div>
+      </div>
+    </div>
+    <div id="monthly-panel" class="chart-panel" style="margin-top:1px;">
+      <div class="chart-panel-title">Monthly P&L Summary</div>
+      <div id="monthly-table" style="overflow-x:auto;"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);margin-top:1px;">
+      <div class="chart-panel">
+        <div class="chart-panel-title">Grade Distribution</div>
+        <canvas id="grade-canvas" style="width:100%;height:220px;"></canvas>
+      </div>
+      <div class="chart-panel">
+        <div class="chart-panel-title">P&L by Session</div>
+        <div id="session-cards" style="display:flex;flex-direction:column;gap:1px;background:var(--border);margin-top:4px;"></div>
+      </div>
+    </div>
+    <div class="chart-panel" style="margin-top:1px;">
+      <div class="chart-panel-title">Confluence Win Rate</div>
+      <canvas id="conf-canvas" style="width:100%;min-height:280px;"></canvas>
+    </div>
+  `;
+
+  requestAnimationFrame(() => {
+    const eq = document.getElementById('equity-canvas');
+    if (eq) { eq.width = eq.offsetWidth; eq.height = 300; renderEquityChart(filtered); }
+    renderDonut(filtered);
+    renderMonthly(filtered);
+    renderCalendar(filtered);
+    const gradeC = document.getElementById('grade-canvas');
+    if (gradeC) { gradeC.width = gradeC.offsetWidth; gradeC.height = 220; renderGradeDist(filtered); }
+    renderSessionPnl(filtered);
+    const confC = document.getElementById('conf-canvas');
+    if (confC) { confC.width = confC.offsetWidth; confC.height = 400; renderConfWinRate(filtered); }
+  });
+}
+
+document.querySelectorAll('.period-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.period-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    currentPeriod = tab.dataset.period;
+    renderAll();
+  });
 });
 
-function updatePartialPreview() {
-  const preview = document.getElementById('partial-pnl-preview');
-  if (!preview) return;
-  const entry = getNum('f-entry');
-  const partialPrice = getNum('f-partial-price');
-  const partialContracts = getNum('f-partial-contracts');
-  const exit = getNum('f-exit');
-  const contracts = getNum('f-contracts') || 1;
-  const instrument = getField('f-instrument');
-  const direction = getField('f-direction');
-  if (!entry || !partialPrice || !partialContracts || !instrument || !direction) { preview.textContent = ''; return; }
-  const tp1Pnl = calcPnL(entry, partialPrice, partialContracts, instrument, direction);
-  const remaining = contracts - partialContracts;
-  let txt = `TP1: +$${Math.abs(tp1Pnl).toLocaleString()} (${partialContracts} contract${partialContracts>1?'s':''})`;
-  if (exit && remaining > 0) {
-    const remPnl = calcPnL(entry, exit, remaining, instrument, direction);
-    txt += ` · Remaining: +$${Math.abs(remPnl).toLocaleString()} (${remaining} contract${remaining>1?'s':''}) · Total: +$${Math.abs(tp1Pnl + remPnl).toLocaleString()}`;
-  }
-  preview.textContent = txt;
-  preview.style.color = (tp1Pnl >= 0) ? 'var(--green)' : 'var(--red)';
-}
-
-function resetForm() {
-  ['f-instrument','f-direction','f-session','f-timeframe','f-outcome'].forEach(id => document.getElementById(id).value = '');
-  ['f-htf','f-model','f-entry','f-exit','f-sl','f-tp','f-contracts','f-entry-time','f-exit-time','f-notes','f-mistakes','f-lessons','f-screenshot','f-partial-price','f-partial-time','f-partial-contracts'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('partial-row').style.display = 'none';
-  document.getElementById('partial-pnl-preview').textContent = '';
-  document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
-  clearConf();
-}
+document.addEventListener('DOMContentLoaded', () => initNav('analytics'));
+fetchTrades();
 </script>
 </body>
 </html>
