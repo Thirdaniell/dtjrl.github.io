@@ -283,7 +283,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
       <!-- Row 8 -->
       <div class="field">
         <label>Contracts</label>
-        <input type="number" id="f-contracts" placeholder="e.g. 2" min="1" oninput="togglePartialRow()">
+        <input type="number" id="f-contracts" placeholder="e.g. 2" min="1">
       </div>
       <div class="field">
         <label>Screenshot Link</label>
@@ -579,6 +579,9 @@ function checkAuth() {
   if (val === PASS) {
     document.getElementById('auth-screen').style.display = 'none';
     document.getElementById('main-screen').style.display = 'block';
+    // Wire up partial row toggle after auth
+    const contractsEl = document.getElementById('f-contracts');
+    if (contractsEl) contractsEl.addEventListener('input', togglePartialRow);
   } else {
     document.getElementById('auth-error').style.display = 'block';
     document.getElementById('pw-input').value = '';
@@ -1503,13 +1506,17 @@ function wToggleExpand(i) {
 function togglePartialRow() {
   const contracts = getNum('f-contracts') || 1;
   const row = document.getElementById('partial-row');
+  if (!row) return;
   if (contracts > 1) {
     row.style.display = 'block';
   } else {
     row.style.display = 'none';
-    document.getElementById('f-partial-price').value = '';
-    document.getElementById('f-partial-time').value = '';
-    document.getElementById('f-partial-contracts').value = '';
+    const pp = document.getElementById('f-partial-price');
+    const pt = document.getElementById('f-partial-time');
+    const pc = document.getElementById('f-partial-contracts');
+    if (pp) pp.value = '';
+    if (pt) pt.value = '';
+    if (pc) pc.value = '';
   }
 }
 
