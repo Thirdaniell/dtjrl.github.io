@@ -271,24 +271,14 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
         <label>Exit Time <span style="color:var(--text3);font-size:9px;">(final)</span></label>
         <input type="text" id="f-exit-time" placeholder="e.g. 10:01 AM">
       </div>
-      <!-- PARTIAL EXIT — shown when contracts > 1 -->
+      <!-- PARTIAL EXITS — dynamic, shown when contracts > 1 -->
       <div class="field form-full" id="partial-row" style="display:none;background:rgba(200,255,0,0.03);border:1px solid rgba(200,255,0,0.15);padding:1rem 1.25rem;">
-        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--accent);text-transform:uppercase;margin-bottom:10px;">Partial Exit (TP1)</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
-          <div>
-            <label style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--text3);text-transform:uppercase;display:block;margin-bottom:5px;">TP1 Price</label>
-            <input type="number" id="f-partial-price" placeholder="e.g. 27419.75" step="0.25" style="font-family:var(--mono);font-size:12px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:8px 10px;width:100%;outline:none;">
-          </div>
-          <div>
-            <label style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--text3);text-transform:uppercase;display:block;margin-bottom:5px;">TP1 Time</label>
-            <input type="text" id="f-partial-time" placeholder="e.g. 10:01 AM" style="font-family:var(--mono);font-size:12px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:8px 10px;width:100%;outline:none;">
-          </div>
-          <div>
-            <label style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--text3);text-transform:uppercase;display:block;margin-bottom:5px;">Contracts at TP1</label>
-            <input type="number" id="f-partial-contracts" placeholder="e.g. 1" min="1" style="font-family:var(--mono);font-size:12px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:8px 10px;width:100%;outline:none;">
-          </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--accent);text-transform:uppercase;">Partial Exits</div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:0.06em;" id="partial-contracts-remaining"></div>
         </div>
-        <div style="font-family:var(--mono);font-size:10px;color:var(--green);margin-top:8px;" id="partial-pnl-preview"></div>
+        <div id="partial-tp-rows"></div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--green);margin-top:10px;line-height:1.8;" id="partial-pnl-preview"></div>
       </div>
       <!-- Row 7 -->
       <div class="field">
@@ -729,28 +719,27 @@ async function analyzeTrade() {
   const date = getField('f-date') || new Date().toISOString().split('T')[0];
   const screenshot = getField('f-screenshot');
 
-  const partialPrice = getNum('f-partial-price');
-  const partialContracts = getNum('f-partial-contracts');
-  const partialTime = getField('f-partial-time');
-  const remainingContracts = (partialContracts && contracts > 1) ? contracts - partialContracts : contracts;
-
+  const tpRows = (contracts > 1) ? getTPRows().filter(r => r.price && r.contracts) : [];
   let pnl = 0;
-  if (entry && exit) {
-    if (partialPrice && partialContracts && contracts > 1) {
-      // Partial: TP1 P&L + remaining contracts at final exit
-      const tp1Pnl = calcPnL(entry, partialPrice, partialContracts, instrument, direction);
-      const remainPnl = calcPnL(entry, exit, remainingContracts, instrument, direction);
-      pnl = tp1Pnl + remainPnl;
-    } else {
+  if (entry) {
+    if (tpRows.length > 0) {
+      tpRows.forEach(r => { pnl += calcPnL(entry, r.price, r.contracts, instrument, direction); });
+    } else if (exit) {
       pnl = calcPnL(entry, exit, contracts, instrument, direction);
     }
   }
+  // For duration, use first TP time or final exit time
+  const firstTPTime = tpRows.length ? tpRows[0].time : null;
+  const partialPrice = tpRows.length ? tpRows[0].price : null;
+  const partialContracts = tpRows.length ? tpRows[0].contracts : null;
+  const partialTime = firstTPTime;
+  const remainingContracts = contracts;
   const rr = calcRR(entry, sl, tp);
   const duration = calcDuration(entryTime, exitTime);
   const grade = autoGrade(confluences, mistakes, notes);
   const followedRules = autoFollowedRules(mistakes, notes, lessons);
 
-  tradeData = { instrument, direction, session, timeframe, htf, model, date, entry, exit, sl, tp, contracts, entryTime, exitTime, pnl, rr, duration, confluences, grade, followedRules, outcome, notes, mistakes, lessons, screenshot, partialPrice, partialContracts, partialTime, remainingContracts };
+  tradeData = { instrument, direction, session, timeframe, htf, model, date, entry, exit, sl, tp, contracts, entryTime, exitTime, pnl, rr, duration, confluences, grade, followedRules, outcome, notes, mistakes, lessons, screenshot, tpRows };
 
   // Show review panel
   document.getElementById('analyze-btn').disabled = true;
@@ -848,10 +837,10 @@ async function submitTrade() {
   if (t.duration) props["Duration (mins)"] = { number: t.duration };
   if (t.entryTime) props["Entry Time"] = { rich_text: [{ text: { content: t.entryTime } }] };
   if (t.exitTime) props["Exit Time"] = { rich_text: [{ text: { content: t.exitTime } }] };
-  const fullNotes = [
-    t.notes,
-    (t.partialPrice && t.partialContracts) ? `TP1: ${t.partialContracts} contract${t.partialContracts>1?'s':''} @ ${t.partialPrice}${t.partialTime?' at '+t.partialTime:''} · Remaining ${t.remainingContracts} contract${t.remainingContracts>1?'s':''} trailed to ${t.exit}` : null
-  ].filter(Boolean).join('\n');
+  const exitBreakdown = (t.tpRows && t.tpRows.length > 0)
+    ? 'Exit breakdown: ' + t.tpRows.map(r=>`${r.label}: ${r.contracts} contract${r.contracts>1?'s':''} @ ${r.price}${r.time?' at '+r.time:''}`).join(' · ')
+    : null;
+  const fullNotes = [t.notes, exitBreakdown].filter(Boolean).join('\n');
   if (fullNotes) props["Notes"] = { rich_text: [{ text: { content: fullNotes } }] };
   if (t.mistakes) props["Mistakes"] = { rich_text: [{ text: { content: t.mistakes } }] };
   if (t.lessons) props["Lessons Learned"] = { rich_text: [{ text: { content: t.lessons } }] };
@@ -1522,21 +1511,42 @@ function wToggleExpand(i) {
   arrow.textContent = open ? '▼' : '▲';
 }
 
+function buildTPRow(i, label) {
+  const inp = `style="font-family:var(--mono);font-size:12px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:8px 10px;width:100%;outline:none;transition:border-color 0.15s;"`;
+  const lbl = `style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;color:var(--text3);text-transform:uppercase;display:block;margin-bottom:4px;"`;
+  return `<div style="margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid rgba(200,255,0,0.1);">
+    <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--accent);text-transform:uppercase;margin-bottom:8px;">${label}</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+      <div><label ${lbl}>Exit Price</label><input type="number" id="f-tp${i}-price" placeholder="e.g. 27419.75" step="0.25" ${inp} oninput="updatePartialPreview()"></div>
+      <div><label ${lbl}>Exit Time</label><input type="text" id="f-tp${i}-time" placeholder="e.g. 10:01 AM" ${inp}></div>
+      <div><label ${lbl}>Contracts</label><input type="number" id="f-tp${i}-contracts" placeholder="e.g. 1" min="1" ${inp} oninput="updatePartialPreview()"></div>
+    </div>
+  </div>`;
+}
+
 function togglePartialRow() {
   const contracts = getNum('f-contracts') || 1;
   const row = document.getElementById('partial-row');
   if (!row) return;
-  if (contracts > 1) {
-    row.style.display = 'block';
-  } else {
+  if (contracts <= 1) {
     row.style.display = 'none';
-    const pp = document.getElementById('f-partial-price');
-    const pt = document.getElementById('f-partial-time');
-    const pc = document.getElementById('f-partial-contracts');
-    if (pp) pp.value = '';
-    if (pt) pt.value = '';
-    if (pc) pc.value = '';
+    document.getElementById('partial-tp-rows').innerHTML = '';
+    document.getElementById('partial-pnl-preview').textContent = '';
+    return;
   }
+  row.style.display = 'block';
+  // Build TP rows: up to contracts-1 partials + 1 final (runner)
+  // Max rows = contracts - 1 partials + runner label on final exit field
+  const maxTPs = Math.min(contracts - 1, 10); // cap at 10 TPs
+  const tpLabels = ['TP1','TP2','TP3','TP4','TP5','TP6','TP7','TP8','TP9','TP10'];
+  let html = '';
+  for (let i = 1; i <= maxTPs; i++) {
+    const label = i === maxTPs ? `${tpLabels[i-1]} / Runner (Final)` : tpLabels[i-1];
+    html += buildTPRow(i, label);
+  }
+  document.getElementById('partial-tp-rows').innerHTML = html;
+  document.getElementById('partial-contracts-remaining').textContent = `${contracts} contracts · ${maxTPs} exit level${maxTPs>1?'s':''}`;
+  updatePartialPreview();
 }
 
 // Live partial P&L preview
@@ -1545,33 +1555,53 @@ function togglePartialRow() {
   if (el) el.addEventListener('input', updatePartialPreview);
 });
 
+function getTPRows() {
+  const contracts = getNum('f-contracts') || 1;
+  const maxTPs = Math.min(contracts - 1, 10);
+  const rows = [];
+  for (let i = 1; i <= maxTPs; i++) {
+    rows.push({
+      price: getNum(`f-tp${i}-price`),
+      time: getField(`f-tp${i}-time`),
+      contracts: getNum(`f-tp${i}-contracts`),
+      label: i === maxTPs ? `Runner` : `TP${i}`
+    });
+  }
+  return rows;
+}
+
 function updatePartialPreview() {
   const preview = document.getElementById('partial-pnl-preview');
   if (!preview) return;
   const entry = getNum('f-entry');
-  const partialPrice = getNum('f-partial-price');
-  const partialContracts = getNum('f-partial-contracts');
-  const exit = getNum('f-exit');
-  const contracts = getNum('f-contracts') || 1;
   const instrument = getField('f-instrument');
   const direction = getField('f-direction');
-  if (!entry || !partialPrice || !partialContracts || !instrument || !direction) { preview.textContent = ''; return; }
-  const tp1Pnl = calcPnL(entry, partialPrice, partialContracts, instrument, direction);
-  const remaining = contracts - partialContracts;
-  let txt = `TP1: +$${Math.abs(tp1Pnl).toLocaleString()} (${partialContracts} contract${partialContracts>1?'s':''})`;
-  if (exit && remaining > 0) {
-    const remPnl = calcPnL(entry, exit, remaining, instrument, direction);
-    txt += ` · Remaining: +$${Math.abs(remPnl).toLocaleString()} (${remaining} contract${remaining>1?'s':''}) · Total: +$${Math.abs(tp1Pnl + remPnl).toLocaleString()}`;
-  }
-  preview.textContent = txt;
-  preview.style.color = (tp1Pnl >= 0) ? 'var(--green)' : 'var(--red)';
+  if (!entry || !instrument || !direction) { preview.textContent = ''; return; }
+  const rows = getTPRows().filter(r => r.price && r.contracts);
+  if (!rows.length) { preview.textContent = ''; return; }
+  let totalPnl = 0;
+  let lines = [];
+  rows.forEach(r => {
+    const pnl = calcPnL(entry, r.price, r.contracts, instrument, direction);
+    totalPnl += pnl;
+    const sign = pnl >= 0 ? '+' : '-';
+    lines.push(`${r.label}: ${sign}$${Math.abs(pnl).toLocaleString()} (${r.contracts} × ${r.price.toLocaleString()})`);
+  });
+  lines.push(`─────────────────`);
+  lines.push(`Total: ${totalPnl >= 0 ? '+' : '-'}$${Math.abs(totalPnl).toLocaleString()}`);
+  preview.innerHTML = lines.join('<br>');
+  preview.style.color = totalPnl >= 0 ? 'var(--green)' : 'var(--red)';
 }
 
 function resetForm() {
   ['f-instrument','f-direction','f-session','f-timeframe','f-outcome'].forEach(id => document.getElementById(id).value = '');
   ['f-htf','f-model','f-entry','f-exit','f-sl','f-tp','f-contracts','f-entry-time','f-exit-time','f-notes','f-mistakes','f-lessons','f-screenshot','f-partial-price','f-partial-time','f-partial-contracts'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('partial-row').style.display = 'none';
-  document.getElementById('partial-pnl-preview').textContent = '';
+  const partialRow = document.getElementById('partial-row');
+  if (partialRow) partialRow.style.display = 'none';
+  const tpRowsEl = document.getElementById('partial-tp-rows');
+  if (tpRowsEl) tpRowsEl.innerHTML = '';
+  const partialPreview = document.getElementById('partial-pnl-preview');
+  if (partialPreview) partialPreview.textContent = '';
   document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
   clearConf();
 }
