@@ -1511,16 +1511,23 @@ function wToggleExpand(i) {
   arrow.textContent = open ? '▼' : '▲';
 }
 
-function buildTPRow(i, label) {
+const TP_LABELS = ['TP1','TP2','TP3','TP4','TP5','TP6','TP7','TP8','TP9','TP10'];
+
+function buildTPRow(i, remainingBefore) {
   const inp = `style="font-family:var(--mono);font-size:12px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:8px 10px;width:100%;outline:none;transition:border-color 0.15s;"`;
   const lbl = `style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;color:var(--text3);text-transform:uppercase;display:block;margin-bottom:4px;"`;
-  return `<div style="margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid rgba(200,255,0,0.1);">
-    <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--accent);text-transform:uppercase;margin-bottom:8px;">${label}</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
-      <div><label ${lbl}>Exit Price</label><input type="number" id="f-tp${i}-price" placeholder="e.g. 27419.75" step="0.25" ${inp} oninput="updatePartialPreview()"></div>
-      <div><label ${lbl}>Exit Time</label><input type="text" id="f-tp${i}-time" placeholder="e.g. 10:01 AM" ${inp}></div>
-      <div><label ${lbl}>Contracts</label><input type="number" id="f-tp${i}-contracts" placeholder="e.g. 1" min="1" ${inp} oninput="updatePartialPreview()"></div>
+  const label = TP_LABELS[i-1] || `TP${i}`;
+  return `<div id="tp-row-${i}" style="margin-bottom:10px;padding:12px;background:var(--surface2);border:1px solid var(--border2);">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+      <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--accent);text-transform:uppercase;">${label}</div>
+      <div style="font-family:var(--mono);font-size:9px;color:var(--text3);" id="tp-remaining-${i}">${remainingBefore} contract${remainingBefore>1?'s':''} available</div>
     </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+      <div><label ${lbl}>Exit Price</label><input type="number" id="f-tp${i}-price" placeholder="e.g. 27419.75" step="0.25" ${inp} oninput="onTPInput()"></div>
+      <div><label ${lbl}>Exit Time</label><input type="text" id="f-tp${i}-time" placeholder="e.g. 10:01 AM" ${inp}></div>
+      <div><label ${lbl}>Contracts off</label><input type="number" id="f-tp${i}-contracts" placeholder="max ${remainingBefore}" min="1" max="${remainingBefore}" ${inp} oninput="onTPInput()"></div>
+    </div>
+    <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:6px;" id="tp-note-${i}"></div>
   </div>`;
 }
 
@@ -1535,17 +1542,81 @@ function togglePartialRow() {
     return;
   }
   row.style.display = 'block';
-  // Build TP rows: up to contracts-1 partials + 1 final (runner)
-  // Max rows = contracts - 1 partials + runner label on final exit field
-  const maxTPs = Math.min(contracts - 1, 10); // cap at 10 TPs
-  const tpLabels = ['TP1','TP2','TP3','TP4','TP5','TP6','TP7','TP8','TP9','TP10'];
+  renderTPRows(contracts);
+}
+
+function renderTPRows(totalContracts) {
+  const maxTPs = Math.min(totalContracts, 10);
   let html = '';
   for (let i = 1; i <= maxTPs; i++) {
-    const label = i === maxTPs ? `${tpLabels[i-1]} / Runner (Final)` : tpLabels[i-1];
-    html += buildTPRow(i, label);
+    html += buildTPRow(i, totalContracts);
   }
   document.getElementById('partial-tp-rows').innerHTML = html;
-  document.getElementById('partial-contracts-remaining').textContent = `${contracts} contracts · ${maxTPs} exit level${maxTPs>1?'s':''}`;
+  document.getElementById('partial-contracts-remaining').textContent = `${totalContracts} contracts total`;
+  onTPInput();
+}
+
+function onTPInput() {
+  const totalContracts = getNum('f-contracts') || 1;
+  const entry = getNum('f-entry');
+  const sl = getNum('f-sl');
+  const instrument = getField('f-instrument');
+  const direction = getField('f-direction');
+  const maxTPs = Math.min(totalContracts, 10);
+
+  let contractsUsed = 0;
+  let allExited = false;
+
+  for (let i = 1; i <= maxTPs; i++) {
+    const rowEl = document.getElementById(`tp-row-${i}`);
+    const remainingEl = document.getElementById(`tp-remaining-${i}`);
+    const noteEl = document.getElementById(`tp-note-${i}`);
+    if (!rowEl) break;
+
+    if (allExited) {
+      // Hide rows after all contracts are gone
+      rowEl.style.display = 'none';
+      continue;
+    }
+
+    rowEl.style.display = 'block';
+    const contractsAvailable = totalContracts - contractsUsed;
+    if (remainingEl) remainingEl.textContent = `${contractsAvailable} contract${contractsAvailable>1?'s':''} available`;
+
+    const tpContracts = getNum(`f-tp${i}-contracts`) || 0;
+    const tpPrice = getNum(`f-tp${i}-price`);
+    const tpContrInput = document.getElementById(`f-tp${i}-contracts`);
+    if (tpContrInput) tpContrInput.max = contractsAvailable;
+
+    // Validate contracts don't exceed available
+    if (tpContracts > contractsAvailable) {
+      const tpContrEl = document.getElementById(`f-tp${i}-contracts`);
+      if (tpContrEl) tpContrEl.value = contractsAvailable;
+    }
+
+    // Detect BE exit (exit at or near entry price, not at SL)
+    let note = '';
+    if (tpPrice && entry && sl && tpContracts > 0) {
+      const isAtSL = Math.abs(tpPrice - sl) < 0.5;
+      const isAtBE = Math.abs(tpPrice - entry) < 1.0 && !isAtSL;
+      if (isAtBE) note = '⚡ BE exit — protecting capital';
+      else if (isAtSL) note = '⛔ Stop loss hit';
+      else if (entry && instrument && direction) {
+        const pnl = calcPnL(entry, tpPrice, tpContracts || 1, instrument, direction);
+        note = `${pnl >= 0 ? '+' : '-'}$${Math.abs(pnl).toLocaleString()} on ${tpContracts || '?'} contract${(tpContracts||1)>1?'s':''}`;
+      }
+    }
+    if (noteEl) { noteEl.textContent = note; noteEl.style.color = note.includes('BE') ? 'var(--yellow)' : note.includes('Stop') ? 'var(--red)' : 'var(--green)'; }
+
+    contractsUsed += tpContracts;
+    if (contractsUsed >= totalContracts) allExited = true;
+  }
+
+  document.getElementById('partial-contracts-remaining').textContent =
+    contractsUsed > 0
+      ? `${contractsUsed} / ${totalContracts} contracts exited${allExited ? ' — fully closed' : ` · ${totalContracts - contractsUsed} running`}`
+      : `${totalContracts} contracts total`;
+
   updatePartialPreview();
 }
 
@@ -1557,15 +1628,19 @@ function togglePartialRow() {
 
 function getTPRows() {
   const contracts = getNum('f-contracts') || 1;
-  const maxTPs = Math.min(contracts - 1, 10);
+  const maxTPs = Math.min(contracts, 10);
   const rows = [];
   for (let i = 1; i <= maxTPs; i++) {
-    rows.push({
-      price: getNum(`f-tp${i}-price`),
-      time: getField(`f-tp${i}-time`),
-      contracts: getNum(`f-tp${i}-contracts`),
-      label: i === maxTPs ? `Runner` : `TP${i}`
-    });
+    const price = getNum(`f-tp${i}-price`);
+    const c = getNum(`f-tp${i}-contracts`);
+    if (price && c) {
+      rows.push({
+        price,
+        time: getField(`f-tp${i}-time`),
+        contracts: c,
+        label: TP_LABELS[i-1] || `TP${i}`
+      });
+    }
   }
   return rows;
 }
@@ -1574,21 +1649,25 @@ function updatePartialPreview() {
   const preview = document.getElementById('partial-pnl-preview');
   if (!preview) return;
   const entry = getNum('f-entry');
+  const sl = getNum('f-sl');
   const instrument = getField('f-instrument');
   const direction = getField('f-direction');
-  if (!entry || !instrument || !direction) { preview.textContent = ''; return; }
-  const rows = getTPRows().filter(r => r.price && r.contracts);
-  if (!rows.length) { preview.textContent = ''; return; }
+  if (!entry || !instrument || !direction) { preview.innerHTML = ''; return; }
+  const rows = getTPRows();
+  if (!rows.length) { preview.innerHTML = ''; return; }
   let totalPnl = 0;
   let lines = [];
   rows.forEach(r => {
+    const isAtSL = sl && Math.abs(r.price - sl) < 0.5;
+    const isAtBE = Math.abs(r.price - entry) < 1.0 && !isAtSL;
     const pnl = calcPnL(entry, r.price, r.contracts, instrument, direction);
     totalPnl += pnl;
+    const tag = isAtBE ? ' [BE]' : isAtSL ? ' [SL]' : '';
     const sign = pnl >= 0 ? '+' : '-';
-    lines.push(`${r.label}: ${sign}$${Math.abs(pnl).toLocaleString()} (${r.contracts} × ${r.price.toLocaleString()})`);
+    lines.push(`${r.label}${tag}: ${sign}$${Math.abs(pnl).toLocaleString()} · ${r.contracts} contract${r.contracts>1?'s':''} @ ${r.price.toLocaleString()}`);
   });
-  lines.push(`─────────────────`);
-  lines.push(`Total: ${totalPnl >= 0 ? '+' : '-'}$${Math.abs(totalPnl).toLocaleString()}`);
+  lines.push(`──────────────────────`);
+  lines.push(`Total P&L: ${totalPnl >= 0 ? '+' : '-'}$${Math.abs(totalPnl).toLocaleString()}`);
   preview.innerHTML = lines.join('<br>');
   preview.style.color = totalPnl >= 0 ? 'var(--green)' : 'var(--red)';
 }
