@@ -659,32 +659,40 @@ function autoGrade(confluences, mistakes, notes) {
   const hasSweep = confluences.includes('Liquidity Sweep') || confluences.includes('BSL Taken') || confluences.includes('SSL Taken');
   const hasHTF = confluences.includes('HTF PDA Delivery') || confluences.includes('HTF Trend');
   const hasSMT = confluences.includes('SMT Divergence');
-  const hasMSS = confluences.includes('MSS') || confluences.includes('BOS') || confluences.includes('CHoCH');
+  const hasMSS = confluences.includes('MSS');
   const hasKZ = confluences.includes('Kill Zone');
   const hasMMM = confluences.includes('Market Maker Model');
-  // Only use MISTAKES field for "against bias" flag — not notes (notes may mention bearish/bullish in context)
+  const hasPO3 = confluences.includes('Power of 3');
   const mistakesOnly = mistakes.toLowerCase();
   const hasMistakes = mistakesOnly.length > 5;
-  const against = mistakesOnly.includes('against') || mistakesOnly.includes('no htf') || mistakesOnly.includes('consolidat') || mistakesOnly.includes('wrong bias');
+  const softMistake = ['impatient','moved stop','trail','tsl before','premium'].some(w => mistakesOnly.includes(w));
+  const hardMistake = ['against','no htf','consolidat','wrong bias','fomo','revenge'].some(w => mistakesOnly.includes(w));
 
-  if (against) return 'D';
+  if (hardMistake && hasMistakes) return 'D';
+
   let score = 0;
   if (hasIFVG || hasFVG) score += 2;
-  if (hasCISD) score += 1;
+  if (hasCISD) score += 1.5;
   if (hasLRLR) score += 1;
   if (hasSweep) score += 2;
   if (hasHTF) score += 2;
-  if (hasSMT) score += 1;
+  if (hasSMT) score += 1.5;
   if (hasMSS) score += 1;
   if (hasKZ) score += 1;
   if (hasMMM) score += 1;
-  if (confluences.length >= 7) score += 1;
-  if (hasMistakes) score -= 1;
-  if (score >= 9) return 'A++';
-  if (score >= 7) return 'A+';
-  if (score >= 5) return 'A';
-  if (score >= 3) return 'B';
-  if (score >= 1) return 'C';
+  if (hasPO3) score += 0.5;
+  if (confluences.length >= 8) score += 1;
+  if (softMistake) score -= 0.5;
+  if (hasMistakes && !softMistake) score -= 1;
+
+  if (score >= 12) return 'A++';
+  if (score >= 10) return 'A+';
+  if (score >= 8)  return 'A';
+  if (score >= 6)  return 'A-';
+  if (score >= 4)  return 'B+';
+  if (score >= 3)  return 'B';
+  if (score >= 2)  return 'B-';
+  if (score >= 1)  return 'C';
   return 'D';
 }
 
@@ -744,7 +752,7 @@ async function analyzeTrade() {
   document.getElementById('review-panel').style.display = 'block';
   document.getElementById('success-msg').style.display = 'none';
 
-  const gradeColor = {'A++':'accent','A+':'green','A':'accent','B':'yellow','C':'yellow','D':'red'}[grade] || '';
+  const gradeColor = {'A++':'accent','A+':'green','A':'green','A-':'green','B+':'yellow','B':'yellow','B-':'yellow','C':'red','D':'red'}[grade] || '';
   const pnlClass = pnl > 0 ? 'green' : pnl < 0 ? 'red' : '';
 
   document.getElementById('review-grid').innerHTML = `
