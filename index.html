@@ -587,16 +587,46 @@
 
   <div class="filters">
     <div class="conf-filter-wrap" id="conf-filter-wrap">
-      <button class="conf-filter-btn" id="conf-filter-btn" onclick="toggleConfDropdown()">
-        <span id="conf-filter-label">All confluences</span>
-        <span style="font-size:10px;margin-left:6px;">▾</span>
+      <button class="conf-filter-btn" id="conf-filter-btn" onclick="toggleConfDropdown()" type="button">
+        <span id="conf-btn-label">All confluences</span>
+        <span class="arrow">▼</span>
       </button>
       <div class="conf-dropdown" id="conf-dropdown">
-        <div class="conf-dropdown-header">
-          <span class="conf-dropdown-title">Select confluences</span>
-          <button class="conf-clear-btn" onclick="clearConfs()">Clear</button>
-        </div>
-        <div class="conf-options" id="conf-options"></div>
+        <div class="conf-group-label">Structure</div>
+        <label class="conf-option"><input type="checkbox" value="MSS" onchange="updateConfFilter()"> MSS — Market Structure Shift</label>
+        <label class="conf-option"><input type="checkbox" value="Displacement" onchange="updateConfFilter()"> Displacement</label>
+        <div class="conf-group-label">Entry (PDA Arrays)</div>
+        <label class="conf-option"><input type="checkbox" value="IFVG" onchange="updateConfFilter()"> IFVG — Inverse Fair Value Gap</label>
+        <label class="conf-option"><input type="checkbox" value="FVG" onchange="updateConfFilter()"> FVG — Fair Value Gap</label>
+        <label class="conf-option"><input type="checkbox" value="CISD" onchange="updateConfFilter()"> CISD — Change in State of Delivery</label>
+        <label class="conf-option"><input type="checkbox" value="Order Block" onchange="updateConfFilter()"> Order Block</label>
+        <label class="conf-option"><input type="checkbox" value="Breaker Block" onchange="updateConfFilter()"> Breaker Block</label>
+        <label class="conf-option"><input type="checkbox" value="Mitigation Block" onchange="updateConfFilter()"> Mitigation Block</label>
+        <label class="conf-option"><input type="checkbox" value="PDA Array" onchange="updateConfFilter()"> PDA Array</label>
+        <div class="conf-group-label">Liquidity</div>
+        <label class="conf-option"><input type="checkbox" value="Liquidity Sweep" onchange="updateConfFilter()"> Liquidity Sweep</label>
+        <label class="conf-option"><input type="checkbox" value="BSL Taken" onchange="updateConfFilter()"> BSL Taken</label>
+        <label class="conf-option"><input type="checkbox" value="SSL Taken" onchange="updateConfFilter()"> SSL Taken</label>
+        <label class="conf-option"><input type="checkbox" value="Equal Highs/Lows" onchange="updateConfFilter()"> Equal Highs / Lows</label>
+        <label class="conf-option"><input type="checkbox" value="LRLR" onchange="updateConfFilter()"> LRLR — Low Resistance Liquidity Run</label>
+        <div class="conf-group-label">Confluence</div>
+        <label class="conf-option"><input type="checkbox" value="SMT Divergence" onchange="updateConfFilter()"> SMT Divergence</label>
+        <label class="conf-option"><input type="checkbox" value="HTF PDA Delivery" onchange="updateConfFilter()"> HTF PDA Delivery</label>
+        <label class="conf-option"><input type="checkbox" value="HTF Trend" onchange="updateConfFilter()"> HTF Trend</label>
+        <label class="conf-option"><input type="checkbox" value="Retracement" onchange="updateConfFilter()"> Retracement</label>
+        <label class="conf-option"><input type="checkbox" value="Clear Targets" onchange="updateConfFilter()"> Clear Targets</label>
+        <label class="conf-option"><input type="checkbox" value="Volume" onchange="updateConfFilter()"> Volume</label>
+        <label class="conf-option"><input type="checkbox" value="ATH" onchange="updateConfFilter()"> ATH — All Time High</label>
+        <label class="conf-option"><input type="checkbox" value="Fib Target (-0.5)" onchange="updateConfFilter()"> Fib Target (-0.5)</label>
+        <div class="conf-group-label">Model</div>
+        <label class="conf-option"><input type="checkbox" value="Market Maker Model" onchange="updateConfFilter()"> Market Maker Model</label>
+        <label class="conf-option"><input type="checkbox" value="Power of 3" onchange="updateConfFilter()"> Power of 3</label>
+        <label class="conf-option"><input type="checkbox" value="Judas Swing" onchange="updateConfFilter()"> Judas Swing</label>
+        <label class="conf-option"><input type="checkbox" value="Kill Zone" onchange="updateConfFilter()"> Kill Zone</label>
+        <label class="conf-option"><input type="checkbox" value="NWOG" onchange="updateConfFilter()"> NWOG — New Week Opening Gap</label>
+        <label class="conf-option"><input type="checkbox" value="NDOG" onchange="updateConfFilter()"> NDOG — New Day Opening Gap</label>
+        <label class="conf-option"><input type="checkbox" value="Asian Range" onchange="updateConfFilter()"> Asian Range</label>
+        <button class="conf-clear-btn" onclick="clearConfFilter()">✕ Clear selection</button>
       </div>
     </div>
     <select id="f-session" onchange="renderAll()">
@@ -1013,10 +1043,7 @@ const ALL_CONFLUENCES = [
 ];
 
 function initConfDropdown() {
-  const container = document.getElementById('conf-options');
-  container.innerHTML = ALL_CONFLUENCES.map(c =>
-    `<div class="conf-option" data-conf="${c}" onclick="toggleConf(this)">${c}</div>`
-  ).join('');
+// confluence filter uses static checkboxes
 }
 
 function toggleConf(el) {
@@ -1039,12 +1066,7 @@ function updateConfLabel() {
   else label.textContent = `${selected.length} confluences`;
 }
 
-function toggleConfDropdown() {
-  const dd = document.getElementById('conf-dropdown');
-  const btn = document.getElementById('conf-filter-btn');
-  dd.classList.toggle('open');
-  btn.classList.toggle('open');
-}
+// duplicate toggleConfDropdown removed
 
 // Close dropdown on outside click
 document.addEventListener('click', e => {
