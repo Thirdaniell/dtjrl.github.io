@@ -1,0 +1,258 @@
+/* ============================================================
+   FTJ MOBILE STYLESHEET
+   Targets: iOS Safari, Android Chrome, Brave
+   Breakpoints: 768px (tablet), 480px (phone)
+   ============================================================ */
+
+/* ---- BASE TOUCH & FONT FIXES ---- */
+* {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+}
+input, select, textarea, button {
+  -webkit-appearance: none;
+  font-size: 16px !important; /* Prevents iOS zoom on focus */
+}
+body {
+  -webkit-text-size-adjust: 100%;
+  overflow-x: hidden;
+}
+
+/* ---- NAV ---- */
+@media (max-width: 768px) {
+  .sidenav {
+    top: auto !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    height: 60px !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    padding: 0 !important;
+    border-right: none !important;
+    border-top: 1px solid var(--border) !important;
+    justify-content: space-around !important;
+    z-index: 999 !important;
+  }
+  .nav-logo, .nav-bottom { display: none !important; }
+  .nav-links {
+    flex-direction: row !important;
+    gap: 0 !important;
+    flex: 1 !important;
+    justify-content: space-around !important;
+    width: 100% !important;
+  }
+  .nav-link {
+    flex-direction: column !important;
+    padding: 8px 12px !important;
+    gap: 2px !important;
+    min-width: 44px !important;
+    align-items: center !important;
+  }
+  .nav-link.active::before {
+    top: 0 !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: 24px !important;
+    height: 2px !important;
+  }
+  .nav-icon { font-size: 18px !important; }
+  .nav-label { font-size: 8px !important; letter-spacing: 0.05em !important; }
+  body { padding-left: 0 !important; padding-bottom: 60px !important; }
+}
+
+/* ---- JOURNAL (index.html) ---- */
+@media (max-width: 768px) {
+  .toolbar {
+    gap: 6px !important;
+    padding: 0.75rem 0 1rem !important;
+  }
+  .toolbar select, .toolbar input {
+    min-width: 0 !important;
+    flex: 1 1 calc(50% - 3px) !important;
+    height: 40px !important;
+    font-size: 12px !important;
+    padding: 6px 8px !important;
+  }
+  .conf-filter-wrap {
+    flex: 1 1 100% !important;
+    min-width: 100% !important;
+  }
+  .conf-filter-btn {
+    height: 40px !important;
+    font-size: 12px !important;
+  }
+  .conf-dropdown {
+    max-height: 50vh !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  .badge-legend {
+    display: none !important; /* Hide on mobile to save space */
+  }
+  .cards {
+    grid-template-columns: 1fr !important;
+    gap: 0 !important;
+  }
+  .card {
+    padding: 1rem !important;
+    border-radius: 0 !important;
+  }
+  .card-instrument { font-size: 20px !important; }
+  .card-pnl { font-size: 22px !important; }
+  .card-meta { grid-template-columns: 1fr 1fr !important; gap: 6px 12px !important; }
+  .field-value { font-size: 13px !important; }
+  .stats-row {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  .stat { padding: 0.875rem 1rem !important; }
+  .stat-value { font-size: 16px !important; }
+  header {
+    padding: 1rem !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 100 !important;
+  }
+  .container { padding: 0.75rem 1rem !important; }
+  .refresh-btn {
+    padding: 6px 10px !important;
+    font-size: 10px !important;
+  }
+}
+
+/* ---- ADMIN (admin.html) ---- */
+@media (max-width: 768px) {
+  .auth-box {
+    width: calc(100% - 2rem) !important;
+    padding: 1.5rem !important;
+    margin: 1rem !important;
+  }
+  #main-screen { padding-left: 0 !important; }
+  .sidenav-admin {
+    position: fixed !important;
+    top: auto !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    height: 44px !important;
+    flex-direction: row !important;
+    padding: 0 1rem !important;
+    border-right: none !important;
+    border-top: 1px solid var(--border) !important;
+    z-index: 999 !important;
+  }
+  .nav-logo-a, .nav-admin-tag { writing-mode: horizontal-tb !important; font-size: 8px !important; }
+  .page { padding: 1rem 1rem 5rem !important; max-width: 100% !important; }
+  .form-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1px !important;
+  }
+  .form-full { grid-column: 1 !important; }
+  .field { padding: 0.875rem 1rem !important; }
+  .field input, .field select, .field textarea {
+    font-size: 16px !important;
+    padding: 10px 12px !important;
+  }
+  .tabs {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    gap: 1px !important;
+  }
+  .tab-btn {
+    padding: 10px 14px !important;
+    font-size: 10px !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+  }
+  .analyze-btn, .confirm-btn, .w-analyze-btn, .w-submit-btn {
+    padding: 14px !important;
+    font-size: 12px !important;
+  }
+  .review-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+  .bias-grid { grid-template-columns: 1fr !important; }
+  .bbtn-group { grid-template-columns: repeat(4, 1fr) !important; gap: 4px !important; }
+  .bbtn { padding: 10px 4px !important; font-size: 10px !important; }
+  .wstats { grid-template-columns: repeat(2, 1fr) !important; }
+  .wrating-grid { grid-template-columns: 1fr !important; }
+  /* Partial exit rows stack */
+  #partial-row > div > div[style*="grid-template-columns"] {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+}
+
+/* ---- ANALYTICS (analytics.html) ---- */
+@media (max-width: 768px) {
+  .page { padding: 1rem 1rem 5rem !important; }
+  .stats-row {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  .stat { padding: 0.875rem 1rem !important; }
+  .stat-value { font-size: 14px !important; }
+  .stat-sub { font-size: 8px !important; }
+  .charts-grid { grid-template-columns: 1fr !important; }
+  .chart-panel { padding: 1rem !important; }
+  .period-tabs { flex-wrap: nowrap !important; overflow-x: auto !important; }
+  .period-tab { padding: 8px 12px !important; font-size: 10px !important; flex-shrink: 0 !important; }
+  .page-header { flex-direction: column !important; align-items: flex-start !important; gap: 0.75rem !important; }
+  .cal-cell { min-height: 55px !important; padding: 4px 6px !important; }
+  .cal-pnl { font-size: 10px !important; }
+  .cal-date { font-size: 9px !important; }
+  .cal-trades { font-size: 8px !important; }
+  #conf-inner { max-height: 400px !important; }
+}
+
+/* ---- RULES (rules.html) ---- */
+@media (max-width: 768px) {
+  .page { padding: 1.5rem 1rem 5rem !important; }
+  .rule { grid-template-columns: 36px 1fr !important; padding: 1rem !important; }
+  .rule-num { font-size: 10px !important; }
+  .rule-title { font-size: 12px !important; }
+  .rule-body { font-size: 12px !important; }
+  /* Breach tracker */
+  .brow { grid-template-columns: 80px 40px 1fr !important; }
+}
+
+/* ---- INFO/GUIDE (info.html) ---- */
+@media (max-width: 768px) {
+  .page { padding: 1.5rem 1rem 5rem !important; }
+  .grades-grid { grid-template-columns: 1fr !important; }
+  .page-cards { grid-template-columns: 1fr !important; }
+  .hero-title { font-size: 24px !important; }
+}
+
+/* ---- CHECKLIST (checklist.html) ---- */
+@media (max-width: 768px) {
+  .page { padding: 1.5rem 1rem 5rem !important; }
+  .item { padding: 12px !important; gap: 10px !important; }
+  .item-title { font-size: 12px !important; }
+  .item-sub { font-size: 11px !important; }
+  .verdict-box { flex-direction: column !important; align-items: flex-start !important; gap: 8px !important; }
+  .verdict-badge { font-size: 14px !important; }
+  .reminder-text { font-size: 12px !important; }
+}
+
+/* ---- SMALL PHONES (480px) ---- */
+@media (max-width: 480px) {
+  .stats-row { grid-template-columns: repeat(2, 1fr) !important; }
+  .card-meta { grid-template-columns: 1fr 1fr !important; }
+  .card-pnl { font-size: 18px !important; }
+  .toolbar select, .toolbar input { flex: 1 1 100% !important; }
+  .wstats { grid-template-columns: 1fr 1fr !important; }
+  .page-title { font-size: 22px !important; }
+  .wstar { font-size: 18px !important; }
+}
+
+/* ---- SAFE AREA (iPhone notch/home bar) ---- */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  body { padding-bottom: calc(60px + env(safe-area-inset-bottom)) !important; }
+  .sidenav {
+    padding-bottom: env(safe-area-inset-bottom) !important;
+    height: calc(60px + env(safe-area-inset-bottom)) !important;
+  }
+}
