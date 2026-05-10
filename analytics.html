@@ -595,8 +595,8 @@ function renderGradeDist(trades) {
   const W = canvas.width, H = canvas.height;
   ctx.clearRect(0, 0, W, H);
 
-  const grades = ['A++','A+','A','B','C','D'];
-  const colors = {'A++':'#c8ff00','A+':'#00e676','A':'#40c4ff','B':'#ffd740','C':'#ff6d00','D':'#ff4444'};
+  const grades = ['A++','A+','A','A-','B+','B','B-','C','D'];
+  const colors = {'A++':'#c8ff00','A+':'#00e676','A':'#00c853','A-':'#40c4ff','B+':'#ffd740','B':'#ffab40','B-':'#ff8f00','C':'#ff6d00','D':'#ff4444'};
   const counts = {};
   grades.forEach(g => counts[g] = 0);
   trades.forEach(t => { if (t.grade && counts[t.grade] !== undefined) counts[t.grade]++; });
