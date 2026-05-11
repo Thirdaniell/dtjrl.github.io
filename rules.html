@@ -359,14 +359,13 @@ async function loadBreaches() {
     }));
 
     const breaches = {
-      'Stop Loss Management': { count: 0, desc: 'Moving SL to BE without close above, or removing SL prematurely' },
-      'HTF Bias Alignment': { count: 0, desc: 'Trading against HTF bias or not confirming bias top-down before entry' },
+      'Stop Loss Management': { count: 0, desc: 'Moving SL to BE without a close above, or removing SL prematurely' },
+      'HTF Bias Alignment': { count: 0, desc: 'Trading against HTF bias or entering without top-down bias confirmation' },
       'Trailing Too Soon': { count: 0, desc: 'Trailing stop too early or too tight, hitting TSL before reaching TP' },
-      'Impatient / FOMO Entry': { count: 0, desc: 'Entering before confirmation or chasing missed moves' },
-      'Overtrading': { count: 0, desc: 'Taking more trades than allowed or trading after stop conditions met' },
-      'Scale-in Discipline': { count: 0, desc: 'Adding contracts on non A+ setups or without proper retracement into PDA' },
-      'No Clear Target': { count: 0, desc: 'Entering without a defined liquidity or PDA target' },
-      'News Discipline': { count: 0, desc: 'Trading high impact news on weak setups' },
+      'Impatient / FOMO Entry': { count: 0, desc: 'Entering before confirmation or chasing a missed move' },
+      'Overtrading': { count: 0, desc: 'Taking more trades than the daily limit allows' },
+      'Traded in Consolidation': { count: 0, desc: 'Entering during a ranging/choppy market with no clear directional delivery' },
+      'No Clear Target': { count: 0, desc: 'Entering without a defined liquidity or PDA target identified beforehand' },
     };
 
     trades.forEach(t => {
