@@ -149,11 +149,11 @@ const NAV_CSS = `
       border-top: 1px solid #1a1a1a;
       padding: 0 1rem;
     }
-    .nav-logo, .nav-bottom { display: none; }
-    .nav-links { flex-direction: row; gap: 0; flex: 1; justify-content: space-around; }
-    .nav-link { flex-direction: column; padding: 8px 16px; }
+    .nav-logo, .nav-bottom, .nav-yt, .nav-theme-btn, .nav-status { display: none !important; }
+    .nav-links { flex-direction: row; gap: 0; flex: 1; justify-content: space-around; align-items: center; }
+    .nav-link { flex-direction: column; padding: 10px 8px; min-width: 44px; }
     .nav-link.active::before { top: 0; left: 50%; transform: translateX(-50%); width: 24px; height: 2px; }
-    body { padding-left: 0; padding-bottom: 56px; }
+    body { padding-left: 0; padding-bottom: 60px; }
   }
 `;
 
