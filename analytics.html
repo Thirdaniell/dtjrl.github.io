@@ -150,8 +150,7 @@
     <div class="stat"><div class="stat-label">Total P&L</div><div class="stat-value" id="s-pnl">—</div></div>
     <div class="stat"><div class="stat-label">Avg P&L</div><div class="stat-value" id="s-avg">—</div></div>
     <div class="stat"><div class="stat-label">Best Trade</div><div class="stat-value pos" id="s-best">—</div></div>
-    <div class="stat"><div class="stat-label">Win Streak</div><div class="stat-value pos" id="s-wstreak">—</div></div>
-    <div class="stat"><div class="stat-label">Loss Streak</div><div class="stat-value neg" id="s-lstreak">—</div></div>
+    <div class="stat"><div class="stat-label">Streak</div><div class="stat-value" id="s-streak">—</div><div class="stat-sub" id="s-streak-sub"></div></div>
     <div class="stat"><div class="stat-label">Best Session</div><div class="stat-value" id="s-session">—</div></div>
     <div class="stat"><div class="stat-label">Avg R:R</div><div class="stat-value" id="s-rr">—</div><div class="stat-sub">risk to reward</div></div>
     <div class="stat"><div class="stat-label">Avg Duration</div><div class="stat-value" id="s-dur">—</div><div class="stat-sub">time in trade</div></div>
@@ -301,8 +300,26 @@ function updateStats(trades) {
   setText('s-pnl', total ? (pnl>=0?'+':'-')+'$'+Math.abs(pnl).toLocaleString() : '—', 'stat-value'+(pnl>0?' pos':pnl<0?' neg':''));
   setText('s-avg', total ? (avg>=0?'+':'-')+'$'+Math.abs(avg).toLocaleString() : '—', 'stat-value'+(avg>0?' pos':avg<0?' neg':''));
   setText('s-best', best ? '+$'+best.toLocaleString() : '—');
-  setText('s-wstreak', maxWin ? maxWin+'W' : '—', 'stat-value pos');
-  setText('s-lstreak', maxLoss ? maxLoss+'L' : '—', 'stat-value neg');
+  // Combined streak - show current streak direction
+  const streakEl = document.getElementById('s-streak');
+  const streakSubEl = document.getElementById('s-streak-sub');
+  if (streakEl) {
+    if (sorted.length === 0) { streakEl.textContent = '—'; streakEl.className = 'stat-value'; }
+    else {
+      const lastStatus = sorted[sorted.length-1].status;
+      const isWinStreak = lastStatus === 'Closed - Win';
+      let currentStreak = 0;
+      for (let i = sorted.length-1; i >= 0; i--) {
+        const s = sorted[i].status === 'Closed - Win' ? 'W' : 'L';
+        const expected = isWinStreak ? 'W' : 'L';
+        if (s === expected) currentStreak++;
+        else break;
+      }
+      streakEl.textContent = currentStreak + (isWinStreak ? 'W 🔥' : 'L ❄️');
+      streakEl.className = 'stat-value ' + (isWinStreak ? 'pos' : 'neg');
+      if (streakSubEl) streakSubEl.textContent = 'best: ' + (isWinStreak ? maxWin : maxLoss);
+    }
+  }
   setText('s-session', bestSession ? bestSession[0] : '—');
 
   document.getElementById('s-best').textContent = best ? '+$' + best.toLocaleString() : '—';
@@ -707,10 +724,16 @@ function renderConfWinRate(trades) {
     });
   });
 
+  const minUsage = Math.max(2, Math.floor(Object.values(confStats).reduce((s,v)=>s+v.total,0) / 15));
   const entries = Object.entries(confStats)
-    .filter(([,v]) => v.total >= 1)
+    .filter(([,v]) => v.total >= Math.min(minUsage, 3))
     .map(([name, v]) => ({ name, wr: Math.round((v.wins/v.total)*100), total: v.total }))
     .sort((a,b) => b.wr - a.wr);
+
+  if (!entries.length) {
+    el.innerHTML = '<div style="font-family:var(--mono);font-size:11px;color:var(--text3);padding:1rem;">Not enough data yet — needs more trades.</div>';
+    return;
+  }
 
   if (!entries.length) {
     ctx.fillStyle = '#444'; ctx.font = '11px Space Mono'; ctx.textAlign = 'center';
