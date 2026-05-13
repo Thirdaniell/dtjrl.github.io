@@ -9,13 +9,15 @@
   -webkit-tap-highlight-color: transparent;
   -webkit-touch-callout: none;
 }
-input, select, textarea, button {
-  -webkit-appearance: none;
-  font-size: 16px !important; /* Prevents iOS zoom on focus */
-}
 body {
   -webkit-text-size-adjust: 100%;
   overflow-x: hidden;
+}
+/* iOS zoom fix — ONLY on mobile */
+@media (max-width: 768px) {
+  input, select, textarea {
+    font-size: 16px !important; /* Prevents iOS Safari auto-zoom on focus */
+  }
 }
 
 /* ---- NAV ---- */
