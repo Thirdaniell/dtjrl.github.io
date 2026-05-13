@@ -91,6 +91,11 @@ const NAV_CSS = `
   }
   .nav-bottom {
     margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 4px;
   }
   .nav-status {
     font-family: 'Space Mono', monospace;
@@ -122,8 +127,6 @@ const NAV_CSS = `
     line-height: 1;
   }
   .nav-theme-btn:hover { color: var(--accent, #c8ff00); }
-  .sidenav { display: flex; flex-direction: column; }
-  .nav-links { flex: 1; }
   body { padding-left: 64px; transition: background 0.2s, color 0.2s; }
   body.light {
     --bg: #f4f4f4;
