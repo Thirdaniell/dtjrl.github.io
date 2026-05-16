@@ -327,7 +327,7 @@ function updateStats(trades) {
         if (s === expected) currentStreak++;
         else break;
       }
-      streakEl.textContent = currentStreak + (isWinStreak ? 'W 🔥' : 'L ❄️');
+      streakEl.textContent = currentStreak + (isWinStreak ? 'W' : 'L');
       streakEl.className = 'stat-value ' + (isWinStreak ? 'pos' : 'neg');
       if (streakSubEl) streakSubEl.textContent = 'best: ' + (isWinStreak ? maxWin : maxLoss);
     }
@@ -931,7 +931,7 @@ function renderAll() {
       </div>
       <div class="chart-panel">
         <div class="chart-panel-title">Instruments Traded</div>
-        <canvas id="donut-canvas"></canvas>
+        <div style="position:relative;height:280px;width:100%;"><canvas id="donut-canvas"></canvas></div>
       </div>
     </div>
     <div id="monthly-panel" class="chart-panel" style="margin-top:1px;">
