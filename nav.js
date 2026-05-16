@@ -194,3 +194,4 @@ function navToggleTheme() {
 function navAdminAccess() {
   window.location.href = 'admin.html';
 }
+
