@@ -880,7 +880,12 @@ async function submitTrade() {
       document.getElementById('success-msg').textContent = `✓ Trade logged! ${tradeName} · ${t.grade} · ${t.pnl >= 0 ? '+' : ''}$${Math.abs(t.pnl).toLocaleString()}`;
       resetForm();
     } else {
-      alert('Error submitting: ' + JSON.stringify(data));
+      const msg = data.message || '';
+      const friendly = msg.includes('Status') ? 'Please select an Outcome.' :
+                       msg.includes('Instrument') ? 'Please select an Instrument.' :
+                       msg.includes('Direction') ? 'Please select a Direction.' :
+                       'Please fill in all required fields before submitting.';
+      alert('\u26a0\ufe0f ' + friendly);
     }
   } catch(e) {
     alert('Submit failed: ' + e.message);
@@ -1679,8 +1684,10 @@ function updatePartialPreview() {
 }
 
 function resetForm() {
-  ['f-instrument','f-direction','f-session','f-timeframe','f-outcome'].forEach(id => document.getElementById(id).value = '');
-  ['f-htf','f-model','f-entry','f-exit','f-sl','f-tp','f-contracts','f-entry-time','f-exit-time','f-notes','f-mistakes','f-lessons','f-screenshot','f-partial-price','f-partial-time','f-partial-contracts'].forEach(id => document.getElementById(id).value = '');
+  ['f-instrument','f-direction','f-session','f-timeframe','f-outcome','f-htf','f-model','f-entry','f-exit','f-sl','f-tp','f-contracts','f-entry-time','f-exit-time','f-notes','f-mistakes','f-lessons','f-screenshot','f-partial-price','f-partial-time','f-partial-contracts'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
   const partialRow = document.getElementById('partial-row');
   if (partialRow) partialRow.style.display = 'none';
   const tpRowsEl = document.getElementById('partial-tp-rows');
