@@ -431,162 +431,8 @@ function renderEquityChart(trades) {
   });
 }
 
-function renderDonut(trades) {
-  const canvas = document.getElementById('donut-canvas');
-  const legendEl = document.getElementById('donut-legend');
-  if (!canvas || !legendEl) return;
 
-  const ctx = canvas.getContext('2d');
-  const W = canvas.width, H = canvas.height;
-  ctx.clearRect(0, 0, W, H);
 
-  // Count by instrument
-  const counts = {};
-  trades.forEach(t => { counts[t.instrument] = (counts[t.instrument] || 0) + 1; });
-  const total = trades.length;
-  if (!total) {
-    ctx.fillStyle = '#444';
-    ctx.font = '11px Space Mono';
-    ctx.textAlign = 'center';
-    ctx.fillText('NO DATA', W/2, H/2);
-    legendEl.innerHTML = '';
-    return;
-  }
-
-  const entries = Object.entries(counts).sort((a,b) => b[1]-a[1]);
-  const cx = W/2, cy = H/2, r = Math.min(W,H)/2 - 10, inner = r * 0.58;
-
-  let startAngle = -Math.PI / 2;
-  entries.forEach(([inst, count]) => {
-    const slice = (count / total) * Math.PI * 2;
-    const color = INSTRUMENT_COLORS[inst] || '#888';
-    ctx.beginPath();
-    ctx.moveTo(cx, cy);
-    ctx.arc(cx, cy, r, startAngle, startAngle + slice);
-    ctx.closePath();
-    ctx.fillStyle = color;
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(cx, cy, inner, 0, Math.PI * 2);
-    ctx.fillStyle = '#111';
-    ctx.fill();
-    startAngle += slice;
-  });
-
-  // Center text
-  ctx.fillStyle = '#e8e8e8';
-  ctx.font = 'bold 20px Space Mono';
-  ctx.textAlign = 'center';
-  ctx.fillText(total, cx, cy + 4);
-  ctx.fillStyle = '#444';
-  ctx.font = '9px Space Mono';
-  ctx.fillText('TRADES', cx, cy + 18);
-
-  // Legend
-  legendEl.innerHTML = entries.map(([inst, count]) => `
-    <div class="legend-item">
-      <div class="legend-left">
-        <div class="legend-dot" style="background:${INSTRUMENT_COLORS[inst] || '#888'}"></div>
-        <span class="legend-name">${inst}</span>
-      </div>
-      <span class="legend-pct">${count} · ${Math.round((count/total)*100)}%</span>
-    </div>
-  `).join('');
-}
-
-function renderGradeChart(trades) {
-  const canvas = document.getElementById('grade-canvas');
-  if (!canvas) return;
-  canvas.width = canvas.offsetWidth; canvas.height = 180;
-  const ctx = canvas.getContext('2d');
-  const W = canvas.width, H = canvas.height;
-  ctx.clearRect(0, 0, W, H);
-
-  const grades = ['A++','A+','A','B','C','D'];
-  const colors = ['#c8ff00','#00e676','#40c4ff','#ffd740','#ff6d00','#ff4444'];
-  const counts = {};
-  grades.forEach(g => counts[g] = 0);
-  trades.forEach(t => { if (t.grade && counts[t.grade] !== undefined) counts[t.grade]++; });
-
-  const max = Math.max(...Object.values(counts), 1);
-  const pad = { top: 10, right: 16, bottom: 30, left: 30 };
-  const cW = W - pad.left - pad.right;
-  const cH = H - pad.top - pad.bottom;
-  const barW = cW / grades.length * 0.6;
-  const gap = cW / grades.length;
-
-  grades.forEach((g, i) => {
-    const count = counts[g];
-    const x = pad.left + i * gap + gap * 0.2;
-    const barH = count ? (count / max) * cH : 0;
-    const y = pad.top + cH - barH;
-    ctx.fillStyle = colors[i];
-    ctx.globalAlpha = 0.85;
-    ctx.fillRect(x, y, barW, barH);
-    ctx.globalAlpha = 1;
-    ctx.fillStyle = '#444';
-    ctx.font = '9px Space Mono';
-    ctx.textAlign = 'center';
-    ctx.fillText(g, x + barW/2, H - pad.bottom + 14);
-    if (count) {
-      ctx.fillStyle = colors[i];
-      ctx.fillText(count, x + barW/2, y - 4);
-    }
-  });
-}
-
-function renderSessionChart(trades) {
-  const canvas = document.getElementById('session-canvas');
-  if (!canvas) return;
-  canvas.width = canvas.offsetWidth; canvas.height = 180;
-  const ctx = canvas.getContext('2d');
-  const W = canvas.width, H = canvas.height;
-  ctx.clearRect(0, 0, W, H);
-
-  const sessions = ['Asia','London','NY AM','NY Lunch','NY PM','Overnight'];
-  const pnlMap = {};
-  sessions.forEach(s => pnlMap[s] = 0);
-  trades.forEach(t => { if (t.session && pnlMap[t.session] !== undefined) pnlMap[t.session] += t.pnl; });
-
-  const vals = Object.values(pnlMap);
-  const max = Math.max(...vals.map(Math.abs), 1);
-  const pad = { top: 10, right: 16, bottom: 30, left: 50 };
-  const cW = W - pad.left - pad.right;
-  const cH = H - pad.top - pad.bottom;
-  const barW = cW / sessions.length * 0.6;
-  const gap = cW / sessions.length;
-  const zeroY = pad.top + cH / 2;
-
-  ctx.beginPath();
-  ctx.strokeStyle = '#2a2a2a';
-  ctx.lineWidth = 1;
-  ctx.moveTo(pad.left, zeroY);
-  ctx.lineTo(W - pad.right, zeroY);
-  ctx.stroke();
-
-  sessions.forEach((s, i) => {
-    const val = pnlMap[s];
-    const x = pad.left + i * gap + gap * 0.2;
-    const barH = (Math.abs(val) / max) * (cH / 2);
-    const isPos = val >= 0;
-    const y = isPos ? zeroY - barH : zeroY;
-    ctx.fillStyle = isPos ? '#00e676' : '#ff4444';
-    ctx.globalAlpha = 0.8;
-    ctx.fillRect(x, y, barW, barH);
-    ctx.globalAlpha = 1;
-    ctx.fillStyle = '#444';
-    ctx.font = '8px Space Mono';
-    ctx.textAlign = 'center';
-    const label = s.length > 6 ? s.replace('NY ', 'NY\n') : s;
-    ctx.fillText(s.substring(0,6), x + barW/2, H - pad.bottom + 14);
-    if (val !== 0) {
-      ctx.fillStyle = isPos ? '#00e676' : '#ff4444';
-      ctx.font = '8px Space Mono';
-      const pStr = (isPos?'+':'') + '$' + Math.abs(Math.round(val/1000)) + 'k';
-      ctx.fillText(val > 999 || val < -999 ? pStr : (isPos?'+':'') + '$' + Math.abs(val), x + barW/2, isPos ? y - 4 : y + barH + 10);
-    }
-  });
-}
 
 function renderGradeDist(trades) {
   const canvas = document.getElementById('grade-canvas');
@@ -691,11 +537,8 @@ function renderSessionPnl(trades) {
 }
 
 function renderConfWinRate(trades) {
-  const canvas = document.getElementById('conf-canvas');
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  const W = canvas.width, H = canvas.height;
-  ctx.clearRect(0, 0, W, H);
+  const el = document.getElementById('conf-inner');
+  if (!el) return;
 
   const confStats = {};
   trades.forEach(t => {
@@ -706,84 +549,30 @@ function renderConfWinRate(trades) {
     });
   });
 
-  const minUsage = Math.max(2, Math.floor(Object.values(confStats).reduce((s,v)=>s+v.total,0) / 15));
+  const minUsage = trades.length >= 30 ? 10 : trades.length >= 15 ? 5 : 3;
   const entries = Object.entries(confStats)
-    .filter(([,v]) => v.total >= Math.min(minUsage, 3))
+    .filter(([,v]) => v.total >= minUsage)
     .map(([name, v]) => ({ name, wr: Math.round((v.wins/v.total)*100), total: v.total }))
     .sort((a,b) => b.wr - a.wr);
 
   if (!entries.length) {
-    el.innerHTML = '<div style="font-family:var(--mono);font-size:11px;color:var(--text3);padding:1rem;">Not enough data yet — needs more trades.</div>';
+    el.innerHTML = '<div style="font-family:var(--mono);font-size:11px;color:var(--text3);padding:1rem;">Not enough data — confluence needs to appear ' + minUsage + '+ times.</div>';
     return;
   }
 
-  if (!entries.length) {
-    ctx.fillStyle = '#444'; ctx.font = '11px Space Mono'; ctx.textAlign = 'center';
-    ctx.fillText('NO DATA', W/2, H/2); return;
-  }
-
-  const pad = { top: 16, right: 60, bottom: 16, left: 140 };
-  const rowH = Math.min(32, Math.floor((H - pad.top - pad.bottom) / entries.length));
-  const trackW = W - pad.left - pad.right;
-
-  // Resize canvas height to fit all entries
-  const neededH = pad.top + pad.bottom + entries.length * rowH;
-  if (canvas.height < neededH) {
-    canvas.height = neededH;
-    canvas.style.height = neededH + 'px';
-  }
-  ctx.clearRect(0, 0, W, canvas.height);
-
-  entries.forEach((e, i) => {
-    const y = pad.top + i * rowH + rowH / 2;
+  el.innerHTML = entries.map(e => {
     const color = e.wr >= 70 ? '#00e676' : e.wr >= 50 ? '#ffd740' : '#ff4444';
-    const fillW = (e.wr / 100) * trackW;
-
-    // Row bg
-    ctx.fillStyle = i % 2 === 0 ? 'rgba(255,255,255,0.02)' : 'transparent';
-    ctx.fillRect(0, pad.top + i * rowH, W, rowH);
-
-    // Label
-    ctx.fillStyle = '#888';
-    ctx.font = '10px Space Mono';
-    ctx.textAlign = 'right';
-    const label = e.name.length > 16 ? e.name.slice(0,15)+'…' : e.name;
-    ctx.fillText(label, pad.left - 10, y + 4);
-
-    // Track bg
-    ctx.fillStyle = '#1a1a1a';
-    ctx.fillRect(pad.left, y - 4, trackW, 8);
-
-    // Fill
-    const grad = ctx.createLinearGradient(pad.left, 0, pad.left + fillW, 0);
-    grad.addColorStop(0, color + '88');
-    grad.addColorStop(1, color);
-    ctx.fillStyle = grad;
-    ctx.fillRect(pad.left, y - 4, fillW, 8);
-
-    // Dot at end
-    ctx.beginPath();
-    ctx.arc(pad.left + fillW, y, 6, 0, Math.PI * 2);
-    ctx.fillStyle = color;
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(pad.left + fillW, y, 3, 0, Math.PI * 2);
-    ctx.fillStyle = '#111';
-    ctx.fill();
-
-    // % label
-    ctx.fillStyle = color;
-    ctx.font = 'bold 10px Space Mono';
-    ctx.textAlign = 'left';
-    ctx.fillText(e.wr + '%', W - pad.right + 8, y + 4);
-
-    // Count
-    ctx.fillStyle = '#444';
-    ctx.font = '9px Space Mono';
-    ctx.fillText('(' + e.total + ')', W - pad.right + 8, y + 15);
-  });
+    return `<div style="display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--border);">
+      <div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--text2);margin-bottom:4px;">${e.name} <span style="color:var(--text3);">(${e.total}x)</span></div>
+        <div style="height:5px;background:var(--border2);border-radius:3px;overflow:hidden;">
+          <div style="height:100%;width:${e.wr}%;background:${color};border-radius:3px;transition:width 0.4s;"></div>
+        </div>
+      </div>
+      <div style="font-family:var(--mono);font-size:13px;font-weight:700;color:${color};">${e.wr}%</div>
+    </div>`;
+  }).join('');
 }
-
 function renderMonthly(trades) {
   const el = document.getElementById('monthly-table');
   if (!el) return;
@@ -931,7 +720,7 @@ function renderAll() {
       </div>
       <div class="chart-panel">
         <div class="chart-panel-title">Instruments Traded</div>
-        <div style="position:relative;height:280px;width:100%;"><canvas id="donut-canvas"></canvas></div>
+        <div style="position:relative;height:260px;"><canvas id="donut-canvas"></canvas></div>
       </div>
     </div>
     <div id="monthly-panel" class="chart-panel" style="margin-top:1px;">
@@ -942,7 +731,7 @@ function renderAll() {
       <div class="chart-panel">
         <div class="chart-panel-title">Grade Distribution</div>
         <div style="position:relative;height:260px;">
-          <canvas id="grade-canvas"></canvas>
+          <div style="position:relative;height:260px;"><canvas id="grade-canvas"></canvas></div>
         </div>
       </div>
       <div class="chart-panel">
@@ -952,7 +741,7 @@ function renderAll() {
     </div>
     <div class="chart-panel" style="margin-top:1px;">
       <div class="chart-panel-title">Confluence Win Rate</div>
-      <canvas id="conf-canvas" style="width:100%;min-height:280px;"></canvas>
+      <div id="conf-inner" style="padding:4px;max-height:400px;overflow-y:auto;"></div>
     </div>
   `;
 
@@ -962,11 +751,7 @@ function renderAll() {
     renderDonut(filtered);
     renderMonthly(filtered);
     renderCalendar(filtered);
-    const gradeC = document.getElementById('grade-canvas');
-    if (gradeC) { gradeC.width = gradeC.offsetWidth; gradeC.height = 220; renderGradeDist(filtered); }
-    renderSessionPnl(filtered);
-    const confC = document.getElementById('conf-canvas');
-    if (confC) { confC.width = confC.offsetWidth; confC.height = 400; renderConfWinRate(filtered); }
+
   });
 }
 
