@@ -44,11 +44,8 @@ const NAV_CSS = `
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 1.5rem 0 1rem 0;
+    padding: 1.5rem 0;
     z-index: 200;
-    min-height: 100vh;
-    height: 100%;
-    box-sizing: border-box;
   }
   .nav-logo {
     font-family: 'Space Mono', monospace;
