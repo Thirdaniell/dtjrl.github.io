@@ -235,39 +235,50 @@ canvas{
   background:rgba(255,68,68,.05);
   border:1px solid rgba(255,68,68,.2);
 }
-
 .cal-panel{
   background:var(--surface);
   padding:1.5rem;
   margin-bottom:2rem;
   border:1px solid var(--border);
+
+  overflow:hidden;
 }
 
 .cal-header{
   display:flex;
   align-items:center;
   justify-content:space-between;
-  margin-bottom:1.25rem;
+
   gap:1rem;
-  flex-wrap:wrap;
+
+  margin-bottom:1.25rem;
 }
 
 .cal-nav{
   display:flex;
   align-items:center;
   gap:12px;
+
+  flex-shrink:0;
 }
 
 .cal-nav-btn{
   font-family:var(--mono);
   font-size:14px;
+
   background:none;
+
   border:1px solid var(--border2);
+
   color:var(--text2);
+
   width:28px;
   height:28px;
+
   cursor:pointer;
+
   transition:all .15s;
+
   display:flex;
   align-items:center;
   justify-content:center;
@@ -282,38 +293,66 @@ canvas{
   font-family:var(--mono);
   font-size:12px;
   letter-spacing:.1em;
+
   color:var(--text);
+
   text-transform:uppercase;
+
   min-width:140px;
+
   text-align:center;
 }
+
+/* WRAPPER */
 
 .cal-grid{
   display:grid;
-  grid-template-columns:repeat(7, minmax(90px, 1fr));
+
+  grid-template-columns:repeat(7,minmax(0,1fr));
+
   gap:1px;
+
   background:var(--border);
-  min-width:700px;
+
+  width:100%;
 }
+
+/* DAY HEADER */
 
 .cal-day-header{
   background:var(--bg);
+
   font-family:var(--mono);
   font-size:9px;
+
   letter-spacing:.1em;
+
   color:var(--text3);
+
   text-transform:uppercase;
+
   text-align:center;
-  padding:6px 0;
+
+  padding:8px 0;
+
+  overflow:hidden;
 }
+
+/* CELLS */
 
 .cal-cell{
   background:var(--surface);
-  min-height:70px;
-  padding:6px 8px;
+
+  min-height:78px;
+
+  padding:6px;
+
   display:flex;
   flex-direction:column;
+
   gap:3px;
+
+  overflow:hidden;
 }
 
 .cal-cell.empty{
@@ -325,17 +364,36 @@ canvas{
   outline:1px solid var(--border2);
 }
 
+.cal-cell.has-trades{
+  background:var(--surface2);
+}
+
 .cal-date{
   font-family:var(--mono);
   font-size:10px;
+
   color:var(--text3);
+}
+
+.cal-trades{
+  font-family:var(--mono);
+  font-size:9px;
+
+  color:var(--text3);
+
+  line-height:1.2;
 }
 
 .cal-pnl{
   font-family:var(--mono);
-  font-size:12px;
+  font-size:11px;
   font-weight:700;
+
   margin-top:auto;
+
+  line-height:1.1;
+
+  word-break:break-word;
 }
 
 .cal-pnl.pos{
@@ -346,16 +404,69 @@ canvas{
   color:var(--red);
 }
 
-.cal-trades{
-  font-family:var(--mono);
-  font-size:9px;
-  color:var(--text3);
+/* TABLET */
+
+@media (max-width:900px){
+
+  .cal-cell{
+    min-height:64px;
+    padding:5px;
+  }
+
+  .cal-pnl{
+    font-size:10px;
+  }
 }
 
-.cal-cell.has-trades{
-  background:var(--surface2);
-}
+/* MOBILE */
 
+@media (max-width:600px){
+
+  .cal-panel{
+    padding:1rem;
+  }
+
+  .cal-header{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+
+  .cal-nav{
+    width:100%;
+    justify-content:space-between;
+  }
+
+  .cal-month-label{
+    min-width:auto;
+    flex:1;
+  }
+
+  .cal-grid{
+    min-width:560px;
+  }
+
+  .cal-cell{
+    min-height:54px;
+
+    padding:4px;
+  }
+
+  .cal-date{
+    font-size:8px;
+  }
+
+  .cal-trades{
+    display:none;
+  }
+
+  .cal-pnl{
+    font-size:9px;
+  }
+
+  .cal-panel{
+    overflow-x:auto;
+  }
+}
 ::-webkit-scrollbar{
   width:4px;
   height:4px;
