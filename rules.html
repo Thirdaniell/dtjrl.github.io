@@ -369,15 +369,16 @@ async function loadBreaches() {
     };
 
     trades.forEach(t => {
-      const text = (t.mistakes + ' ' + t.notes + ' ' + t.lessons).toLowerCase();
-      if (text.match(/stop.*(be|breakeven|moved|early)/)||text.match(/(be|breakeven).*stop/)) breaches['Stop Loss Management'].count++;
-      if (text.match(/bias|htf|against|bearish.*long|bullish.*short/)) breaches['HTF Bias Alignment'].count++;
-      if (text.match(/trail.*(soon|tight|early|tsl)|tsl.*(early|soon)/)) breaches['Trailing Too Soon'].count++;
-      if (text.match(/fomo|impatient|patient|chased|missed|too early/)) breaches['Impatient / FOMO Entry'].count++;
-      if (text.match(/overtrad|too many|extra trade/)) breaches['Overtrading'].count++;
-      if (text.match(/scale|second contract|2nd contract/)) breaches['Scale-in Discipline'].count++;
-      if (text.match(/no target|into void|no clear/)) breaches['No Clear Target'].count++;
-      if (text.match(/news/)) breaches['News Discipline'].count++;
+      // Only check MISTAKES field to avoid false positives from notes/lessons
+      const mistakes = t.mistakes.toLowerCase();
+      if (!mistakes || mistakes.length < 3) return;
+      if (mistakes.match(/stop.*(be|breakeven|moved|early)|moved.*stop|(be|breakeven).*stop/)) breaches['Stop Loss Management'].count++;
+      if (mistakes.match(/against.*bias|wrong bias|no htf bias|htf.*bias|traded against|no htf/)) breaches['HTF Bias Alignment'].count++;
+      if (mistakes.match(/trail.*(soon|tight|early)|tsl.*(early|soon)/)) breaches['Trailing Too Soon'].count++;
+      if (mistakes.match(/fomo|impatient|chased|too early/)) breaches['Impatient / FOMO Entry'].count++;
+      if (mistakes.match(/overtrad|too many trades/)) breaches['Overtrading'].count++;
+      if (mistakes.match(/consolid|ranging|chop/)) breaches['Traded in Consolidation'].count++;
+      if (mistakes.match(/no target|no clear target|into void/)) breaches['No Clear Target'].count++;
     });
 
     const sorted = Object.entries(breaches).filter(([,v])=>v.count>0).sort((a,b)=>b[1].count-a[1].count);
