@@ -55,7 +55,6 @@ const NAV_CSS = `
     z-index: 200;
     height: 100vh;
     box-sizing: border-box;
-    overflow: hidden;
   }
   .nav-logo {
     font-family: 'Space Mono', monospace;
@@ -81,7 +80,7 @@ const NAV_CSS = `
     flex-direction: column;
     align-items: center;
     gap: 3px;
-    padding: 8px 6px;
+    padding: 6px 4px;
     text-decoration: none;
     color: #444;
     transition: color 0.15s;
@@ -97,10 +96,10 @@ const NAV_CSS = `
     width: 2px; height: 24px;
     background: #c8ff00;
   }
-  .nav-icon { font-size: 16px; line-height: 1; }
+  .nav-icon { font-size: 15px; line-height: 1; }
   .nav-label {
     font-family: 'Space Mono', monospace;
-    font-size: 8px;
+    font-size: 7px;
     letter-spacing: 0.08em;
     text-transform: uppercase;
   }
