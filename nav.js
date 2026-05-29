@@ -23,7 +23,6 @@ const NAV_HTML = `
       <span class="nav-icon">◻</span>
       <span class="nav-label">Check</span>
     </a>
-
   </div>
   <div class="nav-bottom">
     <a href="https://www.youtube.com/@DTJRL" target="_blank" rel="noopener" class="nav-yt">
@@ -44,10 +43,9 @@ const NAV_CSS = `
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 1.5rem 0 1rem 0;
+    padding: 1.25rem 0 0.75rem 0;
     z-index: 200;
-    min-height: 100vh;
-    height: 100%;
+    height: 100vh;
     box-sizing: border-box;
   }
   .nav-logo {
@@ -57,24 +55,30 @@ const NAV_CSS = `
     color: #c8ff00;
     writing-mode: vertical-rl;
     text-orientation: mixed;
-    margin-bottom: 2rem;
+    margin-bottom: 1.25rem;
+    flex-shrink: 0;
   }
   .nav-links {
     display: flex;
     flex-direction: column;
-    gap: 4px;
-    flex: 1;
+    gap: 0;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    width: 100%;
+    align-items: center;
   }
   .nav-link {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 4px;
-    padding: 12px 8px;
+    gap: 3px;
+    padding: 9px 8px;
     text-decoration: none;
-    color: #444;
+    color: #555;
     transition: color 0.15s;
     position: relative;
+    width: 100%;
   }
   .nav-link:hover, .nav-link.active { color: #c8ff00; }
   .nav-link.active::before {
@@ -94,10 +98,14 @@ const NAV_CSS = `
   }
   .nav-bottom {
     margin-top: auto;
+    flex-shrink: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
+    padding-top: 10px;
+    border-top: 1px solid #1a1a1a;
+    width: 100%;
     padding-bottom: 4px;
   }
   .nav-status {
@@ -113,7 +121,6 @@ const NAV_CSS = `
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 10px;
     opacity: 0.5;
     transition: opacity 0.15s;
   }
@@ -123,13 +130,12 @@ const NAV_CSS = `
     border: none;
     font-size: 14px;
     cursor: pointer;
-    color: var(--text3, #444);
-    margin-bottom: 10px;
+    color: #444;
     transition: color 0.15s;
     padding: 0;
     line-height: 1;
   }
-  .nav-theme-btn:hover { color: var(--accent, #c8ff00); }
+  .nav-theme-btn:hover { color: #c8ff00; }
   body { padding-left: 64px; transition: background 0.2s, color 0.2s; }
   body.light {
     --bg: #f4f4f4;
@@ -148,26 +154,27 @@ const NAV_CSS = `
   body.light .nav-link:hover, body.light .nav-link.active { color: #111; }
   body.light .nav-link.active::before { background: #111; }
   body.light .nav-logo { color: #111; }
-  @media (max-width: 600px) {
+  body.light .nav-bottom { border-top-color: #e0e0e0; }
+  @media (max-width: 768px) {
     .sidenav {
       top: auto; bottom: 0; left: 0; right: 0;
       width: 100%; height: 56px;
       flex-direction: row;
       border-right: none;
       border-top: 1px solid #1a1a1a;
-      padding: 0 1rem;
+      padding: 0;
     }
     .nav-logo { display: none !important; }
-    .nav-bottom { display: none !important; visibility: hidden !important; height: 0 !important; overflow: hidden !important; }
-    .nav-yt, .nav-theme-btn, .nav-status { display: none !important; visibility: hidden !important; }
-    .nav-links { flex-direction: row !important; gap: 0 !important; flex: 1 !important; justify-content: space-around !important; align-items: center !important; width: 100% !important; }
-    .nav-link { flex-direction: column !important; padding: 10px 8px !important; min-width: 44px !important; min-height: 44px !important; justify-content: center !important; }
+    .nav-bottom { display: none !important; }
+    .nav-links { flex-direction: row !important; gap: 0 !important; flex: 1 !important; justify-content: space-around !important; align-items: center !important; width: 100% !important; overflow: visible !important; }
+    .nav-link { flex-direction: column !important; padding: 8px 10px !important; min-width: 44px !important; justify-content: center !important; }
     .nav-link.active::before { top: 0 !important; left: 50% !important; transform: translateX(-50%) !important; width: 24px !important; height: 2px !important; }
-    body { padding-left: 0 !important; padding-bottom: 60px !important; }
+    body { padding-left: 0 !important; padding-bottom: 56px !important; }
   }
 `;
 
 function initNav(activePage) {
+  if (document.querySelector('.sidenav')) return;
   const style = document.createElement('style');
   style.textContent = NAV_CSS;
   document.head.appendChild(style);
@@ -177,8 +184,6 @@ function initNav(activePage) {
   document.querySelectorAll('.nav-link').forEach(link => {
     if (link.dataset.page === activePage) link.classList.add('active');
   });
-
-  // Apply saved theme on load
   if (localStorage.getItem('ftj-theme') === 'light') {
     document.body.classList.add('light');
     const btn = document.getElementById('nav-theme-btn');
