@@ -32,13 +32,6 @@ const NAV_HTML = `
     <button class="nav-theme-btn" id="nav-theme-btn" onclick="navToggleTheme()" title="Toggle light/dark mode">☀</button>
     <div class="nav-status" id="nav-live" ondblclick="navAdminAccess()" title="" style="cursor:default;">LIVE</div>
   </div>
-  <div class="nav-footer">
-    <a href="https://www.youtube.com/@DTJRL" target="_blank" rel="noopener" class="nav-yt" title="YouTube">
-      <svg viewBox="0 0 24 24" width="18" height="18" fill="#ff0000"><path d="M23.5 6.19a3.02 3.02 0 0 0-2.12-2.14C19.53 3.5 12 3.5 12 3.5s-7.53 0-9.38.55A3.02 3.02 0 0 0 .5 6.19C0 8.05 0 12 0 12s0 3.95.5 5.81a3.02 3.02 0 0 0 2.12 2.14C4.47 20.5 12 20.5 12 20.5s7.53 0 9.38-.55a3.02 3.02 0 0 0 2.12-2.14C24 15.95 24 12 24 12s0-3.95-.5-5.81zM9.75 15.52V8.48L15.86 12l-6.11 3.52z"/></svg>
-    </a>
-    <button class="nav-theme-btn" id="nav-theme-btn" onclick="navToggleTheme()" title="Toggle theme">☀</button>
-    <div class="nav-status" id="nav-live" ondblclick="navAdminAccess()">LIVE</div>
-  </div>
 </nav>`;
 
 const NAV_CSS = `
@@ -51,9 +44,10 @@ const NAV_CSS = `
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 1rem 0 0.75rem 0;
+    padding: 1.5rem 0 1rem 0;
     z-index: 200;
-    height: 100vh;
+    min-height: 100vh;
+    height: 100%;
     box-sizing: border-box;
   }
   .nav-logo {
@@ -68,24 +62,19 @@ const NAV_CSS = `
   .nav-links {
     display: flex;
     flex-direction: column;
-    gap: 2px;
-    flex: 1 1 auto;
-    width: 100%;
-    align-items: center;
-    overflow-y: auto;
-    min-height: 0;
+    gap: 4px;
+    flex: 1;
   }
   .nav-link {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 3px;
-    padding: 6px 4px;
+    gap: 4px;
+    padding: 12px 8px;
     text-decoration: none;
-    color: #555;
+    color: #444;
     transition: color 0.15s;
     position: relative;
-    width: 100%;
   }
   .nav-link:hover, .nav-link.active { color: #c8ff00; }
   .nav-link.active::before {
@@ -96,14 +85,14 @@ const NAV_CSS = `
     width: 2px; height: 24px;
     background: #c8ff00;
   }
-  .nav-icon { font-size: 15px; line-height: 1; color: inherit; }
+  .nav-icon { font-size: 16px; line-height: 1; }
   .nav-label {
     font-family: 'Space Mono', monospace;
-    font-size: 7px;
+    font-size: 8px;
     letter-spacing: 0.08em;
     text-transform: uppercase;
   }
-  .nav-footer {
+  .nav-bottom {
     margin-top: auto;
     display: flex;
     flex-direction: column;
@@ -159,7 +148,6 @@ const NAV_CSS = `
   body.light .nav-link:hover, body.light .nav-link.active { color: #111; }
   body.light .nav-link.active::before { background: #111; }
   body.light .nav-logo { color: #111; }
-  body.light .nav-footer { border-top-color: #e0e0e0; }
   @media (max-width: 600px) {
     .sidenav {
       top: auto; bottom: 0; left: 0; right: 0;
@@ -170,7 +158,7 @@ const NAV_CSS = `
       padding: 0 1rem;
     }
     .nav-logo { display: none !important; }
-    .nav-footer { display: none !important; visibility: hidden !important; height: 0 !important; overflow: hidden !important; }
+    .nav-bottom { display: none !important; visibility: hidden !important; height: 0 !important; overflow: hidden !important; }
     .nav-yt, .nav-theme-btn, .nav-status { display: none !important; visibility: hidden !important; }
     .nav-links { flex-direction: row !important; gap: 0 !important; flex: 1 !important; justify-content: space-around !important; align-items: center !important; width: 100% !important; }
     .nav-link { flex-direction: column !important; padding: 10px 8px !important; min-width: 44px !important; min-height: 44px !important; justify-content: center !important; }
@@ -180,11 +168,7 @@ const NAV_CSS = `
 `;
 
 function initNav(activePage) {
-  // Prevent double injection
-  if (document.querySelector('.sidenav')) return;
   const style = document.createElement('style');
-  style.id = 'nav-style';
-  if (document.getElementById('nav-style')) return;
   style.textContent = NAV_CSS;
   document.head.appendChild(style);
   const div = document.createElement('div');
