@@ -51,11 +51,11 @@ const NAV_CSS = `
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 1.5rem 0 1rem 0;
+    padding: 1rem 0 0.75rem 0;
     z-index: 200;
-    min-height: 100vh;
-    height: 100%;
+    height: 100vh;
     box-sizing: border-box;
+    overflow: hidden;
   }
   .nav-logo {
     font-family: 'Space Mono', monospace;
@@ -69,7 +69,7 @@ const NAV_CSS = `
   .nav-links {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 2px;
     flex: 1 1 auto;
     width: 100%;
     align-items: center;
@@ -80,12 +80,13 @@ const NAV_CSS = `
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 4px;
-    padding: 12px 8px;
+    gap: 3px;
+    padding: 8px 6px;
     text-decoration: none;
     color: #444;
     transition: color 0.15s;
     position: relative;
+    width: 100%;
   }
   .nav-link:hover, .nav-link.active { color: #c8ff00; }
   .nav-link.active::before {
