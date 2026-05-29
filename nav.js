@@ -82,7 +82,7 @@ const NAV_CSS = `
     gap: 3px;
     padding: 6px 4px;
     text-decoration: none;
-    color: #444;
+    color: #555;
     transition: color 0.15s;
     position: relative;
     width: 100%;
@@ -96,7 +96,7 @@ const NAV_CSS = `
     width: 2px; height: 24px;
     background: #c8ff00;
   }
-  .nav-icon { font-size: 15px; line-height: 1; }
+  .nav-icon { font-size: 15px; line-height: 1; color: inherit; }
   .nav-label {
     font-family: 'Space Mono', monospace;
     font-size: 7px;
@@ -180,7 +180,11 @@ const NAV_CSS = `
 `;
 
 function initNav(activePage) {
+  // Prevent double injection
+  if (document.querySelector('.sidenav')) return;
   const style = document.createElement('style');
+  style.id = 'nav-style';
+  if (document.getElementById('nav-style')) return;
   style.textContent = NAV_CSS;
   document.head.appendChild(style);
   const div = document.createElement('div');
