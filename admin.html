@@ -201,7 +201,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
     <p style="font-size:13px;color:var(--text2);margin:0 0 2rem;line-height:1.7;">Fill in your trade details. The AI will grade, verify, and calculate all values — then show you a preview before submitting to Notion.</p>
 
     <div class="form-grid">
-      <!-- Row 1 -->
       <div class="field">
         <label>Instrument</label>
         <select id="f-instrument">
@@ -216,7 +215,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
           <option>Long</option><option>Short</option>
         </select>
       </div>
-      <!-- Row 2 -->
       <div class="field">
         <label>Session</label>
         <select id="f-session">
@@ -231,7 +229,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
           <option>1m</option><option>3m</option><option>5m</option><option>15m</option><option>1h</option><option>4h</option><option>Daily</option>
         </select>
       </div>
-      <!-- Row 3 -->
       <div class="field">
         <label>HTF Timeframe</label>
         <input type="text" id="f-htf" placeholder="e.g. 4H, 1H, 15m">
@@ -240,7 +237,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
         <label>Entry Model</label>
         <input type="text" id="f-model" placeholder="e.g. 1m IFVG retracement">
       </div>
-      <!-- Row 4 -->
       <div class="field">
         <label>Date</label>
         <input type="date" id="f-date">
@@ -254,7 +250,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
           <option value="Breakeven">Breakeven</option>
         </select>
       </div>
-      <!-- Row 5 -->
       <div class="field">
         <label>Entry Price</label>
         <input type="number" id="f-entry" placeholder="e.g. 27363.50" step="0.25">
@@ -263,7 +258,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
         <label>Entry Time</label>
         <input type="text" id="f-entry-time" placeholder="e.g. 9:40 AM">
       </div>
-      <!-- Row 6 -->
       <div class="field">
         <label>Exit Price</label>
         <input type="number" id="f-exit" placeholder="e.g. 27419.75" step="0.25">
@@ -272,7 +266,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
         <label>Exit Time <span style="color:var(--text3);font-size:9px;">(final)</span></label>
         <input type="text" id="f-exit-time" placeholder="e.g. 10:01 AM">
       </div>
-      <!-- PARTIAL EXITS — dynamic, shown when contracts > 1 -->
+      <!-- PARTIAL EXITS -->
       <div class="field form-full" id="partial-row" style="display:none;background:rgba(200,255,0,0.03);border:1px solid rgba(200,255,0,0.15);padding:1rem 1.25rem;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
           <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--accent);text-transform:uppercase;">Partial Exits</div>
@@ -281,7 +275,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
         <div id="partial-tp-rows"></div>
         <div style="font-family:var(--mono);font-size:10px;color:var(--green);margin-top:10px;line-height:1.8;" id="partial-pnl-preview"></div>
       </div>
-      <!-- Row 7 -->
       <div class="field">
         <label>Stop Loss</label>
         <input type="number" id="f-sl" placeholder="e.g. 27336.75" step="0.25">
@@ -290,7 +283,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
         <label>Take Profit</label>
         <input type="number" id="f-tp" placeholder="e.g. 27453.75" step="0.25">
       </div>
-      <!-- Row 8 -->
       <div class="field">
         <label>Contracts</label>
         <input type="number" id="f-contracts" placeholder="e.g. 2" min="1">
@@ -347,7 +339,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
         </div>
         <div class="conf-tags" id="conf-tags"></div>
       </div>
-      <!-- Notes -->
       <div class="field form-full">
         <label>Notes</label>
         <textarea id="f-notes" placeholder="What happened during this trade?"></textarea>
@@ -432,16 +423,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
 
     <!-- WEEKLY REVIEW TAB -->
     <div class="tab-panel" id="tab-weekly">
-
-      <!-- WEEK HEADER -->
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;padding-bottom:1rem;border-bottom:1px solid var(--border);">
         <div>
           <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.2em;color:var(--accent);text-transform:uppercase;margin-bottom:6px;">// Current Week</div>
           <div style="font-family:var(--mono);font-size:16px;font-weight:700;color:var(--text);" id="w-week-label">Loading...</div>
         </div>
       </div>
-
-      <!-- STATS ROW -->
       <div class="wstats" id="w-stats">
         <div class="wstat"><div class="wstat-label">Trades</div><div class="wstat-val">—</div></div>
         <div class="wstat"><div class="wstat-label">Win Rate</div><div class="wstat-val">—</div></div>
@@ -449,8 +436,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
         <div class="wstat"><div class="wstat-label">Best Trade</div><div class="wstat-val">—</div></div>
         <div class="wstat"><div class="wstat-label">Worst Trade</div><div class="wstat-val">—</div></div>
       </div>
-
-      <!-- DATA GRID -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);margin-bottom:2rem;">
         <div style="background:var(--surface);padding:1.25rem;">
           <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--accent);text-transform:uppercase;margin-bottom:10px;">Grade Breakdown</div>
@@ -465,8 +450,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
           <div id="w-breaches"></div>
         </div>
       </div>
-
-      <!-- LOCKED VIEW -->
       <div id="w-locked" style="display:none;">
         <div style="background:rgba(0,230,118,0.04);border:1px solid rgba(0,230,118,0.2);margin-bottom:1.5rem;">
           <div style="padding:10px 16px;border-bottom:1px solid rgba(0,230,118,0.15);display:flex;align-items:center;gap:8px;">
@@ -481,11 +464,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
           <button class="set-btn" id="w-note-btn" onclick="wSaveNote()" style="margin-top:8px;width:auto;padding:8px 20px;font-size:10px;">Save Note</button>
         </div>
       </div>
-
-      <!-- FORM -->
       <div id="w-form">
-
-        <!-- REFLECTION -->
         <div style="background:var(--surface);border:1px solid var(--border2);margin-bottom:1px;">
           <div style="padding:10px 16px;border-bottom:1px solid var(--border2);background:var(--surface2);">
             <span style="font-family:var(--mono);font-size:9px;letter-spacing:0.18em;color:var(--accent);text-transform:uppercase;">Your Reflection</span>
@@ -509,8 +488,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
             </div>
           </div>
         </div>
-
-        <!-- RATINGS -->
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);margin-bottom:1px;">
           <div style="background:var(--surface);padding:1.25rem;">
             <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--accent);text-transform:uppercase;margin-bottom:12px;">Mental State</div>
@@ -545,10 +522,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
             </div>
           </div>
         </div>
-
         <button class="w-analyze-btn" id="w-analyze-btn" onclick="wAnalyze()">⚡ Get AI Coaching</button>
-
-        <!-- AI RESULT -->
         <div id="w-ai-section" style="display:none;margin-top:1px;background:var(--surface);border:1px solid var(--border2);">
           <div style="padding:10px 16px;border-bottom:1px solid var(--border2);background:var(--surface2);display:flex;align-items:center;gap:8px;">
             <span style="color:var(--accent);">⚡</span>
@@ -556,16 +530,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
           </div>
           <div style="padding:1.25rem;" id="w-ai-content"></div>
         </div>
-
         <button class="w-submit-btn" id="w-submit-btn" style="display:none;margin-top:1px;" onclick="wSubmit()">✓ Submit & Lock Weekly Review</button>
       </div>
-
-      <!-- HISTORY -->
       <div style="margin-top:2.5rem;">
         <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.2em;color:var(--text3);text-transform:uppercase;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border);">Past Weekly Reviews</div>
         <div id="w-history" style="border:1px solid var(--border);"><div style="font-family:var(--mono);font-size:11px;color:var(--text3);padding:2rem;text-align:center;background:var(--surface);">Loading history...</div></div>
       </div>
-
     </div><!-- end tab-weekly -->
   </div>
 </div>
@@ -577,16 +547,14 @@ const PASS = 'Pammolad123#';
 
 let tradeData = {};
 
-// Set today's date as default
 document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
 
-// AUTH
+// ── AUTH ──────────────────────────────────────────────────────────────────────
 function checkAuth() {
   const val = document.getElementById('pw-input').value;
   if (val === PASS) {
     document.getElementById('auth-screen').style.display = 'none';
     document.getElementById('main-screen').style.display = 'block';
-    // Wire up partial row toggle after auth
     const contractsEl = document.getElementById('f-contracts');
     if (contractsEl) contractsEl.addEventListener('input', togglePartialRow);
   } else {
@@ -597,7 +565,7 @@ function checkAuth() {
 }
 document.getElementById('pw-input').addEventListener('keydown', e => { if (e.key === 'Enter') checkAuth(); });
 
-// CONFLUENCE DROPDOWN
+// ── CONFLUENCE DROPDOWN ───────────────────────────────────────────────────────
 let confOpen = false;
 function toggleConf() {
   confOpen = !confOpen;
@@ -623,21 +591,18 @@ function clearConf() {
   updateConf();
 }
 
-// CALCULATIONS
+// ── CALCULATIONS ──────────────────────────────────────────────────────────────
 function calcPnL(entry, exit, contracts, instrument, direction) {
   const tickVal = {'NQ':20,'MNQ':2,'ES':50,'MES':5,'CL':1000,'GC':100,'RTY':50}[instrument] || 20;
-  // For longs: profit = exit - entry. For shorts: profit = entry - exit
   const pts = (direction === 'Short') ? (entry - exit) : (exit - entry);
   return Math.round(pts * contracts * tickVal);
 }
-
 function calcRR(entry, sl, tp) {
   if (!entry || !sl || !tp) return null;
   const risk = Math.abs(entry - sl);
   const reward = Math.abs(tp - entry);
   return risk > 0 ? Math.round((reward / risk) * 100) / 100 : null;
 }
-
 function calcDuration(entryTime, exitTime) {
   const parse = s => {
     const m = s.match(/(\d{1,2}):(\d{2})\s*(AM|PM)?/i);
@@ -652,77 +617,75 @@ function calcDuration(entryTime, exitTime) {
   return (e != null && x != null && x > e) ? x - e : null;
 }
 
-function autoGrade(confluences, mistakes, notes) {
-  const hasIFVG = confluences.includes('IFVG');
-  const hasFVG = confluences.includes('FVG');
-  const hasCISD = confluences.includes('CISD');
-  const hasLRLR = confluences.includes('LRLR');
+// ── FALLBACK GRADING (used only if /verify call fails) ────────────────────────
+function autoGradeLocal(confluences, mistakes) {
+  const hasIFVG  = confluences.includes('IFVG');
+  const hasFVG   = confluences.includes('FVG');
+  const hasMSS   = confluences.includes('MSS');
+  const hasCISD  = confluences.includes('CISD');
   const hasSweep = confluences.includes('Liquidity Sweep') || confluences.includes('BSL Taken') || confluences.includes('SSL Taken');
-  const hasHTF = confluences.includes('HTF PDA Delivery') || confluences.includes('HTF Trend');
-  const hasSMT = confluences.includes('SMT Divergence');
-  const hasMSS = confluences.includes('MSS');
-  const hasKZ = confluences.includes('Kill Zone');
-  const hasMMM = confluences.includes('Market Maker Model');
-  const hasPO3 = confluences.includes('Power of 3');
-  const mistakesOnly = mistakes.toLowerCase();
-  const hasMistakes = mistakesOnly.length > 5;
-  const softMistake = ['impatient','moved stop','trail','tsl before','premium'].some(w => mistakesOnly.includes(w));
-  const hardMistake = ['against','no htf','consolidat','wrong bias','fomo','revenge'].some(w => mistakesOnly.includes(w));
-
-  if (hardMistake && hasMistakes) return 'D';
-
+  const hasHTF   = confluences.includes('HTF PDA Delivery') && confluences.includes('HTF Trend');
+  const hasKZ    = confluences.includes('Kill Zone');
+  const hasSMT   = confluences.includes('SMT Divergence');
+  const hasLRLR  = confluences.includes('LRLR');
+  const mistakesLower = (mistakes || '').toLowerCase();
+  const hardBreach = ['against', 'no htf', 'wrong bias', 'fomo', 'revenge', 'wrong instrument'].some(w => mistakesLower.includes(w));
+  if (hardBreach) return 'B-';
   let score = 0;
-  if (hasIFVG || hasFVG) score += 2;
-  if (hasCISD) score += 1.5;
-  if (hasLRLR) score += 1;
-  if (hasSweep) score += 2;
-  if (hasHTF) score += 2;
-  if (hasSMT) score += 1.5;
-  if (hasMSS) score += 1;
-  if (hasKZ) score += 1;
-  if (hasMMM) score += 1;
-  if (hasPO3) score += 0.5;
-  if (confluences.length >= 8) score += 1;
-  if (softMistake) score -= 0.5;
-  if (hasMistakes && !softMistake) score -= 1;
-
-  if (score >= 12) return 'A++';
-  if (score >= 10) return 'A+';
-  if (score >= 8)  return 'A';
-  if (score >= 6)  return 'A-';
-  if (score >= 4)  return 'B+';
-  if (score >= 3)  return 'B';
-  if (score >= 2)  return 'B-';
-  if (score >= 1)  return 'C';
-  return 'D';
+  if (hasIFVG) score += 2; else if (hasFVG) score += 1.5;
+  if (hasMSS)   score += 2;
+  if (hasCISD)  score += 1.5;
+  if (hasSweep) score += 1.5;
+  if (hasHTF)   score += 2;
+  if (hasKZ)    score += 1.5;
+  if (hasSMT)   score += 1;
+  if (hasLRLR)  score += 1;
+  if (confluences.length >= 10) score += 1;
+  if (score >= 11 && hasMSS && hasSweep && hasIFVG && hasKZ && hasHTF) return 'A++';
+  if (score >= 9  && (hasMSS || hasCISD)) return 'A+';
+  if (score >= 7) return 'A';
+  if (score >= 5.5) return 'A-';
+  if (score >= 4) return 'B+';
+  if (score >= 3) return 'B';
+  return 'B-';
 }
 
-function autoFollowedRules(mistakes, notes, lessons) {
-  const text = (mistakes + notes + lessons).toLowerCase();
-  const breaks = ['against','bias','consolidat','fomo','revenge','emotional','impatient','moved stop','trail','tsl before'];
-  const broken = breaks.filter(b => text.includes(b));
-  if (broken.length === 0) return 'Yes ✅';
-  if (broken.length <= 2) return 'Partially ⚠️';
-  return 'No ❌';
+function autoFollowedRulesLocal(mistakes) {
+  const m = (mistakes || '').toLowerCase();
+  const requiredBreaches = ['against', 'no htf', 'wrong bias', 'wrong instrument', 'no stop', 'no bias yet'];
+  const partialBreaches  = ['moved stop', 'be too early', 'trail', "didn't go be", 'didnt go be', 'impatient', 'fomo', 'not checking all'];
+  if (requiredBreaches.some(w => m.includes(w))) return 'No ❌';
+  if (partialBreaches.some(w => m.includes(w)))  return 'Partially ⚠️';
+  if (m.length > 5) return 'Partially ⚠️';
+  return 'Yes ✅';
 }
 
 function getField(id) { return document.getElementById(id)?.value?.trim() || ''; }
 function getNum(id) { const v = parseFloat(document.getElementById(id)?.value); return isNaN(v) ? null : v; }
 
+// ── ANALYZE TRADE — worker is now the source of truth for grade + rules ───────
 async function analyzeTrade() {
   const instrument = getField('f-instrument');
-  const direction = getField('f-direction');
+  const direction  = getField('f-direction');
   if (!instrument || !direction) { alert('Please fill in Instrument and Direction at minimum.'); return; }
 
-  const entry = getNum('f-entry'), exit = getNum('f-exit'), sl = getNum('f-sl'), tp = getNum('f-tp');
-  const contracts = getNum('f-contracts') || 1;
-  const entryTime = getField('f-entry-time'), exitTime = getField('f-exit-time');
+  const entry      = getNum('f-entry');
+  const exit       = getNum('f-exit');
+  const sl         = getNum('f-sl');
+  const tp         = getNum('f-tp');
+  const contracts  = getNum('f-contracts') || 1;
+  const entryTime  = getField('f-entry-time');
+  const exitTime   = getField('f-exit-time');
   const confluences = Array.from(document.querySelectorAll('#conf-dropdown input:checked')).map(cb => cb.value);
-  const notes = getField('f-notes'), mistakes = getField('f-mistakes'), lessons = getField('f-lessons');
-  const session = getField('f-session'), timeframe = getField('f-timeframe');
-  const htf = getField('f-htf'), model = getField('f-model');
-  const outcome = getField('f-outcome');
-  const date = getField('f-date') || new Date().toISOString().split('T')[0];
+  const notes      = getField('f-notes');
+  const mistakes   = getField('f-mistakes');
+  const lessons    = getField('f-lessons');
+  const session    = getField('f-session');
+  const timeframe  = getField('f-timeframe');
+  const htf        = getField('f-htf');
+  const model      = getField('f-model');
+  const outcome    = getField('f-outcome');
+  const date       = getField('f-date') || new Date().toISOString().split('T')[0];
   const screenshot = getField('f-screenshot');
 
   const tpRows = (contracts > 1) ? getTPRows().filter(r => r.price && r.contracts) : [];
@@ -734,28 +697,26 @@ async function analyzeTrade() {
       pnl = calcPnL(entry, exit, contracts, instrument, direction);
     }
   }
-  // For duration, use first TP time or final exit time
-  const firstTPTime = tpRows.length ? tpRows[0].time : null;
-  const partialPrice = tpRows.length ? tpRows[0].price : null;
-  const partialContracts = tpRows.length ? tpRows[0].contracts : null;
-  const partialTime = firstTPTime;
-  const remainingContracts = contracts;
-  const rr = calcRR(entry, sl, tp);
+  const rr       = calcRR(entry, sl, tp);
   const duration = calcDuration(entryTime, exitTime);
-  const grade = autoGrade(confluences, mistakes, notes);
-  const followedRules = autoFollowedRules(mistakes, notes, lessons);
 
-  tradeData = { instrument, direction, session, timeframe, htf, model, date, entry, exit, sl, tp, contracts, entryTime, exitTime, pnl, rr, duration, confluences, grade, followedRules, outcome, notes, mistakes, lessons, screenshot, tpRows };
+  // Start with placeholder — worker will determine the real values
+  tradeData = {
+    instrument, direction, session, timeframe, htf, model, date,
+    entry, exit, sl, tp, contracts, entryTime, exitTime,
+    pnl, rr, duration, confluences,
+    grade: 'Pending...', followedRules: 'Pending...',
+    outcome, notes, mistakes, lessons, screenshot, tpRows
+  };
 
-  // Show review panel
   document.getElementById('analyze-btn').disabled = true;
   document.getElementById('analyze-btn').textContent = 'Analyzing...';
   document.getElementById('review-panel').style.display = 'block';
   document.getElementById('success-msg').style.display = 'none';
 
-  const gradeColor = {'A++':'accent','A+':'green','A':'green','A-':'green','B+':'yellow','B':'yellow','B-':'yellow','C':'red','D':'red'}[grade] || '';
   const pnlClass = pnl > 0 ? 'green' : pnl < 0 ? 'red' : '';
 
+  // Render review grid with placeholders for grade/rules (updated after worker responds)
   document.getElementById('review-grid').innerHTML = `
     <div class="review-field"><div class="review-label">Instrument</div><div class="review-value">${instrument} ${direction}</div></div>
     <div class="review-field"><div class="review-label">Session / TF</div><div class="review-value">${session} · ${timeframe}</div></div>
@@ -766,20 +727,41 @@ async function analyzeTrade() {
     <div class="review-field"><div class="review-label">P&L</div><div class="review-value ${pnlClass}">${pnl >= 0 ? '+' : ''}$${Math.abs(pnl).toLocaleString()}</div></div>
     <div class="review-field"><div class="review-label">R:R</div><div class="review-value">${rr ? '1:' + rr : '—'}</div></div>
     <div class="review-field"><div class="review-label">Duration</div><div class="review-value">${duration ? duration + 'm' : '—'}</div></div>
-    <div class="review-field"><div class="review-label">Setup Grade</div><div class="review-value ${gradeColor}">${grade}</div></div>
-    <div class="review-field"><div class="review-label">Followed Rules</div><div class="review-value">${followedRules}</div></div>
+    <div class="review-field" id="rg-grade"><div class="review-label">Setup Grade</div><div class="review-value" id="rg-grade-val" style="opacity:0.4;">Analyzing...</div></div>
+    <div class="review-field" id="rg-rules"><div class="review-label">Followed Rules</div><div class="review-value" id="rg-rules-val" style="opacity:0.4;">Analyzing...</div></div>
     <div class="review-field"><div class="review-label">Outcome</div><div class="review-value">${outcome || '—'}</div></div>
     <div class="review-field" style="grid-column:1/-1"><div class="review-label">Confluences</div><div class="review-value">${confluences.join(', ') || '—'}</div></div>
-    ${htf ? `<div class="review-field"><div class="review-label">HTF TF</div><div class="review-value">${htf}</div></div>` : ''}
+    ${htf   ? `<div class="review-field"><div class="review-label">HTF TF</div><div class="review-value">${htf}</div></div>` : ''}
     ${model ? `<div class="review-field"><div class="review-label">Entry Model</div><div class="review-value">${model}</div></div>` : ''}
   `;
 
-  // AI Verification
   document.getElementById('ai-result').innerHTML = '<span class="loading-msg">Verifying against your rules...</span>';
   document.getElementById('ai-verdict-badge').innerHTML = '';
 
   try {
-    const tradeStr = `Instrument: ${instrument}\nDirection: ${direction}\nSession: ${session}\nTimeframe: ${timeframe}\nEntry: ${entry} at ${entryTime}\nExit: ${exit} at ${exitTime}\nStop Loss: ${sl}\nTake Profit: ${tp}\nContracts: ${contracts}\nP&L: $${pnl}\nConfluences: ${confluences.join(', ')}\nSetup Grade: ${grade}\nOutcome: ${outcome}\nNotes: ${notes}\nMistakes: ${mistakes}\nLessons: ${lessons}`;
+    // NOTE: Setup Grade is intentionally excluded — worker determines it fresh.
+    // Including it would be circular (telling the AI the answer before asking).
+    const tradeStr = [
+      `Instrument: ${instrument}`,
+      `Direction: ${direction}`,
+      `Session: ${session}`,
+      `Timeframe: ${timeframe}`,
+      `HTF Timeframe: ${htf}`,
+      `Entry Model: ${model}`,
+      `Date: ${date}`,
+      `Entry Price: ${entry} at ${entryTime}`,
+      `Exit Price: ${exit} at ${exitTime}`,
+      `Stop Loss: ${sl}`,
+      `Take Profit: ${tp}`,
+      `Contracts: ${contracts}`,
+      `R:R: ${rr || ''}`,
+      `P&L: $${pnl}`,
+      `Status: ${outcome}`,
+      `Confluences: ${confluences.join(', ')}`,
+      `Notes: ${notes}`,
+      `Mistakes: ${mistakes}`,
+      `Lessons Learned: ${lessons}`,
+    ].filter(line => !line.endsWith(': ') && !line.endsWith(': null') && !line.endsWith(': undefined')).join('\n');
 
     const res = await fetch(WORKER + '/verify', {
       method: 'POST',
@@ -788,20 +770,69 @@ async function analyzeTrade() {
     });
     const data = await res.json();
     const text = data.result || 'No response.';
-    const upper = text.toUpperCase();
 
-    let verdictClass = 'verdict-partial', verdictLabel = 'PARTIALLY ⚠️';
-    if (upper.includes('VERDICT: YES')) { verdictClass = 'verdict-yes'; verdictLabel = 'FOLLOWED RULES ✅'; tradeData.followedRules = 'Yes ✅'; }
-    else if (upper.includes('VERDICT: NO')) { verdictClass = 'verdict-no'; verdictLabel = 'RULES BROKEN ❌'; tradeData.followedRules = 'No ❌'; }
-    else { tradeData.followedRules = 'Partially ⚠️'; }
+    // ── Worker grade/rules are now the source of truth ────────────────────────
+    // data.grade and data.followedRules come from the deterministic grading engine
+    if (data.grade && data.grade !== 'Pending...') {
+      tradeData.grade = data.grade;
+    }
+
+    const frMap = { 'YES': 'Yes ✅', 'PARTIALLY': 'Partially ⚠️', 'NO': 'No ❌' };
+    if (data.followedRules && frMap[data.followedRules]) {
+      tradeData.followedRules = frMap[data.followedRules];
+    } else {
+      // Fallback: parse from text if structured field is missing (safety net)
+      const upper = text.toUpperCase();
+      if (upper.includes('VERDICT: YES'))      tradeData.followedRules = 'Yes ✅';
+      else if (upper.includes('VERDICT: NO'))  tradeData.followedRules = 'No ❌';
+      else                                     tradeData.followedRules = 'Partially ⚠️';
+    }
+
+    // ── Update grade cell in the review grid ──────────────────────────────────
+    const gradeColors = {
+      'A++':'accent','A+':'green','A':'green','A-':'green',
+      'B+':'yellow','B':'yellow','B-':'yellow','C':'red','D':'red'
+    };
+    const gradeEl = document.getElementById('rg-grade-val');
+    if (gradeEl) {
+      gradeEl.textContent = tradeData.grade;
+      gradeEl.style.opacity = '1';
+      gradeEl.className = 'review-value ' + (gradeColors[tradeData.grade] || '');
+    }
+
+    // ── Update followed rules cell ────────────────────────────────────────────
+    const rulesEl = document.getElementById('rg-rules-val');
+    if (rulesEl) {
+      rulesEl.textContent = tradeData.followedRules;
+      rulesEl.style.opacity = '1';
+      if (tradeData.followedRules.includes('✅'))      rulesEl.className = 'review-value green';
+      else if (tradeData.followedRules.includes('⚠️')) rulesEl.className = 'review-value yellow';
+      else if (tradeData.followedRules.includes('❌')) rulesEl.className = 'review-value red';
+    }
+
+    // ── Verdict badge ─────────────────────────────────────────────────────────
+    let verdictClass, verdictLabel;
+    if (data.followedRules === 'YES' || tradeData.followedRules.includes('✅')) {
+      verdictClass = 'verdict-yes';     verdictLabel = 'FOLLOWED RULES ✅';
+    } else if (data.followedRules === 'NO' || tradeData.followedRules.includes('❌')) {
+      verdictClass = 'verdict-no';      verdictLabel = 'RULES BROKEN ❌';
+    } else {
+      verdictClass = 'verdict-partial'; verdictLabel = 'PARTIALLY ⚠️';
+    }
 
     const formatted = text.replace(/\*\*(.*?)\*\*/g, '$1').replace(/\n/g, '<br>');
     document.getElementById('ai-result').innerHTML = formatted;
     document.getElementById('ai-verdict-badge').innerHTML = `<span class="ai-verdict ${verdictClass}">${verdictLabel}</span>`;
-    document.getElementById('review-grid').querySelector('[style*="Followed Rules"] + .review-value') ;
 
   } catch(e) {
+    // Fallback to local logic if worker call fails
     document.getElementById('ai-result').textContent = 'Verification failed: ' + e.message;
+    tradeData.grade = autoGradeLocal(confluences, mistakes);
+    tradeData.followedRules = autoFollowedRulesLocal(mistakes);
+    const gradeEl = document.getElementById('rg-grade-val');
+    if (gradeEl) { gradeEl.textContent = tradeData.grade; gradeEl.style.opacity = '1'; }
+    const rulesEl = document.getElementById('rg-rules-val');
+    if (rulesEl) { rulesEl.textContent = tradeData.followedRules; rulesEl.style.opacity = '1'; }
   }
 
   document.getElementById('analyze-btn').disabled = false;
@@ -824,42 +855,39 @@ async function submitTrade() {
   const props = {
     "Trade Name": { title: [{ text: { content: tradeName } }] },
     "Instrument": { select: { name: t.instrument } },
-    "Direction": { select: { name: t.direction } },
-    "Status": { select: { name: t.outcome } },
-    "Session": { select: { name: t.session } },
-    "Timeframe": { select: { name: t.timeframe } },
-    "Date": { date: { start: t.date } },
-    "Contracts": { number: t.contracts },
-    "P&L ($)": { number: t.pnl },
+    "Direction":  { select: { name: t.direction } },
+    "Status":     { select: { name: t.outcome } },
+    "Session":    { select: { name: t.session } },
+    "Timeframe":  { select: { name: t.timeframe } },
+    "Date":       { date: { start: t.date } },
+    "Contracts":  { number: t.contracts },
+    "P&L ($)":    { number: t.pnl },
     "Followed Rules": { select: { name: t.followedRules } },
-    "Setup Grade": { select: { name: t.grade } },
+    "Setup Grade":    { select: { name: t.grade } },
   };
 
-  if (t.entry) props["Entry Price"] = { number: t.entry };
-  if (t.exit) props["Exit Price"] = { number: t.exit };
-  if (t.sl) props["Stop Loss"] = { number: t.sl };
-  if (t.tp) props["Take Profit"] = { number: t.tp };
-  if (t.rr) props["R:R"] = { number: t.rr };
-  if (t.duration) props["Duration (mins)"] = { number: t.duration };
-  if (t.entryTime) props["Entry Time"] = { rich_text: [{ text: { content: t.entryTime } }] };
-  if (t.exitTime) props["Exit Time"] = { rich_text: [{ text: { content: t.exitTime } }] };
+  if (t.entry)    props["Entry Price"]    = { number: t.entry };
+  if (t.exit)     props["Exit Price"]     = { number: t.exit };
+  if (t.sl)       props["Stop Loss"]      = { number: t.sl };
+  if (t.tp)       props["Take Profit"]    = { number: t.tp };
+  if (t.rr)       props["R:R"]            = { number: t.rr };
+  if (t.duration) props["Duration (mins)"]= { number: t.duration };
+  if (t.entryTime) props["Entry Time"]    = { rich_text: [{ text: { content: t.entryTime } }] };
+  if (t.exitTime)  props["Exit Time"]     = { rich_text: [{ text: { content: t.exitTime } }] };
+
   const exitBreakdown = (t.tpRows && t.tpRows.length > 0)
     ? 'Exit breakdown: ' + t.tpRows.map(r=>`${r.label}: ${r.contracts} contract${r.contracts>1?'s':''} @ ${r.price}${r.time?' at '+r.time:''}`).join(' · ')
     : null;
   const fullNotes = [t.notes, exitBreakdown].filter(Boolean).join('\n');
-  if (fullNotes) props["Notes"] = { rich_text: [{ text: { content: fullNotes } }] };
-  if (t.mistakes) props["Mistakes"] = { rich_text: [{ text: { content: t.mistakes } }] };
-  if (t.lessons) props["Lessons Learned"] = { rich_text: [{ text: { content: t.lessons } }] };
-  if (t.htf) props["HTF Timeframe"] = { rich_text: [{ text: { content: t.htf } }] };
-  if (t.model) props["Entry Model"] = { rich_text: [{ text: { content: t.model } }] };
+  if (fullNotes)   props["Notes"]          = { rich_text: [{ text: { content: fullNotes } }] };
+  if (t.mistakes)  props["Mistakes"]       = { rich_text: [{ text: { content: t.mistakes } }] };
+  if (t.lessons)   props["Lessons Learned"]= { rich_text: [{ text: { content: t.lessons } }] };
+  if (t.htf)       props["HTF Timeframe"]  = { rich_text: [{ text: { content: t.htf } }] };
+  if (t.model)     props["Entry Model"]    = { rich_text: [{ text: { content: t.model } }] };
   if (t.confluences.length) props["Confluences"] = { multi_select: t.confluences.map(c => ({ name: c })) };
 
-  const body = {
-    parent: { database_id: DB_ID },
-    properties: props,
-  };
+  const body = { parent: { database_id: DB_ID }, properties: props };
 
-  // Add screenshot as page content if provided
   if (t.screenshot) {
     body.children = [{
       object: 'block', type: 'paragraph',
@@ -895,7 +923,7 @@ async function submitTrade() {
   btn.textContent = '✓ Confirm & Submit to Notion';
 }
 
-// ---- TAB SWITCHING ----
+// ── TAB SWITCHING ─────────────────────────────────────────────────────────────
 function switchTab(name, btn) {
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
@@ -905,7 +933,7 @@ function switchTab(name, btn) {
   if (name === 'weekly') initWeeklyReview();
 }
 
-// ---- BIAS BOARD ----
+// ── BIAS BOARD ────────────────────────────────────────────────────────────────
 const BIAS_DB = 'c163f7373bb44be19ae4f4a886384ddf';
 const BTODAY = new Date().toISOString().split('T')[0];
 const bSelected = { NQ: null, ES: null };
@@ -915,14 +943,12 @@ let biasLoaded = false;
 function bBiasClass(b) {
   return {'Bullish':'b-bull','Bearish':'b-bear','Ranging':'b-range','Waiting':'b-wait'}[b] || 'b-none';
 }
-
 function bSelectBias(inst, bias) {
   bSelected[inst] = bias;
   document.querySelectorAll(`#bbtns-${inst} .bbtn`).forEach(b => b.classList.remove('active'));
   const map = {'Bullish':'bull','Bearish':'bear','Ranging':'range','Waiting':'wait'};
   document.querySelector(`#bbtns-${inst} .${map[bias]}`).classList.add('active');
 }
-
 async function bQuery() {
   const res = await fetch(`${WORKER}/notion/databases/${BIAS_DB}/query`, {
     method:'POST', headers:{'Content-Type':'application/json'},
@@ -930,7 +956,6 @@ async function bQuery() {
   });
   return res.json();
 }
-
 async function bCreate(props) {
   const res = await fetch(`${WORKER}/notion/pages`, {
     method:'POST', headers:{'Content-Type':'application/json'},
@@ -938,14 +963,13 @@ async function bCreate(props) {
   });
   return res.json();
 }
-
 function bLockCard(inst, bias, switchBias, hasSwitched) {
-  const valEl = document.getElementById(`bval-${inst}`);
-  const swEl = document.getElementById(`bswitch-${inst}`);
+  const valEl  = document.getElementById(`bval-${inst}`);
+  const swEl   = document.getElementById(`bswitch-${inst}`);
   const swFrom = document.getElementById(`bswitch-from-${inst}`);
-  const btn = document.getElementById(`bset-${inst}`);
+  const btn    = document.getElementById(`bset-${inst}`);
   const locked = document.getElementById(`blocked-${inst}`);
-  const notes = document.getElementById(`bnotes-${inst}`);
+  const notes  = document.getElementById(`bnotes-${inst}`);
   const effective = switchBias || bias;
   valEl.className = 'bias-val ' + bBiasClass(effective);
   valEl.textContent = effective || '—';
@@ -961,11 +985,9 @@ function bLockCard(inst, bias, switchBias, hasSwitched) {
     locked.style.display='block'; locked.textContent='Bias locked · 1 switch remaining';
   }
 }
-
 function bOpenSwitch(inst, original) {
   document.querySelectorAll(`#bbtns-${inst} .bbtn`).forEach(b => {
     b.disabled = false;
-    const map2 = {'Bullish':'Bullish','Bearish':'Bearish','Ranging':'Ranging','Waiting':'Waiting'};
     b.onclick = () => bSelectBias(inst, b.textContent.trim());
   });
   const notes = document.getElementById(`bnotes-${inst}`);
@@ -975,7 +997,6 @@ function bOpenSwitch(inst, original) {
   btn.onclick = () => bSubmitSwitch(inst, original);
   document.getElementById(`blocked-${inst}`).textContent = 'Select new bias then confirm';
 }
-
 async function bSubmit(inst) {
   if (!bSelected[inst]) { alert(`Select a bias for ${inst}`); return; }
   const btn = document.getElementById(`bset-${inst}`);
@@ -996,7 +1017,6 @@ async function bSubmit(inst) {
     else { btn.disabled=false; btn.textContent=`Set ${inst} Bias`; alert('Error: ' + JSON.stringify(data)); }
   } catch(e) { btn.disabled=false; btn.textContent=`Set ${inst} Bias`; alert('Error: '+e.message); }
 }
-
 async function bSubmitSwitch(inst, original) {
   const newBias = bSelected[inst];
   if (!newBias) { alert(`Select a new bias for ${inst}`); return; }
@@ -1018,7 +1038,6 @@ async function bSubmitSwitch(inst, original) {
     else { btn.disabled=false; btn.textContent=`Confirm ${inst} Switch`; alert('Error: '+JSON.stringify(data)); }
   } catch(e) { btn.disabled=false; btn.textContent=`Confirm ${inst} Switch`; alert('Error: '+e.message); }
 }
-
 async function bLoadHistory() {
   const container = document.getElementById('bhistory-container');
   try {
@@ -1032,14 +1051,14 @@ async function bLoadHistory() {
     });
     if (!pages.length) { container.innerHTML='<div style="font-family:var(--mono);font-size:11px;color:var(--text3);padding:2rem;text-align:center;background:var(--surface);">No bias entries yet</div>'; return; }
     const rows = pages.map(p => {
-      const inst = p.properties['Instrument']?.select?.name||'—';
-      const bias = p.properties['Bias']?.select?.name||'—';
-      const isSw = p.properties['switched']?.checkbox;
+      const inst  = p.properties['Instrument']?.select?.name||'—';
+      const bias  = p.properties['Bias']?.select?.name||'—';
+      const isSw  = p.properties['switched']?.checkbox;
       const notes = (p.properties['Notes']?.rich_text||[]).map(r=>r.plain_text||'').join('');
-      const date = p.properties['Date']?.date?.start||'—';
-      const d2 = new Date(date+'T12:00:00');
-      const ds = d2.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
-      const bCls = bBiasClass(bias);
+      const date  = p.properties['Date']?.date?.start||'—';
+      const d2    = new Date(date+'T12:00:00');
+      const ds    = d2.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+      const bCls  = bBiasClass(bias);
       return `<div class="brow">
         <div class="bh-date">${ds}</div>
         <div class="bh-inst" style="color:${inst==='NQ'?'#c8ff00':'#40c4ff'}">${inst}</div>
@@ -1050,7 +1069,6 @@ async function bLoadHistory() {
     container.innerHTML = `<div class="bhistory">${rows}</div>`;
   } catch(e) { container.innerHTML=`<div style="font-family:var(--mono);font-size:11px;color:var(--red);padding:1rem;">Error: ${e.message}</div>`; }
 }
-
 async function initBiasBoard() {
   if (biasLoaded) return;
   biasLoaded = true;
@@ -1060,11 +1078,11 @@ async function initBiasBoard() {
   try {
     const data = await bQuery();
     ['NQ','ES'].forEach(inst => {
-      const entries = (data.results||[]).filter(p=>p.properties['Instrument']?.select?.name===inst);
+      const entries  = (data.results||[]).filter(p=>p.properties['Instrument']?.select?.name===inst);
       const original = entries.find(p=>!p.properties['switched']?.checkbox);
       const switched = entries.find(p=>p.properties['switched']?.checkbox);
       if (original) {
-        const bias = original.properties['Bias']?.select?.name;
+        const bias       = original.properties['Bias']?.select?.name;
         const switchBias = switched?.properties['Bias']?.select?.name||null;
         bState[inst] = { bias, switchBias, pageId:original.id };
         bLockCard(inst, bias, switchBias, !!switched);
@@ -1074,90 +1092,47 @@ async function initBiasBoard() {
   await bLoadHistory();
 }
 
-// ============================================================
-// WEEKLY REVIEW TAB — injected into admin.html
-// ============================================================
-
-const WEEKLY_DB = '6d1309c6e6174f489e32293e253ae729';
+// ── WEEKLY REVIEW ─────────────────────────────────────────────────────────────
+const WEEKLY_DB  = '6d1309c6e6174f489e32293e253ae729';
 const TRADE_DB_W = '5398f956345943b7b12b2298bbb6e127';
 
-// YouTube resource map by topic
 const YT_RESOURCES = {
-  'htf_bias': [
-    { creator: 'ICT', title: 'HTF Bias & Top Down Analysis', url: 'https://www.youtube.com/@InnerCircleTrader' },
-    { creator: 'Dodgy', title: 'HTF Bias with iFVG Model', url: 'https://www.youtube.com/@DodgyFX' },
-    { creator: 'BionicNQ', title: 'Top Down Analysis NQ', url: 'https://www.youtube.com/@BionicNQ' },
-  ],
-  'entry_model': [
-    { creator: 'Dodgy', title: 'iFVG Ultimate+ Entry Model', url: 'https://www.youtube.com/@DodgyFX' },
-    { creator: 'Lumi Traders', title: 'FVG & IFVG Entries', url: 'https://www.youtube.com/@LumiTraders' },
-    { creator: 'Tizz Trades', title: 'ICT Entry Models Explained', url: 'https://www.youtube.com/@TizzTrades' },
-  ],
-  'stop_loss': [
-    { creator: 'BionicNQ', title: 'Stop Loss Placement & Management', url: 'https://www.youtube.com/@BionicNQ' },
-    { creator: 'PBTrades', title: 'SL Management ICT Style', url: 'https://www.youtube.com/@PBTrades' },
-    { creator: 'ICT', title: 'Stop Hunt & SL Concepts', url: 'https://www.youtube.com/@InnerCircleTrader' },
-  ],
-  'trailing': [
-    { creator: 'BionicNQ', title: 'Trade Management & Trailing', url: 'https://www.youtube.com/@BionicNQ' },
-    { creator: 'PBTrades', title: 'Exit Strategy & TSL', url: 'https://www.youtube.com/@PBTrades' },
-    { creator: 'Lumi Traders', title: 'Managing Winning Trades', url: 'https://www.youtube.com/@LumiTraders' },
-  ],
-  'discipline': [
-    { creator: 'ICT', title: 'Trading Psychology & Discipline', url: 'https://www.youtube.com/@InnerCircleTrader' },
-    { creator: 'Tizz Trades', title: 'Trader Mindset', url: 'https://www.youtube.com/@TizzTrades' },
-    { creator: 'BionicNQ', title: 'Consistency & Process', url: 'https://www.youtube.com/@BionicNQ' },
-  ],
-  'liquidity': [
-    { creator: 'ICT', title: 'Liquidity Concepts & Sweeps', url: 'https://www.youtube.com/@InnerCircleTrader' },
-    { creator: 'Dodgy', title: 'Liquidity in iFVG Model', url: 'https://www.youtube.com/@DodgyFX' },
-    { creator: 'Lumi Traders', title: 'BSL SSL Explained', url: 'https://www.youtube.com/@LumiTraders' },
-  ],
-  'smt': [
-    { creator: 'ICT', title: 'SMT Divergence Deep Dive', url: 'https://www.youtube.com/@InnerCircleTrader' },
-    { creator: 'BionicNQ', title: 'SMT NQ vs ES', url: 'https://www.youtube.com/@BionicNQ' },
-    { creator: 'Tizz Trades', title: 'Using SMT for Entries', url: 'https://www.youtube.com/@TizzTrades' },
-  ],
-  'consolidation': [
-    { creator: 'BionicNQ', title: 'Avoiding Consolidation Traps', url: 'https://www.youtube.com/@BionicNQ' },
-    { creator: 'PBTrades', title: 'Range vs Trend Identification', url: 'https://www.youtube.com/@PBTrades' },
-    { creator: 'Lumi Traders', title: 'Reading Market Structure', url: 'https://www.youtube.com/@LumiTraders' },
-  ],
-  'general': [
-    { creator: 'Dodgy', title: 'Full iFVG Model Breakdown', url: 'https://www.youtube.com/@DodgyFX' },
-    { creator: 'ICT', title: 'ICT Mentorship Series', url: 'https://www.youtube.com/@InnerCircleTrader' },
-    { creator: 'BionicNQ', title: 'NQ Futures Trading', url: 'https://www.youtube.com/@BionicNQ' },
-  ]
+  'htf_bias':      [{ creator:'ICT',    title:'HTF Bias & Top Down Analysis',   url:'https://www.youtube.com/@InnerCircleTrader' },{ creator:'Dodgy',    title:'HTF Bias with iFVG Model',         url:'https://www.youtube.com/@DodgyFX' },{ creator:'BionicNQ',title:'Top Down Analysis NQ',            url:'https://www.youtube.com/@BionicNQ' }],
+  'entry_model':   [{ creator:'Dodgy',  title:'iFVG Ultimate+ Entry Model',     url:'https://www.youtube.com/@DodgyFX' },{ creator:'Lumi Traders',title:'FVG & IFVG Entries',           url:'https://www.youtube.com/@LumiTraders' },{ creator:'Tizz Trades',title:'ICT Entry Models Explained',     url:'https://www.youtube.com/@TizzTrades' }],
+  'stop_loss':     [{ creator:'BionicNQ',title:'Stop Loss Placement & Management',url:'https://www.youtube.com/@BionicNQ' },{ creator:'PBTrades',title:'SL Management ICT Style',        url:'https://www.youtube.com/@PBTrades' },{ creator:'ICT',title:'Stop Hunt & SL Concepts',            url:'https://www.youtube.com/@InnerCircleTrader' }],
+  'trailing':      [{ creator:'BionicNQ',title:'Trade Management & Trailing',   url:'https://www.youtube.com/@BionicNQ' },{ creator:'PBTrades',title:'Exit Strategy & TSL',            url:'https://www.youtube.com/@PBTrades' },{ creator:'Lumi Traders',title:'Managing Winning Trades',       url:'https://www.youtube.com/@LumiTraders' }],
+  'discipline':    [{ creator:'ICT',    title:'Trading Psychology & Discipline',url:'https://www.youtube.com/@InnerCircleTrader' },{ creator:'Tizz Trades',title:'Trader Mindset',            url:'https://www.youtube.com/@TizzTrades' },{ creator:'BionicNQ',title:'Consistency & Process',            url:'https://www.youtube.com/@BionicNQ' }],
+  'liquidity':     [{ creator:'ICT',    title:'Liquidity Concepts & Sweeps',    url:'https://www.youtube.com/@InnerCircleTrader' },{ creator:'Dodgy',title:'Liquidity in iFVG Model',          url:'https://www.youtube.com/@DodgyFX' },{ creator:'Lumi Traders',title:'BSL SSL Explained',              url:'https://www.youtube.com/@LumiTraders' }],
+  'smt':           [{ creator:'ICT',    title:'SMT Divergence Deep Dive',       url:'https://www.youtube.com/@InnerCircleTrader' },{ creator:'BionicNQ',title:'SMT NQ vs ES',                  url:'https://www.youtube.com/@BionicNQ' },{ creator:'Tizz Trades',title:'Using SMT for Entries',           url:'https://www.youtube.com/@TizzTrades' }],
+  'consolidation': [{ creator:'BionicNQ',title:'Avoiding Consolidation Traps', url:'https://www.youtube.com/@BionicNQ' },{ creator:'PBTrades',title:'Range vs Trend Identification',    url:'https://www.youtube.com/@PBTrades' },{ creator:'Lumi Traders',title:'Reading Market Structure',         url:'https://www.youtube.com/@LumiTraders' }],
+  'general':       [{ creator:'Dodgy',  title:'Full iFVG Model Breakdown',      url:'https://www.youtube.com/@DodgyFX' },{ creator:'ICT',title:'ICT Mentorship Series',              url:'https://www.youtube.com/@InnerCircleTrader' },{ creator:'BionicNQ',title:'NQ Futures Trading',               url:'https://www.youtube.com/@BionicNQ' }],
 };
 
 function getWeekRange(date) {
   const d = date ? new Date(date) : new Date();
-  const day = d.getDay(); // 0=Sun
-  const diff = d.getDate() - day; // Sunday start
+  const day = d.getDay();
+  const diff = d.getDate() - day;
   const start = new Date(d.setDate(diff));
   const end = new Date(start);
   end.setDate(end.getDate() + 6);
   const fmt = d2 => d2.toISOString().split('T')[0];
   return { start: fmt(start), end: fmt(end) };
 }
-
 function wExtractText(rt) { return (rt||[]).map(r=>r.plain_text||'').join(''); }
-
-let wState = { loaded: false, existing: null, trades: [], weekStart: null, weekEnd: null };
-let wSelected = { mental: 0, discipline: 0 };
+let wState = { loaded:false, existing:null, trades:[], weekStart:null, weekEnd:null };
+let wSelected = { mental:0, discipline:0 };
 
 async function initWeeklyReview() {
   if (wState.loaded) return;
   wState.loaded = true;
   const { start, end } = getWeekRange();
   wState.weekStart = start;
-  wState.weekEnd = end;
+  wState.weekEnd   = end;
   document.getElementById('w-week-label').textContent = `Week of ${new Date(start+'T12:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric'})} – ${new Date(end+'T12:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}`;
   await wLoadTrades();
   await wCheckExisting();
   await wLoadHistory();
 }
-
 async function wLoadTrades() {
   try {
     const res = await fetch(`${WORKER}/notion/databases/${TRADE_DB_W}/query`, {
@@ -1172,22 +1147,18 @@ async function wLoadTrades() {
     wRenderStats();
   } catch(e) { console.error('wLoadTrades',e); }
 }
-
 function wRenderStats() {
   const trades = wState.trades;
-  const total = trades.length;
-  const wins = trades.filter(t=>t.properties['Status']?.select?.name==='Closed - Win').length;
-  const pnls = trades.map(t=>t.properties['P&L ($)']?.number||0);
+  const total  = trades.length;
+  const wins   = trades.filter(t=>t.properties['Status']?.select?.name==='Closed - Win').length;
+  const pnls   = trades.map(t=>t.properties['P&L ($)']?.number||0);
   const totalPnl = pnls.reduce((a,b)=>a+b,0);
-  const best = total ? Math.max(...pnls) : 0;
-  const worst = total ? Math.min(...pnls) : 0;
-  const wr = total ? Math.round((wins/total)*100) : 0;
-
+  const best   = total ? Math.max(...pnls) : 0;
+  const worst  = total ? Math.min(...pnls) : 0;
+  const wr     = total ? Math.round((wins/total)*100) : 0;
   wState.stats = { total, wins, totalPnl, best, worst, wr };
-
   const pClass = totalPnl >= 0 ? 'color:var(--green)' : 'color:var(--red)';
-  const pStr = (totalPnl>=0?'+':'-')+'$'+Math.abs(totalPnl).toLocaleString();
-
+  const pStr   = (totalPnl>=0?'+':'-')+'$'+Math.abs(totalPnl).toLocaleString();
   document.getElementById('w-stats').innerHTML = `
     <div class="wstat"><div class="wstat-label">Trades</div><div class="wstat-val">${total}</div></div>
     <div class="wstat"><div class="wstat-label">Win Rate</div><div class="wstat-val">${wr}%</div></div>
@@ -1195,44 +1166,32 @@ function wRenderStats() {
     <div class="wstat"><div class="wstat-label">Best Trade</div><div class="wstat-val" style="color:var(--green)">+$${best.toLocaleString()}</div></div>
     <div class="wstat"><div class="wstat-label">Worst Trade</div><div class="wstat-val" style="color:var(--red)">${worst<=0?'-':''}$${Math.abs(worst).toLocaleString()}</div></div>
   `;
-
-  // Grade breakdown
   const grades = {};
-  trades.forEach(t => {
-    const g = t.properties['Setup Grade']?.select?.name;
-    if (g) grades[g] = (grades[g]||0)+1;
-  });
+  trades.forEach(t => { const g=t.properties['Setup Grade']?.select?.name; if(g) grades[g]=(grades[g]||0)+1; });
   const gradeColors = {'A++':'#c8ff00','A+':'#00e676','A':'#40c4ff','B':'#ffd740','C':'#ff6d00','D':'#ff4444'};
   document.getElementById('w-grades').innerHTML = Object.entries(grades).length
     ? Object.entries(grades).map(([g,c])=>`<span style="font-family:var(--mono);font-size:10px;padding:3px 8px;border:1px solid;color:${gradeColors[g]||'#888'};border-color:${gradeColors[g]||'#888'}33;margin-right:4px;">${g}: ${c}</span>`).join('')
     : '<span style="font-family:var(--mono);font-size:10px;color:var(--text3);">No trades this week</span>';
-
-  // Top confluences
   const confs = {};
-  trades.forEach(t => {
-    (t.properties['Confluences']?.multi_select||[]).forEach(c => confs[c.name]=(confs[c.name]||0)+1);
-  });
+  trades.forEach(t => { (t.properties['Confluences']?.multi_select||[]).forEach(c => confs[c.name]=(confs[c.name]||0)+1); });
   const topConfs = Object.entries(confs).sort((a,b)=>b[1]-a[1]).slice(0,5);
   document.getElementById('w-confs').innerHTML = topConfs.length
     ? topConfs.map(([c,n])=>`<span style="font-family:var(--mono);font-size:10px;padding:2px 8px;border:1px solid var(--border2);color:var(--text3);margin-right:4px;">${c} (${n})</span>`).join('')
     : '<span style="font-family:var(--mono);font-size:10px;color:var(--text3);">None</span>';
-
-  // Rule breaches
   const breaks = [];
   trades.forEach(t => {
     const txt = [wExtractText(t.properties['Mistakes']?.rich_text), wExtractText(t.properties['Notes']?.rich_text)].join(' ').toLowerCase();
     if (txt.match(/stop.*(be|breakeven|moved)/)||txt.match(/(be|breakeven).*stop/)) breaks.push('SL moved to BE early');
-    if (txt.match(/bias|against|htf/)) breaks.push('HTF bias not followed');
-    if (txt.match(/trail.*(soon|tight)|tsl/)) breaks.push('Trailed too soon/tight');
-    if (txt.match(/fomo|impatient|chased/)) breaks.push('FOMO / impatient entry');
-    if (txt.match(/consolidat/)) breaks.push('Traded in consolidation');
+    if (txt.match(/bias|against|htf/))         breaks.push('HTF bias not followed');
+    if (txt.match(/trail.*(soon|tight)|tsl/))   breaks.push('Trailed too soon/tight');
+    if (txt.match(/fomo|impatient|chased/))     breaks.push('FOMO / impatient entry');
+    if (txt.match(/consolidat/))                breaks.push('Traded in consolidation');
   });
   const uniqueBreaches = [...new Set(breaks)];
   document.getElementById('w-breaches').innerHTML = uniqueBreaches.length
     ? uniqueBreaches.map(b=>`<div style="font-family:var(--mono);font-size:10px;color:var(--red);padding:3px 0;">❌ ${b}</div>`).join('')
     : '<div style="font-family:var(--mono);font-size:10px;color:var(--green);">✅ No clear breaches detected</div>';
 }
-
 async function wCheckExisting() {
   try {
     const res = await fetch(`${WORKER}/notion/databases/${WEEKLY_DB}/query`, {
@@ -1243,16 +1202,10 @@ async function wCheckExisting() {
     const existing = (data.results||[])[0];
     if (existing) {
       wState.existing = existing;
-      const submitted = existing.properties['Submitted']?.checkbox;
-      if (submitted) {
-        wShowLocked(existing);
-      } else {
-        wPreFill(existing);
-      }
+      if (existing.properties['Submitted']?.checkbox) { wShowLocked(existing); } else { wPreFill(existing); }
     }
   } catch(e) { console.error('wCheckExisting',e); }
 }
-
 function wShowLocked(page) {
   const props = page.properties;
   document.getElementById('w-form').style.display = 'none';
@@ -1266,62 +1219,50 @@ function wShowLocked(page) {
     <div class="wfield-label" style="margin-top:12px;">Mental State</div><div class="wfield-val">${wRenderStarsDisplay(props['Mental State']?.number||0)}</div>
     <div class="wfield-label" style="margin-top:8px;">Discipline</div><div class="wfield-val">${wRenderStarsDisplay(props['Discipline']?.number||0)}</div>
   `;
-  // Add note section
   document.getElementById('w-addnote').style.display = 'block';
 }
-
 function wPreFill(page) {
   const props = page.properties;
   document.getElementById('w-went-well').value = wExtractText(props['What Went Well']?.rich_text)||'';
-  document.getElementById('w-improve').value = wExtractText(props['Needs Improvement']?.rich_text)||'';
-  document.getElementById('w-goal').value = wExtractText(props['Next Week Goal']?.rich_text)||'';
-  document.getElementById('w-focus').value = wExtractText(props['Focus Confluences']?.rich_text)||'';
+  document.getElementById('w-improve').value   = wExtractText(props['Needs Improvement']?.rich_text)||'';
+  document.getElementById('w-goal').value      = wExtractText(props['Next Week Goal']?.rich_text)||'';
+  document.getElementById('w-focus').value     = wExtractText(props['Focus Confluences']?.rich_text)||'';
   const mental = props['Mental State']?.number||0;
-  const disc = props['Discipline']?.number||0;
+  const disc   = props['Discipline']?.number||0;
   if (mental) wSetStar('mental', mental);
-  if (disc) wSetStar('discipline', disc);
+  if (disc)   wSetStar('discipline', disc);
 }
-
 function wRenderStarsDisplay(val) {
   let html = '';
   for (let i = 1; i <= 5; i++) {
-    const full = val >= i;
-    const half = !full && val >= i - 0.5;
+    const full = val >= i, half = !full && val >= i - 0.5;
     html += `<span style="color:${full||half?'#ffd740':'#333'};font-size:16px;">${half?'⯨':'★'}</span>`;
   }
   return html + ` <span style="font-family:var(--mono);font-size:10px;color:var(--text3);">${val}/5</span>`;
 }
-
 function wSetStar(type, val) {
   wSelected[type] = val;
-  const container = document.getElementById(`w-stars-${type}`);
-  container.querySelectorAll('.wstar').forEach((s, i) => {
-    const starVal = parseFloat(s.dataset.val);
-    s.style.color = starVal <= val ? '#ffd740' : '#333';
+  document.getElementById(`w-stars-${type}`).querySelectorAll('.wstar').forEach(s => {
+    s.style.color = parseFloat(s.dataset.val) <= val ? '#ffd740' : '#333';
   });
   document.getElementById(`w-${type}-val`).textContent = val + '/5';
 }
-
 async function wAnalyze() {
-  const wentWell = document.getElementById('w-went-well').value.trim();
-  const improve = document.getElementById('w-improve').value.trim();
-  const goal = document.getElementById('w-goal').value.trim();
-  const focus = document.getElementById('w-focus').value.trim();
-  const mental = wSelected.mental;
+  const wentWell   = document.getElementById('w-went-well').value.trim();
+  const improve    = document.getElementById('w-improve').value.trim();
+  const goal       = document.getElementById('w-goal').value.trim();
+  const focus      = document.getElementById('w-focus').value.trim();
+  const mental     = wSelected.mental;
   const discipline = wSelected.discipline;
-
   if (!wentWell && !improve) { alert('Please fill in at least "What went well" and "Needs improvement"'); return; }
   if (!mental || !discipline) { alert('Please set your mental state and discipline ratings'); return; }
-
   const btn = document.getElementById('w-analyze-btn');
   btn.disabled = true; btn.textContent = 'Analyzing...';
   document.getElementById('w-ai-section').style.display = 'block';
   document.getElementById('w-ai-content').innerHTML = '<div style="font-family:var(--mono);font-size:11px;color:var(--text3);animation:blink 1s infinite;">AI coach is reviewing your week...</div>';
-
-  const trades = wState.trades;
-  const stats = wState.stats;
+  const trades  = wState.trades;
+  const stats   = wState.stats;
   const breaches = document.getElementById('w-breaches').innerText;
-
   const prompt = `You are a professional ICT futures trading coach reviewing a trader's week. Give detailed, honest, actionable coaching — like a real coach would. Be specific to their data.
 
 Week summary:
@@ -1346,7 +1287,6 @@ Provide:
 4. MINDSET NOTE (1 paragraph on their mental state/discipline ratings)
 
 Be detailed and specific. Reference their actual data. Do not be generic. Format with clear headers.`;
-
   try {
     const res = await fetch(`${WORKER}/verify`, {
       method:'POST', headers:{'Content-Type':'application/json'},
@@ -1354,22 +1294,19 @@ Be detailed and specific. Reference their actual data. Do not be generic. Format
     });
     const data = await res.json();
     const text = data.result || 'No response.';
-
-    // Determine which YT resources to show based on content
     const lower = (improve + breaches + text).toLowerCase();
     let ytTopics = [];
-    if (lower.includes('bias') || lower.includes('htf')) ytTopics.push('htf_bias');
-    if (lower.includes('entry') || lower.includes('fvg') || lower.includes('ifvg')) ytTopics.push('entry_model');
-    if (lower.includes('stop') || lower.includes('sl') || lower.includes('breakeven')) ytTopics.push('stop_loss');
-    if (lower.includes('trail') || lower.includes('tsl') || lower.includes('exit')) ytTopics.push('trailing');
-    if (lower.includes('fomo') || lower.includes('emotion') || lower.includes('discipline')) ytTopics.push('discipline');
-    if (lower.includes('liquid') || lower.includes('bsl') || lower.includes('ssl')) ytTopics.push('liquidity');
-    if (lower.includes('smt')) ytTopics.push('smt');
-    if (lower.includes('consolid') || lower.includes('chop') || lower.includes('rang')) ytTopics.push('consolidation');
+    if (lower.includes('bias')||lower.includes('htf'))              ytTopics.push('htf_bias');
+    if (lower.includes('entry')||lower.includes('fvg')||lower.includes('ifvg')) ytTopics.push('entry_model');
+    if (lower.includes('stop')||lower.includes('sl')||lower.includes('breakeven')) ytTopics.push('stop_loss');
+    if (lower.includes('trail')||lower.includes('tsl')||lower.includes('exit'))  ytTopics.push('trailing');
+    if (lower.includes('fomo')||lower.includes('emotion')||lower.includes('discipline')) ytTopics.push('discipline');
+    if (lower.includes('liquid')||lower.includes('bsl')||lower.includes('ssl'))  ytTopics.push('liquidity');
+    if (lower.includes('smt'))  ytTopics.push('smt');
+    if (lower.includes('consolid')||lower.includes('chop')||lower.includes('rang')) ytTopics.push('consolidation');
     if (ytTopics.length === 0) ytTopics.push('general');
-    ytTopics = [...new Set(ytTopics)].slice(0, 3);
-
-    const resources = ytTopics.flatMap(t => YT_RESOURCES[t]||[]).slice(0, 6);
+    ytTopics = [...new Set(ytTopics)].slice(0,3);
+    const resources = ytTopics.flatMap(t => YT_RESOURCES[t]||[]).slice(0,6);
     const ytHtml = resources.map(r => `
       <a href="${r.url}" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--surface2);border:1px solid var(--border2);text-decoration:none;transition:border-color 0.15s;margin-bottom:4px;" onmouseover="this.style.borderColor='#ff0000'" onmouseout="this.style.borderColor='var(--border2)'">
         <svg viewBox="0 0 24 24" width="14" height="14" fill="#ff4444" style="flex-shrink:0;"><path d="M23.5 6.19a3.02 3.02 0 0 0-2.12-2.14C19.53 3.5 12 3.5 12 3.5s-7.53 0-9.38.55A3.02 3.02 0 0 0 .5 6.19C0 8.05 0 12 0 12s0 3.95.5 5.81a3.02 3.02 0 0 0 2.12 2.14C4.47 20.5 12 20.5 12 20.5s7.53 0 9.38-.55a3.02 3.02 0 0 0 2.12-2.14C24 15.95 24 12 24 12s0-3.95-.5-5.81zM9.75 15.52V8.48L15.86 12l-6.11 3.52z"/></svg>
@@ -1379,56 +1316,48 @@ Be detailed and specific. Reference their actual data. Do not be generic. Format
         </div>
         <span style="margin-left:auto;font-family:var(--mono);font-size:9px;color:var(--text3);">↗</span>
       </a>`).join('');
-
     const formatted = text.replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
     document.getElementById('w-ai-content').innerHTML = `
       <div style="font-size:13px;color:var(--text2);line-height:1.9;margin-bottom:1.5rem;">${formatted}</div>
       <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--text3);text-transform:uppercase;margin-bottom:8px;">Recommended watching this week</div>
       ${ytHtml}`;
-
     wState.aiCoaching = text;
     document.getElementById('w-submit-btn').style.display = 'block';
   } catch(e) {
     document.getElementById('w-ai-content').innerHTML = `<div style="color:var(--red);font-size:12px;">Error: ${e.message}</div>`;
   }
-
   btn.disabled = false; btn.textContent = '⚡ Get AI Coaching';
 }
-
 async function wSubmit() {
   const btn = document.getElementById('w-submit-btn');
   btn.disabled = true; btn.textContent = 'Submitting...';
-
   const wentWell = document.getElementById('w-went-well').value.trim();
-  const improve = document.getElementById('w-improve').value.trim();
-  const goal = document.getElementById('w-goal').value.trim();
-  const focus = document.getElementById('w-focus').value.trim();
-  const stats = wState.stats || {};
-
-  const title = `Week of ${wState.weekStart}`;
+  const improve  = document.getElementById('w-improve').value.trim();
+  const goal     = document.getElementById('w-goal').value.trim();
+  const focus    = document.getElementById('w-focus').value.trim();
+  const stats    = wState.stats || {};
+  const title    = `Week of ${wState.weekStart}`;
   const props = {
-    "Title":{ title:[{ text:{ content:title } }] },
-    "Week Start":{ date:{ start:wState.weekStart } },
-    "Week End":{ date:{ start:wState.weekEnd } },
-    "Trade Count":{ number: stats.total||0 },
-    "Win Rate":{ number: (stats.wr||0)/100 },
-    "Total P&L":{ number: stats.totalPnl||0 },
-    "Best Trade":{ number: stats.best||0 },
-    "Worst Trade":{ number: stats.worst||0 },
+    "Title":       { title:[{ text:{ content:title } }] },
+    "Week Start":  { date:{ start:wState.weekStart } },
+    "Week End":    { date:{ start:wState.weekEnd } },
+    "Trade Count": { number: stats.total||0 },
+    "Win Rate":    { number: (stats.wr||0)/100 },
+    "Total P&L":   { number: stats.totalPnl||0 },
+    "Best Trade":  { number: stats.best||0 },
+    "Worst Trade": { number: stats.worst||0 },
     "Mental State":{ number: wSelected.mental },
-    "Discipline":{ number: wSelected.discipline },
-    "Submitted":{ checkbox: true },
+    "Discipline":  { number: wSelected.discipline },
+    "Submitted":   { checkbox: true },
   };
-  if (wentWell) props["What Went Well"] = { rich_text:[{ text:{ content:wentWell } }] };
-  if (improve) props["Needs Improvement"] = { rich_text:[{ text:{ content:improve } }] };
-  if (goal) props["Next Week Goal"] = { rich_text:[{ text:{ content:goal } }] };
-  if (focus) props["Focus Confluences"] = { rich_text:[{ text:{ content:focus } }] };
-  if (wState.aiCoaching) props["AI Coaching"] = { rich_text:[{ text:{ content:wState.aiCoaching.substring(0,2000) } }] };
-
+  if (wentWell) props["What Went Well"]      = { rich_text:[{ text:{ content:wentWell } }] };
+  if (improve)  props["Needs Improvement"]   = { rich_text:[{ text:{ content:improve } }] };
+  if (goal)     props["Next Week Goal"]      = { rich_text:[{ text:{ content:goal } }] };
+  if (focus)    props["Focus Confluences"]   = { rich_text:[{ text:{ content:focus } }] };
+  if (wState.aiCoaching) props["AI Coaching"]= { rich_text:[{ text:{ content:wState.aiCoaching.substring(0,2000) } }] };
   try {
     let data;
     if (wState.existing && !wState.existing.properties['Submitted']?.checkbox) {
-      // Update existing draft
       const res = await fetch(`${WORKER}/notion/pages/${wState.existing.id}`, {
         method:'PATCH', headers:{'Content-Type':'application/json'},
         body: JSON.stringify({ properties:props })
@@ -1441,16 +1370,10 @@ async function wSubmit() {
       });
       data = await res.json();
     }
-    if (data.id) {
-      wState.existing = data;
-      wShowLocked(data);
-      wLoadHistory();
-    }
+    if (data.id) { wState.existing = data; wShowLocked(data); wLoadHistory(); }
   } catch(e) { alert('Submit error: '+e.message); }
-
   btn.disabled = false; btn.textContent = '✓ Submit Weekly Review';
 }
-
 async function wSaveNote() {
   const note = document.getElementById('w-extra-note').value.trim();
   if (!note || !wState.existing) return;
@@ -1465,7 +1388,6 @@ async function wSaveNote() {
     setTimeout(()=>{btn.disabled=false;btn.textContent='Save Note';},2000);
   } catch(e) { btn.disabled=false; btn.textContent='Save Note'; alert('Error: '+e.message); }
 }
-
 async function wLoadHistory() {
   const container = document.getElementById('w-history');
   try {
@@ -1476,22 +1398,19 @@ async function wLoadHistory() {
     const data = await res.json();
     const pages = (data.results||[]).sort((a,b)=>(b.properties['Week Start']?.date?.start||'').localeCompare(a.properties['Week Start']?.date?.start||''));
     if (!pages.length) { container.innerHTML='<div style="font-family:var(--mono);font-size:11px;color:var(--text3);padding:1.5rem;background:var(--surface);text-align:center;">No weekly reviews yet</div>'; return; }
-
     container.innerHTML = pages.map((p,i) => {
-      const props = p.properties;
-      const ws = props['Week Start']?.date?.start||'';
-      const we = props['Week End']?.date?.start||'';
-      const pnl = props['Total P&L']?.number||0;
-      const wr = Math.round((props['Win Rate']?.number||0)*100);
-      const tc = props['Trade Count']?.number||0;
+      const props  = p.properties;
+      const ws     = props['Week Start']?.date?.start||'';
+      const we     = props['Week End']?.date?.start||'';
+      const pnl    = props['Total P&L']?.number||0;
+      const wr     = Math.round((props['Win Rate']?.number||0)*100);
+      const tc     = props['Trade Count']?.number||0;
       const mental = props['Mental State']?.number||0;
-      const disc = props['Discipline']?.number||0;
-      const submitted = props['Submitted']?.checkbox;
+      const disc   = props['Discipline']?.number||0;
       const pClass = pnl>=0?'color:var(--green)':'color:var(--red)';
-      const pStr = (pnl>=0?'+':'-')+'$'+Math.abs(pnl).toLocaleString();
-      const wsFmt = ws ? new Date(ws+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'}) : '—';
-      const weFmt = we ? new Date(we+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '—';
-
+      const pStr   = (pnl>=0?'+':'-')+'$'+Math.abs(pnl).toLocaleString();
+      const wsFmt  = ws ? new Date(ws+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'}) : '—';
+      const weFmt  = we ? new Date(we+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '—';
       return `<div style="background:var(--surface);border-bottom:1px solid var(--border);">
         <div style="display:grid;grid-template-columns:160px 80px 80px 80px 1fr auto;gap:12px;align-items:center;padding:12px 16px;cursor:pointer;" onclick="wToggleExpand(${i})">
           <div style="font-family:var(--mono);font-size:11px;color:var(--text2);">${wsFmt} – ${weFmt}</div>
@@ -1502,26 +1421,26 @@ async function wLoadHistory() {
           <div style="font-family:var(--mono);font-size:10px;color:var(--text3);" id="w-expand-arrow-${i}">▼</div>
         </div>
         <div id="w-expand-${i}" style="display:none;padding:0 16px 16px;border-top:1px solid var(--border);">
-          ${wExtractText(props['What Went Well']?.rich_text) ? `<div class="wfield-label" style="margin-top:12px;">What went well</div><div class="wfield-val">${wExtractText(props['What Went Well']?.rich_text)}</div>` : ''}
-          ${wExtractText(props['Needs Improvement']?.rich_text) ? `<div class="wfield-label" style="margin-top:10px;">Needs improvement</div><div class="wfield-val">${wExtractText(props['Needs Improvement']?.rich_text)}</div>` : ''}
-          ${wExtractText(props['Next Week Goal']?.rich_text) ? `<div class="wfield-label" style="margin-top:10px;">Goal</div><div class="wfield-val">${wExtractText(props['Next Week Goal']?.rich_text)}</div>` : ''}
-          ${wExtractText(props['Focus Confluences']?.rich_text) ? `<div class="wfield-label" style="margin-top:10px;">Focus confluences</div><div class="wfield-val">${wExtractText(props['Focus Confluences']?.rich_text)}</div>` : ''}
-          ${wExtractText(props['AI Coaching']?.rich_text) ? `<div class="wfield-label" style="margin-top:10px;">AI Coaching</div><div class="wfield-val" style="white-space:pre-wrap;">${wExtractText(props['AI Coaching']?.rich_text)}</div>` : ''}
-          ${wExtractText(props['Extra Note']?.rich_text) ? `<div class="wfield-label" style="margin-top:10px;">Extra note</div><div class="wfield-val">${wExtractText(props['Extra Note']?.rich_text)}</div>` : ''}
+          ${wExtractText(props['What Went Well']?.rich_text)?`<div class="wfield-label" style="margin-top:12px;">What went well</div><div class="wfield-val">${wExtractText(props['What Went Well']?.rich_text)}</div>`:''}
+          ${wExtractText(props['Needs Improvement']?.rich_text)?`<div class="wfield-label" style="margin-top:10px;">Needs improvement</div><div class="wfield-val">${wExtractText(props['Needs Improvement']?.rich_text)}</div>`:''}
+          ${wExtractText(props['Next Week Goal']?.rich_text)?`<div class="wfield-label" style="margin-top:10px;">Goal</div><div class="wfield-val">${wExtractText(props['Next Week Goal']?.rich_text)}</div>`:''}
+          ${wExtractText(props['Focus Confluences']?.rich_text)?`<div class="wfield-label" style="margin-top:10px;">Focus confluences</div><div class="wfield-val">${wExtractText(props['Focus Confluences']?.rich_text)}</div>`:''}
+          ${wExtractText(props['AI Coaching']?.rich_text)?`<div class="wfield-label" style="margin-top:10px;">AI Coaching</div><div class="wfield-val" style="white-space:pre-wrap;">${wExtractText(props['AI Coaching']?.rich_text)}</div>`:''}
+          ${wExtractText(props['Extra Note']?.rich_text)?`<div class="wfield-label" style="margin-top:10px;">Extra note</div><div class="wfield-val">${wExtractText(props['Extra Note']?.rich_text)}</div>`:''}
         </div>
       </div>`;
     }).join('');
   } catch(e) { container.innerHTML=`<div style="color:var(--red);font-size:12px;padding:1rem;">Error: ${e.message}</div>`; }
 }
-
 function wToggleExpand(i) {
-  const el = document.getElementById(`w-expand-${i}`);
+  const el    = document.getElementById(`w-expand-${i}`);
   const arrow = document.getElementById(`w-expand-arrow-${i}`);
-  const open = el.style.display !== 'none';
+  const open  = el.style.display !== 'none';
   el.style.display = open ? 'none' : 'block';
   arrow.textContent = open ? '▼' : '▲';
 }
 
+// ── PARTIAL EXITS ─────────────────────────────────────────────────────────────
 const TP_LABELS = ['TP1','TP2','TP3','TP4','TP5','TP6','TP7','TP8','TP9','TP10'];
 
 function buildTPRow(i, remainingBefore) {
@@ -1541,7 +1460,6 @@ function buildTPRow(i, remainingBefore) {
     <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:6px;" id="tp-note-${i}"></div>
   </div>`;
 }
-
 function togglePartialRow() {
   const contracts = getNum('f-contracts') || 1;
   const row = document.getElementById('partial-row');
@@ -1555,57 +1473,36 @@ function togglePartialRow() {
   row.style.display = 'block';
   renderTPRows(contracts);
 }
-
 function renderTPRows(totalContracts) {
   const maxTPs = Math.min(totalContracts, 10);
   let html = '';
-  for (let i = 1; i <= maxTPs; i++) {
-    html += buildTPRow(i, totalContracts);
-  }
+  for (let i = 1; i <= maxTPs; i++) html += buildTPRow(i, totalContracts);
   document.getElementById('partial-tp-rows').innerHTML = html;
   document.getElementById('partial-contracts-remaining').textContent = `${totalContracts} contracts total`;
   onTPInput();
 }
-
 function onTPInput() {
   const totalContracts = getNum('f-contracts') || 1;
-  const entry = getNum('f-entry');
-  const sl = getNum('f-sl');
+  const entry      = getNum('f-entry');
+  const sl         = getNum('f-sl');
   const instrument = getField('f-instrument');
-  const direction = getField('f-direction');
-  const maxTPs = Math.min(totalContracts, 10);
-
-  let contractsUsed = 0;
-  let allExited = false;
-
+  const direction  = getField('f-direction');
+  const maxTPs     = Math.min(totalContracts, 10);
+  let contractsUsed = 0, allExited = false;
   for (let i = 1; i <= maxTPs; i++) {
-    const rowEl = document.getElementById(`tp-row-${i}`);
-    const remainingEl = document.getElementById(`tp-remaining-${i}`);
-    const noteEl = document.getElementById(`tp-note-${i}`);
+    const rowEl      = document.getElementById(`tp-row-${i}`);
+    const remainingEl= document.getElementById(`tp-remaining-${i}`);
+    const noteEl     = document.getElementById(`tp-note-${i}`);
     if (!rowEl) break;
-
-    if (allExited) {
-      // Hide rows after all contracts are gone
-      rowEl.style.display = 'none';
-      continue;
-    }
-
+    if (allExited) { rowEl.style.display='none'; continue; }
     rowEl.style.display = 'block';
     const contractsAvailable = totalContracts - contractsUsed;
     if (remainingEl) remainingEl.textContent = `${contractsAvailable} contract${contractsAvailable>1?'s':''} available`;
-
     const tpContracts = getNum(`f-tp${i}-contracts`) || 0;
-    const tpPrice = getNum(`f-tp${i}-price`);
-    const tpContrInput = document.getElementById(`f-tp${i}-contracts`);
+    const tpPrice     = getNum(`f-tp${i}-price`);
+    const tpContrInput= document.getElementById(`f-tp${i}-contracts`);
     if (tpContrInput) tpContrInput.max = contractsAvailable;
-
-    // Validate contracts don't exceed available
-    if (tpContracts > contractsAvailable) {
-      const tpContrEl = document.getElementById(`f-tp${i}-contracts`);
-      if (tpContrEl) tpContrEl.value = contractsAvailable;
-    }
-
-    // Detect BE exit (exit at or near entry price, not at SL)
+    if (tpContracts > contractsAvailable) { const el=document.getElementById(`f-tp${i}-contracts`); if(el) el.value=contractsAvailable; }
     let note = '';
     if (tpPrice && entry && sl && tpContracts > 0) {
       const isAtSL = Math.abs(tpPrice - sl) < 0.5;
@@ -1617,76 +1514,57 @@ function onTPInput() {
         note = `${pnl >= 0 ? '+' : '-'}$${Math.abs(pnl).toLocaleString()} on ${tpContracts || '?'} contract${(tpContracts||1)>1?'s':''}`;
       }
     }
-    if (noteEl) { noteEl.textContent = note; noteEl.style.color = note.includes('BE') ? 'var(--yellow)' : note.includes('Stop') ? 'var(--red)' : 'var(--green)'; }
-
+    if (noteEl) { noteEl.textContent=note; noteEl.style.color=note.includes('BE')?'var(--yellow)':note.includes('Stop')?'var(--red)':'var(--green)'; }
     contractsUsed += tpContracts;
     if (contractsUsed >= totalContracts) allExited = true;
   }
-
   document.getElementById('partial-contracts-remaining').textContent =
     contractsUsed > 0
-      ? `${contractsUsed} / ${totalContracts} contracts exited${allExited ? ' — fully closed' : ` · ${totalContracts - contractsUsed} running`}`
+      ? `${contractsUsed} / ${totalContracts} contracts exited${allExited?' — fully closed':` · ${totalContracts-contractsUsed} running`}`
       : `${totalContracts} contracts total`;
-
   updatePartialPreview();
 }
-
-// Live partial P&L preview
-['f-partial-price','f-partial-contracts','f-entry','f-exit','f-direction','f-instrument'].forEach(id => {
-  const el = document.getElementById(id);
-  if (el) el.addEventListener('input', updatePartialPreview);
-});
-
 function getTPRows() {
   const contracts = getNum('f-contracts') || 1;
   const maxTPs = Math.min(contracts, 10);
   const rows = [];
   for (let i = 1; i <= maxTPs; i++) {
     const price = getNum(`f-tp${i}-price`);
-    const c = getNum(`f-tp${i}-contracts`);
-    if (price && c) {
-      rows.push({
-        price,
-        time: getField(`f-tp${i}-time`),
-        contracts: c,
-        label: TP_LABELS[i-1] || `TP${i}`
-      });
-    }
+    const c     = getNum(`f-tp${i}-contracts`);
+    if (price && c) rows.push({ price, time:getField(`f-tp${i}-time`), contracts:c, label:TP_LABELS[i-1]||`TP${i}` });
   }
   return rows;
 }
-
 function updatePartialPreview() {
-  const preview = document.getElementById('partial-pnl-preview');
+  const preview    = document.getElementById('partial-pnl-preview');
   if (!preview) return;
-  const entry = getNum('f-entry');
-  const sl = getNum('f-sl');
+  const entry      = getNum('f-entry');
+  const sl         = getNum('f-sl');
   const instrument = getField('f-instrument');
-  const direction = getField('f-direction');
-  if (!entry || !instrument || !direction) { preview.innerHTML = ''; return; }
+  const direction  = getField('f-direction');
+  if (!entry || !instrument || !direction) { preview.innerHTML=''; return; }
   const rows = getTPRows();
-  if (!rows.length) { preview.innerHTML = ''; return; }
-  let totalPnl = 0;
-  let lines = [];
+  if (!rows.length) { preview.innerHTML=''; return; }
+  let totalPnl = 0, lines = [];
   rows.forEach(r => {
     const isAtSL = sl && Math.abs(r.price - sl) < 0.5;
     const isAtBE = Math.abs(r.price - entry) < 1.0 && !isAtSL;
-    const pnl = calcPnL(entry, r.price, r.contracts, instrument, direction);
+    const pnl    = calcPnL(entry, r.price, r.contracts, instrument, direction);
     totalPnl += pnl;
-    const tag = isAtBE ? ' [BE]' : isAtSL ? ' [SL]' : '';
+    const tag  = isAtBE?' [BE]':isAtSL?' [SL]':'';
     const sign = pnl >= 0 ? '+' : '-';
     lines.push(`${r.label}${tag}: ${sign}$${Math.abs(pnl).toLocaleString()} · ${r.contracts} contract${r.contracts>1?'s':''} @ ${r.price.toLocaleString()}`);
   });
   lines.push(`──────────────────────`);
-  lines.push(`Total P&L: ${totalPnl >= 0 ? '+' : '-'}$${Math.abs(totalPnl).toLocaleString()}`);
+  lines.push(`Total P&L: ${totalPnl>=0?'+':'-'}$${Math.abs(totalPnl).toLocaleString()}`);
   preview.innerHTML = lines.join('<br>');
   preview.style.color = totalPnl >= 0 ? 'var(--green)' : 'var(--red)';
 }
-
 function resetForm() {
-  ['f-instrument','f-direction','f-session','f-timeframe','f-outcome','f-htf','f-model','f-entry','f-exit','f-sl','f-tp','f-contracts','f-entry-time','f-exit-time','f-notes','f-mistakes','f-lessons','f-screenshot','f-partial-price','f-partial-time','f-partial-contracts'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.value = '';
+  ['f-instrument','f-direction','f-session','f-timeframe','f-outcome','f-htf','f-model',
+   'f-entry','f-exit','f-sl','f-tp','f-contracts','f-entry-time','f-exit-time',
+   'f-notes','f-mistakes','f-lessons','f-screenshot'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
   });
   const partialRow = document.getElementById('partial-row');
   if (partialRow) partialRow.style.display = 'none';
