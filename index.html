@@ -991,25 +991,28 @@ async function verifyTrade(tradeId, btn) {
   btn.textContent = '...';
   panel.innerHTML = `<div class="verification-panel"><div class="verify-loading">Analysing trade against your rules...</div></div>`;
 
-  const tradeData = `
-Instrument: ${trade.instrument}
-Direction: ${trade.direction}
-Session: ${trade.session}
-Timeframe: ${trade.timeframe}
-Entry: ${trade.entryPrice} at ${trade.entryTime || 'unknown time'}
-Exit: ${trade.exitPrice} at ${trade.exitTime || 'unknown time'}
-Stop Loss: ${trade.stopLoss}
-Take Profit: ${trade.takeProfit}
-Contracts: ${trade.contracts}
-P&L: $${trade.pnl}
-Confluences: ${trade.confluences.join(', ') || 'none listed'}
-Setup Grade: ${trade.grade || 'not graded'}
-Outcome: ${trade.status}
-Notes: ${trade.notes || 'none'}
-Mistakes noted: ${trade.mistakes || 'none'}
-Lessons: ${trade.lessons || 'none'}
-  `.trim();
-
+const tradeData = [
+  `Instrument: ${trade.instrument}`,
+  `Direction: ${trade.direction}`,
+  `Session: ${trade.session}`,
+  `Timeframe: ${trade.timeframe}`,
+  `HTF Timeframe: ${trade.htfTimeframe || ''}`,
+  `Entry Model: ${trade.entryModel || ''}`,
+  `Date: ${trade.date || ''}`,
+  `Entry Price: ${trade.entryPrice} at ${trade.entryTime || ''}`,
+  `Exit Price: ${trade.exitPrice} at ${trade.exitTime || ''}`,
+  `Stop Loss: ${trade.stopLoss}`,
+  `Take Profit: ${trade.takeProfit}`,
+  `Contracts: ${trade.contracts}`,
+  `R:R: ${trade.rr || ''}`,
+  `P&L: $${trade.pnl}`,
+  `Status: ${trade.status}`,
+  `Confluences: ${trade.confluences.join(', ') || ''}`,
+  `Notes: ${trade.notes || ''}`,
+  `Mistakes: ${trade.mistakes || ''}`,
+  `Lessons Learned: ${trade.lessons || ''}`,
+].filter(line => !line.endsWith(': ') && !line.endsWith(': null') && !line.endsWith(': undefined')).join('\n');
+  
   try {
     const res = await fetch(WORKER_URL + '/verify', {
       method: 'POST',
