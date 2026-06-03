@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Futures Trade Journal</title>
+  <link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0a0a0a">
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -1217,6 +1219,11 @@ function renderAll() {
 document.addEventListener("DOMContentLoaded", () => initNav("index"));
 initConfDropdown();
 loadTrades();
+</script>
+  <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/dtjrl.github.io/sw.js');
+  }
 </script>
 </body>
 </html>
