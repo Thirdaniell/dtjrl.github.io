@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -20,6 +20,8 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;min-height:100vh;}
 ::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+
+/* AUTH SCREEN */
 #auth-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:999;flex-direction:column;gap:16px;}
 .auth-box{background:var(--surface);border:1px solid var(--border2);padding:2.5rem;width:360px;display:flex;flex-direction:column;gap:16px;}
 .auth-logo{font-family:var(--mono);font-size:11px;letter-spacing:0.15em;color:var(--accent);margin-bottom:4px;}
@@ -30,14 +32,20 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
 .auth-btn{font-family:var(--mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;padding:10px;background:var(--accent);color:#000;border:none;cursor:pointer;font-weight:700;transition:opacity 0.15s;}
 .auth-btn:hover{opacity:0.85;}
 .auth-error{font-family:var(--mono);font-size:10px;color:var(--red);letter-spacing:0.05em;display:none;}
+
+/* MAIN LAYOUT */
 #main-screen{display:none;padding-left:64px;}
 .page{max-width:800px;margin:0 auto;padding:3rem 2rem 5rem;}
+
+/* TABS */
 .tabs{display:flex;gap:1px;background:var(--border);margin-bottom:2rem;overflow-x:auto;}
 .tab-btn{font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;padding:10px 16px;background:var(--surface);color:var(--text3);border:none;cursor:pointer;transition:all 0.15s;flex:1;white-space:nowrap;}
 .tab-btn:hover{color:var(--text2);}
 .tab-btn.active{background:var(--surface2);color:var(--accent);}
 .tab-panel{display:none;}
 .tab-panel.active{display:block;}
+
+/* BIAS BOARD (inside admin) */
 .bias-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);margin-bottom:2rem;}
 .bias-card{background:var(--surface);padding:1.5rem;}
 .bias-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;}
@@ -45,7 +53,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
 .inst-nq{color:#c8ff00;border-color:rgba(200,255,0,0.3);}
 .inst-es{color:#40c4ff;border-color:rgba(64,196,255,0.3);}
 .bias-val{font-family:var(--mono);font-size:28px;font-weight:700;line-height:1;margin-bottom:4px;}
-.b-bull{color:var(--green);}.b-bear{color:var(--red);}.b-range{color:var(--yellow);}.b-wait{color:var(--text3);}.b-none{color:var(--border2);}
+.b-bull{color:var(--green);} .b-bear{color:var(--red);} .b-range{color:var(--yellow);} .b-wait{color:var(--text3);} .b-none{color:var(--border2);}
 .bias-sublabel{font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--text3);text-transform:uppercase;margin-bottom:6px;}
 .switch-row{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10px;color:var(--yellow);margin-top:6px;}
 .bbtn-group{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin:12px 0 8px;}
@@ -72,11 +80,14 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
 .bh-inst{font-family:var(--mono);font-size:10px;color:var(--text3);}
 .bh-bias{font-family:var(--mono);font-size:11px;font-weight:700;}
 .bh-notes{font-size:11px;color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
 .top-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:2.5rem;}
 .back-btn{font-family:var(--mono);font-size:10px;letter-spacing:0.1em;color:var(--text3);background:none;border:1px solid var(--border2);padding:6px 14px;cursor:pointer;text-transform:uppercase;transition:all 0.15s;text-decoration:none;display:inline-block;}
 .back-btn:hover{color:var(--accent);border-color:var(--accent);}
 .page-eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:0.2em;color:var(--accent);text-transform:uppercase;margin-bottom:8px;}
 .page-title{font-family:var(--mono);font-size:28px;font-weight:700;line-height:1.1;}
+
+/* FORM */
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);margin-bottom:2rem;}
 .form-full{grid-column:1/-1;}
 .field{background:var(--surface);padding:1rem 1.25rem;}
@@ -133,6 +144,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
 .sidenav-admin{position:fixed;left:0;top:0;bottom:0;width:64px;background:var(--bg);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:1.5rem 0;z-index:200;}
 .nav-logo-a{font-family:var(--mono);font-size:9px;letter-spacing:0.1em;color:var(--accent);writing-mode:vertical-rl;margin-bottom:2rem;}
 .nav-admin-tag{font-family:var(--mono);font-size:8px;letter-spacing:0.12em;color:var(--red);writing-mode:vertical-rl;margin-top:auto;}
+
 /* PRE-MARKET ANALYSIS */
 .pma-step{margin-bottom:1px;}
 .pma-step-header{background:var(--surface2);padding:10px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;border:1px solid var(--border);}
@@ -178,7 +190,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
 .pma-set-bias-btn{font-family:var(--mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;padding:12px 24px;background:var(--accent);color:#000;border:none;cursor:pointer;font-weight:700;width:100%;transition:opacity 0.15s;}
 .pma-set-bias-btn:hover{opacity:0.85;}
 .pma-set-bias-btn:disabled{opacity:0.35;cursor:not-allowed;}
-/* WEEKLY REVIEW */
+
+/* WEEKLY REVIEW STYLES */
 .wstats{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--border);margin-bottom:2rem;border:1px solid var(--border);}
 .wstat{background:var(--surface);padding:1.25rem 1.5rem;}
 .wstat-label{font-family:var(--mono);font-size:9px;letter-spacing:0.14em;color:var(--text3);text-transform:uppercase;margin-bottom:8px;}
@@ -197,16 +210,17 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
 .w-submit-btn{font-family:var(--mono);font-size:11px;letter-spacing:0.12em;text-transform:uppercase;padding:14px 24px;background:var(--green);color:#000;border:none;cursor:pointer;font-weight:700;width:100%;transition:opacity 0.15s;margin-top:8px;}
 .w-submit-btn:hover{opacity:0.85;}
 .w-submit-btn:disabled{opacity:0.35;cursor:not-allowed;}
+
+@media(max-width:600px){.form-grid{grid-template-columns:1fr;}#main-screen{padding-left:0;}.pma-correlated{grid-template-columns:1fr;}.pma-dol-grid{grid-template-columns:repeat(2,1fr);}.bias-grid{grid-template-columns:1fr;}}
 /* EDIT TRADE TAB */
 .edit-trade-row{display:grid;grid-template-columns:130px 1fr 80px 50px auto;gap:12px;align-items:center;padding:12px 16px;background:var(--surface);border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.12s;}
 .edit-trade-row:hover{background:var(--surface2);}
 .edit-trade-header-row{display:grid;grid-template-columns:130px 1fr 80px 50px auto;gap:12px;padding:8px 16px;background:var(--surface2);border-bottom:1px solid var(--border);}
-
-@media(max-width:600px){.form-grid{grid-template-columns:1fr;}#main-screen{padding-left:0;}.pma-correlated{grid-template-columns:1fr;}.pma-dol-grid{grid-template-columns:repeat(2,1fr);}.bias-grid{grid-template-columns:1fr;}.edit-trade-row,.edit-trade-header-row{grid-template-columns:1fr 1fr auto;}.edit-trade-row>*:nth-child(3),.edit-trade-row>*:nth-child(4),.edit-trade-header-row>*:nth-child(3),.edit-trade-header-row>*:nth-child(4){display:none;}}
 </style>
 </head>
 <body>
 
+<!-- AUTH SCREEN -->
 <div id="auth-screen">
   <div class="auth-box">
     <div class="auth-logo">// FTJ</div>
@@ -218,13 +232,17 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
   </div>
 </div>
 
+<!-- MAIN SCREEN -->
 <div id="main-screen">
   <nav class="sidenav-admin">
     <div class="nav-logo-a">// FTJ</div>
     <div class="nav-admin-tag">ADMIN</div>
   </nav>
+
   <div class="page">
-    <div class="top-bar"><a href="index.html" class="back-btn">← Back to Journal</a></div>
+    <div class="top-bar">
+      <a href="index.html" class="back-btn">← Back to Journal</a>
+    </div>
     <div class="page-eyebrow">// Admin</div>
     <div class="page-title">Admin Panel</div>
 
@@ -236,7 +254,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
       <button class="tab-btn" onclick="switchTab('premarket',this)">◎ Pre-Market</button>
     </div>
 
-    <!-- LOG TRADE TAB -->
+    <!-- TRADE TAB -->
     <div class="tab-panel active" id="tab-trade">
     <p style="font-size:13px;color:var(--text2);margin:0 0 2rem;line-height:1.7;">Fill in your trade details. The AI will grade, verify, and calculate all values — then show you a preview before submitting to Notion.</p>
     <div class="form-grid">
@@ -252,6 +270,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
       <div class="field"><label>Entry Time</label><input type="text" id="f-entry-time" placeholder="e.g. 9:40 AM"></div>
       <div class="field"><label>Exit Price</label><input type="number" id="f-exit" placeholder="e.g. 27419.75" step="0.25"></div>
       <div class="field"><label>Exit Time <span style="color:var(--text3);font-size:9px;">(final)</span></label><input type="text" id="f-exit-time" placeholder="e.g. 10:01 AM"></div>
+      <!-- PARTIAL EXITS -->
       <div class="field form-full" id="partial-row" style="display:none;background:rgba(200,255,0,0.03);border:1px solid rgba(200,255,0,0.15);padding:1rem 1.25rem;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
           <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--accent);text-transform:uppercase;">Partial Exits</div>
@@ -326,10 +345,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
     </div>
     <div class="success-msg" id="success-msg">✓ Trade logged successfully to Notion!</div>
     </div><!-- end tab-trade -->
-
     <!-- EDIT TRADE TAB -->
     <div class="tab-panel" id="tab-edit">
-      <p style="font-size:13px;color:var(--text2);margin:0 0 1.5rem;line-height:1.7;">Select a recent trade to edit. All fields will pre-fill from Notion. Changes are saved back and re-verified automatically.</p>
+      <p style="font-size:13px;color:var(--text2);margin:0 0 1.5rem;line-height:1.7;">Select a recent trade to edit. All fields pre-fill from Notion. Changes are saved back and re-verified automatically.</p>
       <div id="edit-trade-list">
         <div style="font-family:var(--mono);font-size:11px;color:var(--text3);padding:2rem;text-align:center;background:var(--surface);border:1px solid var(--border2);">Loading recent trades...</div>
       </div>
@@ -410,7 +428,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
         <div class="success-msg" id="edit-success-msg" style="margin-top:1rem;"></div>
       </div>
     </div><!-- end tab-edit -->
-
     <!-- BIAS TAB -->
     <div class="tab-panel" id="tab-bias">
       <p style="font-size:13px;color:var(--text2);margin:0 0 1.5rem;line-height:1.7;">Set your daily HTF bias. Locked once set — one switch allowed per instrument per day.</p>
@@ -495,7 +512,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
       </div>
       <div id="w-form">
         <div style="background:var(--surface);border:1px solid var(--border2);margin-bottom:1px;">
-          <div style="padding:10px 16px;border-bottom:1px solid var(--border2);background:var(--surface2);"><span style="font-family:var(--mono);font-size:9px;letter-spacing:0.18em;color:var(--accent);text-transform:uppercase;">Your Reflection</span></div>
+          <div style="padding:10px 16px;border-bottom:1px solid var(--border2);background:var(--surface2);">
+            <span style="font-family:var(--mono);font-size:9px;letter-spacing:0.18em;color:var(--accent);text-transform:uppercase;">Your Reflection</span>
+          </div>
           <div style="padding:1.25rem;display:flex;flex-direction:column;gap:14px;">
             <div><div style="font-family:var(--mono);font-size:9px;letter-spacing:0.14em;color:var(--text3);text-transform:uppercase;margin-bottom:5px;">What went well this week?</div><textarea class="wtextarea" id="w-went-well" placeholder="Trades you executed well, setups you read correctly, discipline wins..."></textarea></div>
             <div><div style="font-family:var(--mono);font-size:9px;letter-spacing:0.14em;color:var(--text3);text-transform:uppercase;margin-bottom:5px;">What needs improvement?</div><textarea class="wtextarea" id="w-improve" placeholder="Mistakes made, rules broken, things you struggled with..."></textarea></div>
@@ -543,73 +562,189 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
       </div>
     </div><!-- end tab-weekly -->
 
-    <!-- PRE-MARKET TAB -->
+    <!-- PRE-MARKET ANALYSIS TAB -->
     <div class="tab-panel" id="tab-premarket">
       <p style="font-size:13px;color:var(--text2);margin:0 0 1.5rem;line-height:1.7;">Work through your top-down analysis step by step. NQ and ES are shown side-by-side as a correlated view. Complete all steps to generate your bias and DOL for the day.</p>
+
+      <!-- STEP 1 — DAILY -->
       <div class="pma-step">
-        <div class="pma-step-header" onclick="pmaToggleStep(1)"><span class="pma-step-num">Step 1</span><span class="pma-step-title">Daily — Market Structure & Price Position</span><span class="pma-step-status" id="pma-status-1">—</span></div>
+        <div class="pma-step-header" onclick="pmaToggleStep(1)">
+          <span class="pma-step-num">Step 1</span>
+          <span class="pma-step-title">Daily — Market Structure & Price Position</span>
+          <span class="pma-step-status" id="pma-status-1">—</span>
+        </div>
         <div class="pma-step-body" id="pma-body-1">
           <div class="pma-section-label">Market Structure (NQ & ES)</div>
           <div class="pma-correlated">
-            <div class="pma-inst-col"><div class="pma-inst-label" style="color:#c8ff00;">NQ — Daily Structure</div><div class="pma-btn-row"><button class="pma-btn" onclick="pmaSelect('d_nq_struct','Bullish',this,'selected-bull')">Bullish</button><button class="pma-btn" onclick="pmaSelect('d_nq_struct','Bearish',this,'selected-bear')">Bearish</button><button class="pma-btn" onclick="pmaSelect('d_nq_struct','Ranging',this,'selected-range')">Ranging</button></div></div>
-            <div class="pma-inst-col"><div class="pma-inst-label" style="color:#40c4ff;">ES — Daily Structure</div><div class="pma-btn-row"><button class="pma-btn" onclick="pmaSelect('d_es_struct','Bullish',this,'selected-bull')">Bullish</button><button class="pma-btn" onclick="pmaSelect('d_es_struct','Bearish',this,'selected-bear')">Bearish</button><button class="pma-btn" onclick="pmaSelect('d_es_struct','Ranging',this,'selected-range')">Ranging</button></div></div>
+            <div class="pma-inst-col">
+              <div class="pma-inst-label" style="color:#c8ff00;">NQ — Daily Structure</div>
+              <div class="pma-btn-row">
+                <button class="pma-btn" onclick="pmaSelect('d_nq_struct','Bullish',this,'selected-bull')">Bullish</button>
+                <button class="pma-btn" onclick="pmaSelect('d_nq_struct','Bearish',this,'selected-bear')">Bearish</button>
+                <button class="pma-btn" onclick="pmaSelect('d_nq_struct','Ranging',this,'selected-range')">Ranging</button>
+              </div>
+            </div>
+            <div class="pma-inst-col">
+              <div class="pma-inst-label" style="color:#40c4ff;">ES — Daily Structure</div>
+              <div class="pma-btn-row">
+                <button class="pma-btn" onclick="pmaSelect('d_es_struct','Bullish',this,'selected-bull')">Bullish</button>
+                <button class="pma-btn" onclick="pmaSelect('d_es_struct','Bearish',this,'selected-bear')">Bearish</button>
+                <button class="pma-btn" onclick="pmaSelect('d_es_struct','Ranging',this,'selected-range')">Ranging</button>
+              </div>
+            </div>
           </div>
           <div class="pma-section-label">Price Position (are both instruments in premium or discount?)</div>
-          <div class="pma-btn-row"><button class="pma-btn" onclick="pmaSelect('d_price_pos','Premium',this,'selected-bear')">Premium (expensive — look for shorts)</button><button class="pma-btn" onclick="pmaSelect('d_price_pos','Discount',this,'selected-bull')">Discount (cheap — look for longs)</button><button class="pma-btn" onclick="pmaSelect('d_price_pos','Equilibrium',this,'selected-neutral')">At Equilibrium (~50% range)</button></div>
+          <div class="pma-btn-row">
+            <button class="pma-btn" onclick="pmaSelect('d_price_pos','Premium',this,'selected-bear')">Premium (expensive — look for shorts)</button>
+            <button class="pma-btn" onclick="pmaSelect('d_price_pos','Discount',this,'selected-bull')">Discount (cheap — look for longs)</button>
+            <button class="pma-btn" onclick="pmaSelect('d_price_pos','Equilibrium',this,'selected-neutral')">At Equilibrium (~50% range)</button>
+          </div>
           <div class="pma-section-label">Previous Day Levels</div>
-          <div class="pma-btn-row"><button class="pma-btn" onclick="pmaSelect('d_pdh','Intact',this,'selected-no')">PDH Intact</button><button class="pma-btn" onclick="pmaSelect('d_pdh','Taken',this,'selected-bull')">PDH Taken (BSL swept)</button></div>
-          <div class="pma-btn-row" style="margin-top:4px;"><button class="pma-btn" onclick="pmaSelect('d_pdl','Intact',this,'selected-no')">PDL Intact</button><button class="pma-btn" onclick="pmaSelect('d_pdl','Taken',this,'selected-bear')">PDL Taken (SSL swept)</button></div>
+          <div class="pma-btn-row">
+            <button class="pma-btn" onclick="pmaSelect('d_pdh','Intact',this,'selected-no')">PDH Intact</button>
+            <button class="pma-btn" onclick="pmaSelect('d_pdh','Taken',this,'selected-bull')">PDH Taken (BSL swept)</button>
+          </div>
+          <div class="pma-btn-row" style="margin-top:4px;">
+            <button class="pma-btn" onclick="pmaSelect('d_pdl','Intact',this,'selected-no')">PDL Intact</button>
+            <button class="pma-btn" onclick="pmaSelect('d_pdl','Taken',this,'selected-bear')">PDL Taken (SSL swept)</button>
+          </div>
           <button class="pma-next-btn" onclick="pmaNext(1,2)">Next: 4H →</button>
         </div>
       </div>
+
+      <!-- STEP 2 — 4H -->
       <div class="pma-step">
-        <div class="pma-step-header" onclick="pmaToggleStep(2)"><span class="pma-step-num">Step 2</span><span class="pma-step-title">4H — Structure, PDAs & Equal Levels</span><span class="pma-step-status" id="pma-status-2">—</span></div>
+        <div class="pma-step-header" onclick="pmaToggleStep(2)">
+          <span class="pma-step-num">Step 2</span>
+          <span class="pma-step-title">4H — Structure, PDAs & Equal Levels</span>
+          <span class="pma-step-status" id="pma-status-2">—</span>
+        </div>
         <div class="pma-step-body" id="pma-body-2">
           <div class="pma-section-label">4H Market Structure</div>
           <div class="pma-correlated">
-            <div class="pma-inst-col"><div class="pma-inst-label" style="color:#c8ff00;">NQ — 4H Structure</div><div class="pma-btn-row"><button class="pma-btn" onclick="pmaSelect('h4_nq_struct','Bullish',this,'selected-bull')">Bullish</button><button class="pma-btn" onclick="pmaSelect('h4_nq_struct','Bearish',this,'selected-bear')">Bearish</button><button class="pma-btn" onclick="pmaSelect('h4_nq_struct','Ranging',this,'selected-range')">Ranging</button></div></div>
-            <div class="pma-inst-col"><div class="pma-inst-label" style="color:#40c4ff;">ES — 4H Structure</div><div class="pma-btn-row"><button class="pma-btn" onclick="pmaSelect('h4_es_struct','Bullish',this,'selected-bull')">Bullish</button><button class="pma-btn" onclick="pmaSelect('h4_es_struct','Bearish',this,'selected-bear')">Bearish</button><button class="pma-btn" onclick="pmaSelect('h4_es_struct','Ranging',this,'selected-range')">Ranging</button></div></div>
+            <div class="pma-inst-col">
+              <div class="pma-inst-label" style="color:#c8ff00;">NQ — 4H Structure</div>
+              <div class="pma-btn-row">
+                <button class="pma-btn" onclick="pmaSelect('h4_nq_struct','Bullish',this,'selected-bull')">Bullish</button>
+                <button class="pma-btn" onclick="pmaSelect('h4_nq_struct','Bearish',this,'selected-bear')">Bearish</button>
+                <button class="pma-btn" onclick="pmaSelect('h4_nq_struct','Ranging',this,'selected-range')">Ranging</button>
+              </div>
+            </div>
+            <div class="pma-inst-col">
+              <div class="pma-inst-label" style="color:#40c4ff;">ES — 4H Structure</div>
+              <div class="pma-btn-row">
+                <button class="pma-btn" onclick="pmaSelect('h4_es_struct','Bullish',this,'selected-bull')">Bullish</button>
+                <button class="pma-btn" onclick="pmaSelect('h4_es_struct','Bearish',this,'selected-bear')">Bearish</button>
+                <button class="pma-btn" onclick="pmaSelect('h4_es_struct','Ranging',this,'selected-range')">Ranging</button>
+              </div>
+            </div>
           </div>
           <div class="pma-section-label">Nearest Unmitigated FVG / IFVG</div>
-          <div class="pma-btn-row"><button class="pma-btn" onclick="pmaSelect('h4_fvg','Above',this,'selected-bear')">FVG / IFVG Above price (bearish magnet)</button><button class="pma-btn" onclick="pmaSelect('h4_fvg','Below',this,'selected-bull')">FVG / IFVG Below price (bullish magnet)</button><button class="pma-btn" onclick="pmaSelect('h4_fvg','Both',this,'selected-neutral')">Both sides</button><button class="pma-btn" onclick="pmaSelect('h4_fvg','None',this,'selected-no')">None nearby</button></div>
+          <div class="pma-btn-row">
+            <button class="pma-btn" onclick="pmaSelect('h4_fvg','Above',this,'selected-bear')">FVG / IFVG Above price (bearish magnet)</button>
+            <button class="pma-btn" onclick="pmaSelect('h4_fvg','Below',this,'selected-bull')">FVG / IFVG Below price (bullish magnet)</button>
+            <button class="pma-btn" onclick="pmaSelect('h4_fvg','Both',this,'selected-neutral')">Both sides</button>
+            <button class="pma-btn" onclick="pmaSelect('h4_fvg','None',this,'selected-no')">None nearby</button>
+          </div>
           <div class="pma-section-label">Equal Highs / Equal Lows</div>
-          <div class="pma-btn-row"><button class="pma-btn" onclick="pmaSelect('h4_eql','EQH Above',this,'selected-bear')">EQH Above (BSL target)</button><button class="pma-btn" onclick="pmaSelect('h4_eql','EQL Below',this,'selected-bull')">EQL Below (SSL target)</button><button class="pma-btn" onclick="pmaSelect('h4_eql','Both',this,'selected-neutral')">Both</button><button class="pma-btn" onclick="pmaSelect('h4_eql','None',this,'selected-no')">None</button></div>
+          <div class="pma-btn-row">
+            <button class="pma-btn" onclick="pmaSelect('h4_eql','EQH Above',this,'selected-bear')">EQH Above (BSL target)</button>
+            <button class="pma-btn" onclick="pmaSelect('h4_eql','EQL Below',this,'selected-bull')">EQL Below (SSL target)</button>
+            <button class="pma-btn" onclick="pmaSelect('h4_eql','Both',this,'selected-neutral')">Both</button>
+            <button class="pma-btn" onclick="pmaSelect('h4_eql','None',this,'selected-no')">None</button>
+          </div>
           <button class="pma-next-btn" onclick="pmaNext(2,3)">Next: 1H →</button>
         </div>
       </div>
+
+      <!-- STEP 3 — 1H -->
       <div class="pma-step">
-        <div class="pma-step-header" onclick="pmaToggleStep(3)"><span class="pma-step-num">Step 3</span><span class="pma-step-title">1H — Structure, SMT & HTF PDAs</span><span class="pma-step-status" id="pma-status-3">—</span></div>
+        <div class="pma-step-header" onclick="pmaToggleStep(3)">
+          <span class="pma-step-num">Step 3</span>
+          <span class="pma-step-title">1H — Structure, SMT & HTF PDAs</span>
+          <span class="pma-step-status" id="pma-status-3">—</span>
+        </div>
         <div class="pma-step-body" id="pma-body-3">
           <div class="pma-section-label">1H Market Structure</div>
           <div class="pma-correlated">
-            <div class="pma-inst-col"><div class="pma-inst-label" style="color:#c8ff00;">NQ — 1H Structure</div><div class="pma-btn-row"><button class="pma-btn" onclick="pmaSelect('h1_nq_struct','Bullish',this,'selected-bull')">Bullish</button><button class="pma-btn" onclick="pmaSelect('h1_nq_struct','Bearish',this,'selected-bear')">Bearish</button><button class="pma-btn" onclick="pmaSelect('h1_nq_struct','Ranging',this,'selected-range')">Ranging</button></div></div>
-            <div class="pma-inst-col"><div class="pma-inst-label" style="color:#40c4ff;">ES — 1H Structure</div><div class="pma-btn-row"><button class="pma-btn" onclick="pmaSelect('h1_es_struct','Bullish',this,'selected-bull')">Bullish</button><button class="pma-btn" onclick="pmaSelect('h1_es_struct','Bearish',this,'selected-bear')">Bearish</button><button class="pma-btn" onclick="pmaSelect('h1_es_struct','Ranging',this,'selected-range')">Ranging</button></div></div>
+            <div class="pma-inst-col">
+              <div class="pma-inst-label" style="color:#c8ff00;">NQ — 1H Structure</div>
+              <div class="pma-btn-row">
+                <button class="pma-btn" onclick="pmaSelect('h1_nq_struct','Bullish',this,'selected-bull')">Bullish</button>
+                <button class="pma-btn" onclick="pmaSelect('h1_nq_struct','Bearish',this,'selected-bear')">Bearish</button>
+                <button class="pma-btn" onclick="pmaSelect('h1_nq_struct','Ranging',this,'selected-range')">Ranging</button>
+              </div>
+            </div>
+            <div class="pma-inst-col">
+              <div class="pma-inst-label" style="color:#40c4ff;">ES — 1H Structure</div>
+              <div class="pma-btn-row">
+                <button class="pma-btn" onclick="pmaSelect('h1_es_struct','Bullish',this,'selected-bull')">Bullish</button>
+                <button class="pma-btn" onclick="pmaSelect('h1_es_struct','Bearish',this,'selected-bear')">Bearish</button>
+                <button class="pma-btn" onclick="pmaSelect('h1_es_struct','Ranging',this,'selected-range')">Ranging</button>
+              </div>
+            </div>
           </div>
           <div class="pma-section-label">SMT Divergence (NQ vs ES correlation)</div>
-          <div class="pma-btn-row"><button class="pma-btn" onclick="pmaSelect('h1_smt','Bullish SMT',this,'selected-bull')">Bullish SMT (NQ stronger, ES weaker at lows)</button><button class="pma-btn" onclick="pmaSelect('h1_smt','Bearish SMT',this,'selected-bear')">Bearish SMT (ES stronger, NQ weaker at highs)</button><button class="pma-btn" onclick="pmaSelect('h1_smt','None',this,'selected-no')">No SMT</button></div>
+          <div class="pma-btn-row">
+            <button class="pma-btn" onclick="pmaSelect('h1_smt','Bullish SMT',this,'selected-bull')">Bullish SMT (NQ stronger, ES weaker at lows)</button>
+            <button class="pma-btn" onclick="pmaSelect('h1_smt','Bearish SMT',this,'selected-bear')">Bearish SMT (ES stronger, NQ weaker at highs)</button>
+            <button class="pma-btn" onclick="pmaSelect('h1_smt','None',this,'selected-no')">No SMT</button>
+          </div>
           <div class="pma-section-label">HTF PDA (1H FVG, IFVG or OB)</div>
-          <div class="pma-btn-row"><button class="pma-btn" onclick="pmaSelect('h1_htf_pda','Above',this,'selected-bear')">HTF PDA Above price</button><button class="pma-btn" onclick="pmaSelect('h1_htf_pda','Below',this,'selected-bull')">HTF PDA Below price</button><button class="pma-btn" onclick="pmaSelect('h1_htf_pda','At PDA',this,'selected-neutral')">Price is AT a HTF PDA now</button><button class="pma-btn" onclick="pmaSelect('h1_htf_pda','None',this,'selected-no')">None identified</button></div>
+          <div class="pma-btn-row">
+            <button class="pma-btn" onclick="pmaSelect('h1_htf_pda','Above',this,'selected-bear')">HTF PDA Above price</button>
+            <button class="pma-btn" onclick="pmaSelect('h1_htf_pda','Below',this,'selected-bull')">HTF PDA Below price</button>
+            <button class="pma-btn" onclick="pmaSelect('h1_htf_pda','At PDA',this,'selected-neutral')">Price is AT a HTF PDA now</button>
+            <button class="pma-btn" onclick="pmaSelect('h1_htf_pda','None',this,'selected-no')">None identified</button>
+          </div>
           <button class="pma-next-btn" onclick="pmaNext(3,4)">Next: 15m →</button>
         </div>
       </div>
+
+      <!-- STEP 4 — 15M -->
       <div class="pma-step">
-        <div class="pma-step-header" onclick="pmaToggleStep(4)"><span class="pma-step-num">Step 4</span><span class="pma-step-title">15m — Session Context & Current Delivery</span><span class="pma-step-status" id="pma-status-4">—</span></div>
+        <div class="pma-step-header" onclick="pmaToggleStep(4)">
+          <span class="pma-step-num">Step 4</span>
+          <span class="pma-step-title">15m — Session Context & Current Delivery</span>
+          <span class="pma-step-status" id="pma-status-4">—</span>
+        </div>
         <div class="pma-step-body" id="pma-body-4">
           <div class="pma-section-label">Price vs Midnight (00:00) Open</div>
-          <div class="pma-btn-row"><button class="pma-btn" onclick="pmaSelect('m15_midnight','Above',this,'selected-bull')">Above midnight open (bullish lean)</button><button class="pma-btn" onclick="pmaSelect('m15_midnight','Below',this,'selected-bear')">Below midnight open (bearish lean)</button></div>
+          <div class="pma-btn-row">
+            <button class="pma-btn" onclick="pmaSelect('m15_midnight','Above',this,'selected-bull')">Above midnight open (bullish lean)</button>
+            <button class="pma-btn" onclick="pmaSelect('m15_midnight','Below',this,'selected-bear')">Below midnight open (bearish lean)</button>
+          </div>
           <div class="pma-section-label">Price vs London Open</div>
-          <div class="pma-btn-row"><button class="pma-btn" onclick="pmaSelect('m15_london','Above',this,'selected-bull')">Above London open</button><button class="pma-btn" onclick="pmaSelect('m15_london','Below',this,'selected-bear')">Below London open</button><button class="pma-btn" onclick="pmaSelect('m15_london','Pre-London',this,'selected-neutral')">Pre-London (not opened yet)</button></div>
+          <div class="pma-btn-row">
+            <button class="pma-btn" onclick="pmaSelect('m15_london','Above',this,'selected-bull')">Above London open</button>
+            <button class="pma-btn" onclick="pmaSelect('m15_london','Below',this,'selected-bear')">Below London open</button>
+            <button class="pma-btn" onclick="pmaSelect('m15_london','Pre-London',this,'selected-neutral')">Pre-London (not opened yet)</button>
+          </div>
           <div class="pma-section-label">Current 15m Delivery</div>
-          <div class="pma-btn-row"><button class="pma-btn" onclick="pmaSelect('m15_delivery','Bullish',this,'selected-bull')">Bullish delivery</button><button class="pma-btn" onclick="pmaSelect('m15_delivery','Bearish',this,'selected-bear')">Bearish delivery</button><button class="pma-btn" onclick="pmaSelect('m15_delivery','Consolidating',this,'selected-range')">Consolidating / Choppy</button></div>
+          <div class="pma-btn-row">
+            <button class="pma-btn" onclick="pmaSelect('m15_delivery','Bullish',this,'selected-bull')">Bullish delivery</button>
+            <button class="pma-btn" onclick="pmaSelect('m15_delivery','Bearish',this,'selected-bear')">Bearish delivery</button>
+            <button class="pma-btn" onclick="pmaSelect('m15_delivery','Consolidating',this,'selected-range')">Consolidating / Choppy</button>
+          </div>
           <div class="pma-section-label">Resting Liquidity</div>
-          <div class="pma-btn-row"><button class="pma-btn" onclick="pmaSelect('m15_liq','BSL Above',this,'selected-bear')">BSL resting above (draw to highs)</button><button class="pma-btn" onclick="pmaSelect('m15_liq','SSL Below',this,'selected-bull')">SSL resting below (draw to lows)</button><button class="pma-btn" onclick="pmaSelect('m15_liq','Both',this,'selected-neutral')">Both sides</button></div>
+          <div class="pma-btn-row">
+            <button class="pma-btn" onclick="pmaSelect('m15_liq','BSL Above',this,'selected-bear')">BSL resting above (draw to highs)</button>
+            <button class="pma-btn" onclick="pmaSelect('m15_liq','SSL Below',this,'selected-bull')">SSL resting below (draw to lows)</button>
+            <button class="pma-btn" onclick="pmaSelect('m15_liq','Both',this,'selected-neutral')">Both sides</button>
+          </div>
           <button class="pma-next-btn" onclick="pmaNext(4,5)">Next: DOL →</button>
         </div>
       </div>
+
+      <!-- STEP 5 — DOL -->
       <div class="pma-step">
-        <div class="pma-step-header" onclick="pmaToggleStep(5)"><span class="pma-step-num">Step 5</span><span class="pma-step-title">Draw on Liquidity — Select Your Target</span><span class="pma-step-status" id="pma-status-5">—</span></div>
+        <div class="pma-step-header" onclick="pmaToggleStep(5)">
+          <span class="pma-step-num">Step 5</span>
+          <span class="pma-step-title">Draw on Liquidity — Select Your Target</span>
+          <span class="pma-step-status" id="pma-status-5">—</span>
+        </div>
         <div class="pma-step-body" id="pma-body-5">
-          <p style="font-size:12px;color:var(--text3);margin-bottom:12px;line-height:1.6;">Where is price most likely drawing to today? Select the most relevant target.</p>
+          <p style="font-size:12px;color:var(--text3);margin-bottom:12px;line-height:1.6;">Where is price most likely drawing to today? Select the most relevant target. This becomes your DOL for the session.</p>
           <div class="pma-dol-grid" id="pma-dol-grid">
             <button class="pma-dol-btn" onclick="pmaDOL('Previous Day High (PDH)',this)">Previous Day High<br><span style="color:var(--text3);font-size:8px;">PDH</span></button>
             <button class="pma-dol-btn" onclick="pmaDOL('Previous Day Low (PDL)',this)">Previous Day Low<br><span style="color:var(--text3);font-size:8px;">PDL</span></button>
@@ -627,8 +762,13 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
           <button class="pma-next-btn" style="margin-top:1rem;" onclick="pmaGenerateOutput()">⚡ Generate Bias & DOL</button>
         </div>
       </div>
+
+      <!-- OUTPUT -->
       <div class="pma-output" id="pma-output">
-        <div class="pma-output-header"><span style="color:var(--accent);">⚡</span><div class="pma-output-title">Pre-Market Analysis Output</div></div>
+        <div class="pma-output-header">
+          <span style="color:var(--accent);">⚡</span>
+          <div class="pma-output-title">Pre-Market Analysis Output</div>
+        </div>
         <div class="pma-output-body">
           <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--text3);text-transform:uppercase;margin-bottom:8px;">Bias</div>
           <div class="pma-bias-result" id="pma-bias-result">—</div>
@@ -643,6 +783,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
           <div style="font-family:var(--mono);font-size:11px;color:var(--green);text-align:center;margin-top:8px;display:none;" id="pma-success">✓ Bias set successfully!</div>
         </div>
       </div>
+
       <div style="margin-top:1rem;">
         <button onclick="pmaReset()" style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;padding:6px 14px;background:none;border:1px solid var(--border2);color:var(--text3);cursor:pointer;transition:all 0.15s;" onmouseover="this.style.color='var(--accent)';this.style.borderColor='var(--accent)'" onmouseout="this.style.color='var(--text3)';this.style.borderColor='var(--border2)'">↺ Reset Analysis</button>
       </div>
@@ -650,115 +791,259 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
 
   </div>
 </div>
-
 <script>
-const WORKER='https://trade-journal-proxy.daniel-mouldd.workers.dev';
-const DB_ID='5398f956345943b7b12b2298bbb6e127';
-const PASS='Pammolad123#';
-let tradeData={};
-document.getElementById('f-date').value=new Date().toISOString().split('T')[0];
+const WORKER = 'https://trade-journal-proxy.daniel-mouldd.workers.dev';
+const DB_ID = '5398f956345943b7b12b2298bbb6e127';
+const PASS = 'Pammolad123#';
+
+let tradeData = {};
+
+document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
 
 // ── AUTH ──────────────────────────────────────────────────────────────────────
-function checkAuth(){
-  const val=document.getElementById('pw-input').value;
-  if(val===PASS){
-    document.getElementById('auth-screen').style.display='none';
-    document.getElementById('main-screen').style.display='block';
-    const contractsEl=document.getElementById('f-contracts');
-    if(contractsEl)contractsEl.addEventListener('input',togglePartialRow);
-  }else{
-    document.getElementById('auth-error').style.display='block';
-    document.getElementById('pw-input').value='';
+function checkAuth() {
+  const val = document.getElementById('pw-input').value;
+  if (val === PASS) {
+    document.getElementById('auth-screen').style.display = 'none';
+    document.getElementById('main-screen').style.display = 'block';
+    const contractsEl = document.getElementById('f-contracts');
+    if (contractsEl) contractsEl.addEventListener('input', togglePartialRow);
+  } else {
+    document.getElementById('auth-error').style.display = 'block';
+    document.getElementById('pw-input').value = '';
     document.getElementById('pw-input').focus();
   }
 }
-document.getElementById('pw-input').addEventListener('keydown',e=>{if(e.key==='Enter')checkAuth();});
+document.getElementById('pw-input').addEventListener('keydown', e => { if (e.key === 'Enter') checkAuth(); });
 
 // ── CONFLUENCE DROPDOWN ───────────────────────────────────────────────────────
-let confOpen=false;
-function toggleConf(){confOpen=!confOpen;document.getElementById('conf-dropdown').classList.toggle('open',confOpen);document.getElementById('conf-btn').classList.toggle('open',confOpen);}
-document.addEventListener('click',e=>{
-  const wrap=document.querySelector('#conf-dropdown')?.closest('.conf-wrap');
-  if(wrap&&!wrap.contains(e.target)){confOpen=false;document.getElementById('conf-dropdown').classList.remove('open');document.getElementById('conf-btn').classList.remove('open');}
-});
-function updateConf(){
-  const checked=Array.from(document.querySelectorAll('#conf-dropdown input:checked')).map(cb=>cb.value);
-  document.getElementById('conf-label').textContent=checked.length?`${checked.length} selected`:'Select confluences...';
-  document.getElementById('conf-tags').innerHTML=checked.map(c=>`<span class="conf-tag">${c}</span>`).join('');
-  document.querySelectorAll('#conf-dropdown .conf-opt').forEach(o=>o.classList.toggle('selected',o.querySelector('input').checked));
+let confOpen = false;
+function toggleConf() {
+  confOpen = !confOpen;
+  document.getElementById('conf-dropdown').classList.toggle('open', confOpen);
+  document.getElementById('conf-btn').classList.toggle('open', confOpen);
 }
-function clearConf(){document.querySelectorAll('#conf-dropdown input').forEach(cb=>cb.checked=false);updateConf();}
+document.addEventListener('click', e => {
+  const wrap = document.querySelector('.conf-wrap');
+  if (wrap && !wrap.contains(e.target)) {
+    confOpen = false;
+    document.getElementById('conf-dropdown').classList.remove('open');
+    document.getElementById('conf-btn').classList.remove('open');
+  }
+});
+function updateConf() {
+  const checked = Array.from(document.querySelectorAll('#conf-dropdown input:checked')).map(cb => cb.value);
+  document.getElementById('conf-label').textContent = checked.length ? `${checked.length} selected` : 'Select confluences...';
+  document.getElementById('conf-tags').innerHTML = checked.map(c => `<span class="conf-tag">${c}</span>`).join('');
+  document.querySelectorAll('.conf-opt').forEach(o => o.classList.toggle('selected', o.querySelector('input').checked));
+}
+function clearConf() {
+  document.querySelectorAll('#conf-dropdown input').forEach(cb => cb.checked = false);
+  updateConf();
+}
 
 // ── CALCULATIONS ──────────────────────────────────────────────────────────────
-function calcPnL(entry,exit,contracts,instrument,direction){const tickVal={'NQ':20,'MNQ':2,'ES':50,'MES':5,'CL':1000,'GC':100,'RTY':50}[instrument]||20;const pts=(direction==='Short')?(entry-exit):(exit-entry);return Math.round(pts*contracts*tickVal);}
-function calcRR(entry,sl,tp){if(!entry||!sl||!tp)return null;const risk=Math.abs(entry-sl),reward=Math.abs(tp-entry);return risk>0?Math.round((reward/risk)*100)/100:null;}
-function calcDuration(entryTime,exitTime){const parse=s=>{const m=s.match(/(\d{1,2}):(\d{2})\s*(AM|PM)?/i);if(!m)return null;let h=parseInt(m[1]),min=parseInt(m[2]);const ap=(m[3]||'').toUpperCase();if(ap==='PM'&&h<12)h+=12;if(ap==='AM'&&h===12)h=0;return h*60+min;};const e=parse(entryTime),x=parse(exitTime);return(e!=null&&x!=null&&x>e)?x-e:null;}
-function autoGradeLocal(confluences,mistakes){const hasIFVG=confluences.includes('IFVG'),hasFVG=confluences.includes('FVG'),hasMSS=confluences.includes('MSS'),hasCISD=confluences.includes('CISD'),hasSweep=confluences.includes('Liquidity Sweep')||confluences.includes('BSL Taken')||confluences.includes('SSL Taken'),hasHTF=confluences.includes('HTF PDA Delivery')&&confluences.includes('HTF Trend'),hasKZ=confluences.includes('Kill Zone'),hasSMT=confluences.includes('SMT Divergence'),hasLRLR=confluences.includes('LRLR'),mistakesLower=(mistakes||'').toLowerCase(),hardBreach=['against','no htf','wrong bias','fomo','revenge'].some(w=>mistakesLower.includes(w));if(hardBreach)return'B-';let score=0;if(hasIFVG)score+=2;else if(hasFVG)score+=1.5;if(hasMSS)score+=2;if(hasCISD)score+=1.5;if(hasSweep)score+=1.5;if(hasHTF)score+=2;if(hasKZ)score+=1.5;if(hasSMT)score+=1;if(hasLRLR)score+=1;if(confluences.length>=10)score+=1;if(score>=11&&hasMSS&&hasSweep&&hasIFVG&&hasKZ&&hasHTF)return'A++';if(score>=9&&(hasMSS||hasCISD))return'A+';if(score>=7)return'A';if(score>=5.5)return'A-';if(score>=4)return'B+';if(score>=3)return'B';return'B-';}
-function autoFollowedRulesLocal(mistakes){const m=(mistakes||'').toLowerCase(),requiredBreaches=['against','no htf','wrong bias','no stop','no bias yet'],partialBreaches=['moved stop','be too early','trail','impatient','fomo'];if(requiredBreaches.some(w=>m.includes(w)))return'No ❌';if(partialBreaches.some(w=>m.includes(w)))return'Partially ⚠️';if(m.length>5)return'Partially ⚠️';return'Yes ✅';}
-function getField(id){return document.getElementById(id)?.value?.trim()||'';}
-function getNum(id){const v=parseFloat(document.getElementById(id)?.value);return isNaN(v)?null:v;}
+function calcPnL(entry, exit, contracts, instrument, direction) {
+  const tickVal = {'NQ':20,'MNQ':2,'ES':50,'MES':5,'CL':1000,'GC':100,'RTY':50}[instrument] || 20;
+  const pts = (direction === 'Short') ? (entry - exit) : (exit - entry);
+  return Math.round(pts * contracts * tickVal);
+}
+function calcRR(entry, sl, tp) {
+  if (!entry || !sl || !tp) return null;
+  const risk = Math.abs(entry - sl);
+  const reward = Math.abs(tp - entry);
+  return risk > 0 ? Math.round((reward / risk) * 100) / 100 : null;
+}
+function calcDuration(entryTime, exitTime) {
+  const parse = s => {
+    const m = s.match(/(\d{1,2}):(\d{2})\s*(AM|PM)?/i);
+    if (!m) return null;
+    let h = parseInt(m[1]), min = parseInt(m[2]);
+    const ap = (m[3]||'').toUpperCase();
+    if (ap === 'PM' && h < 12) h += 12;
+    if (ap === 'AM' && h === 12) h = 0;
+    return h * 60 + min;
+  };
+  const e = parse(entryTime), x = parse(exitTime);
+  return (e != null && x != null && x > e) ? x - e : null;
+}
+
+function autoGradeLocal(confluences, mistakes) {
+  const hasIFVG  = confluences.includes('IFVG');
+  const hasFVG   = confluences.includes('FVG');
+  const hasMSS   = confluences.includes('MSS');
+  const hasCISD  = confluences.includes('CISD');
+  const hasSweep = confluences.includes('Liquidity Sweep') || confluences.includes('BSL Taken') || confluences.includes('SSL Taken');
+  const hasHTF   = confluences.includes('HTF PDA Delivery') && confluences.includes('HTF Trend');
+  const hasKZ    = confluences.includes('Kill Zone');
+  const hasSMT   = confluences.includes('SMT Divergence');
+  const hasLRLR  = confluences.includes('LRLR');
+  const mistakesLower = (mistakes || '').toLowerCase();
+  const hardBreach = ['against', 'no htf', 'wrong bias', 'fomo', 'revenge'].some(w => mistakesLower.includes(w));
+  if (hardBreach) return 'B-';
+  let score = 0;
+  if (hasIFVG) score += 2; else if (hasFVG) score += 1.5;
+  if (hasMSS)   score += 2;
+  if (hasCISD)  score += 1.5;
+  if (hasSweep) score += 1.5;
+  if (hasHTF)   score += 2;
+  if (hasKZ)    score += 1.5;
+  if (hasSMT)   score += 1;
+  if (hasLRLR)  score += 1;
+  if (confluences.length >= 10) score += 1;
+  if (score >= 11 && hasMSS && hasSweep && hasIFVG && hasKZ && hasHTF) return 'A++';
+  if (score >= 9  && (hasMSS || hasCISD)) return 'A+';
+  if (score >= 7) return 'A';
+  if (score >= 5.5) return 'A-';
+  if (score >= 4) return 'B+';
+  if (score >= 3) return 'B';
+  return 'B-';
+}
+
+function autoFollowedRulesLocal(mistakes) {
+  const m = (mistakes || '').toLowerCase();
+  const requiredBreaches = ['against', 'no htf', 'wrong bias', 'no stop', 'no bias yet'];
+  const partialBreaches  = ['moved stop', 'be too early', 'trail', 'impatient', 'fomo'];
+  if (requiredBreaches.some(w => m.includes(w))) return 'No ❌';
+  if (partialBreaches.some(w => m.includes(w)))  return 'Partially ⚠️';
+  if (m.length > 5) return 'Partially ⚠️';
+  return 'Yes ✅';
+}
+
+function getField(id) { return document.getElementById(id)?.value?.trim() || ''; }
+function getNum(id) { const v = parseFloat(document.getElementById(id)?.value); return isNaN(v) ? null : v; }
 
 // ── ANALYZE TRADE ─────────────────────────────────────────────────────────────
-async function analyzeTrade(){
-  const instrument=getField('f-instrument'),direction=getField('f-direction');
-  if(!instrument||!direction){alert('Please fill in Instrument and Direction at minimum.');return;}
-  const entry=getNum('f-entry'),exit=getNum('f-exit'),sl=getNum('f-sl'),tp=getNum('f-tp'),contracts=getNum('f-contracts')||1,entryTime=getField('f-entry-time'),exitTime=getField('f-exit-time'),confluences=Array.from(document.querySelectorAll('#conf-dropdown input:checked')).map(cb=>cb.value),notes=getField('f-notes'),mistakes=getField('f-mistakes'),lessons=getField('f-lessons'),session=getField('f-session'),timeframe=getField('f-timeframe'),htf=getField('f-htf'),model=getField('f-model'),outcome=getField('f-outcome'),date=getField('f-date')||new Date().toISOString().split('T')[0],screenshot=getField('f-screenshot');
-  const tpRows=(contracts>1)?getTPRows().filter(r=>r.price&&r.contracts):[];
-  let pnl=0;if(entry){if(tpRows.length>0){tpRows.forEach(r=>{pnl+=calcPnL(entry,r.price,r.contracts,instrument,direction);});}else if(exit){pnl=calcPnL(entry,exit,contracts,instrument,direction);}}
-  const rr=calcRR(entry,sl,tp),duration=calcDuration(entryTime,exitTime);
-  tradeData={instrument,direction,session,timeframe,htf,model,date,entry,exit,sl,tp,contracts,entryTime,exitTime,pnl,rr,duration,confluences,grade:'Pending...',followedRules:'Pending...',outcome,notes,mistakes,lessons,screenshot,tpRows};
-  document.getElementById('analyze-btn').disabled=true;document.getElementById('analyze-btn').textContent='Analyzing...';
-  document.getElementById('review-panel').style.display='block';document.getElementById('success-msg').style.display='none';
-  const pnlClass=pnl>0?'green':pnl<0?'red':'';
-  document.getElementById('review-grid').innerHTML=`<div class="review-field"><div class="review-label">Instrument</div><div class="review-value">${instrument} ${direction}</div></div><div class="review-field"><div class="review-label">Session / TF</div><div class="review-value">${session} · ${timeframe}</div></div><div class="review-field"><div class="review-label">Entry</div><div class="review-value">${entry?.toLocaleString()||'—'} @ ${entryTime||'—'}</div></div><div class="review-field"><div class="review-label">Exit</div><div class="review-value">${exit?.toLocaleString()||'—'} @ ${exitTime||'—'}</div></div><div class="review-field"><div class="review-label">SL / TP</div><div class="review-value">${sl?.toLocaleString()||'—'} / ${tp?.toLocaleString()||'—'}</div></div><div class="review-field"><div class="review-label">Contracts</div><div class="review-value">${contracts}</div></div><div class="review-field"><div class="review-label">P&L</div><div class="review-value ${pnlClass}">${pnl>=0?'+':''}$${Math.abs(pnl).toLocaleString()}</div></div><div class="review-field"><div class="review-label">R:R</div><div class="review-value">${rr?'1:'+rr:'—'}</div></div><div class="review-field"><div class="review-label">Duration</div><div class="review-value">${duration?duration+'m':'—'}</div></div><div class="review-field" id="rg-grade"><div class="review-label">Setup Grade</div><div class="review-value" id="rg-grade-val" style="opacity:0.4;">Analyzing...</div></div><div class="review-field" id="rg-rules"><div class="review-label">Followed Rules</div><div class="review-value" id="rg-rules-val" style="opacity:0.4;">Analyzing...</div></div><div class="review-field"><div class="review-label">Outcome</div><div class="review-value">${outcome||'—'}</div></div><div class="review-field" style="grid-column:1/-1"><div class="review-label">Confluences</div><div class="review-value">${confluences.join(', ')||'—'}</div></div>${htf?`<div class="review-field"><div class="review-label">HTF TF</div><div class="review-value">${htf}</div></div>`:''}${model?`<div class="review-field"><div class="review-label">Entry Model</div><div class="review-value">${model}</div></div>`:''}`;
-  document.getElementById('ai-result').innerHTML='<span class="loading-msg">Verifying against your rules...</span>';document.getElementById('ai-verdict-badge').innerHTML='';
-  try{
-    const tradeStr=[`Instrument: ${instrument}`,`Direction: ${direction}`,`Session: ${session}`,`Timeframe: ${timeframe}`,`HTF Timeframe: ${htf}`,`Entry Model: ${model}`,`Date: ${date}`,`Entry Price: ${entry} at ${entryTime}`,`Exit Price: ${exit} at ${exitTime}`,`Stop Loss: ${sl}`,`Take Profit: ${tp}`,`Contracts: ${contracts}`,`R:R: ${rr||''}`,`P&L: $${pnl}`,`Status: ${outcome}`,`Confluences: ${confluences.join(', ')}`,`Notes: ${notes}`,`Mistakes: ${mistakes}`,`Lessons Learned: ${lessons}`].filter(l=>!l.endsWith(': ')&&!l.endsWith(': null')&&!l.endsWith(': undefined')).join('\n');
-    const res=await fetch(WORKER+'/verify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({trade:tradeStr})});
-    const data=await res.json(),text=data.result||'No response.';
-    if(data.grade&&data.grade!=='Pending...')tradeData.grade=data.grade;
-    const frMap={'YES':'Yes ✅','PARTIALLY':'Partially ⚠️','NO':'No ❌'};
-    if(data.followedRules&&frMap[data.followedRules]){tradeData.followedRules=frMap[data.followedRules];}else{const u=text.toUpperCase();if(u.includes('VERDICT: YES'))tradeData.followedRules='Yes ✅';else if(u.includes('VERDICT: NO'))tradeData.followedRules='No ❌';else tradeData.followedRules='Partially ⚠️';}
+async function analyzeTrade() {
+  const instrument = getField('f-instrument');
+  const direction  = getField('f-direction');
+  if (!instrument || !direction) { alert('Please fill in Instrument and Direction at minimum.'); return; }
+  const entry = getNum('f-entry'), exit = getNum('f-exit'), sl = getNum('f-sl'), tp = getNum('f-tp');
+  const contracts = getNum('f-contracts') || 1;
+  const entryTime = getField('f-entry-time'), exitTime = getField('f-exit-time');
+  const confluences = Array.from(document.querySelectorAll('#conf-dropdown input:checked')).map(cb => cb.value);
+  const notes = getField('f-notes'), mistakes = getField('f-mistakes'), lessons = getField('f-lessons');
+  const session = getField('f-session'), timeframe = getField('f-timeframe');
+  const htf = getField('f-htf'), model = getField('f-model'), outcome = getField('f-outcome');
+  const date = getField('f-date') || new Date().toISOString().split('T')[0];
+  const screenshot = getField('f-screenshot');
+  const tpRows = (contracts > 1) ? getTPRows().filter(r => r.price && r.contracts) : [];
+  let pnl = 0;
+  if (entry) {
+    if (tpRows.length > 0) { tpRows.forEach(r => { pnl += calcPnL(entry, r.price, r.contracts, instrument, direction); }); }
+    else if (exit) { pnl = calcPnL(entry, exit, contracts, instrument, direction); }
+  }
+  const rr = calcRR(entry, sl, tp);
+  const duration = calcDuration(entryTime, exitTime);
+  tradeData = { instrument, direction, session, timeframe, htf, model, date, entry, exit, sl, tp, contracts, entryTime, exitTime, pnl, rr, duration, confluences, grade: 'Pending...', followedRules: 'Pending...', outcome, notes, mistakes, lessons, screenshot, tpRows };
+  document.getElementById('analyze-btn').disabled = true;
+  document.getElementById('analyze-btn').textContent = 'Analyzing...';
+  document.getElementById('review-panel').style.display = 'block';
+  document.getElementById('success-msg').style.display = 'none';
+  const pnlClass = pnl > 0 ? 'green' : pnl < 0 ? 'red' : '';
+  document.getElementById('review-grid').innerHTML = `
+    <div class="review-field"><div class="review-label">Instrument</div><div class="review-value">${instrument} ${direction}</div></div>
+    <div class="review-field"><div class="review-label">Session / TF</div><div class="review-value">${session} · ${timeframe}</div></div>
+    <div class="review-field"><div class="review-label">Entry</div><div class="review-value">${entry?.toLocaleString()||'—'} @ ${entryTime||'—'}</div></div>
+    <div class="review-field"><div class="review-label">Exit</div><div class="review-value">${exit?.toLocaleString()||'—'} @ ${exitTime||'—'}</div></div>
+    <div class="review-field"><div class="review-label">SL / TP</div><div class="review-value">${sl?.toLocaleString()||'—'} / ${tp?.toLocaleString()||'—'}</div></div>
+    <div class="review-field"><div class="review-label">Contracts</div><div class="review-value">${contracts}</div></div>
+    <div class="review-field"><div class="review-label">P&L</div><div class="review-value ${pnlClass}">${pnl>=0?'+':''}$${Math.abs(pnl).toLocaleString()}</div></div>
+    <div class="review-field"><div class="review-label">R:R</div><div class="review-value">${rr?'1:'+rr:'—'}</div></div>
+    <div class="review-field"><div class="review-label">Duration</div><div class="review-value">${duration?duration+'m':'—'}</div></div>
+    <div class="review-field" id="rg-grade"><div class="review-label">Setup Grade</div><div class="review-value" id="rg-grade-val" style="opacity:0.4;">Analyzing...</div></div>
+    <div class="review-field" id="rg-rules"><div class="review-label">Followed Rules</div><div class="review-value" id="rg-rules-val" style="opacity:0.4;">Analyzing...</div></div>
+    <div class="review-field"><div class="review-label">Outcome</div><div class="review-value">${outcome||'—'}</div></div>
+    <div class="review-field" style="grid-column:1/-1"><div class="review-label">Confluences</div><div class="review-value">${confluences.join(', ')||'—'}</div></div>
+    ${htf?`<div class="review-field"><div class="review-label">HTF TF</div><div class="review-value">${htf}</div></div>`:''}
+    ${model?`<div class="review-field"><div class="review-label">Entry Model</div><div class="review-value">${model}</div></div>`:''}`;
+  document.getElementById('ai-result').innerHTML = '<span class="loading-msg">Verifying against your rules...</span>';
+  document.getElementById('ai-verdict-badge').innerHTML = '';
+  try {
+    const tradeStr = [`Instrument: ${instrument}`,`Direction: ${direction}`,`Session: ${session}`,`Timeframe: ${timeframe}`,`HTF Timeframe: ${htf}`,`Entry Model: ${model}`,`Date: ${date}`,`Entry Price: ${entry} at ${entryTime}`,`Exit Price: ${exit} at ${exitTime}`,`Stop Loss: ${sl}`,`Take Profit: ${tp}`,`Contracts: ${contracts}`,`R:R: ${rr||''}`,`P&L: $${pnl}`,`Status: ${outcome}`,`Confluences: ${confluences.join(', ')}`,`Notes: ${notes}`,`Mistakes: ${mistakes}`,`Lessons Learned: ${lessons}`].filter(l=>!l.endsWith(': ')&&!l.endsWith(': null')&&!l.endsWith(': undefined')).join('\n');
+    const res = await fetch(WORKER+'/verify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({trade:tradeStr})});
+    const data = await res.json();
+    const text = data.result||'No response.';
+    if (data.grade && data.grade !== 'Pending...') tradeData.grade = data.grade;
+    const frMap = {'YES':'Yes ✅','PARTIALLY':'Partially ⚠️','NO':'No ❌'};
+    if (data.followedRules && frMap[data.followedRules]) { tradeData.followedRules = frMap[data.followedRules]; }
+    else { const u=text.toUpperCase(); if(u.includes('VERDICT: YES')) tradeData.followedRules='Yes ✅'; else if(u.includes('VERDICT: NO')) tradeData.followedRules='No ❌'; else tradeData.followedRules='Partially ⚠️'; }
     const gradeColors={'A++':'accent','A+':'green','A':'green','A-':'green','B+':'yellow','B':'yellow','B-':'yellow','C':'red','D':'red'};
-    const gradeEl=document.getElementById('rg-grade-val');if(gradeEl){gradeEl.textContent=tradeData.grade;gradeEl.style.opacity='1';gradeEl.className='review-value '+(gradeColors[tradeData.grade]||'');}
-    const rulesEl=document.getElementById('rg-rules-val');if(rulesEl){rulesEl.textContent=tradeData.followedRules;rulesEl.style.opacity='1';if(tradeData.followedRules.includes('✅'))rulesEl.className='review-value green';else if(tradeData.followedRules.includes('⚠️'))rulesEl.className='review-value yellow';else if(tradeData.followedRules.includes('❌'))rulesEl.className='review-value red';}
+    const gradeEl=document.getElementById('rg-grade-val'); if(gradeEl){gradeEl.textContent=tradeData.grade;gradeEl.style.opacity='1';gradeEl.className='review-value '+(gradeColors[tradeData.grade]||'');}
+    const rulesEl=document.getElementById('rg-rules-val'); if(rulesEl){rulesEl.textContent=tradeData.followedRules;rulesEl.style.opacity='1';if(tradeData.followedRules.includes('✅'))rulesEl.className='review-value green';else if(tradeData.followedRules.includes('⚠️'))rulesEl.className='review-value yellow';else if(tradeData.followedRules.includes('❌'))rulesEl.className='review-value red';}
     let verdictClass,verdictLabel;
     if(data.followedRules==='YES'||tradeData.followedRules.includes('✅')){verdictClass='verdict-yes';verdictLabel='FOLLOWED RULES ✅';}
     else if(data.followedRules==='NO'||tradeData.followedRules.includes('❌')){verdictClass='verdict-no';verdictLabel='RULES BROKEN ❌';}
     else{verdictClass='verdict-partial';verdictLabel='PARTIALLY ⚠️';}
     document.getElementById('ai-result').innerHTML=text.replace(/\*\*(.*?)\*\*/g,'$1').replace(/\n/g,'<br>');
     document.getElementById('ai-verdict-badge').innerHTML=`<span class="ai-verdict ${verdictClass}">${verdictLabel}</span>`;
-  }catch(e){
+  } catch(e) {
     document.getElementById('ai-result').textContent='Verification failed: '+e.message;
-    tradeData.grade=autoGradeLocal(confluences,mistakes);tradeData.followedRules=autoFollowedRulesLocal(mistakes);
-    const gradeEl=document.getElementById('rg-grade-val');if(gradeEl){gradeEl.textContent=tradeData.grade;gradeEl.style.opacity='1';}
-    const rulesEl=document.getElementById('rg-rules-val');if(rulesEl){rulesEl.textContent=tradeData.followedRules;rulesEl.style.opacity='1';}
+    tradeData.grade=autoGradeLocal(confluences,mistakes);
+    tradeData.followedRules=autoFollowedRulesLocal(mistakes);
+    const gradeEl=document.getElementById('rg-grade-val'); if(gradeEl){gradeEl.textContent=tradeData.grade;gradeEl.style.opacity='1';}
+    const rulesEl=document.getElementById('rg-rules-val'); if(rulesEl){rulesEl.textContent=tradeData.followedRules;rulesEl.style.opacity='1';}
   }
-  document.getElementById('analyze-btn').disabled=false;document.getElementById('analyze-btn').textContent='⚡ Analyze & Preview Trade';
+  document.getElementById('analyze-btn').disabled=false;
+  document.getElementById('analyze-btn').textContent='⚡ Analyze & Preview Trade';
   document.getElementById('review-panel').scrollIntoView({behavior:'smooth'});
 }
-function editTrade(){document.getElementById('review-panel').style.display='none';}
 
-async function submitTrade(){
-  const btn=document.getElementById('confirm-btn');btn.disabled=true;btn.textContent='Submitting...';
-  const t=tradeData,tradeName=`${t.instrument} ${t.direction} — ${t.session}`;
-  const props={"Trade Name":{title:[{text:{content:tradeName}}]},"Instrument":{select:{name:t.instrument}},"Direction":{select:{name:t.direction}},"Status":{select:{name:t.outcome}},"Session":{select:{name:t.session}},"Timeframe":{select:{name:t.timeframe}},"Date":{date:{start:t.date}},"Contracts":{number:t.contracts},"P&L ($)":{number:t.pnl},"Followed Rules":{select:{name:t.followedRules}},"Setup Grade":{select:{name:t.grade}}};
-  if(t.entry)props["Entry Price"]={number:t.entry};if(t.exit)props["Exit Price"]={number:t.exit};if(t.sl)props["Stop Loss"]={number:t.sl};if(t.tp)props["Take Profit"]={number:t.tp};if(t.rr)props["R:R"]={number:t.rr};if(t.duration)props["Duration (mins)"]={number:t.duration};if(t.entryTime)props["Entry Time"]={rich_text:[{text:{content:t.entryTime}}]};if(t.exitTime)props["Exit Time"]={rich_text:[{text:{content:t.exitTime}}]};
+function editTrade() { document.getElementById('review-panel').style.display='none'; }
+
+async function submitTrade() {
+  const btn=document.getElementById('confirm-btn'); btn.disabled=true; btn.textContent='Submitting...';
+  const t=tradeData;
+  const tradeName=`${t.instrument} ${t.direction} — ${t.session}`;
+  const props={
+    "Trade Name":{title:[{text:{content:tradeName}}]},
+    "Instrument":{select:{name:t.instrument}},
+    "Direction":{select:{name:t.direction}},
+    "Status":{select:{name:t.outcome}},
+    "Session":{select:{name:t.session}},
+    "Timeframe":{select:{name:t.timeframe}},
+    "Date":{date:{start:t.date}},
+    "Contracts":{number:t.contracts},
+    "P&L ($)":{number:t.pnl},
+    "Followed Rules":{select:{name:t.followedRules}},
+    "Setup Grade":{select:{name:t.grade}},
+  };
+  if(t.entry) props["Entry Price"]={number:t.entry};
+  if(t.exit)  props["Exit Price"]={number:t.exit};
+  if(t.sl)    props["Stop Loss"]={number:t.sl};
+  if(t.tp)    props["Take Profit"]={number:t.tp};
+  if(t.rr)    props["R:R"]={number:t.rr};
+  if(t.duration) props["Duration (mins)"]={number:t.duration};
+  if(t.entryTime) props["Entry Time"]={rich_text:[{text:{content:t.entryTime}}]};
+  if(t.exitTime)  props["Exit Time"]={rich_text:[{text:{content:t.exitTime}}]};
   const exitBreakdown=(t.tpRows&&t.tpRows.length>0)?'Exit breakdown: '+t.tpRows.map(r=>`${r.label}: ${r.contracts} contract${r.contracts>1?'s':''} @ ${r.price}${r.time?' at '+r.time:''}`).join(' · '):null;
   const fullNotes=[t.notes,exitBreakdown].filter(Boolean).join('\n');
-  if(fullNotes)props["Notes"]={rich_text:[{text:{content:fullNotes}}]};if(t.mistakes)props["Mistakes"]={rich_text:[{text:{content:t.mistakes}}]};if(t.lessons)props["Lessons Learned"]={rich_text:[{text:{content:t.lessons}}]};if(t.htf)props["HTF Timeframe"]={rich_text:[{text:{content:t.htf}}]};if(t.model)props["Entry Model"]={rich_text:[{text:{content:t.model}}]};if(t.confluences.length)props["Confluences"]={multi_select:t.confluences.map(c=>({name:c}))};
+  if(fullNotes) props["Notes"]={rich_text:[{text:{content:fullNotes}}]};
+  if(t.mistakes) props["Mistakes"]={rich_text:[{text:{content:t.mistakes}}]};
+  if(t.lessons)  props["Lessons Learned"]={rich_text:[{text:{content:t.lessons}}]};
+  if(t.htf)      props["HTF Timeframe"]={rich_text:[{text:{content:t.htf}}]};
+  if(t.model)    props["Entry Model"]={rich_text:[{text:{content:t.model}}]};
+  if(t.confluences.length) props["Confluences"]={multi_select:t.confluences.map(c=>({name:c}))};
   const body={parent:{database_id:DB_ID},properties:props};
   if(t.screenshot){body.children=[{object:'block',type:'paragraph',paragraph:{rich_text:[{type:'text',text:{content:'📸 Screenshot: '+t.screenshot,link:{url:t.screenshot}}}]}}];}
-  try{
+  try {
     const res=await fetch(WORKER+'/notion/pages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
     const data=await res.json();
-    if(data.id){document.getElementById('success-msg').style.display='block';document.getElementById('review-panel').style.display='none';document.getElementById('success-msg').textContent=`✓ Trade logged! ${tradeName} · ${t.grade} · ${t.pnl>=0?'+':''}$${Math.abs(t.pnl).toLocaleString()}`;resetForm();}
-    else{const msg=data.message||'';const friendly=msg.includes('Status')?'Please select an Outcome.':msg.includes('Instrument')?'Please select an Instrument.':msg.includes('Direction')?'Please select a Direction.':'Please fill in all required fields before submitting.';alert('\u26a0\ufe0f '+friendly);}
-  }catch(e){alert('Submit failed: '+e.message);}
-  btn.disabled=false;btn.textContent='✓ Confirm & Submit to Notion';
+    if(data.id){
+      document.getElementById('success-msg').style.display='block';
+      document.getElementById('review-panel').style.display='none';
+      document.getElementById('success-msg').textContent=`✓ Trade logged! ${tradeName} · ${t.grade} · ${t.pnl>=0?'+':''}$${Math.abs(t.pnl).toLocaleString()}`;
+      resetForm();
+    } else {
+      const msg=data.message||'';
+      const friendly=msg.includes('Status')?'Please select an Outcome.':msg.includes('Instrument')?'Please select an Instrument.':msg.includes('Direction')?'Please select a Direction.':'Please fill in all required fields before submitting.';
+      alert('\u26a0\ufe0f '+friendly);
+    }
+  } catch(e) { alert('Submit failed: '+e.message); }
+  btn.disabled=false; btn.textContent='✓ Confirm & Submit to Notion';
 }
 
-// ── TAB SWITCHING ─────────────────────────────────────────────────────────────
+// ── TAB SWITCHING (updated to include edit tab) ───────────────────────────────
 function switchTab(name,btn){
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
@@ -770,13 +1055,7 @@ function switchTab(name,btn){
 
 // ── EDIT TRADE TAB ────────────────────────────────────────────────────────────
 let editPageId=null,editConfOpen=false,editTabLoaded=false;
-
-async function initEditTab(){
-  if(editTabLoaded)return;
-  editTabLoaded=true;
-  await refreshEditList();
-}
-
+async function initEditTab(){if(editTabLoaded)return;editTabLoaded=true;await refreshEditList();}
 async function refreshEditList(){
   const list=document.getElementById('edit-trade-list');
   list.innerHTML=`<div style="font-family:var(--mono);font-size:11px;color:var(--text3);padding:2rem;text-align:center;background:var(--surface);border:1px solid var(--border2);animation:blink 1s infinite;">Loading recent trades...</div>`;
@@ -786,33 +1065,16 @@ async function refreshEditList(){
     if(!pages.length){list.innerHTML=`<div style="font-family:var(--mono);font-size:11px;color:var(--text3);padding:2rem;text-align:center;background:var(--surface);border:1px solid var(--border2);">No trades found</div>`;return;}
     const gradeColors={'A++':'#c8ff00','A+':'#00e676','A':'#40c4ff','A-':'#40c4ff','B+':'#ffd740','B':'#ffd740','B-':'#ffab40','C':'#ff6d00','D':'#ff4444'};
     const rows=pages.map(p=>{
-      const props=p.properties,id=p.id,name=(props['Trade Name']?.title||[]).map(r=>r.plain_text||'').join('')||'—',date=props['Date']?.date?.start||'—',pnl=props['P&L ($)']?.number,grade=props['Setup Grade']?.select?.name||'—',status=props['Status']?.select?.name||'—';
+      const props=p.properties,id=p.id,name=(props['Trade Name']?.title||[]).map(r=>r.plain_text||'').join('')||'—',date=props['Date']?.date?.start||'—',pnl=props['P&L ($)']?.number,grade=props['Setup Grade']?.select?.name||'—';
       const pnlStr=pnl!=null?(pnl>=0?'+':'-')+'$'+Math.abs(pnl).toLocaleString():'—',pnlCol=pnl>0?'var(--green)':pnl<0?'var(--red)':'var(--text2)',gradeCol=gradeColors[grade]||'var(--text3)';
-      const d=new Date(date+'T12:00:00'),dateStr=d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
-      return `<div class="edit-trade-row" onclick="loadEditTrade('${id}')">
-        <div style="font-family:var(--mono);font-size:10px;color:var(--text2);">${dateStr}</div>
-        <div style="font-family:var(--mono);font-size:11px;color:var(--text);">${name}</div>
-        <div style="font-family:var(--mono);font-size:11px;font-weight:700;color:${pnlCol};">${pnlStr}</div>
-        <div style="font-family:var(--mono);font-size:10px;color:${gradeCol};">${grade}</div>
-        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.08em;color:var(--accent);text-transform:uppercase;">Edit →</div>
-      </div>`;
+      const d=new Date(date+'T12:00:00'),dateStr=isNaN(d)?date:d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+      return `<div class="edit-trade-row" onclick="loadEditTrade('${id}')"><div style="font-family:var(--mono);font-size:10px;color:var(--text2);">${dateStr}</div><div style="font-family:var(--mono);font-size:11px;color:var(--text);">${name}</div><div style="font-family:var(--mono);font-size:11px;font-weight:700;color:${pnlCol};">${pnlStr}</div><div style="font-family:var(--mono);font-size:10px;color:${gradeCol};">${grade}</div><div style="font-family:var(--mono);font-size:9px;letter-spacing:0.08em;color:var(--accent);text-transform:uppercase;">Edit →</div></div>`;
     }).join('');
-    list.innerHTML=`<div style="border:1px solid var(--border2);">
-      <div class="edit-trade-header-row">
-        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--text3);text-transform:uppercase;">Date</div>
-        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--text3);text-transform:uppercase;">Trade</div>
-        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--text3);text-transform:uppercase;">P&L</div>
-        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--text3);text-transform:uppercase;">Grade</div>
-        <div></div>
-      </div>
-      ${rows}
-    </div>`;
+    list.innerHTML=`<div style="border:1px solid var(--border2);"><div class="edit-trade-header-row"><div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--text3);text-transform:uppercase;">Date</div><div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--text3);text-transform:uppercase;">Trade</div><div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--text3);text-transform:uppercase;">P&L</div><div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--text3);text-transform:uppercase;">Grade</div><div></div></div>${rows}</div>`;
   }catch(e){list.innerHTML=`<div style="color:var(--red);font-family:var(--mono);font-size:11px;padding:1rem;">Error: ${e.message}</div>`;}
 }
-
 async function loadEditTrade(pageId){
-  editPageId=pageId;
-  const btn=document.getElementById('ef-save-btn');btn.disabled=true;btn.textContent='Loading...';
+  editPageId=pageId;const btn=document.getElementById('ef-save-btn');btn.disabled=true;btn.textContent='Loading...';
   document.getElementById('edit-success-msg').style.display='none';
   try{
     const res=await fetch(`${WORKER}/notion/pages/${pageId}`,{headers:{'Content-Type':'application/json'}});
@@ -820,20 +1082,20 @@ async function loadEditTrade(pageId){
     const getText=key=>(p[key]?.rich_text||[]).map(r=>r.plain_text||'').join('');
     const getNum=key=>p[key]?.number??'';
     const getSel=key=>p[key]?.select?.name||'';
-    // Fill edit form
     const setV=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v;};
     setV('ef-instrument',getSel('Instrument'));setV('ef-direction',getSel('Direction'));setV('ef-session',getSel('Session'));setV('ef-timeframe',getSel('Timeframe'));setV('ef-outcome',getSel('Status'));
     setV('ef-htf',getText('HTF Timeframe'));setV('ef-model',getText('Entry Model'));setV('ef-date',p['Date']?.date?.start||'');
     setV('ef-entry',getNum('Entry Price'));setV('ef-exit',getNum('Exit Price'));setV('ef-sl',getNum('Stop Loss'));setV('ef-tp',getNum('Take Profit'));setV('ef-contracts',getNum('Contracts')||1);
     setV('ef-entry-time',getText('Entry Time'));setV('ef-exit-time',getText('Exit Time'));
     setV('ef-notes',getText('Notes'));setV('ef-mistakes',getText('Mistakes'));setV('ef-lessons',getText('Lessons Learned'));
-    // Screenshot
-    try{const bres=await fetch(`${WORKER}/notion/blocks/${pageId}/children`);const bdata=await bres.json();let screenshot='';for(const b of(bdata.results||[])){const texts=b[b.type]?.rich_text||[];for(const t of texts){const plain=t.plain_text||'',href=t.href||'';if(plain.includes('Screenshot:')){screenshot=plain.replace('📸 Screenshot: ','').trim();}else{const match=(plain+' '+href).match(/https?:\/\/[^\s]+/);if(match)screenshot=match[0];}}}setV('ef-screenshot',screenshot);}catch(e){}
-    // Confluences
+    try{
+      const bres=await fetch(`${WORKER}/notion/blocks/${pageId}/children`);const bdata=await bres.json();let screenshot='';
+      for(const b of(bdata.results||[])){const texts=b[b.type]?.rich_text||[];for(const t of texts){const plain=t.plain_text||'';if(plain.includes('Screenshot:')){screenshot=plain.replace('📸 Screenshot: ','').trim();}}}
+      setV('ef-screenshot',screenshot);
+    }catch(e){}
     const confs=(p['Confluences']?.multi_select||[]).map(c=>c.name);
     document.querySelectorAll('#ef-conf-dropdown input[type=checkbox]').forEach(cb=>{cb.checked=confs.includes(cb.value);});
     updateEditConf();
-    // Title
     const tradeName=(p['Trade Name']?.title||[]).map(r=>r.plain_text||'').join('')||'Trade';
     document.getElementById('edit-trade-title').textContent=tradeName;
     document.getElementById('edit-form-wrap').style.display='block';
@@ -841,7 +1103,6 @@ async function loadEditTrade(pageId){
   }catch(e){alert('Failed to load trade: '+e.message);}
   btn.disabled=false;btn.textContent='✓ Save Changes & Re-Verify';
 }
-
 async function saveEdit(){
   if(!editPageId)return;
   const btn=document.getElementById('ef-save-btn');btn.disabled=true;btn.textContent='Saving & Re-Verifying...';
@@ -854,35 +1115,24 @@ async function saveEdit(){
   const confluences=Array.from(document.querySelectorAll('#ef-conf-dropdown input:checked')).map(cb=>cb.value);
   const pnl=(entry&&exit&&instrument&&direction)?calcPnL(entry,exit,contracts,instrument,direction):null;
   const rr=calcRR(entry,sl,tp);
-  // Re-verify
   let grade='',followedRules='Partially ⚠️';
   try{
     const tradeStr=[`Instrument: ${instrument}`,`Direction: ${direction}`,`Session: ${session}`,`Timeframe: ${timeframe}`,`HTF Timeframe: ${htf}`,`Entry Model: ${model}`,`Date: ${date}`,`Entry Price: ${entry} at ${entryTime}`,`Exit Price: ${exit} at ${exitTime}`,`Stop Loss: ${sl}`,`Take Profit: ${tp}`,`Contracts: ${contracts}`,`R:R: ${rr||''}`,`P&L: $${pnl}`,`Status: ${outcome}`,`Confluences: ${confluences.join(', ')}`,`Notes: ${notes}`,`Mistakes: ${mistakes}`,`Lessons Learned: ${lessons}`].filter(l=>!l.endsWith(': ')&&!l.endsWith(': null')&&!l.endsWith(': undefined')).join('\n');
     const vres=await fetch(`${WORKER}/verify`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({trade:tradeStr})});
-    const vdata=await vres.json();
-    if(vdata.grade)grade=vdata.grade;
-    const frMap={'YES':'Yes ✅','PARTIALLY':'Partially ⚠️','NO':'No ❌'};
-    if(vdata.followedRules)followedRules=frMap[vdata.followedRules]||'Partially ⚠️';
+    const vdata=await vres.json();if(vdata.grade)grade=vdata.grade;const frMap={'YES':'Yes ✅','PARTIALLY':'Partially ⚠️','NO':'No ❌'};if(vdata.followedRules)followedRules=frMap[vdata.followedRules]||'Partially ⚠️';
   }catch(e){}
-  // PATCH Notion
-  const tradeName=`${instrument} ${direction} — ${session}`;
-  const props={};
+  const tradeName=`${instrument} ${direction} — ${session}`;const props={};
   props["Trade Name"]={title:[{text:{content:tradeName}}]};
   if(instrument)props["Instrument"]={select:{name:instrument}};if(direction)props["Direction"]={select:{name:direction}};if(session)props["Session"]={select:{name:session}};if(timeframe)props["Timeframe"]={select:{name:timeframe}};if(outcome)props["Status"]={select:{name:outcome}};if(date)props["Date"]={date:{start:date}};if(contracts)props["Contracts"]={number:contracts};if(pnl!=null)props["P&L ($)"]={number:pnl};if(rr)props["R:R"]={number:rr};if(entry)props["Entry Price"]={number:entry};if(exit)props["Exit Price"]={number:exit};if(sl)props["Stop Loss"]={number:sl};if(tp)props["Take Profit"]={number:tp};if(entryTime)props["Entry Time"]={rich_text:[{text:{content:entryTime}}]};if(exitTime)props["Exit Time"]={rich_text:[{text:{content:exitTime}}]};if(notes)props["Notes"]={rich_text:[{text:{content:notes}}]};if(mistakes)props["Mistakes"]={rich_text:[{text:{content:mistakes}}]};if(lessons)props["Lessons Learned"]={rich_text:[{text:{content:lessons}}]};if(htf)props["HTF Timeframe"]={rich_text:[{text:{content:htf}}]};if(model)props["Entry Model"]={rich_text:[{text:{content:model}}]};if(grade)props["Setup Grade"]={select:{name:grade}};props["Followed Rules"]={select:{name:followedRules}};if(confluences.length)props["Confluences"]={multi_select:confluences.map(c=>({name:c}))};
   try{
     const res=await fetch(`${WORKER}/notion/pages/${editPageId}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({properties:props})});
     const data=await res.json();
-    if(data.id){
-      const msg=document.getElementById('edit-success-msg');msg.style.display='block';msg.textContent=`✓ Updated! ${tradeName} · ${grade} · ${followedRules}`;
-      editTabLoaded=false;await refreshEditList();editTabLoaded=true;
-    }else{alert('Update failed: '+JSON.stringify(data));}
+    if(data.id){const msg=document.getElementById('edit-success-msg');msg.style.display='block';msg.textContent=`✓ Updated! ${tradeName} · ${grade} · ${followedRules}`;editTabLoaded=false;await refreshEditList();editTabLoaded=true;}
+    else{alert('Update failed: '+JSON.stringify(data));}
   }catch(e){alert('Save failed: '+e.message);}
   btn.disabled=false;btn.textContent='✓ Save Changes & Re-Verify';
 }
-
 function cancelEdit(){editPageId=null;document.getElementById('edit-form-wrap').style.display='none';document.getElementById('edit-success-msg').style.display='none';}
-
-// Edit confluence dropdown
 function toggleEditConf(){editConfOpen=!editConfOpen;document.getElementById('ef-conf-dropdown').classList.toggle('open',editConfOpen);document.getElementById('ef-conf-btn').classList.toggle('open',editConfOpen);}
 function updateEditConf(){const checked=Array.from(document.querySelectorAll('#ef-conf-dropdown input:checked')).map(cb=>cb.value);document.getElementById('ef-conf-label').textContent=checked.length?`${checked.length} selected`:'Select confluences...';document.getElementById('ef-conf-tags').innerHTML=checked.map(c=>`<span class="conf-tag">${c}</span>`).join('');}
 function clearEditConf(){document.querySelectorAll('#ef-conf-dropdown input').forEach(cb=>cb.checked=false);updateEditConf();}
@@ -900,28 +1150,35 @@ async function bQuery(){const res=await fetch(`${WORKER}/notion/databases/${BIAS
 async function bCreate(props){const res=await fetch(`${WORKER}/notion/pages`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({parent:{database_id:BIAS_DB},properties:props})});return res.json();}
 function bLockCard(inst,bias,switchBias,hasSwitched){
   const valEl=document.getElementById(`bval-${inst}`),swEl=document.getElementById(`bswitch-${inst}`),swFrom=document.getElementById(`bswitch-from-${inst}`),btn=document.getElementById(`bset-${inst}`),locked=document.getElementById(`blocked-${inst}`),notes=document.getElementById(`bnotes-${inst}`);
-  const effective=switchBias||bias;valEl.className='bias-val '+bBiasClass(effective);valEl.textContent=effective||'—';
+  const effective=switchBias||bias;
+  valEl.className='bias-val '+bBiasClass(effective); valEl.textContent=effective||'—';
   if(switchBias){swEl.style.display='flex';swFrom.textContent=bias;}
-  document.querySelectorAll(`#bbtns-${inst} .bbtn`).forEach(b=>b.disabled=true);notes.disabled=true;notes.placeholder='';
+  document.querySelectorAll(`#bbtns-${inst} .bbtn`).forEach(b=>b.disabled=true);
+  notes.disabled=true; notes.placeholder='';
   if(hasSwitched){btn.disabled=true;btn.textContent='Locked for today';locked.style.display='block';locked.textContent='Bias + switch used — locked until tomorrow';}
   else{btn.classList.add('sw');btn.textContent=`↺ Switch ${inst} Bias`;btn.onclick=()=>bOpenSwitch(inst,bias);locked.style.display='block';locked.textContent='Bias locked · 1 switch remaining';}
 }
-function bOpenSwitch(inst,original){document.querySelectorAll(`#bbtns-${inst} .bbtn`).forEach(b=>{b.disabled=false;b.onclick=()=>bSelectBias(inst,b.textContent.trim());});const notes=document.getElementById(`bnotes-${inst}`);notes.disabled=false;notes.value='';notes.placeholder='Why are you switching?';const btn=document.getElementById(`bset-${inst}`);btn.classList.remove('sw');btn.textContent=`Confirm ${inst} Switch`;btn.onclick=()=>bSubmitSwitch(inst,original);document.getElementById(`blocked-${inst}`).textContent='Select new bias then confirm';}
+function bOpenSwitch(inst,original){
+  document.querySelectorAll(`#bbtns-${inst} .bbtn`).forEach(b=>{b.disabled=false;b.onclick=()=>bSelectBias(inst,b.textContent.trim());});
+  const notes=document.getElementById(`bnotes-${inst}`); notes.disabled=false;notes.value='';notes.placeholder='Why are you switching?';
+  const btn=document.getElementById(`bset-${inst}`); btn.classList.remove('sw');btn.textContent=`Confirm ${inst} Switch`;btn.onclick=()=>bSubmitSwitch(inst,original);
+  document.getElementById(`blocked-${inst}`).textContent='Select new bias then confirm';
+}
 async function bSubmit(inst){
   if(!bSelected[inst]){alert(`Select a bias for ${inst}`);return;}
-  const btn=document.getElementById(`bset-${inst}`);btn.disabled=true;btn.textContent='Saving...';
+  const btn=document.getElementById(`bset-${inst}`); btn.disabled=true;btn.textContent='Saving...';
   const bias=bSelected[inst],notes=document.getElementById(`bnotes-${inst}`).value.trim();
   const props={"Title":{title:[{text:{content:`${inst} ${bias} — ${BTODAY}`}}]},"Instrument":{select:{name:inst}},"Bias":{select:{name:bias}},"Date":{date:{start:BTODAY}},"switched":{checkbox:false}};
-  if(notes)props["Notes"]={rich_text:[{text:{content:notes}}]};
+  if(notes) props["Notes"]={rich_text:[{text:{content:notes}}]};
   try{const data=await bCreate(props);if(data.id){bState[inst]={bias,switchBias:null,pageId:data.id};bLockCard(inst,bias,null,false);bLoadHistory();}else{btn.disabled=false;btn.textContent=`Set ${inst} Bias`;alert('Error: '+JSON.stringify(data));}}
   catch(e){btn.disabled=false;btn.textContent=`Set ${inst} Bias`;alert('Error: '+e.message);}
 }
 async function bSubmitSwitch(inst,original){
-  const newBias=bSelected[inst];if(!newBias){alert(`Select a new bias for ${inst}`);return;}if(newBias===original){alert('Pick a different bias to switch to');return;}
-  const btn=document.getElementById(`bset-${inst}`);btn.disabled=true;btn.textContent='Saving switch...';
+  const newBias=bSelected[inst]; if(!newBias){alert(`Select a new bias for ${inst}`);return;} if(newBias===original){alert('Pick a different bias to switch to');return;}
+  const btn=document.getElementById(`bset-${inst}`); btn.disabled=true;btn.textContent='Saving switch...';
   const notes=document.getElementById(`bnotes-${inst}`).value.trim();
   const props={"Title":{title:[{text:{content:`${inst} Switch → ${newBias} — ${BTODAY}`}}]},"Instrument":{select:{name:inst}},"Bias":{select:{name:newBias}},"Date":{date:{start:BTODAY}},"switched":{checkbox:true}};
-  if(notes)props["Notes"]={rich_text:[{text:{content:notes}}]};
+  if(notes) props["Notes"]={rich_text:[{text:{content:notes}}]};
   try{const data=await bCreate(props);if(data.id){bState[inst].switchBias=newBias;bLockCard(inst,original,newBias,true);bLoadHistory();}else{btn.disabled=false;btn.textContent=`Confirm ${inst} Switch`;alert('Error: '+JSON.stringify(data));}}
   catch(e){btn.disabled=false;btn.textContent=`Confirm ${inst} Switch`;alert('Error: '+e.message);}
 }
@@ -929,63 +1186,261 @@ async function bLoadHistory(){
   const container=document.getElementById('bhistory-container');
   try{
     const res=await fetch(`${WORKER}/notion/databases/${BIAS_DB}/query`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({page_size:50})});
-    const data=await res.json(),pages=(data.results||[]).sort((a,b)=>(b.properties['Date']?.date?.start||'').localeCompare(a.properties['Date']?.date?.start||''));
+    const data=await res.json();
+    const pages=(data.results||[]).sort((a,b)=>(b.properties['Date']?.date?.start||'').localeCompare(a.properties['Date']?.date?.start||''));
     if(!pages.length){container.innerHTML='<div style="font-family:var(--mono);font-size:11px;color:var(--text3);padding:2rem;text-align:center;background:var(--surface);">No bias entries yet</div>';return;}
-    const rows=pages.map(p=>{const inst=p.properties['Instrument']?.select?.name||'—',bias=p.properties['Bias']?.select?.name||'—',isSw=p.properties['switched']?.checkbox,notes=(p.properties['Notes']?.rich_text||[]).map(r=>r.plain_text||'').join(''),date=p.properties['Date']?.date?.start||'—';const d2=new Date(date+'T12:00:00'),ds=d2.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}),bCls=bBiasClass(bias);return `<div class="brow"><div class="bh-date">${ds}</div><div class="bh-inst" style="color:${inst==='NQ'?'#c8ff00':'#40c4ff'}">${inst}</div><div class="bh-bias ${bCls}">${isSw?'↺ ':''} ${bias}</div><div class="bh-notes">${notes||'—'}</div></div>`;}).join('');
+    const rows=pages.map(p=>{
+      const inst=p.properties['Instrument']?.select?.name||'—',bias=p.properties['Bias']?.select?.name||'—',isSw=p.properties['switched']?.checkbox,notes=(p.properties['Notes']?.rich_text||[]).map(r=>r.plain_text||'').join(''),date=p.properties['Date']?.date?.start||'—';
+      const d2=new Date(date+'T12:00:00'),ds=d2.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}),bCls=bBiasClass(bias);
+      return `<div class="brow"><div class="bh-date">${ds}</div><div class="bh-inst" style="color:${inst==='NQ'?'#c8ff00':'#40c4ff'}">${inst}</div><div class="bh-bias ${bCls}">${isSw?'↺ ':''} ${bias}</div><div class="bh-notes">${notes||'—'}</div></div>`;
+    }).join('');
     container.innerHTML=`<div class="bhistory">${rows}</div>`;
   }catch(e){container.innerHTML=`<div style="font-family:var(--mono);font-size:11px;color:var(--red);padding:1rem;">Error: ${e.message}</div>`;}
 }
 async function initBiasBoard(){
-  if(biasLoaded)return;biasLoaded=true;
-  const d=new Date(),lbl=document.getElementById('bias-date-label');if(lbl)lbl.textContent=d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
-  try{const data=await bQuery();['NQ','ES'].forEach(inst=>{const entries=(data.results||[]).filter(p=>p.properties['Instrument']?.select?.name===inst),original=entries.find(p=>!p.properties['switched']?.checkbox),switched=entries.find(p=>p.properties['switched']?.checkbox);if(original){const bias=original.properties['Bias']?.select?.name,switchBias=switched?.properties['Bias']?.select?.name||null;bState[inst]={bias,switchBias,pageId:original.id};bLockCard(inst,bias,switchBias,!!switched);}});}catch(e){console.error('bias load error',e);}
+  if(biasLoaded)return; biasLoaded=true;
+  const d=new Date(),lbl=document.getElementById('bias-date-label');
+  if(lbl) lbl.textContent=d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+  try{
+    const data=await bQuery();
+    ['NQ','ES'].forEach(inst=>{
+      const entries=(data.results||[]).filter(p=>p.properties['Instrument']?.select?.name===inst);
+      const original=entries.find(p=>!p.properties['switched']?.checkbox),switched=entries.find(p=>p.properties['switched']?.checkbox);
+      if(original){const bias=original.properties['Bias']?.select?.name,switchBias=switched?.properties['Bias']?.select?.name||null;bState[inst]={bias,switchBias,pageId:original.id};bLockCard(inst,bias,switchBias,!!switched);}
+    });
+  }catch(e){console.error('bias load error',e);}
   await bLoadHistory();
 }
 
 // ── PRE-MARKET ANALYSIS ───────────────────────────────────────────────────────
-const pmaData={};let pmaDOLSelected=null;
-function pmaToggleStep(n){document.getElementById(`pma-body-${n}`).classList.toggle('open');}
-function pmaSelect(key,value,btn,styleClass){const parent=btn.closest('.pma-inst-col')?btn.closest('.pma-inst-col'):btn.closest('.pma-btn-row');if(parent){const allBtns=parent.querySelectorAll('.pma-btn');allBtns.forEach(b=>{b.className='pma-btn';});}btn.className=`pma-btn ${styleClass}`;pmaData[key]=value;pmaUpdateStatus();}
-function pmaDOL(value,btn){document.querySelectorAll('#pma-dol-grid .pma-dol-btn').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');pmaDOLSelected=value;pmaData['dol']=value;pmaUpdateStatus();}
-function pmaUpdateStatus(){const step1Keys=['d_nq_struct','d_es_struct','d_price_pos'],step2Keys=['h4_nq_struct','h4_es_struct','h4_fvg'],step3Keys=['h1_nq_struct','h1_es_struct','h1_smt'],step4Keys=['m15_midnight','m15_delivery'],step5Keys=['dol'];const checkStep=(keys,id)=>{const done=keys.filter(k=>pmaData[k]).length,el=document.getElementById(`pma-status-${id}`);if(el)el.textContent=done>=keys.length?'✓ Done':`${done}/${keys.length}`;};checkStep(step1Keys,1);checkStep(step2Keys,2);checkStep(step3Keys,3);checkStep(step4Keys,4);checkStep(step5Keys,5);}
-function pmaNext(current,next){document.getElementById(`pma-body-${current}`).classList.remove('open');const nextBody=document.getElementById(`pma-body-${next}`);nextBody.classList.add('open');nextBody.scrollIntoView({behavior:'smooth',block:'start'});}
-function pmaGenerateOutput(){
-  if(!pmaDOLSelected){alert('Please select a Draw on Liquidity target first.');return;}
-  let bullScore=0,bearScore=0;const p=pmaData;
-  if(p.d_nq_struct==='Bullish')bullScore+=2;if(p.d_nq_struct==='Bearish')bearScore+=2;if(p.d_es_struct==='Bullish')bullScore+=2;if(p.d_es_struct==='Bearish')bearScore+=2;if(p.d_price_pos==='Discount')bullScore+=1;if(p.d_price_pos==='Premium')bearScore+=1;if(p.d_pdh==='Taken')bullScore+=1;if(p.d_pdl==='Taken')bearScore+=1;
-  if(p.h4_nq_struct==='Bullish')bullScore+=2;if(p.h4_nq_struct==='Bearish')bearScore+=2;if(p.h4_es_struct==='Bullish')bullScore+=2;if(p.h4_es_struct==='Bearish')bearScore+=2;if(p.h4_fvg==='Below')bullScore+=1;if(p.h4_fvg==='Above')bearScore+=1;if(p.h4_eql==='EQL Below')bullScore+=1;if(p.h4_eql==='EQH Above')bearScore+=1;
-  if(p.h1_nq_struct==='Bullish')bullScore+=2;if(p.h1_nq_struct==='Bearish')bearScore+=2;if(p.h1_es_struct==='Bullish')bullScore+=2;if(p.h1_es_struct==='Bearish')bearScore+=2;if(p.h1_smt==='Bullish SMT')bullScore+=2;if(p.h1_smt==='Bearish SMT')bearScore+=2;if(p.h1_htf_pda==='Below')bullScore+=1;if(p.h1_htf_pda==='Above')bearScore+=1;if(p.h1_htf_pda==='At PDA'){bullScore+=0.5;bearScore+=0.5;}
-  if(p.m15_midnight==='Above')bullScore+=1;if(p.m15_midnight==='Below')bearScore+=1;if(p.m15_london==='Above')bullScore+=1;if(p.m15_london==='Below')bearScore+=1;if(p.m15_delivery==='Bullish')bullScore+=1;if(p.m15_delivery==='Bearish')bearScore+=1;if(p.m15_liq==='SSL Below')bullScore+=1;if(p.m15_liq==='BSL Above')bearScore+=1;
-  const total=bullScore+bearScore,bullPct=total>0?bullScore/total:0;
-  let bias,biasColor,confidence,confClass;
-  const isRanging=p.d_nq_struct==='Ranging'&&p.d_es_struct==='Ranging';
-  if(isRanging||(bullPct>=0.4&&bullPct<=0.6&&!p.h1_smt)){bias='Ranging';biasColor='var(--yellow)';confidence='Low';confClass='low';}
-  else if(bullPct>=0.65){bias='Bullish';biasColor='var(--green)';confidence=bullPct>=0.8?'High':'Medium';confClass=bullPct>=0.8?'high':'medium';}
-  else if(bullPct<=0.35){bias='Bearish';biasColor='var(--red)';confidence=bullPct<=0.2?'High':'Medium';confClass=bullPct<=0.2?'high':'medium';}
-  else{bias='Waiting';biasColor='var(--text3)';confidence='Low';confClass='low';}
-  const reasons=[];
-  if(p.d_nq_struct&&p.d_es_struct){if(p.d_nq_struct===p.d_es_struct)reasons.push(`Daily structure is ${p.d_nq_struct} on both NQ and ES — correlated`);else reasons.push(`Daily structure divergence: NQ is ${p.d_nq_struct}, ES is ${p.d_es_struct}`);}
-  if(p.d_price_pos)reasons.push(`Price in ${p.d_price_pos} on daily range${p.d_price_pos==='Discount'?' — favor longs':p.d_price_pos==='Premium'?' — favor shorts':''}`);
-  if(p.d_pdh==='Taken')reasons.push('PDH taken — BSL swept, potential reversal or continuation push');if(p.d_pdl==='Taken')reasons.push('PDL taken — SSL swept, potential reversal or continuation drop');
-  if(p.h4_nq_struct&&p.h4_es_struct){if(p.h4_nq_struct===p.h4_es_struct)reasons.push(`4H structure aligned: both ${p.h4_nq_struct}`);else reasons.push(`4H structure mixed: NQ ${p.h4_nq_struct}, ES ${p.h4_es_struct}`);}
-  if(p.h4_fvg&&p.h4_fvg!=='None')reasons.push(`4H FVG/IFVG ${p.h4_fvg.toLowerCase()} price — potential delivery target`);if(p.h4_eql&&p.h4_eql!=='None')reasons.push(`${p.h4_eql} identified on 4H — liquidity target`);if(p.h1_smt&&p.h1_smt!=='None')reasons.push(`${p.h1_smt} divergence on 1H — strong directional signal`);if(p.h1_htf_pda==='At PDA')reasons.push('Price currently at a 1H HTF PDA — watch for reaction');if(p.m15_midnight)reasons.push(`Price ${p.m15_midnight.toLowerCase()} midnight open — ${p.m15_midnight==='Above'?'bullish':'bearish'} session open lean`);if(p.m15_delivery&&p.m15_delivery!=='Consolidating')reasons.push(`15m currently delivering ${p.m15_delivery.toLowerCase()}`);if(p.m15_delivery==='Consolidating')reasons.push('15m in consolidation — wait for expansion before entry');if(p.m15_liq&&p.m15_liq!=='Both')reasons.push(`${p.m15_liq} — clear liquidity target for the session`);if(pmaDOLSelected)reasons.push(`DOL identified: ${pmaDOLSelected}`);
-  document.getElementById('pma-bias-result').textContent=bias;document.getElementById('pma-bias-result').style.color=biasColor;
-  document.getElementById('pma-confidence-badge').innerHTML=`<span class="pma-confidence ${confClass}">${confidence} Confidence — ${Math.round(bullPct*100)}% bullish / ${Math.round((1-bullPct)*100)}% bearish signals</span>`;
-  document.getElementById('pma-dol-result').textContent=`🎯 Draw on Liquidity: ${pmaDOLSelected}`;
-  document.getElementById('pma-reasoning').innerHTML=reasons.map(r=>`<div style="padding:4px 0;border-bottom:1px solid var(--border);color:var(--text2);">→ ${r}</div>`).join('');
-  document.getElementById('pma-output').style.display='block';document.getElementById('pma-output').scrollIntoView({behavior:'smooth'});
-  pmaData._bias=bias;pmaData._confidence=confidence;pmaData._reasons=reasons;
+const pmaData = {};
+let pmaDOLSelected = null;
+
+function pmaToggleStep(n) {
+  const body = document.getElementById(`pma-body-${n}`);
+  body.classList.toggle('open');
 }
-async function pmaSetAsBias(){
-  const bias=pmaData._bias;if(!bias){alert('Generate output first');return;}
-  const btn=document.getElementById('pma-set-bias-btn');btn.disabled=true;btn.textContent='Setting bias...';
-  const notes=document.getElementById('pma-notes-input').value.trim(),today=new Date().toISOString().split('T')[0],reasoning=(pmaData._reasons||[]).slice(0,5).join(' | '),fullNotes=[notes,`Pre-market: ${pmaData._confidence} confidence. ${reasoning}`].filter(Boolean).join('\n').substring(0,2000);
-  try{
-    for(const inst of['NQ','ES']){const props={"Title":{title:[{text:{content:`${inst} ${bias} — ${today} (Pre-Market)`}}]},"Instrument":{select:{name:inst}},"Bias":{select:{name:bias}},"Date":{date:{start:today}},"switched":{checkbox:false}};if(fullNotes)props["Notes"]={rich_text:[{text:{content:fullNotes}}]};await fetch(`${WORKER}/notion/pages`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({parent:{database_id:BIAS_DB},properties:props})});}
-    document.getElementById('pma-success').style.display='block';btn.textContent='✓ Bias Set';biasLoaded=false;
-  }catch(e){btn.disabled=false;btn.textContent="Set as Today's Bias in Notion";alert('Error: '+e.message);}
+
+function pmaSelect(key, value, btn, styleClass) {
+  // Deselect siblings in same group
+  const parent = btn.closest('.pma-btn-row, .pma-correlated');
+  if (parent) {
+    // Find all buttons in the same logical group
+    const allBtns = btn.closest('.pma-inst-col')
+      ? btn.closest('.pma-inst-col').querySelectorAll('.pma-btn')
+      : btn.closest('.pma-btn-row').querySelectorAll('.pma-btn');
+    allBtns.forEach(b => {
+      b.className = 'pma-btn';
+    });
+  }
+  btn.className = `pma-btn ${styleClass}`;
+  pmaData[key] = value;
+  pmaUpdateStatus();
 }
-function pmaReset(){document.querySelectorAll('.pma-btn').forEach(b=>b.className='pma-btn');document.querySelectorAll('.pma-dol-btn').forEach(b=>b.classList.remove('selected'));document.querySelectorAll('.pma-step-body').forEach(b=>b.classList.remove('open'));document.querySelectorAll('[id^="pma-status-"]').forEach(el=>el.textContent='—');Object.keys(pmaData).forEach(k=>delete pmaData[k]);pmaDOLSelected=null;document.getElementById('pma-output').style.display='none';document.getElementById('pma-notes-input').value='';document.getElementById('pma-success').style.display='none';const btn=document.getElementById('pma-set-bias-btn');btn.disabled=false;btn.textContent="Set as Today's Bias in Notion";document.getElementById('pma-body-1').classList.add('open');}
+
+function pmaDOL(value, btn) {
+  document.querySelectorAll('#pma-dol-grid .pma-dol-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  pmaDOLSelected = value;
+  pmaData['dol'] = value;
+  pmaUpdateStatus();
+}
+
+function pmaUpdateStatus() {
+  // Step completion indicators
+  const step1Keys = ['d_nq_struct','d_es_struct','d_price_pos'];
+  const step2Keys = ['h4_nq_struct','h4_es_struct','h4_fvg'];
+  const step3Keys = ['h1_nq_struct','h1_es_struct','h1_smt'];
+  const step4Keys = ['m15_midnight','m15_delivery'];
+  const step5Keys = ['dol'];
+  const checkStep = (keys, id) => {
+    const done = keys.filter(k => pmaData[k]).length;
+    const el = document.getElementById(`pma-status-${id}`);
+    if (el) el.textContent = done >= keys.length ? '✓ Done' : `${done}/${keys.length}`;
+  };
+  checkStep(step1Keys, 1);
+  checkStep(step2Keys, 2);
+  checkStep(step3Keys, 3);
+  checkStep(step4Keys, 4);
+  checkStep(step5Keys, 5);
+}
+
+function pmaNext(current, next) {
+  document.getElementById(`pma-body-${current}`).classList.remove('open');
+  const nextBody = document.getElementById(`pma-body-${next}`);
+  nextBody.classList.add('open');
+  nextBody.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function pmaGenerateOutput() {
+  if (!pmaDOLSelected) { alert('Please select a Draw on Liquidity target first.'); return; }
+
+  // Score bullish vs bearish signals
+  let bullScore = 0, bearScore = 0;
+  const p = pmaData;
+
+  // Daily
+  if (p.d_nq_struct === 'Bullish') bullScore += 2;
+  if (p.d_nq_struct === 'Bearish') bearScore += 2;
+  if (p.d_es_struct === 'Bullish') bullScore += 2;
+  if (p.d_es_struct === 'Bearish') bearScore += 2;
+  if (p.d_price_pos === 'Discount') bullScore += 1;
+  if (p.d_price_pos === 'Premium') bearScore += 1;
+  if (p.d_pdh === 'Taken') bullScore += 1;
+  if (p.d_pdl === 'Taken') bearScore += 1;
+
+  // 4H
+  if (p.h4_nq_struct === 'Bullish') bullScore += 2;
+  if (p.h4_nq_struct === 'Bearish') bearScore += 2;
+  if (p.h4_es_struct === 'Bullish') bullScore += 2;
+  if (p.h4_es_struct === 'Bearish') bearScore += 2;
+  if (p.h4_fvg === 'Below') bullScore += 1;
+  if (p.h4_fvg === 'Above') bearScore += 1;
+  if (p.h4_eql === 'EQL Below') bullScore += 1;
+  if (p.h4_eql === 'EQH Above') bearScore += 1;
+
+  // 1H
+  if (p.h1_nq_struct === 'Bullish') bullScore += 2;
+  if (p.h1_nq_struct === 'Bearish') bearScore += 2;
+  if (p.h1_es_struct === 'Bullish') bullScore += 2;
+  if (p.h1_es_struct === 'Bearish') bearScore += 2;
+  if (p.h1_smt === 'Bullish SMT') bullScore += 2;
+  if (p.h1_smt === 'Bearish SMT') bearScore += 2;
+  if (p.h1_htf_pda === 'Below') bullScore += 1;
+  if (p.h1_htf_pda === 'Above') bearScore += 1;
+  if (p.h1_htf_pda === 'At PDA') { bullScore += 0.5; bearScore += 0.5; }
+
+  // 15m
+  if (p.m15_midnight === 'Above') bullScore += 1;
+  if (p.m15_midnight === 'Below') bearScore += 1;
+  if (p.m15_london === 'Above') bullScore += 1;
+  if (p.m15_london === 'Below') bearScore += 1;
+  if (p.m15_delivery === 'Bullish') bullScore += 1;
+  if (p.m15_delivery === 'Bearish') bearScore += 1;
+  if (p.m15_liq === 'SSL Below') bullScore += 1;
+  if (p.m15_liq === 'BSL Above') bearScore += 1;
+
+  const total = bullScore + bearScore;
+  const bullPct = total > 0 ? bullScore / total : 0;
+
+  let bias, biasColor, confidence, confClass;
+  const isRanging = p.d_nq_struct === 'Ranging' && p.d_es_struct === 'Ranging';
+  const isConsolidating = p.m15_delivery === 'Consolidating';
+
+  if (isRanging || (bullPct >= 0.4 && bullPct <= 0.6 && !p.h1_smt)) {
+    bias = 'Ranging';
+    biasColor = 'var(--yellow)';
+    confidence = 'Low';
+    confClass = 'low';
+  } else if (bullPct >= 0.65) {
+    bias = 'Bullish';
+    biasColor = 'var(--green)';
+    confidence = bullPct >= 0.8 ? 'High' : 'Medium';
+    confClass = bullPct >= 0.8 ? 'high' : 'medium';
+  } else if (bullPct <= 0.35) {
+    bias = 'Bearish';
+    biasColor = 'var(--red)';
+    confidence = bullPct <= 0.2 ? 'High' : 'Medium';
+    confClass = bullPct <= 0.2 ? 'high' : 'medium';
+  } else {
+    bias = 'Waiting';
+    biasColor = 'var(--text3)';
+    confidence = 'Low';
+    confClass = 'low';
+  }
+
+  // Build reasoning
+  const reasons = [];
+  if (p.d_nq_struct && p.d_es_struct) {
+    if (p.d_nq_struct === p.d_es_struct) reasons.push(`Daily structure is ${p.d_nq_struct} on both NQ and ES — correlated`);
+    else reasons.push(`Daily structure divergence: NQ is ${p.d_nq_struct}, ES is ${p.d_es_struct}`);
+  }
+  if (p.d_price_pos) reasons.push(`Price in ${p.d_price_pos} on daily range${p.d_price_pos==='Discount'?' — favor longs':p.d_price_pos==='Premium'?' — favor shorts':''}`);
+  if (p.d_pdh === 'Taken') reasons.push('PDH taken — BSL swept, potential reversal or continuation push');
+  if (p.d_pdl === 'Taken') reasons.push('PDL taken — SSL swept, potential reversal or continuation drop');
+  if (p.h4_nq_struct && p.h4_es_struct) {
+    if (p.h4_nq_struct === p.h4_es_struct) reasons.push(`4H structure aligned: both ${p.h4_nq_struct}`);
+    else reasons.push(`4H structure mixed: NQ ${p.h4_nq_struct}, ES ${p.h4_es_struct}`);
+  }
+  if (p.h4_fvg && p.h4_fvg !== 'None') reasons.push(`4H FVG/IFVG ${p.h4_fvg.toLowerCase()} price — potential delivery target`);
+  if (p.h4_eql && p.h4_eql !== 'None') reasons.push(`${p.h4_eql} identified on 4H — liquidity target`);
+  if (p.h1_smt && p.h1_smt !== 'None') reasons.push(`${p.h1_smt} divergence on 1H — strong directional signal`);
+  if (p.h1_htf_pda === 'At PDA') reasons.push('Price currently at a 1H HTF PDA — watch for reaction');
+  if (p.m15_midnight) reasons.push(`Price ${p.m15_midnight.toLowerCase()} midnight open — ${p.m15_midnight==='Above'?'bullish':'bearish'} session open lean`);
+  if (p.m15_delivery && p.m15_delivery !== 'Consolidating') reasons.push(`15m currently delivering ${p.m15_delivery.toLowerCase()}`);
+  if (p.m15_delivery === 'Consolidating') reasons.push('15m in consolidation — wait for expansion before entry');
+  if (p.m15_liq && p.m15_liq !== 'Both') reasons.push(`${p.m15_liq} — clear liquidity target for the session`);
+  if (pmaDOLSelected) reasons.push(`DOL identified: ${pmaDOLSelected}`);
+
+  // Render output
+  document.getElementById('pma-bias-result').textContent = bias;
+  document.getElementById('pma-bias-result').style.color = biasColor;
+  document.getElementById('pma-confidence-badge').innerHTML = `<span class="pma-confidence ${confClass}">${confidence} Confidence — ${Math.round(bullPct*100)}% bullish / ${Math.round((1-bullPct)*100)}% bearish signals</span>`;
+  document.getElementById('pma-dol-result').textContent = `🎯 Draw on Liquidity: ${pmaDOLSelected}`;
+  document.getElementById('pma-reasoning').innerHTML = reasons.map(r => `<div style="padding:4px 0;border-bottom:1px solid var(--border);color:var(--text2);">→ ${r}</div>`).join('');
+  document.getElementById('pma-output').style.display = 'block';
+  document.getElementById('pma-output').scrollIntoView({ behavior: 'smooth' });
+
+  // Store for bias submission
+  pmaData._bias = bias;
+  pmaData._confidence = confidence;
+  pmaData._reasons = reasons;
+}
+
+async function pmaSetAsBias() {
+  const bias = pmaData._bias;
+  if (!bias) { alert('Generate output first'); return; }
+  const btn = document.getElementById('pma-set-bias-btn');
+  btn.disabled = true; btn.textContent = 'Setting bias...';
+  const notes = document.getElementById('pma-notes-input').value.trim();
+  const today = new Date().toISOString().split('T')[0];
+  const reasoning = (pmaData._reasons || []).slice(0, 5).join(' | ');
+  const fullNotes = [notes, `Pre-market: ${pmaData._confidence} confidence. ${reasoning}`].filter(Boolean).join('\n').substring(0, 2000);
+
+  try {
+    // Set for both NQ and ES
+    for (const inst of ['NQ', 'ES']) {
+      const props = {
+        "Title": { title: [{ text: { content: `${inst} ${bias} — ${today} (Pre-Market)` } }] },
+        "Instrument": { select: { name: inst } },
+        "Bias": { select: { name: bias } },
+        "Date": { date: { start: today } },
+        "switched": { checkbox: false }
+      };
+      if (fullNotes) props["Notes"] = { rich_text: [{ text: { content: fullNotes } }] };
+      await fetch(`${WORKER}/notion/pages`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ parent: { database_id: BIAS_DB }, properties: props })
+      });
+    }
+    document.getElementById('pma-success').style.display = 'block';
+    btn.textContent = '✓ Bias Set';
+    // Reset bias board so it reloads
+    biasLoaded = false;
+  } catch(e) {
+    btn.disabled = false;
+    btn.textContent = 'Set as Today\'s Bias in Notion';
+    alert('Error: ' + e.message);
+  }
+}
+
+function pmaReset() {
+  // Clear all selections
+  document.querySelectorAll('.pma-btn').forEach(b => b.className = 'pma-btn');
+  document.querySelectorAll('.pma-dol-btn').forEach(b => b.classList.remove('selected'));
+  document.querySelectorAll('.pma-step-body').forEach(b => b.classList.remove('open'));
+  document.querySelectorAll('[id^="pma-status-"]').forEach(el => el.textContent = '—');
+  Object.keys(pmaData).forEach(k => delete pmaData[k]);
+  pmaDOLSelected = null;
+  document.getElementById('pma-output').style.display = 'none';
+  document.getElementById('pma-notes-input').value = '';
+  document.getElementById('pma-success').style.display = 'none';
+  const btn = document.getElementById('pma-set-bias-btn');
+  btn.disabled = false; btn.textContent = "Set as Today's Bias in Notion";
+  // Open step 1
+  document.getElementById('pma-body-1').classList.add('open');
+}
 
 // ── WEEKLY REVIEW ─────────────────────────────────────────────────────────────
 const WEEKLY_DB='6d1309c6e6174f489e32293e253ae729';
@@ -995,40 +1450,181 @@ function getWeekRange(date){const d=date?new Date(date):new Date(),day=d.getDay(
 function wExtractText(rt){return(rt||[]).map(r=>r.plain_text||'').join('');}
 let wState={loaded:false,existing:null,trades:[],weekStart:null,weekEnd:null};
 let wSelected={mental:0,discipline:0};
-async function initWeeklyReview(){if(wState.loaded)return;wState.loaded=true;const{start,end}=getWeekRange();wState.weekStart=start;wState.weekEnd=end;document.getElementById('w-week-label').textContent=`Week of ${new Date(start+'T12:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric'})} – ${new Date(end+'T12:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}`;await wLoadTrades();await wCheckExisting();await wLoadHistory();}
-async function wLoadTrades(){try{const res=await fetch(`${WORKER}/notion/databases/${TRADE_DB_W}/query`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({page_size:100})});const data=await res.json();wState.trades=(data.results||[]).filter(p=>{const d=p.properties['Date']?.date?.start||'';return d>=wState.weekStart&&d<=wState.weekEnd;});wRenderStats();}catch(e){console.error('wLoadTrades',e);}}
-function wRenderStats(){const trades=wState.trades,total=trades.length,wins=trades.filter(t=>t.properties['Status']?.select?.name==='Closed - Win').length,pnls=trades.map(t=>t.properties['P&L ($)']?.number||0),totalPnl=pnls.reduce((a,b)=>a+b,0),best=total?Math.max(...pnls):0,worst=total?Math.min(...pnls):0,wr=total?Math.round((wins/total)*100):0;wState.stats={total,wins,totalPnl,best,worst,wr};const pClass=totalPnl>=0?'color:var(--green)':'color:var(--red)',pStr=(totalPnl>=0?'+':'-')+'$'+Math.abs(totalPnl).toLocaleString();document.getElementById('w-stats').innerHTML=`<div class="wstat"><div class="wstat-label">Trades</div><div class="wstat-val">${total}</div></div><div class="wstat"><div class="wstat-label">Win Rate</div><div class="wstat-val">${wr}%</div></div><div class="wstat"><div class="wstat-label">Total P&L</div><div class="wstat-val" style="${pClass}">${pStr}</div></div><div class="wstat"><div class="wstat-label">Best Trade</div><div class="wstat-val" style="color:var(--green)">+$${best.toLocaleString()}</div></div><div class="wstat"><div class="wstat-label">Worst Trade</div><div class="wstat-val" style="color:var(--red)">${worst<=0?'-':''}$${Math.abs(worst).toLocaleString()}</div></div>`;const grades={};trades.forEach(t=>{const g=t.properties['Setup Grade']?.select?.name;if(g)grades[g]=(grades[g]||0)+1;});const gradeColors={'A++':'#c8ff00','A+':'#00e676','A':'#40c4ff','B':'#ffd740','C':'#ff6d00','D':'#ff4444'};document.getElementById('w-grades').innerHTML=Object.entries(grades).length?Object.entries(grades).map(([g,c])=>`<span style="font-family:var(--mono);font-size:10px;padding:3px 8px;border:1px solid;color:${gradeColors[g]||'#888'};border-color:${gradeColors[g]||'#888'}33;margin-right:4px;">${g}: ${c}</span>`).join(''):'<span style="font-family:var(--mono);font-size:10px;color:var(--text3);">No trades this week</span>';const confs={};trades.forEach(t=>{(t.properties['Confluences']?.multi_select||[]).forEach(c=>confs[c.name]=(confs[c.name]||0)+1);});const topConfs=Object.entries(confs).sort((a,b)=>b[1]-a[1]).slice(0,5);document.getElementById('w-confs').innerHTML=topConfs.length?topConfs.map(([c,n])=>`<span style="font-family:var(--mono);font-size:10px;padding:2px 8px;border:1px solid var(--border2);color:var(--text3);margin-right:4px;">${c} (${n})</span>`).join(''):'<span style="font-family:var(--mono);font-size:10px;color:var(--text3);">None</span>';const breaks=[];trades.forEach(t=>{const txt=[wExtractText(t.properties['Mistakes']?.rich_text),wExtractText(t.properties['Notes']?.rich_text)].join(' ').toLowerCase();if(txt.match(/stop.*(be|breakeven|moved)/)||txt.match(/(be|breakeven).*stop/))breaks.push('SL moved to BE early');if(txt.match(/bias|against|htf/))breaks.push('HTF bias not followed');if(txt.match(/trail.*(soon|tight)|tsl/))breaks.push('Trailed too soon/tight');if(txt.match(/fomo|impatient|chased/))breaks.push('FOMO / impatient entry');if(txt.match(/consolidat/))breaks.push('Traded in consolidation');});const uniqueBreaches=[...new Set(breaks)];document.getElementById('w-breaches').innerHTML=uniqueBreaches.length?uniqueBreaches.map(b=>`<div style="font-family:var(--mono);font-size:10px;color:var(--red);padding:3px 0;">❌ ${b}</div>`).join(''):'<div style="font-family:var(--mono);font-size:10px;color:var(--green);">✅ No clear breaches detected</div>';}
-async function wCheckExisting(){try{const res=await fetch(`${WORKER}/notion/databases/${WEEKLY_DB}/query`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({filter:{property:'Week Start',date:{equals:wState.weekStart}},page_size:5})});const data=await res.json(),existing=(data.results||[])[0];if(existing){wState.existing=existing;if(existing.properties['Submitted']?.checkbox){wShowLocked(existing);}else{wPreFill(existing);}}}catch(e){console.error('wCheckExisting',e);}}
-function wShowLocked(page){const props=page.properties;document.getElementById('w-form').style.display='none';document.getElementById('w-locked').style.display='block';document.getElementById('w-locked-content').innerHTML=`<div style="font-family:var(--mono);font-size:10px;color:var(--green);margin-bottom:1rem;">✓ Weekly review submitted — locked</div><div class="wfield-label">What went well</div><div class="wfield-val">${wExtractText(props['What Went Well']?.rich_text)||'—'}</div><div class="wfield-label" style="margin-top:12px;">Needs improvement</div><div class="wfield-val">${wExtractText(props['Needs Improvement']?.rich_text)||'—'}</div><div class="wfield-label" style="margin-top:12px;">Next week goal</div><div class="wfield-val">${wExtractText(props['Next Week Goal']?.rich_text)||'—'}</div><div class="wfield-label" style="margin-top:12px;">Focus confluences</div><div class="wfield-val">${wExtractText(props['Focus Confluences']?.rich_text)||'—'}</div><div class="wfield-label" style="margin-top:12px;">Mental State</div><div class="wfield-val">${wRenderStarsDisplay(props['Mental State']?.number||0)}</div><div class="wfield-label" style="margin-top:8px;">Discipline</div><div class="wfield-val">${wRenderStarsDisplay(props['Discipline']?.number||0)}</div>`;document.getElementById('w-addnote').style.display='block';}
+async function initWeeklyReview(){
+  if(wState.loaded)return; wState.loaded=true;
+  const{start,end}=getWeekRange(); wState.weekStart=start; wState.weekEnd=end;
+  document.getElementById('w-week-label').textContent=`Week of ${new Date(start+'T12:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric'})} – ${new Date(end+'T12:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}`;
+  await wLoadTrades(); await wCheckExisting(); await wLoadHistory();
+}
+async function wLoadTrades(){
+  try{const res=await fetch(`${WORKER}/notion/databases/${TRADE_DB_W}/query`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({page_size:100})});const data=await res.json();wState.trades=(data.results||[]).filter(p=>{const d=p.properties['Date']?.date?.start||'';return d>=wState.weekStart&&d<=wState.weekEnd;});wRenderStats();}catch(e){console.error('wLoadTrades',e);}
+}
+function wRenderStats(){
+  const trades=wState.trades,total=trades.length,wins=trades.filter(t=>t.properties['Status']?.select?.name==='Closed - Win').length,pnls=trades.map(t=>t.properties['P&L ($)']?.number||0),totalPnl=pnls.reduce((a,b)=>a+b,0),best=total?Math.max(...pnls):0,worst=total?Math.min(...pnls):0,wr=total?Math.round((wins/total)*100):0;
+  wState.stats={total,wins,totalPnl,best,worst,wr};
+  const pClass=totalPnl>=0?'color:var(--green)':'color:var(--red)',pStr=(totalPnl>=0?'+':'-')+'$'+Math.abs(totalPnl).toLocaleString();
+  document.getElementById('w-stats').innerHTML=`<div class="wstat"><div class="wstat-label">Trades</div><div class="wstat-val">${total}</div></div><div class="wstat"><div class="wstat-label">Win Rate</div><div class="wstat-val">${wr}%</div></div><div class="wstat"><div class="wstat-label">Total P&L</div><div class="wstat-val" style="${pClass}">${pStr}</div></div><div class="wstat"><div class="wstat-label">Best Trade</div><div class="wstat-val" style="color:var(--green)">+$${best.toLocaleString()}</div></div><div class="wstat"><div class="wstat-label">Worst Trade</div><div class="wstat-val" style="color:var(--red)">${worst<=0?'-':''}$${Math.abs(worst).toLocaleString()}</div></div>`;
+  const grades={};trades.forEach(t=>{const g=t.properties['Setup Grade']?.select?.name;if(g)grades[g]=(grades[g]||0)+1;});
+  const gradeColors={'A++':'#c8ff00','A+':'#00e676','A':'#40c4ff','B':'#ffd740','C':'#ff6d00','D':'#ff4444'};
+  document.getElementById('w-grades').innerHTML=Object.entries(grades).length?Object.entries(grades).map(([g,c])=>`<span style="font-family:var(--mono);font-size:10px;padding:3px 8px;border:1px solid;color:${gradeColors[g]||'#888'};border-color:${gradeColors[g]||'#888'}33;margin-right:4px;">${g}: ${c}</span>`).join(''):'<span style="font-family:var(--mono);font-size:10px;color:var(--text3);">No trades this week</span>';
+  const confs={};trades.forEach(t=>{(t.properties['Confluences']?.multi_select||[]).forEach(c=>confs[c.name]=(confs[c.name]||0)+1);});
+  const topConfs=Object.entries(confs).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  document.getElementById('w-confs').innerHTML=topConfs.length?topConfs.map(([c,n])=>`<span style="font-family:var(--mono);font-size:10px;padding:2px 8px;border:1px solid var(--border2);color:var(--text3);margin-right:4px;">${c} (${n})</span>`).join(''):'<span style="font-family:var(--mono);font-size:10px;color:var(--text3);">None</span>';
+  const breaks=[];
+  trades.forEach(t=>{const txt=[wExtractText(t.properties['Mistakes']?.rich_text),wExtractText(t.properties['Notes']?.rich_text)].join(' ').toLowerCase();if(txt.match(/stop.*(be|breakeven|moved)/)||txt.match(/(be|breakeven).*stop/))breaks.push('SL moved to BE early');if(txt.match(/bias|against|htf/))breaks.push('HTF bias not followed');if(txt.match(/trail.*(soon|tight)|tsl/))breaks.push('Trailed too soon/tight');if(txt.match(/fomo|impatient|chased/))breaks.push('FOMO / impatient entry');if(txt.match(/consolidat/))breaks.push('Traded in consolidation');});
+  const uniqueBreaches=[...new Set(breaks)];
+  document.getElementById('w-breaches').innerHTML=uniqueBreaches.length?uniqueBreaches.map(b=>`<div style="font-family:var(--mono);font-size:10px;color:var(--red);padding:3px 0;">❌ ${b}</div>`).join(''):'<div style="font-family:var(--mono);font-size:10px;color:var(--green);">✅ No clear breaches detected</div>';
+}
+async function wCheckExisting(){
+  try{const res=await fetch(`${WORKER}/notion/databases/${WEEKLY_DB}/query`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({filter:{property:'Week Start',date:{equals:wState.weekStart}},page_size:5})});const data=await res.json();const existing=(data.results||[])[0];if(existing){wState.existing=existing;if(existing.properties['Submitted']?.checkbox){wShowLocked(existing);}else{wPreFill(existing);}}}catch(e){console.error('wCheckExisting',e);}
+}
+function wShowLocked(page){
+  const props=page.properties;
+  document.getElementById('w-form').style.display='none';document.getElementById('w-locked').style.display='block';
+  document.getElementById('w-locked-content').innerHTML=`<div style="font-family:var(--mono);font-size:10px;color:var(--green);margin-bottom:1rem;">✓ Weekly review submitted — locked</div><div class="wfield-label">What went well</div><div class="wfield-val">${wExtractText(props['What Went Well']?.rich_text)||'—'}</div><div class="wfield-label" style="margin-top:12px;">Needs improvement</div><div class="wfield-val">${wExtractText(props['Needs Improvement']?.rich_text)||'—'}</div><div class="wfield-label" style="margin-top:12px;">Next week goal</div><div class="wfield-val">${wExtractText(props['Next Week Goal']?.rich_text)||'—'}</div><div class="wfield-label" style="margin-top:12px;">Focus confluences</div><div class="wfield-val">${wExtractText(props['Focus Confluences']?.rich_text)||'—'}</div><div class="wfield-label" style="margin-top:12px;">Mental State</div><div class="wfield-val">${wRenderStarsDisplay(props['Mental State']?.number||0)}</div><div class="wfield-label" style="margin-top:8px;">Discipline</div><div class="wfield-val">${wRenderStarsDisplay(props['Discipline']?.number||0)}</div>`;
+  document.getElementById('w-addnote').style.display='block';
+}
 function wPreFill(page){const props=page.properties;document.getElementById('w-went-well').value=wExtractText(props['What Went Well']?.rich_text)||'';document.getElementById('w-improve').value=wExtractText(props['Needs Improvement']?.rich_text)||'';document.getElementById('w-goal').value=wExtractText(props['Next Week Goal']?.rich_text)||'';document.getElementById('w-focus').value=wExtractText(props['Focus Confluences']?.rich_text)||'';const mental=props['Mental State']?.number||0,disc=props['Discipline']?.number||0;if(mental)wSetStar('mental',mental);if(disc)wSetStar('discipline',disc);}
 function wRenderStarsDisplay(val){let html='';for(let i=1;i<=5;i++){const full=val>=i,half=!full&&val>=i-0.5;html+=`<span style="color:${full||half?'#ffd740':'#333'};font-size:16px;">${half?'⯨':'★'}</span>`;}return html+` <span style="font-family:var(--mono);font-size:10px;color:var(--text3);">${val}/5</span>`;}
 function wSetStar(type,val){wSelected[type]=val;document.getElementById(`w-stars-${type}`).querySelectorAll('.wstar').forEach(s=>{s.style.color=parseFloat(s.dataset.val)<=val?'#ffd740':'#333';});document.getElementById(`w-${type}-val`).textContent=val+'/5';}
 async function wAnalyze(){
   const wentWell=document.getElementById('w-went-well').value.trim(),improve=document.getElementById('w-improve').value.trim(),goal=document.getElementById('w-goal').value.trim(),focus=document.getElementById('w-focus').value.trim(),mental=wSelected.mental,discipline=wSelected.discipline;
-  if(!wentWell&&!improve){alert('Please fill in at least "What went well" and "Needs improvement"');return;}if(!mental||!discipline){alert('Please set your mental state and discipline ratings');return;}
-  const btn=document.getElementById('w-analyze-btn');btn.disabled=true;btn.textContent='Analyzing...';document.getElementById('w-ai-section').style.display='block';document.getElementById('w-ai-content').innerHTML='<div style="font-family:var(--mono);font-size:11px;color:var(--text3);animation:blink 1s infinite;">AI coach is reviewing your week...</div>';
+  if(!wentWell&&!improve){alert('Please fill in at least "What went well" and "Needs improvement"');return;}
+  if(!mental||!discipline){alert('Please set your mental state and discipline ratings');return;}
+  const btn=document.getElementById('w-analyze-btn');btn.disabled=true;btn.textContent='Analyzing...';
+  document.getElementById('w-ai-section').style.display='block';
+  document.getElementById('w-ai-content').innerHTML='<div style="font-family:var(--mono);font-size:11px;color:var(--text3);animation:blink 1s infinite;">AI coach is reviewing your week...</div>';
   const stats=wState.stats,breaches=document.getElementById('w-breaches').innerText;
   const prompt=`You are a professional ICT futures trading coach reviewing a trader's week. Give detailed, honest, actionable coaching — like a real coach would. Be specific to their data.\n\nWeek summary:\n- Trades: ${stats?.total||0} | Wins: ${stats?.wins||0} | Win Rate: ${stats?.wr||0}% | Total P&L: $${stats?.totalPnl||0}\n- Best trade: $${stats?.best||0} | Worst trade: $${stats?.worst||0}\n- Rule breaches detected: ${breaches}\n- Mental state rating: ${mental}/5\n- Discipline rating: ${discipline}/5\n\nTrader's own notes:\n- What went well: ${wentWell}\n- Needs improvement: ${improve}\n- Next week goal: ${goal}\n- Focus confluences: ${focus}\n\nTheir trading model: ICT concepts + Dodgy's iFVG Ultimate+ model. They trade NQ and ES futures on 1m/3m timeframes, primarily London and NY AM sessions.\n\nProvide:\n1. STRENGTHS (2-3 specific things they did well based on the data)\n2. AREAS TO WORK ON (3-4 specific, detailed coaching points with explanations — be a real coach, not generic)\n3. FOCUS FOR NEXT WEEK (2-3 concrete actionable tasks)\n4. MINDSET NOTE (1 paragraph on their mental state/discipline ratings)\n\nBe detailed and specific. Reference their actual data. Do not be generic. Format with clear headers.`;
-  try{const res=await fetch(`${WORKER}/verify`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({trade:prompt})});const data=await res.json(),text=data.result||'No response.';const lower=(improve+breaches+text).toLowerCase();let ytTopics=[];if(lower.includes('bias')||lower.includes('htf'))ytTopics.push('htf_bias');if(lower.includes('entry')||lower.includes('fvg')||lower.includes('ifvg'))ytTopics.push('entry_model');if(lower.includes('stop')||lower.includes('sl')||lower.includes('breakeven'))ytTopics.push('stop_loss');if(lower.includes('trail')||lower.includes('tsl')||lower.includes('exit'))ytTopics.push('trailing');if(lower.includes('fomo')||lower.includes('emotion')||lower.includes('discipline'))ytTopics.push('discipline');if(lower.includes('liquid')||lower.includes('bsl')||lower.includes('ssl'))ytTopics.push('liquidity');if(lower.includes('smt'))ytTopics.push('smt');if(lower.includes('consolid')||lower.includes('chop')||lower.includes('rang'))ytTopics.push('consolidation');if(ytTopics.length===0)ytTopics.push('general');ytTopics=[...new Set(ytTopics)].slice(0,3);const resources=ytTopics.flatMap(t=>YT_RESOURCES[t]||[]).slice(0,6);const ytHtml=resources.map(r=>`<a href="${r.url}" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--surface2);border:1px solid var(--border2);text-decoration:none;transition:border-color 0.15s;margin-bottom:4px;" onmouseover="this.style.borderColor='#ff0000'" onmouseout="this.style.borderColor='var(--border2)'"><svg viewBox="0 0 24 24" width="14" height="14" fill="#ff4444" style="flex-shrink:0;"><path d="M23.5 6.19a3.02 3.02 0 0 0-2.12-2.14C19.53 3.5 12 3.5 12 3.5s-7.53 0-9.38.55A3.02 3.02 0 0 0 .5 6.19C0 8.05 0 12 0 12s0 3.95.5 5.81a3.02 3.02 0 0 0 2.12 2.14C4.47 20.5 12 20.5 12 20.5s7.53 0 9.38-.55a3.02 3.02 0 0 0 2.12-2.14C24 15.95 24 12 24 12s0-3.95-.5-5.81zM9.75 15.52V8.48L15.86 12l-6.11 3.52z"/></svg><div><div style="font-family:var(--mono);font-size:10px;color:var(--accent);letter-spacing:0.06em;">${r.creator}</div><div style="font-size:11px;color:var(--text2);">${r.title}</div></div><span style="margin-left:auto;font-family:var(--mono);font-size:9px;color:var(--text3);">↗</span></a>`).join('');document.getElementById('w-ai-content').innerHTML=`<div style="font-size:13px;color:var(--text2);line-height:1.9;margin-bottom:1.5rem;">${text.replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</div><div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--text3);text-transform:uppercase;margin-bottom:8px;">Recommended watching this week</div>${ytHtml}`;wState.aiCoaching=text;document.getElementById('w-submit-btn').style.display='block';}catch(e){document.getElementById('w-ai-content').innerHTML=`<div style="color:var(--red);font-size:12px;">Error: ${e.message}</div>`;}
+  try{
+    const res=await fetch(`${WORKER}/verify`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({trade:prompt})});
+    const data=await res.json(),text=data.result||'No response.';
+    const lower=(improve+breaches+text).toLowerCase();
+    let ytTopics=[];
+    if(lower.includes('bias')||lower.includes('htf'))ytTopics.push('htf_bias');
+    if(lower.includes('entry')||lower.includes('fvg')||lower.includes('ifvg'))ytTopics.push('entry_model');
+    if(lower.includes('stop')||lower.includes('sl')||lower.includes('breakeven'))ytTopics.push('stop_loss');
+    if(lower.includes('trail')||lower.includes('tsl')||lower.includes('exit'))ytTopics.push('trailing');
+    if(lower.includes('fomo')||lower.includes('emotion')||lower.includes('discipline'))ytTopics.push('discipline');
+    if(lower.includes('liquid')||lower.includes('bsl')||lower.includes('ssl'))ytTopics.push('liquidity');
+    if(lower.includes('smt'))ytTopics.push('smt');
+    if(lower.includes('consolid')||lower.includes('chop')||lower.includes('rang'))ytTopics.push('consolidation');
+    if(ytTopics.length===0)ytTopics.push('general');
+    ytTopics=[...new Set(ytTopics)].slice(0,3);
+    const resources=ytTopics.flatMap(t=>YT_RESOURCES[t]||[]).slice(0,6);
+    const ytHtml=resources.map(r=>`<a href="${r.url}" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--surface2);border:1px solid var(--border2);text-decoration:none;transition:border-color 0.15s;margin-bottom:4px;" onmouseover="this.style.borderColor='#ff0000'" onmouseout="this.style.borderColor='var(--border2)'"><svg viewBox="0 0 24 24" width="14" height="14" fill="#ff4444" style="flex-shrink:0;"><path d="M23.5 6.19a3.02 3.02 0 0 0-2.12-2.14C19.53 3.5 12 3.5 12 3.5s-7.53 0-9.38.55A3.02 3.02 0 0 0 .5 6.19C0 8.05 0 12 0 12s0 3.95.5 5.81a3.02 3.02 0 0 0 2.12 2.14C4.47 20.5 12 20.5 12 20.5s7.53 0 9.38-.55a3.02 3.02 0 0 0 2.12-2.14C24 15.95 24 12 24 12s0-3.95-.5-5.81zM9.75 15.52V8.48L15.86 12l-6.11 3.52z"/></svg><div><div style="font-family:var(--mono);font-size:10px;color:var(--accent);letter-spacing:0.06em;">${r.creator}</div><div style="font-size:11px;color:var(--text2);">${r.title}</div></div><span style="margin-left:auto;font-family:var(--mono);font-size:9px;color:var(--text3);">↗</span></a>`).join('');
+    document.getElementById('w-ai-content').innerHTML=`<div style="font-size:13px;color:var(--text2);line-height:1.9;margin-bottom:1.5rem;">${text.replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</div><div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--text3);text-transform:uppercase;margin-bottom:8px;">Recommended watching this week</div>${ytHtml}`;
+    wState.aiCoaching=text;document.getElementById('w-submit-btn').style.display='block';
+  }catch(e){document.getElementById('w-ai-content').innerHTML=`<div style="color:var(--red);font-size:12px;">Error: ${e.message}</div>`;}
   btn.disabled=false;btn.textContent='⚡ Get AI Coaching';
 }
-async function wSubmit(){const btn=document.getElementById('w-submit-btn');btn.disabled=true;btn.textContent='Submitting...';const wentWell=document.getElementById('w-went-well').value.trim(),improve=document.getElementById('w-improve').value.trim(),goal=document.getElementById('w-goal').value.trim(),focus=document.getElementById('w-focus').value.trim(),stats=wState.stats||{},title=`Week of ${wState.weekStart}`;const props={"Title":{title:[{text:{content:title}}]},"Week Start":{date:{start:wState.weekStart}},"Week End":{date:{start:wState.weekEnd}},"Trade Count":{number:stats.total||0},"Win Rate":{number:(stats.wr||0)/100},"Total P&L":{number:stats.totalPnl||0},"Best Trade":{number:stats.best||0},"Worst Trade":{number:stats.worst||0},"Mental State":{number:wSelected.mental},"Discipline":{number:wSelected.discipline},"Submitted":{checkbox:true}};if(wentWell)props["What Went Well"]={rich_text:[{text:{content:wentWell}}]};if(improve)props["Needs Improvement"]={rich_text:[{text:{content:improve}}]};if(goal)props["Next Week Goal"]={rich_text:[{text:{content:goal}}]};if(focus)props["Focus Confluences"]={rich_text:[{text:{content:focus}}]};if(wState.aiCoaching)props["AI Coaching"]={rich_text:[{text:{content:wState.aiCoaching.substring(0,2000)}}]};try{let data;if(wState.existing&&!wState.existing.properties['Submitted']?.checkbox){const res=await fetch(`${WORKER}/notion/pages/${wState.existing.id}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({properties:props})});data=await res.json();}else{const res=await fetch(`${WORKER}/notion/pages`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({parent:{database_id:WEEKLY_DB},properties:props})});data=await res.json();}if(data.id){wState.existing=data;wShowLocked(data);wLoadHistory();}}catch(e){alert('Submit error: '+e.message);}btn.disabled=false;btn.textContent='✓ Submit Weekly Review';}
-async function wSaveNote(){const note=document.getElementById('w-extra-note').value.trim();if(!note||!wState.existing)return;const btn=document.getElementById('w-note-btn');btn.disabled=true;btn.textContent='Saving...';try{await fetch(`${WORKER}/notion/pages/${wState.existing.id}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({properties:{"Extra Note":{rich_text:[{text:{content:note}}]}}})});btn.textContent='Saved ✓';setTimeout(()=>{btn.disabled=false;btn.textContent='Save Note';},2000);}catch(e){btn.disabled=false;btn.textContent='Save Note';alert('Error: '+e.message);}}
-async function wLoadHistory(){const container=document.getElementById('w-history');try{const res=await fetch(`${WORKER}/notion/databases/${WEEKLY_DB}/query`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({page_size:20})});const data=await res.json(),pages=(data.results||[]).sort((a,b)=>(b.properties['Week Start']?.date?.start||'').localeCompare(a.properties['Week Start']?.date?.start||''));if(!pages.length){container.innerHTML='<div style="font-family:var(--mono);font-size:11px;color:var(--text3);padding:1.5rem;background:var(--surface);text-align:center;">No weekly reviews yet</div>';return;}container.innerHTML=pages.map((p,i)=>{const props=p.properties,ws=props['Week Start']?.date?.start||'',we=props['Week End']?.date?.start||'',pnl=props['Total P&L']?.number||0,wr=Math.round((props['Win Rate']?.number||0)*100),tc=props['Trade Count']?.number||0,mental=props['Mental State']?.number||0,disc=props['Discipline']?.number||0;const pClass=pnl>=0?'color:var(--green)':'color:var(--red)',pStr=(pnl>=0?'+':'-')+'$'+Math.abs(pnl).toLocaleString();const wsFmt=ws?new Date(ws+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'}):'—',weFmt=we?new Date(we+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'—';return `<div style="background:var(--surface);border-bottom:1px solid var(--border);"><div style="display:grid;grid-template-columns:160px 80px 80px 80px 1fr auto;gap:12px;align-items:center;padding:12px 16px;cursor:pointer;" onclick="wToggleExpand(${i})"><div style="font-family:var(--mono);font-size:11px;color:var(--text2);">${wsFmt} – ${weFmt}</div><div style="font-family:var(--mono);font-size:12px;font-weight:700;${pClass}">${pStr}</div><div style="font-family:var(--mono);font-size:11px;color:var(--text2);">${wr}% WR</div><div style="font-family:var(--mono);font-size:11px;color:var(--text3);">${tc} trades</div><div style="font-family:var(--mono);font-size:10px;color:var(--text3);">${wRenderStarsDisplay(mental)} · ${wRenderStarsDisplay(disc)}</div><div style="font-family:var(--mono);font-size:10px;color:var(--text3);" id="w-expand-arrow-${i}">▼</div></div><div id="w-expand-${i}" style="display:none;padding:0 16px 16px;border-top:1px solid var(--border);">${wExtractText(props['What Went Well']?.rich_text)?`<div class="wfield-label" style="margin-top:12px;">What went well</div><div class="wfield-val">${wExtractText(props['What Went Well']?.rich_text)}</div>`:''} ${wExtractText(props['Needs Improvement']?.rich_text)?`<div class="wfield-label" style="margin-top:10px;">Needs improvement</div><div class="wfield-val">${wExtractText(props['Needs Improvement']?.rich_text)}</div>`:''} ${wExtractText(props['Next Week Goal']?.rich_text)?`<div class="wfield-label" style="margin-top:10px;">Goal</div><div class="wfield-val">${wExtractText(props['Next Week Goal']?.rich_text)}</div>`:''} ${wExtractText(props['AI Coaching']?.rich_text)?`<div class="wfield-label" style="margin-top:10px;">AI Coaching</div><div class="wfield-val" style="white-space:pre-wrap;">${wExtractText(props['AI Coaching']?.rich_text)}</div>`:''}</div></div>`;}).join('');}catch(e){container.innerHTML=`<div style="color:var(--red);font-size:12px;padding:1rem;">Error: ${e.message}</div>`;}}
+async function wSubmit(){
+  const btn=document.getElementById('w-submit-btn');btn.disabled=true;btn.textContent='Submitting...';
+  const wentWell=document.getElementById('w-went-well').value.trim(),improve=document.getElementById('w-improve').value.trim(),goal=document.getElementById('w-goal').value.trim(),focus=document.getElementById('w-focus').value.trim(),stats=wState.stats||{},title=`Week of ${wState.weekStart}`;
+  const props={"Title":{title:[{text:{content:title}}]},"Week Start":{date:{start:wState.weekStart}},"Week End":{date:{start:wState.weekEnd}},"Trade Count":{number:stats.total||0},"Win Rate":{number:(stats.wr||0)/100},"Total P&L":{number:stats.totalPnl||0},"Best Trade":{number:stats.best||0},"Worst Trade":{number:stats.worst||0},"Mental State":{number:wSelected.mental},"Discipline":{number:wSelected.discipline},"Submitted":{checkbox:true}};
+  if(wentWell)props["What Went Well"]={rich_text:[{text:{content:wentWell}}]};
+  if(improve)props["Needs Improvement"]={rich_text:[{text:{content:improve}}]};
+  if(goal)props["Next Week Goal"]={rich_text:[{text:{content:goal}}]};
+  if(focus)props["Focus Confluences"]={rich_text:[{text:{content:focus}}]};
+  if(wState.aiCoaching)props["AI Coaching"]={rich_text:[{text:{content:wState.aiCoaching.substring(0,2000)}}]};
+  try{
+    let data;
+    if(wState.existing&&!wState.existing.properties['Submitted']?.checkbox){const res=await fetch(`${WORKER}/notion/pages/${wState.existing.id}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({properties:props})});data=await res.json();}
+    else{const res=await fetch(`${WORKER}/notion/pages`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({parent:{database_id:WEEKLY_DB},properties:props})});data=await res.json();}
+    if(data.id){wState.existing=data;wShowLocked(data);wLoadHistory();}
+  }catch(e){alert('Submit error: '+e.message);}
+  btn.disabled=false;btn.textContent='✓ Submit Weekly Review';
+}
+async function wSaveNote(){
+  const note=document.getElementById('w-extra-note').value.trim();if(!note||!wState.existing)return;
+  const btn=document.getElementById('w-note-btn');btn.disabled=true;btn.textContent='Saving...';
+  try{await fetch(`${WORKER}/notion/pages/${wState.existing.id}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({properties:{"Extra Note":{rich_text:[{text:{content:note}}]}}})});btn.textContent='Saved ✓';setTimeout(()=>{btn.disabled=false;btn.textContent='Save Note';},2000);}
+  catch(e){btn.disabled=false;btn.textContent='Save Note';alert('Error: '+e.message);}
+}
+async function wLoadHistory(){
+  const container=document.getElementById('w-history');
+  try{
+    const res=await fetch(`${WORKER}/notion/databases/${WEEKLY_DB}/query`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({page_size:20})});
+    const data=await res.json(),pages=(data.results||[]).sort((a,b)=>(b.properties['Week Start']?.date?.start||'').localeCompare(a.properties['Week Start']?.date?.start||''));
+    if(!pages.length){container.innerHTML='<div style="font-family:var(--mono);font-size:11px;color:var(--text3);padding:1.5rem;background:var(--surface);text-align:center;">No weekly reviews yet</div>';return;}
+    container.innerHTML=pages.map((p,i)=>{
+      const props=p.properties,ws=props['Week Start']?.date?.start||'',we=props['Week End']?.date?.start||'',pnl=props['Total P&L']?.number||0,wr=Math.round((props['Win Rate']?.number||0)*100),tc=props['Trade Count']?.number||0,mental=props['Mental State']?.number||0,disc=props['Discipline']?.number||0;
+      const pClass=pnl>=0?'color:var(--green)':'color:var(--red)',pStr=(pnl>=0?'+':'-')+'$'+Math.abs(pnl).toLocaleString();
+      const wsFmt=ws?new Date(ws+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'}):'—',weFmt=we?new Date(we+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'—';
+      return `<div style="background:var(--surface);border-bottom:1px solid var(--border);"><div style="display:grid;grid-template-columns:160px 80px 80px 80px 1fr auto;gap:12px;align-items:center;padding:12px 16px;cursor:pointer;" onclick="wToggleExpand(${i})"><div style="font-family:var(--mono);font-size:11px;color:var(--text2);">${wsFmt} – ${weFmt}</div><div style="font-family:var(--mono);font-size:12px;font-weight:700;${pClass}">${pStr}</div><div style="font-family:var(--mono);font-size:11px;color:var(--text2);">${wr}% WR</div><div style="font-family:var(--mono);font-size:11px;color:var(--text3);">${tc} trades</div><div style="font-family:var(--mono);font-size:10px;color:var(--text3);">${wRenderStarsDisplay(mental)} · ${wRenderStarsDisplay(disc)}</div><div style="font-family:var(--mono);font-size:10px;color:var(--text3);" id="w-expand-arrow-${i}">▼</div></div><div id="w-expand-${i}" style="display:none;padding:0 16px 16px;border-top:1px solid var(--border);">${wExtractText(props['What Went Well']?.rich_text)?`<div class="wfield-label" style="margin-top:12px;">What went well</div><div class="wfield-val">${wExtractText(props['What Went Well']?.rich_text)}</div>`:''} ${wExtractText(props['Needs Improvement']?.rich_text)?`<div class="wfield-label" style="margin-top:10px;">Needs improvement</div><div class="wfield-val">${wExtractText(props['Needs Improvement']?.rich_text)}</div>`:''} ${wExtractText(props['Next Week Goal']?.rich_text)?`<div class="wfield-label" style="margin-top:10px;">Goal</div><div class="wfield-val">${wExtractText(props['Next Week Goal']?.rich_text)}</div>`:''} ${wExtractText(props['AI Coaching']?.rich_text)?`<div class="wfield-label" style="margin-top:10px;">AI Coaching</div><div class="wfield-val" style="white-space:pre-wrap;">${wExtractText(props['AI Coaching']?.rich_text)}</div>`:''}</div></div>`;
+    }).join('');
+  }catch(e){container.innerHTML=`<div style="color:var(--red);font-size:12px;padding:1rem;">Error: ${e.message}</div>`;}
+}
 function wToggleExpand(i){const el=document.getElementById(`w-expand-${i}`),arrow=document.getElementById(`w-expand-arrow-${i}`),open=el.style.display!=='none';el.style.display=open?'none':'block';arrow.textContent=open?'▼':'▲';}
 
 // ── PARTIAL EXITS ─────────────────────────────────────────────────────────────
 const TP_LABELS=['TP1','TP2','TP3','TP4','TP5','TP6','TP7','TP8','TP9','TP10'];
-function buildTPRow(i,remainingBefore){const inp=`style="font-family:var(--mono);font-size:12px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:8px 10px;width:100%;outline:none;transition:border-color 0.15s;"`;const lbl=`style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;color:var(--text3);text-transform:uppercase;display:block;margin-bottom:4px;"`;const label=TP_LABELS[i-1]||`TP${i}`;return `<div id="tp-row-${i}" style="margin-bottom:10px;padding:12px;background:var(--surface2);border:1px solid var(--border2);"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;"><div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--accent);text-transform:uppercase;">${label}</div><div style="font-family:var(--mono);font-size:9px;color:var(--text3);" id="tp-remaining-${i}">${remainingBefore} contract${remainingBefore>1?'s':''} available</div></div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;"><div><label ${lbl}>Exit Price</label><input type="number" id="f-tp${i}-price" placeholder="e.g. 27419.75" step="0.25" ${inp} oninput="onTPInput()"></div><div><label ${lbl}>Exit Time</label><input type="text" id="f-tp${i}-time" placeholder="e.g. 10:01 AM" ${inp}></div><div><label ${lbl}>Contracts off</label><input type="number" id="f-tp${i}-contracts" placeholder="max ${remainingBefore}" min="1" max="${remainingBefore}" ${inp} oninput="onTPInput()"></div></div><div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:6px;" id="tp-note-${i}"></div></div>`;}
-function togglePartialRow(){const contracts=getNum('f-contracts')||1,row=document.getElementById('partial-row');if(!row)return;if(contracts<=1){row.style.display='none';document.getElementById('partial-tp-rows').innerHTML='';document.getElementById('partial-pnl-preview').textContent='';return;}row.style.display='block';renderTPRows(contracts);}
-function renderTPRows(totalContracts){const maxTPs=Math.min(totalContracts,10);let html='';for(let i=1;i<=maxTPs;i++)html+=buildTPRow(i,totalContracts);document.getElementById('partial-tp-rows').innerHTML=html;document.getElementById('partial-contracts-remaining').textContent=`${totalContracts} contracts total`;onTPInput();}
-function onTPInput(){const totalContracts=getNum('f-contracts')||1,entry=getNum('f-entry'),sl=getNum('f-sl'),instrument=getField('f-instrument'),direction=getField('f-direction'),maxTPs=Math.min(totalContracts,10);let contractsUsed=0,allExited=false;for(let i=1;i<=maxTPs;i++){const rowEl=document.getElementById(`tp-row-${i}`),remainingEl=document.getElementById(`tp-remaining-${i}`),noteEl=document.getElementById(`tp-note-${i}`);if(!rowEl)break;if(allExited){rowEl.style.display='none';continue;}rowEl.style.display='block';const contractsAvailable=totalContracts-contractsUsed;if(remainingEl)remainingEl.textContent=`${contractsAvailable} contract${contractsAvailable>1?'s':''} available`;const tpContracts=getNum(`f-tp${i}-contracts`)||0,tpPrice=getNum(`f-tp${i}-price`),tpContrInput=document.getElementById(`f-tp${i}-contracts`);if(tpContrInput)tpContrInput.max=contractsAvailable;if(tpContracts>contractsAvailable){const el=document.getElementById(`f-tp${i}-contracts`);if(el)el.value=contractsAvailable;}let note='';if(tpPrice&&entry&&sl&&tpContracts>0){const isAtSL=Math.abs(tpPrice-sl)<0.5,isAtBE=Math.abs(tpPrice-entry)<1.0&&!isAtSL;if(isAtBE)note='⚡ BE exit — protecting capital';else if(isAtSL)note='⛔ Stop loss hit';else if(entry&&instrument&&direction){const pnl=calcPnL(entry,tpPrice,tpContracts||1,instrument,direction);note=`${pnl>=0?'+':'-'}$${Math.abs(pnl).toLocaleString()} on ${tpContracts||'?'} contract${(tpContracts||1)>1?'s':''}`;}}if(noteEl){noteEl.textContent=note;noteEl.style.color=note.includes('BE')?'var(--yellow)':note.includes('Stop')?'var(--red)':'var(--green)';}contractsUsed+=tpContracts;if(contractsUsed>=totalContracts)allExited=true;}document.getElementById('partial-contracts-remaining').textContent=contractsUsed>0?`${contractsUsed} / ${totalContracts} contracts exited${allExited?' — fully closed':` · ${totalContracts-contractsUsed} running`}`:`${totalContracts} contracts total`;updatePartialPreview();}
-function getTPRows(){const contracts=getNum('f-contracts')||1,maxTPs=Math.min(contracts,10),rows=[];for(let i=1;i<=maxTPs;i++){const price=getNum(`f-tp${i}-price`),c=getNum(`f-tp${i}-contracts`);if(price&&c)rows.push({price,time:getField(`f-tp${i}-time`),contracts:c,label:TP_LABELS[i-1]||`TP${i}`});}return rows;}
-function updatePartialPreview(){const preview=document.getElementById('partial-pnl-preview');if(!preview)return;const entry=getNum('f-entry'),sl=getNum('f-sl'),instrument=getField('f-instrument'),direction=getField('f-direction');if(!entry||!instrument||!direction){preview.innerHTML='';return;}const rows=getTPRows();if(!rows.length){preview.innerHTML='';return;}let totalPnl=0,lines=[];rows.forEach(r=>{const isAtSL=sl&&Math.abs(r.price-sl)<0.5,isAtBE=Math.abs(r.price-entry)<1.0&&!isAtSL,pnl=calcPnL(entry,r.price,r.contracts,instrument,direction);totalPnl+=pnl;const tag=isAtBE?' [BE]':isAtSL?' [SL]':'',sign=pnl>=0?'+':'-';lines.push(`${r.label}${tag}: ${sign}$${Math.abs(pnl).toLocaleString()} · ${r.contracts} contract${r.contracts>1?'s':''} @ ${r.price.toLocaleString()}`);});lines.push(`──────────────────────`);lines.push(`Total P&L: ${totalPnl>=0?'+':'-'}$${Math.abs(totalPnl).toLocaleString()}`);preview.innerHTML=lines.join('<br>');preview.style.color=totalPnl>=0?'var(--green)':'var(--red)';}
-function resetForm(){['f-instrument','f-direction','f-session','f-timeframe','f-outcome','f-htf','f-model','f-entry','f-exit','f-sl','f-tp','f-contracts','f-entry-time','f-exit-time','f-notes','f-mistakes','f-lessons','f-screenshot'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});const partialRow=document.getElementById('partial-row');if(partialRow)partialRow.style.display='none';const tpRowsEl=document.getElementById('partial-tp-rows');if(tpRowsEl)tpRowsEl.innerHTML='';const partialPreview=document.getElementById('partial-pnl-preview');if(partialPreview)partialPreview.textContent='';document.getElementById('f-date').value=new Date().toISOString().split('T')[0];clearConf();}
+function buildTPRow(i,remainingBefore){
+  const inp=`style="font-family:var(--mono);font-size:12px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:8px 10px;width:100%;outline:none;transition:border-color 0.15s;"`;
+  const lbl=`style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;color:var(--text3);text-transform:uppercase;display:block;margin-bottom:4px;"`;
+  const label=TP_LABELS[i-1]||`TP${i}`;
+  return `<div id="tp-row-${i}" style="margin-bottom:10px;padding:12px;background:var(--surface2);border:1px solid var(--border2);"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;"><div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--accent);text-transform:uppercase;">${label}</div><div style="font-family:var(--mono);font-size:9px;color:var(--text3);" id="tp-remaining-${i}">${remainingBefore} contract${remainingBefore>1?'s':''} available</div></div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;"><div><label ${lbl}>Exit Price</label><input type="number" id="f-tp${i}-price" placeholder="e.g. 27419.75" step="0.25" ${inp} oninput="onTPInput()"></div><div><label ${lbl}>Exit Time</label><input type="text" id="f-tp${i}-time" placeholder="e.g. 10:01 AM" ${inp}></div><div><label ${lbl}>Contracts off</label><input type="number" id="f-tp${i}-contracts" placeholder="max ${remainingBefore}" min="1" max="${remainingBefore}" ${inp} oninput="onTPInput()"></div></div><div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:6px;" id="tp-note-${i}"></div></div>`;
+}
+function togglePartialRow(){
+  const contracts=getNum('f-contracts')||1,row=document.getElementById('partial-row');if(!row)return;
+  if(contracts<=1){row.style.display='none';document.getElementById('partial-tp-rows').innerHTML='';document.getElementById('partial-pnl-preview').textContent='';return;}
+  row.style.display='block';renderTPRows(contracts);
+}
+function renderTPRows(totalContracts){
+  const maxTPs=Math.min(totalContracts,10);let html='';for(let i=1;i<=maxTPs;i++)html+=buildTPRow(i,totalContracts);
+  document.getElementById('partial-tp-rows').innerHTML=html;document.getElementById('partial-contracts-remaining').textContent=`${totalContracts} contracts total`;onTPInput();
+}
+function onTPInput(){
+  const totalContracts=getNum('f-contracts')||1,entry=getNum('f-entry'),sl=getNum('f-sl'),instrument=getField('f-instrument'),direction=getField('f-direction'),maxTPs=Math.min(totalContracts,10);
+  let contractsUsed=0,allExited=false;
+  for(let i=1;i<=maxTPs;i++){
+    const rowEl=document.getElementById(`tp-row-${i}`),remainingEl=document.getElementById(`tp-remaining-${i}`),noteEl=document.getElementById(`tp-note-${i}`);if(!rowEl)break;
+    if(allExited){rowEl.style.display='none';continue;}
+    rowEl.style.display='block';const contractsAvailable=totalContracts-contractsUsed;if(remainingEl)remainingEl.textContent=`${contractsAvailable} contract${contractsAvailable>1?'s':''} available`;
+    const tpContracts=getNum(`f-tp${i}-contracts`)||0,tpPrice=getNum(`f-tp${i}-price`),tpContrInput=document.getElementById(`f-tp${i}-contracts`);if(tpContrInput)tpContrInput.max=contractsAvailable;
+    if(tpContracts>contractsAvailable){const el=document.getElementById(`f-tp${i}-contracts`);if(el)el.value=contractsAvailable;}
+    let note='';
+    if(tpPrice&&entry&&sl&&tpContracts>0){const isAtSL=Math.abs(tpPrice-sl)<0.5,isAtBE=Math.abs(tpPrice-entry)<1.0&&!isAtSL;if(isAtBE)note='⚡ BE exit — protecting capital';else if(isAtSL)note='⛔ Stop loss hit';else if(entry&&instrument&&direction){const pnl=calcPnL(entry,tpPrice,tpContracts||1,instrument,direction);note=`${pnl>=0?'+':'-'}$${Math.abs(pnl).toLocaleString()} on ${tpContracts||'?'} contract${(tpContracts||1)>1?'s':''}`;}}
+    if(noteEl){noteEl.textContent=note;noteEl.style.color=note.includes('BE')?'var(--yellow)':note.includes('Stop')?'var(--red)':'var(--green)';}
+    contractsUsed+=tpContracts;if(contractsUsed>=totalContracts)allExited=true;
+  }
+  document.getElementById('partial-contracts-remaining').textContent=contractsUsed>0?`${contractsUsed} / ${totalContracts} contracts exited${allExited?' — fully closed':` · ${totalContracts-contractsUsed} running`}`:`${totalContracts} contracts total`;
+  updatePartialPreview();
+}
+function getTPRows(){
+  const contracts=getNum('f-contracts')||1,maxTPs=Math.min(contracts,10),rows=[];
+  for(let i=1;i<=maxTPs;i++){const price=getNum(`f-tp${i}-price`),c=getNum(`f-tp${i}-contracts`);if(price&&c)rows.push({price,time:getField(`f-tp${i}-time`),contracts:c,label:TP_LABELS[i-1]||`TP${i}`});}
+  return rows;
+}
+function updatePartialPreview(){
+  const preview=document.getElementById('partial-pnl-preview');if(!preview)return;
+  const entry=getNum('f-entry'),sl=getNum('f-sl'),instrument=getField('f-instrument'),direction=getField('f-direction');
+  if(!entry||!instrument||!direction){preview.innerHTML='';return;}
+  const rows=getTPRows();if(!rows.length){preview.innerHTML='';return;}
+  let totalPnl=0,lines=[];
+  rows.forEach(r=>{const isAtSL=sl&&Math.abs(r.price-sl)<0.5,isAtBE=Math.abs(r.price-entry)<1.0&&!isAtSL,pnl=calcPnL(entry,r.price,r.contracts,instrument,direction);totalPnl+=pnl;const tag=isAtBE?' [BE]':isAtSL?' [SL]':'',sign=pnl>=0?'+':'-';lines.push(`${r.label}${tag}: ${sign}$${Math.abs(pnl).toLocaleString()} · ${r.contracts} contract${r.contracts>1?'s':''} @ ${r.price.toLocaleString()}`);});
+  lines.push(`──────────────────────`);lines.push(`Total P&L: ${totalPnl>=0?'+':'-'}$${Math.abs(totalPnl).toLocaleString()}`);
+  preview.innerHTML=lines.join('<br>');preview.style.color=totalPnl>=0?'var(--green)':'var(--red)';
+}
+function resetForm(){
+  ['f-instrument','f-direction','f-session','f-timeframe','f-outcome','f-htf','f-model','f-entry','f-exit','f-sl','f-tp','f-contracts','f-entry-time','f-exit-time','f-notes','f-mistakes','f-lessons','f-screenshot'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  const partialRow=document.getElementById('partial-row');if(partialRow)partialRow.style.display='none';
+  const tpRowsEl=document.getElementById('partial-tp-rows');if(tpRowsEl)tpRowsEl.innerHTML='';
+  const partialPreview=document.getElementById('partial-pnl-preview');if(partialPreview)partialPreview.textContent='';
+  document.getElementById('f-date').value=new Date().toISOString().split('T')[0];
+  clearConf();
+}
 
-document.addEventListener('DOMContentLoaded',()=>{const body1=document.getElementById('pma-body-1');if(body1)body1.classList.add('open');});
+// Open step 1 by default when tab loads
+document.addEventListener('DOMContentLoaded', () => {
+  const body1 = document.getElementById('pma-body-1');
+  if (body1) body1.classList.add('open');
+});
 </script>
-<script>if('serviceWorker' in navigator){navigator.serviceWorker.register('/dtjrl.github.io/sw.js');}</script>
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/dtjrl.github.io/sw.js');
+  }
+</script>
 </body>
 </html>
