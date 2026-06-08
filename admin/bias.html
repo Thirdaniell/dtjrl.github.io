@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bias Board — FTJ Admin</title>
+<link rel="manifest" href="../manifest.json">
+<meta name="theme-color" content="#0a0a0a">
+<link rel="icon" type="image/png" href="https://i.imgur.com/ZP2pTk2.png">
+<link rel="stylesheet" href="../mobile.css">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0a0a;--surface:#111;--surface2:#181818;--border:#1a1a1a;--border2:#2a2a2a;--text:#e8e8e8;--text2:#888;--text3:#444;--green:#00e676;--red:#ff4444;--yellow:#ffd740;--accent:#c8ff00;--mono:'Space Mono',monospace;--sans:'DM Sans',sans-serif;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;min-height:100vh;}
+::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+#main{padding-left:64px;}
+.page{max-width:800px;margin:0 auto;padding:3rem 2rem 5rem;}
+.sidenav-admin{position:fixed;left:0;top:0;bottom:0;width:64px;background:var(--bg);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:1.5rem 0;z-index:200;}
+.nav-logo-a{font-family:var(--mono);font-size:9px;letter-spacing:0.1em;color:var(--accent);writing-mode:vertical-rl;margin-bottom:2rem;}
+.nav-admin-tag{font-family:var(--mono);font-size:8px;letter-spacing:0.12em;color:var(--red);writing-mode:vertical-rl;margin-top:auto;}
+.back-btn{font-family:var(--mono);font-size:10px;letter-spacing:0.1em;color:var(--text3);background:none;border:1px solid var(--border2);padding:6px 14px;cursor:pointer;text-transform:uppercase;transition:all 0.15s;text-decoration:none;display:inline-block;margin-bottom:2rem;}
+.back-btn:hover{color:var(--accent);border-color:var(--accent);}
+.page-eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:0.2em;color:var(--accent);text-transform:uppercase;margin-bottom:8px;}
+.page-title{font-family:var(--mono);font-size:28px;font-weight:700;line-height:1.1;margin-bottom:2rem;}
+.bias-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);margin-bottom:2rem;}
+.bias-card{background:var(--surface);padding:1.5rem;}
+.bias-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;}
+.inst-badge{font-family:var(--mono);font-size:11px;letter-spacing:0.1em;padding:3px 10px;border:1px solid;}
+.inst-nq{color:#c8ff00;border-color:rgba(200,255,0,0.3);}
+.inst-es{color:#40c4ff;border-color:rgba(64,196,255,0.3);}
+.bias-val{font-family:var(--mono);font-size:28px;font-weight:700;line-height:1;margin-bottom:4px;}
+.b-bull{color:var(--green);}.b-bear{color:var(--red);}.b-range{color:var(--yellow);}.b-wait{color:var(--text3);}.b-none{color:var(--border2);}
+.bias-sublabel{font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--text3);text-transform:uppercase;margin-bottom:6px;}
+.switch-row{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10px;color:var(--yellow);margin-top:6px;}
+.bbtn-group{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin:12px 0 8px;}
+.bbtn{font-family:var(--mono);font-size:9px;letter-spacing:0.06em;text-transform:uppercase;padding:8px 4px;background:var(--surface2);border:1px solid var(--border2);color:var(--text3);cursor:pointer;transition:all 0.15s;}
+.bbtn:hover{border-color:var(--text2);color:var(--text);}
+.bbtn.bull.active{border-color:var(--green);color:var(--green);background:rgba(0,230,118,0.08);}
+.bbtn.bear.active{border-color:var(--red);color:var(--red);background:rgba(255,68,68,0.08);}
+.bbtn.range.active{border-color:var(--yellow);color:var(--yellow);background:rgba(255,215,64,0.08);}
+.bbtn.wait.active{border-color:var(--text2);color:var(--text2);background:rgba(136,136,136,0.08);}
+.bbtn:disabled{opacity:0.3;cursor:not-allowed;}
+.bnotes{font-family:var(--sans);font-size:12px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:8px 10px;width:100%;outline:none;resize:none;min-height:50px;margin-bottom:8px;line-height:1.5;transition:border-color 0.15s;}
+.bnotes:focus{border-color:var(--accent);}
+.bnotes:disabled{opacity:0.4;}
+.bset-btn{font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;padding:10px;background:var(--accent);color:#000;border:none;cursor:pointer;font-weight:700;width:100%;transition:opacity 0.15s;}
+.bset-btn:hover{opacity:0.85;}
+.bset-btn:disabled{opacity:0.3;cursor:not-allowed;}
+.bset-btn.sw{background:var(--surface2);color:var(--text2);border:1px solid var(--border2);}
+.bset-btn.sw:hover{border-color:var(--yellow);color:var(--yellow);}
+.blocked-msg{font-family:var(--mono);font-size:9px;color:var(--text3);text-align:center;padding:5px;margin-top:3px;letter-spacing:0.05em;}
+.bhistory{display:flex;flex-direction:column;gap:1px;background:var(--border);}
+.brow{background:var(--surface);display:grid;grid-template-columns:100px 60px 1fr 1fr;gap:12px;align-items:center;padding:10px 14px;}
+.brow:hover{background:var(--surface2);}
+.bh-date{font-family:var(--mono);font-size:10px;color:var(--text2);}
+.bh-inst{font-family:var(--mono);font-size:10px;color:var(--text3);}
+.bh-bias{font-family:var(--mono);font-size:11px;font-weight:700;}
+.bh-notes{font-size:11px;color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.section-label{font-family:var(--mono);font-size:9px;letter-spacing:0.2em;color:var(--text3);text-transform:uppercase;margin-bottom:10px;}
+@media(max-width:600px){.bias-grid{grid-template-columns:1fr;}#main{padding-left:0;}}
+</style>
+</head>
+<body>
+<div id="main">
+  <nav class="sidenav-admin">
+    <div class="nav-logo-a">// FTJ</div>
+    <div class="nav-admin-tag">ADMIN</div>
+  </nav>
+  <div class="page">
+    <a href="admin.html" class="back-btn">← Back to Admin</a>
+    <div class="page-eyebrow">// Admin</div>
+    <div class="page-title">Bias Board</div>
+    <p style="font-size:13px;color:var(--text2);margin:0 0 1.5rem;line-height:1.7;">Set your daily HTF bias for NQ and ES. Locked once set — one switch allowed per instrument per day.</p>
+
+    <div class="bias-grid">
+      <div class="bias-card">
+        <div class="bias-card-header"><span class="inst-badge inst-nq">NQ</span><span style="font-family:var(--mono);font-size:10px;color:var(--text3);" id="bias-date-label"></span></div>
+        <div class="bias-sublabel">Current Bias</div>
+        <div class="bias-val b-none" id="bval-NQ">—</div>
+        <div id="bswitch-NQ" style="display:none;" class="switch-row"><span>→ Switched from</span><span id="bswitch-from-NQ"></span></div>
+        <div class="bbtn-group" id="bbtns-NQ">
+          <button class="bbtn bull" onclick="bSelectBias('NQ','Bullish')">Bullish</button>
+          <button class="bbtn bear" onclick="bSelectBias('NQ','Bearish')">Bearish</button>
+          <button class="bbtn range" onclick="bSelectBias('NQ','Ranging')">Ranging</button>
+          <button class="bbtn wait" onclick="bSelectBias('NQ','Waiting')">Waiting</button>
+        </div>
+        <textarea class="bnotes" id="bnotes-NQ" placeholder="Notes — key levels, reasoning..."></textarea>
+        <button class="bset-btn" id="bset-NQ" onclick="bSubmit('NQ')">Set NQ Bias</button>
+        <div class="blocked-msg" id="blocked-NQ" style="display:none;"></div>
+      </div>
+      <div class="bias-card">
+        <div class="bias-card-header"><span class="inst-badge inst-es">ES</span></div>
+        <div class="bias-sublabel">Current Bias</div>
+        <div class="bias-val b-none" id="bval-ES">—</div>
+        <div id="bswitch-ES" style="display:none;" class="switch-row"><span>→ Switched from</span><span id="bswitch-from-ES"></span></div>
+        <div class="bbtn-group" id="bbtns-ES">
+          <button class="bbtn bull" onclick="bSelectBias('ES','Bullish')">Bullish</button>
+          <button class="bbtn bear" onclick="bSelectBias('ES','Bearish')">Bearish</button>
+          <button class="bbtn range" onclick="bSelectBias('ES','Ranging')">Ranging</button>
+          <button class="bbtn wait" onclick="bSelectBias('ES','Waiting')">Waiting</button>
+        </div>
+        <textarea class="bnotes" id="bnotes-ES" placeholder="Notes — key levels, reasoning..."></textarea>
+        <button class="bset-btn" id="bset-ES" onclick="bSubmit('ES')">Set ES Bias</button>
+        <div class="blocked-msg" id="blocked-ES" style="display:none;"></div>
+      </div>
+    </div>
+
+    <div class="section-label">Bias History</div>
+    <div id="bhistory-container"><div style="font-family:var(--mono);font-size:11px;color:var(--text3);padding:2rem;text-align:center;">Loading...</div></div>
+  </div>
+</div>
+
+<script src="admin-core.js"></script>
+<script>
+if (!requireAuth()) { /* redirected */ }
+
+const bSelected = {NQ:null, ES:null};
+const bState    = {NQ:null, ES:null};
+
+function bBiasClass(b){return{'Bullish':'b-bull','Bearish':'b-bear','Ranging':'b-range','Waiting':'b-wait'}[b]||'b-none';}
+
+function bSelectBias(inst,bias){
+  bSelected[inst]=bias;
+  document.querySelectorAll(`#bbtns-${inst} .bbtn`).forEach(b=>b.classList.remove('active'));
+  const map={'Bullish':'bull','Bearish':'bear','Ranging':'range','Waiting':'wait'};
+  document.querySelector(`#bbtns-${inst} .${map[bias]}`).classList.add('active');
+}
+
+function bLockCard(inst,bias,switchBias,hasSwitched){
+  const valEl=document.getElementById(`bval-${inst}`),swEl=document.getElementById(`bswitch-${inst}`),swFrom=document.getElementById(`bswitch-from-${inst}`),btn=document.getElementById(`bset-${inst}`),locked=document.getElementById(`blocked-${inst}`),notes=document.getElementById(`bnotes-${inst}`);
+  const effective=switchBias||bias;
+  valEl.className='bias-val '+bBiasClass(effective); valEl.textContent=effective||'—';
+  if(switchBias){swEl.style.display='flex';swFrom.textContent=bias;}
+  document.querySelectorAll(`#bbtns-${inst} .bbtn`).forEach(b=>b.disabled=true);
+  notes.disabled=true; notes.placeholder='';
+  if(hasSwitched){btn.disabled=true;btn.textContent='Locked for today';locked.style.display='block';locked.textContent='Bias + switch used — locked until tomorrow';}
+  else{btn.classList.add('sw');btn.textContent=`↺ Switch ${inst} Bias`;btn.onclick=()=>bOpenSwitch(inst,bias);locked.style.display='block';locked.textContent='Bias locked · 1 switch remaining';}
+}
+
+function bOpenSwitch(inst,original){
+  document.querySelectorAll(`#bbtns-${inst} .bbtn`).forEach(b=>{b.disabled=false;b.onclick=()=>bSelectBias(inst,b.textContent.trim());});
+  const notes=document.getElementById(`bnotes-${inst}`);notes.disabled=false;notes.value='';notes.placeholder='Why are you switching?';
+  const btn=document.getElementById(`bset-${inst}`);btn.classList.remove('sw');btn.textContent=`Confirm ${inst} Switch`;btn.onclick=()=>bSubmitSwitch(inst,original);
+  document.getElementById(`blocked-${inst}`).textContent='Select new bias then confirm';
+}
+
+async function bSubmit(inst){
+  if(!bSelected[inst]){alert(`Select a bias for ${inst}`);return;}
+  const btn=document.getElementById(`bset-${inst}`);btn.disabled=true;btn.textContent='Saving...';
+  const bias=bSelected[inst],notes=document.getElementById(`bnotes-${inst}`).value.trim();
+  const props={"Title":{title:[{text:{content:`${inst} ${bias} — ${TODAY}`}}]},"Instrument":{select:{name:inst}},"Bias":{select:{name:bias}},"Date":{date:{start:TODAY}},"switched":{checkbox:false}};
+  if(notes)props["Notes"]={rich_text:[{text:{content:notes}}]};
+  try{
+    const data=await notionPost('/pages',{parent:{database_id:BIAS_DB},properties:props});
+    if(data.id){bState[inst]={bias,switchBias:null,pageId:data.id};bLockCard(inst,bias,null,false);loadHistory();}
+    else{btn.disabled=false;btn.textContent=`Set ${inst} Bias`;alert('Error: '+JSON.stringify(data));}
+  }catch(e){btn.disabled=false;btn.textContent=`Set ${inst} Bias`;alert('Error: '+e.message);}
+}
+
+async function bSubmitSwitch(inst,original){
+  const newBias=bSelected[inst];if(!newBias){alert(`Select a new bias for ${inst}`);return;}if(newBias===original){alert('Pick a different bias to switch to');return;}
+  const btn=document.getElementById(`bset-${inst}`);btn.disabled=true;btn.textContent='Saving switch...';
+  const notes=document.getElementById(`bnotes-${inst}`).value.trim();
+  const props={"Title":{title:[{text:{content:`${inst} Switch → ${newBias} — ${TODAY}`}}]},"Instrument":{select:{name:inst}},"Bias":{select:{name:newBias}},"Date":{date:{start:TODAY}},"switched":{checkbox:true}};
+  if(notes)props["Notes"]={rich_text:[{text:{content:notes}}]};
+  try{
+    const data=await notionPost('/pages',{parent:{database_id:BIAS_DB},properties:props});
+    if(data.id){bState[inst].switchBias=newBias;bLockCard(inst,original,newBias,true);loadHistory();}
+    else{btn.disabled=false;btn.textContent=`Confirm ${inst} Switch`;alert('Error: '+JSON.stringify(data));}
+  }catch(e){btn.disabled=false;btn.textContent=`Confirm ${inst} Switch`;alert('Error: '+e.message);}
+}
+
+async function loadHistory(){
+  const container=document.getElementById('bhistory-container');
+  try{
+    const data=await notionPost(`/databases/${BIAS_DB}/query`,{page_size:50});
+    const pages=(data.results||[]).sort((a,b)=>(b.properties['Date']?.date?.start||'').localeCompare(a.properties['Date']?.date?.start||''));
+    if(!pages.length){container.innerHTML='<div style="font-family:var(--mono);font-size:11px;color:var(--text3);padding:2rem;text-align:center;background:var(--surface);">No bias entries yet</div>';return;}
+    const rows=pages.map(p=>{
+      const inst=p.properties['Instrument']?.select?.name||'—',bias=p.properties['Bias']?.select?.name||'—',isSw=p.properties['switched']?.checkbox,notes=wExtractText(p.properties['Notes']?.rich_text),date=p.properties['Date']?.date?.start||'—';
+      const ds=new Date(date+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+      return `<div class="brow"><div class="bh-date">${ds}</div><div class="bh-inst" style="color:${inst==='NQ'?'#c8ff00':'#40c4ff'}">${inst}</div><div class="bh-bias ${bBiasClass(bias)}">${isSw?'↺ ':''} ${bias}</div><div class="bh-notes">${notes||'—'}</div></div>`;
+    }).join('');
+    container.innerHTML=`<div class="bhistory">${rows}</div>`;
+  }catch(e){container.innerHTML=`<div style="font-family:var(--mono);font-size:11px;color:var(--red);padding:1rem;">Error: ${e.message}</div>`;}
+}
+
+async function init(){
+  const d=new Date(),lbl=document.getElementById('bias-date-label');
+  if(lbl)lbl.textContent=d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+  try{
+    const data=await notionPost(`/databases/${BIAS_DB}/query`,{filter:{and:[{property:'Date',date:{equals:TODAY}}]},page_size:100});
+    ['NQ','ES'].forEach(inst=>{
+      const entries=(data.results||[]).filter(p=>p.properties['Instrument']?.select?.name===inst);
+      const original=entries.find(p=>!p.properties['switched']?.checkbox),switched=entries.find(p=>p.properties['switched']?.checkbox);
+      if(original){const bias=original.properties['Bias']?.select?.name,switchBias=switched?.properties['Bias']?.select?.name||null;bState[inst]={bias,switchBias,pageId:original.id};bLockCard(inst,bias,switchBias,!!switched);}
+    });
+  }catch(e){console.error('bias load error',e);}
+  await loadHistory();
+}
+
+init();
+</script>
+<script>if('serviceWorker' in navigator){navigator.serviceWorker.register('../sw.js');}</script>
+</body>
+</html>
