@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Log Trade — FTJ Admin</title>
+<link rel="manifest" href="../manifest.json">
+<meta name="theme-color" content="#0a0a0a">
+<link rel="icon" type="image/png" href="https://i.imgur.com/ZP2pTk2.png">
+<link rel="stylesheet" href="../mobile.css">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0a0a;--surface:#111;--surface2:#181818;--border:#1a1a1a;--border2:#2a2a2a;--text:#e8e8e8;--text2:#888;--text3:#444;--green:#00e676;--red:#ff4444;--yellow:#ffd740;--accent:#c8ff00;--mono:'Space Mono',monospace;--sans:'DM Sans',sans-serif;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;min-height:100vh;}
+::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+#main{padding-left:64px;}
+.page{max-width:800px;margin:0 auto;padding:3rem 2rem 5rem;}
+.sidenav-admin{position:fixed;left:0;top:0;bottom:0;width:64px;background:var(--bg);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:1.5rem 0;z-index:200;}
+.nav-logo-a{font-family:var(--mono);font-size:9px;letter-spacing:0.1em;color:var(--accent);writing-mode:vertical-rl;margin-bottom:2rem;}
+.nav-admin-tag{font-family:var(--mono);font-size:8px;letter-spacing:0.12em;color:var(--red);writing-mode:vertical-rl;margin-top:auto;}
+.back-btn{font-family:var(--mono);font-size:10px;letter-spacing:0.1em;color:var(--text3);background:none;border:1px solid var(--border2);padding:6px 14px;cursor:pointer;text-transform:uppercase;transition:all 0.15s;text-decoration:none;display:inline-block;margin-bottom:2rem;}
+.back-btn:hover{color:var(--accent);border-color:var(--accent);}
+.page-eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:0.2em;color:var(--accent);text-transform:uppercase;margin-bottom:8px;}
+.page-title{font-family:var(--mono);font-size:28px;font-weight:700;line-height:1.1;margin-bottom:2rem;}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);margin-bottom:2rem;}
+.form-full{grid-column:1/-1;}
+.field{background:var(--surface);padding:1rem 1.25rem;}
+.field label{font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--text3);text-transform:uppercase;display:block;margin-bottom:6px;}
+.field input,.field select,.field textarea{font-family:var(--mono);font-size:12px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:8px 10px;width:100%;outline:none;transition:border-color 0.15s;appearance:none;}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent);}
+.field textarea{resize:vertical;min-height:70px;font-family:var(--sans);font-size:13px;line-height:1.6;}
+.field select option{background:var(--surface2);}
+.conf-wrap{position:relative;}
+.conf-btn{font-family:var(--mono);font-size:11px;background:var(--surface2);border:1px solid var(--border2);color:var(--text2);padding:8px 10px;width:100%;text-align:left;cursor:pointer;transition:border-color 0.15s;display:flex;justify-content:space-between;align-items:center;}
+.conf-btn.open,.conf-btn:focus{border-color:var(--accent);outline:none;}
+.conf-dropdown{display:none;position:absolute;top:100%;left:0;right:0;background:var(--surface);border:1px solid var(--accent);border-top:none;z-index:100;max-height:260px;overflow-y:auto;}
+.conf-dropdown.open{display:block;}
+.conf-group-lbl{font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--text3);text-transform:uppercase;padding:7px 10px 3px;border-top:1px solid var(--border2);}
+.conf-group-lbl:first-child{border-top:none;}
+.conf-opt{display:flex;align-items:center;gap:8px;padding:6px 10px;cursor:pointer;font-size:12px;color:var(--text2);transition:background 0.1s;}
+.conf-opt:hover{background:var(--surface2);}
+.conf-opt input{accent-color:var(--accent);width:12px;height:12px;flex-shrink:0;}
+.conf-opt.selected{color:var(--text);}
+.conf-clear{width:100%;font-family:var(--mono);font-size:9px;color:var(--text3);background:none;border:none;border-top:1px solid var(--border2);padding:7px;cursor:pointer;text-transform:uppercase;transition:color 0.15s;}
+.conf-clear:hover{color:var(--accent);}
+.conf-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;min-height:24px;}
+.conf-tag{font-family:var(--mono);font-size:9px;padding:2px 8px;border:1px solid var(--border2);color:var(--text3);}
+.analyze-btn{font-family:var(--mono);font-size:12px;letter-spacing:0.1em;text-transform:uppercase;padding:14px 28px;background:var(--accent);color:#000;border:none;cursor:pointer;font-weight:700;transition:opacity 0.15s;width:100%;}
+.analyze-btn:hover{opacity:0.85;}
+.analyze-btn:disabled{opacity:0.4;cursor:not-allowed;}
+#review-panel{display:none;margin-top:2rem;border:1px solid var(--border2);}
+.review-header{background:var(--surface);padding:1rem 1.25rem;border-bottom:1px solid var(--border2);}
+.review-title{font-family:var(--mono);font-size:11px;letter-spacing:0.12em;color:var(--accent);text-transform:uppercase;}
+.review-body{padding:1.25rem;}
+.review-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 24px;margin-bottom:1.25rem;}
+.review-label{font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--text3);text-transform:uppercase;margin-bottom:2px;}
+.review-value{font-family:var(--mono);font-size:12px;color:var(--text2);}
+.review-value.accent{color:var(--accent);}
+.review-value.green{color:var(--green);}
+.review-value.red{color:var(--red);}
+.review-value.yellow{color:var(--yellow);}
+.ai-section{background:var(--surface2);padding:1rem;margin-bottom:1.25rem;border:1px solid var(--border2);}
+.ai-title{font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--accent);text-transform:uppercase;margin-bottom:8px;}
+.ai-result{font-size:13px;color:var(--text2);line-height:1.8;white-space:pre-wrap;}
+.ai-verdict{font-family:var(--mono);font-size:11px;padding:6px 12px;display:inline-block;border:1px solid;margin-top:8px;}
+.verdict-yes{color:var(--green);border-color:rgba(0,230,118,0.4);background:rgba(0,230,118,0.07);}
+.verdict-partial{color:var(--yellow);border-color:rgba(255,215,64,0.4);background:rgba(255,215,64,0.07);}
+.verdict-no{color:var(--red);border-color:rgba(255,68,68,0.4);background:rgba(255,68,68,0.07);}
+.review-actions{display:flex;gap:8px;}
+.confirm-btn{font-family:var(--mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;padding:10px 20px;background:var(--green);color:#000;border:none;cursor:pointer;font-weight:700;flex:1;transition:opacity 0.15s;}
+.confirm-btn:hover{opacity:0.85;}
+.confirm-btn:disabled{opacity:0.4;cursor:not-allowed;}
+.edit-btn{font-family:var(--mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;padding:10px 20px;background:none;color:var(--text2);border:1px solid var(--border2);cursor:pointer;transition:all 0.15s;}
+.edit-btn:hover{color:var(--accent);border-color:var(--accent);}
+.success-msg{display:none;background:rgba(0,230,118,0.08);border:1px solid rgba(0,230,118,0.3);padding:1rem 1.25rem;font-family:var(--mono);font-size:12px;color:var(--green);text-align:center;margin-top:1rem;letter-spacing:0.05em;}
+.loading-msg{font-family:var(--mono);font-size:11px;color:var(--text3);letter-spacing:0.1em;text-align:center;padding:1rem;animation:blink 1s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+/* PARTIAL EXITS */
+.partial-row{display:none;background:rgba(200,255,0,0.03);border:1px solid rgba(200,255,0,0.15);padding:1rem 1.25rem;}
+@media(max-width:600px){.form-grid{grid-template-columns:1fr;}#main{padding-left:0;}}
+</style>
+</head>
+<body>
+<div id="main">
+  <nav class="sidenav-admin">
+    <div class="nav-logo-a">// FTJ</div>
+    <div class="nav-admin-tag">ADMIN</div>
+  </nav>
+  <div class="page">
+    <a href="admin.html" class="back-btn">← Back to Admin</a>
+    <div class="page-eyebrow">// Admin</div>
+    <div class="page-title">Log Trade</div>
+    <p style="font-size:13px;color:var(--text2);margin:0 0 2rem;line-height:1.7;">Fill in your trade details. The AI will grade, verify, and calculate all values — then show you a preview before submitting to Notion.</p>
+
+    <div class="form-grid">
+      <div class="field"><label>Instrument</label><select id="f-instrument"><option value="">Select...</option><option>NQ</option><option>ES</option><option>MNQ</option><option>MES</option><option>CL</option><option>GC</option><option>RTY</option></select></div>
+      <div class="field"><label>Direction</label><select id="f-direction"><option value="">Select...</option><option>Long</option><option>Short</option></select></div>
+      <div class="field"><label>Session</label><select id="f-session"><option value="">Select...</option><option>Asia</option><option>London</option><option>NY AM</option><option>NY Lunch</option><option>NY PM</option><option>Overnight</option></select></div>
+      <div class="field"><label>Timeframe</label><select id="f-timeframe"><option value="">Select...</option><option>1m</option><option>3m</option><option>5m</option><option>15m</option><option>1h</option><option>4h</option><option>Daily</option></select></div>
+      <div class="field"><label>HTF Timeframe</label><input type="text" id="f-htf" placeholder="e.g. 4H, 1H, 15m"></div>
+      <div class="field"><label>Entry Model</label><input type="text" id="f-model" placeholder="e.g. 1m IFVG retracement"></div>
+      <div class="field"><label>Date</label><input type="date" id="f-date"></div>
+      <div class="field"><label>Outcome</label><select id="f-outcome"><option value="">Select...</option><option value="Closed - Win">Win</option><option value="Closed - Loss">Loss</option><option value="Breakeven">Breakeven</option></select></div>
+      <div class="field"><label>Entry Price</label><input type="number" id="f-entry" placeholder="e.g. 27363.50" step="0.25"></div>
+      <div class="field"><label>Entry Time</label><input type="text" id="f-entry-time" placeholder="e.g. 9:40 AM"></div>
+      <div class="field"><label>Exit Price</label><input type="number" id="f-exit" placeholder="e.g. 27419.75" step="0.25"></div>
+      <div class="field"><label>Exit Time <span style="color:var(--text3);font-size:9px;">(final)</span></label><input type="text" id="f-exit-time" placeholder="e.g. 10:01 AM"></div>
+      <!-- PARTIAL EXITS -->
+      <div class="field form-full partial-row" id="partial-row">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--accent);text-transform:uppercase;">Partial Exits</div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--text3);" id="partial-contracts-remaining"></div>
+        </div>
+        <div id="partial-tp-rows"></div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--green);margin-top:10px;line-height:1.8;" id="partial-pnl-preview"></div>
+      </div>
+      <div class="field"><label>Stop Loss</label><input type="number" id="f-sl" placeholder="e.g. 27336.75" step="0.25"></div>
+      <div class="field"><label>Take Profit</label><input type="number" id="f-tp" placeholder="e.g. 27453.75" step="0.25"></div>
+      <div class="field"><label>Contracts</label><input type="number" id="f-contracts" placeholder="e.g. 2" min="1"></div>
+      <div class="field"><label>Screenshot Link</label><input type="text" id="f-screenshot" placeholder="imgur or TradingView URL"></div>
+      <div class="field form-full">
+        <label>Confluences</label>
+        <div class="conf-wrap">
+          <button class="conf-btn" id="conf-btn" onclick="toggleConf()" type="button"><span id="conf-label">Select confluences...</span><span>▼</span></button>
+          <div class="conf-dropdown" id="conf-dropdown"></div>
+        </div>
+        <div class="conf-tags" id="conf-tags"></div>
+      </div>
+      <div class="field form-full"><label>Notes</label><textarea id="f-notes" placeholder="What happened during this trade?"></textarea></div>
+      <div class="field form-full"><label>Mistakes</label><textarea id="f-mistakes" placeholder="What did you do wrong?"></textarea></div>
+      <div class="field form-full"><label>Lessons Learned</label><textarea id="f-lessons" placeholder="What will you do differently?"></textarea></div>
+    </div>
+
+    <button class="analyze-btn" id="analyze-btn" onclick="analyzeTrade()">⚡ Analyze & Preview Trade</button>
+
+    <div id="review-panel">
+      <div class="review-header"><div class="review-title">⚡ Trade Preview — Review Before Submitting</div></div>
+      <div class="review-body">
+        <div class="review-grid" id="review-grid"></div>
+        <div class="ai-section"><div class="ai-title">AI Rule Verification</div><div class="ai-result" id="ai-result"></div><div id="ai-verdict-badge"></div></div>
+        <div class="review-actions">
+          <button class="confirm-btn" id="confirm-btn" onclick="submitTrade()">✓ Confirm & Submit to Notion</button>
+          <button class="edit-btn" onclick="document.getElementById('review-panel').style.display='none'">← Edit</button>
+        </div>
+      </div>
+    </div>
+    <div class="success-msg" id="success-msg"></div>
+  </div>
+</div>
+
+<script src="admin-core.js"></script>
+<script>
+if (!requireAuth()) { /* redirected */ }
+
+document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
+buildConfDropdown('conf-btn','conf-dropdown','conf-label','conf-tags','updateConf');
+
+let confOpen = false;
+let tradeData = {};
+const TP_LABELS = ['TP1','TP2','TP3','TP4','TP5','TP6','TP7','TP8','TP9','TP10'];
+
+function toggleConf() {
+  confOpen = !confOpen;
+  document.getElementById('conf-dropdown').classList.toggle('open', confOpen);
+  document.getElementById('conf-btn').classList.toggle('open', confOpen);
+}
+document.addEventListener('click', e => {
+  const wrap = document.querySelector('.conf-wrap');
+  if (wrap && !wrap.contains(e.target)) {
+    confOpen = false;
+    document.getElementById('conf-dropdown').classList.remove('open');
+    document.getElementById('conf-btn').classList.remove('open');
+  }
+});
+function updateConf() { updateConfDisplay('conf-dropdown','conf-label','conf-tags'); }
+
+document.getElementById('f-contracts').addEventListener('input', togglePartialRow);
+
+function togglePartialRow() {
+  const contracts = getNum('f-contracts') || 1;
+  const row = document.getElementById('partial-row');
+  if (contracts <= 1) { row.style.display='none'; document.getElementById('partial-tp-rows').innerHTML=''; document.getElementById('partial-pnl-preview').textContent=''; return; }
+  row.style.display = 'block';
+  renderTPRows(contracts);
+}
+
+function buildTPRow(i, remainingBefore) {
+  const inp=`style="font-family:var(--mono);font-size:12px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:8px 10px;width:100%;outline:none;"`;
+  const lbl=`style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;color:var(--text3);text-transform:uppercase;display:block;margin-bottom:4px;"`;
+  return `<div id="tp-row-${i}" style="margin-bottom:10px;padding:12px;background:var(--surface2);border:1px solid var(--border2);">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+      <div style="font-family:var(--mono);font-size:9px;color:var(--accent);text-transform:uppercase;">${TP_LABELS[i-1]||'TP'+i}</div>
+      <div style="font-family:var(--mono);font-size:9px;color:var(--text3);" id="tp-remaining-${i}">${remainingBefore} contract${remainingBefore>1?'s':''} available</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+      <div><label ${lbl}>Exit Price</label><input type="number" id="f-tp${i}-price" step="0.25" ${inp} oninput="onTPInput()"></div>
+      <div><label ${lbl}>Exit Time</label><input type="text" id="f-tp${i}-time" placeholder="e.g. 10:01 AM" ${inp}></div>
+      <div><label ${lbl}>Contracts off</label><input type="number" id="f-tp${i}-contracts" min="1" max="${remainingBefore}" ${inp} oninput="onTPInput()"></div>
+    </div>
+    <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:6px;" id="tp-note-${i}"></div>
+  </div>`;
+}
+
+function renderTPRows(total) {
+  let html = ''; for(let i=1;i<=Math.min(total,10);i++) html+=buildTPRow(i,total);
+  document.getElementById('partial-tp-rows').innerHTML = html;
+  document.getElementById('partial-contracts-remaining').textContent = `${total} contracts total`;
+  onTPInput();
+}
+
+function onTPInput() {
+  const total=getNum('f-contracts')||1, entry=getNum('f-entry'), sl=getNum('f-sl'), inst=getField('f-instrument'), dir=getField('f-direction');
+  let used=0, allExited=false;
+  for(let i=1;i<=Math.min(total,10);i++) {
+    const rowEl=document.getElementById(`tp-row-${i}`), remEl=document.getElementById(`tp-remaining-${i}`), noteEl=document.getElementById(`tp-note-${i}`);
+    if(!rowEl) break;
+    if(allExited){rowEl.style.display='none';continue;}
+    rowEl.style.display='block';
+    const avail=total-used; if(remEl) remEl.textContent=`${avail} contract${avail>1?'s':''} available`;
+    const c=getNum(`f-tp${i}-contracts`)||0, p=getNum(`f-tp${i}-price`);
+    if(c>avail){const el=document.getElementById(`f-tp${i}-contracts`);if(el)el.value=avail;}
+    let note='';
+    if(p&&entry&&c>0){const isAtSL=sl&&Math.abs(p-sl)<0.5,isAtBE=Math.abs(p-entry)<1.0&&!isAtSL;if(isAtBE)note='⚡ BE exit';else if(isAtSL)note='⛔ Stop loss hit';else if(inst&&dir){const pnl=calcPnL(entry,p,c,inst,dir);note=`${pnl>=0?'+':'-'}$${Math.abs(pnl).toLocaleString()} on ${c} contract${c>1?'s':''}`;}}
+    if(noteEl){noteEl.textContent=note;noteEl.style.color=note.includes('BE')?'var(--yellow)':note.includes('Stop')?'var(--red)':'var(--green)';}
+    used+=c; if(used>=total) allExited=true;
+  }
+  document.getElementById('partial-contracts-remaining').textContent = used>0?`${used}/${total} exited${allExited?' — fully closed':` · ${total-used} running`}`:`${total} contracts total`;
+  updatePartialPreview();
+}
+
+function getTPRows() {
+  const total=getNum('f-contracts')||1, rows=[];
+  for(let i=1;i<=Math.min(total,10);i++){const p=getNum(`f-tp${i}-price`),c=getNum(`f-tp${i}-contracts`);if(p&&c)rows.push({price:p,time:getField(`f-tp${i}-time`),contracts:c,label:TP_LABELS[i-1]||`TP${i}`});}
+  return rows;
+}
+
+function updatePartialPreview() {
+  const preview=document.getElementById('partial-pnl-preview'); if(!preview) return;
+  const entry=getNum('f-entry'),sl=getNum('f-sl'),inst=getField('f-instrument'),dir=getField('f-direction');
+  if(!entry||!inst||!dir){preview.innerHTML='';return;}
+  const rows=getTPRows(); if(!rows.length){preview.innerHTML='';return;}
+  let total=0, lines=[];
+  rows.forEach(r=>{const isAtSL=sl&&Math.abs(r.price-sl)<0.5,isAtBE=Math.abs(r.price-entry)<1.0&&!isAtSL,pnl=calcPnL(entry,r.price,r.contracts,inst,dir);total+=pnl;lines.push(`${r.label}${isAtBE?' [BE]':isAtSL?' [SL]':''}: ${pnl>=0?'+':'-'}$${Math.abs(pnl).toLocaleString()} · ${r.contracts} @ ${r.price.toLocaleString()}`);});
+  lines.push('──────────────────────');lines.push(`Total: ${total>=0?'+':'-'}$${Math.abs(total).toLocaleString()}`);
+  preview.innerHTML=lines.join('<br>');preview.style.color=total>=0?'var(--green)':'var(--red)';
+}
+
+async function analyzeTrade() {
+  const instrument=getField('f-instrument'),direction=getField('f-direction');
+  if(!instrument||!direction){alert('Please fill in Instrument and Direction at minimum.');return;}
+  const entry=getNum('f-entry'),exit=getNum('f-exit'),sl=getNum('f-sl'),tp=getNum('f-tp'),contracts=getNum('f-contracts')||1;
+  const entryTime=getField('f-entry-time'),exitTime=getField('f-exit-time'),notes=getField('f-notes'),mistakes=getField('f-mistakes'),lessons=getField('f-lessons');
+  const session=getField('f-session'),timeframe=getField('f-timeframe'),htf=getField('f-htf'),model=getField('f-model'),outcome=getField('f-outcome'),date=getField('f-date')||TODAY,screenshot=getField('f-screenshot');
+  const confluences=getCheckedConf('conf-dropdown');
+  const tpRows=(contracts>1)?getTPRows().filter(r=>r.price&&r.contracts):[];
+  let pnl=0;
+  if(entry){if(tpRows.length>0){tpRows.forEach(r=>{pnl+=calcPnL(entry,r.price,r.contracts,instrument,direction);});}else if(exit){pnl=calcPnL(entry,exit,contracts,instrument,direction);}}
+  const rr=calcRR(entry,sl,tp),duration=calcDuration(entryTime,exitTime);
+  tradeData={instrument,direction,session,timeframe,htf,model,date,entry,exit,sl,tp,contracts,entryTime,exitTime,pnl,rr,duration,confluences,grade:'Pending...',followedRules:'Pending...',outcome,notes,mistakes,lessons,screenshot,tpRows};
+
+  const btn=document.getElementById('analyze-btn'); btn.disabled=true; btn.textContent='Analyzing...';
+  document.getElementById('review-panel').style.display='block';
+  document.getElementById('success-msg').style.display='none';
+
+  const pnlClass=pnl>0?'green':pnl<0?'red':'';
+  document.getElementById('review-grid').innerHTML=`
+    <div class="review-field"><div class="review-label">Instrument</div><div class="review-value">${instrument} ${direction}</div></div>
+    <div class="review-field"><div class="review-label">Session / TF</div><div class="review-value">${session} · ${timeframe}</div></div>
+    <div class="review-field"><div class="review-label">Entry</div><div class="review-value">${entry?.toLocaleString()||'—'} @ ${entryTime||'—'}</div></div>
+    <div class="review-field"><div class="review-label">Exit</div><div class="review-value">${exit?.toLocaleString()||'—'} @ ${exitTime||'—'}</div></div>
+    <div class="review-field"><div class="review-label">SL / TP</div><div class="review-value">${sl?.toLocaleString()||'—'} / ${tp?.toLocaleString()||'—'}</div></div>
+    <div class="review-field"><div class="review-label">Contracts</div><div class="review-value">${contracts}</div></div>
+    <div class="review-field"><div class="review-label">P&L</div><div class="review-value ${pnlClass}">${pnl>=0?'+':''}$${Math.abs(pnl).toLocaleString()}</div></div>
+    <div class="review-field"><div class="review-label">R:R</div><div class="review-value">${rr?'1:'+rr:'—'}</div></div>
+    <div class="review-field"><div class="review-label">Duration</div><div class="review-value">${duration?duration+'m':'—'}</div></div>
+    <div class="review-field" id="rg-grade"><div class="review-label">Setup Grade</div><div class="review-value" id="rg-grade-val" style="opacity:0.4;">Analyzing...</div></div>
+    <div class="review-field"><div class="review-label">Followed Rules</div><div class="review-value" id="rg-rules-val" style="opacity:0.4;">Analyzing...</div></div>
+    <div class="review-field"><div class="review-label">Outcome</div><div class="review-value">${outcome||'—'}</div></div>
+    <div class="review-field" style="grid-column:1/-1"><div class="review-label">Confluences</div><div class="review-value">${confluences.join(', ')||'—'}</div></div>
+    ${htf?`<div class="review-field"><div class="review-label">HTF TF</div><div class="review-value">${htf}</div></div>`:''}
+    ${model?`<div class="review-field"><div class="review-label">Entry Model</div><div class="review-value">${model}</div></div>`:''}`;
+  document.getElementById('ai-result').innerHTML='<span class="loading-msg">Verifying against your rules...</span>';
+  document.getElementById('ai-verdict-badge').innerHTML='';
+
+  try {
+    const tradeStr=[`Instrument: ${instrument}`,`Direction: ${direction}`,`Session: ${session}`,`Timeframe: ${timeframe}`,`HTF Timeframe: ${htf}`,`Entry Model: ${model}`,`Date: ${date}`,`Entry Price: ${entry} at ${entryTime}`,`Exit Price: ${exit} at ${exitTime}`,`Stop Loss: ${sl}`,`Take Profit: ${tp}`,`Contracts: ${contracts}`,`R:R: ${rr||''}`,`P&L: $${pnl}`,`Status: ${outcome}`,`Confluences: ${confluences.join(', ')}`,`Notes: ${notes}`,`Mistakes: ${mistakes}`,`Lessons Learned: ${lessons}`].filter(l=>!l.endsWith(': ')&&!l.endsWith(': null')&&!l.endsWith(': undefined')).join('\n');
+    const data=await verifyTrade(tradeStr);
+    const text=data.result||'No response.';
+    if(data.grade&&data.grade!=='Pending...') tradeData.grade=data.grade;
+    const frMap={'YES':'Yes ✅','PARTIALLY':'Partially ⚠️','NO':'No ❌'};
+    if(data.followedRules&&frMap[data.followedRules]){tradeData.followedRules=frMap[data.followedRules];}
+    else{const u=text.toUpperCase();if(u.includes('VERDICT: YES'))tradeData.followedRules='Yes ✅';else if(u.includes('VERDICT: NO'))tradeData.followedRules='No ❌';else tradeData.followedRules='Partially ⚠️';}
+    const gradeColors={'A++':'accent','A+':'green','A':'green','A-':'green','B+':'yellow','B':'yellow','B-':'yellow','C':'red','D':'red'};
+    const gradeEl=document.getElementById('rg-grade-val');if(gradeEl){gradeEl.textContent=tradeData.grade;gradeEl.style.opacity='1';gradeEl.className='review-value '+(gradeColors[tradeData.grade]||'');}
+    const rulesEl=document.getElementById('rg-rules-val');if(rulesEl){rulesEl.textContent=tradeData.followedRules;rulesEl.style.opacity='1';if(tradeData.followedRules.includes('✅'))rulesEl.className='review-value green';else if(tradeData.followedRules.includes('⚠️'))rulesEl.className='review-value yellow';else rulesEl.className='review-value red';}
+    let vc,vl;
+    if(data.followedRules==='YES'||tradeData.followedRules.includes('✅')){vc='verdict-yes';vl='FOLLOWED RULES ✅';}
+    else if(data.followedRules==='NO'||tradeData.followedRules.includes('❌')){vc='verdict-no';vl='RULES BROKEN ❌';}
+    else{vc='verdict-partial';vl='PARTIALLY ⚠️';}
+    document.getElementById('ai-result').innerHTML=text.replace(/\*\*(.*?)\*\*/g,'$1').replace(/\n/g,'<br>');
+    document.getElementById('ai-verdict-badge').innerHTML=`<span class="ai-verdict ${vc}">${vl}</span>`;
+  } catch(e) {
+    document.getElementById('ai-result').textContent='Verification failed: '+e.message;
+    tradeData.grade=autoGradeLocal(confluences,mistakes);
+    tradeData.followedRules=autoFollowedRulesLocal(mistakes);
+    const gradeEl=document.getElementById('rg-grade-val');if(gradeEl){gradeEl.textContent=tradeData.grade;gradeEl.style.opacity='1';}
+    const rulesEl=document.getElementById('rg-rules-val');if(rulesEl){rulesEl.textContent=tradeData.followedRules;rulesEl.style.opacity='1';}
+  }
+  btn.disabled=false; btn.textContent='⚡ Analyze & Preview Trade';
+  document.getElementById('review-panel').scrollIntoView({behavior:'smooth'});
+}
+
+async function submitTrade() {
+  const btn=document.getElementById('confirm-btn'); btn.disabled=true; btn.textContent='Submitting...';
+  const t=tradeData, tradeName=`${t.instrument} ${t.direction} — ${t.session}`;
+  const props={"Trade Name":{title:[{text:{content:tradeName}}]},"Instrument":{select:{name:t.instrument}},"Direction":{select:{name:t.direction}},"Status":{select:{name:t.outcome}},"Session":{select:{name:t.session}},"Timeframe":{select:{name:t.timeframe}},"Date":{date:{start:t.date}},"Contracts":{number:t.contracts},"P&L ($)":{number:t.pnl},"Followed Rules":{select:{name:t.followedRules}},"Setup Grade":{select:{name:t.grade}}};
+  if(t.entry)props["Entry Price"]={number:t.entry};if(t.exit)props["Exit Price"]={number:t.exit};if(t.sl)props["Stop Loss"]={number:t.sl};if(t.tp)props["Take Profit"]={number:t.tp};if(t.rr)props["R:R"]={number:t.rr};if(t.duration)props["Duration (mins)"]={number:t.duration};if(t.entryTime)props["Entry Time"]={rich_text:[{text:{content:t.entryTime}}]};if(t.exitTime)props["Exit Time"]={rich_text:[{text:{content:t.exitTime}}]};
+  const exitBreakdown=(t.tpRows&&t.tpRows.length>0)?'Exit breakdown: '+t.tpRows.map(r=>`${r.label}: ${r.contracts} contract${r.contracts>1?'s':''} @ ${r.price}${r.time?' at '+r.time:''}`).join(' · '):null;
+  const fullNotes=[t.notes,exitBreakdown].filter(Boolean).join('\n');
+  if(fullNotes)props["Notes"]={rich_text:[{text:{content:fullNotes}}]};if(t.mistakes)props["Mistakes"]={rich_text:[{text:{content:t.mistakes}}]};if(t.lessons)props["Lessons Learned"]={rich_text:[{text:{content:t.lessons}}]};if(t.htf)props["HTF Timeframe"]={rich_text:[{text:{content:t.htf}}]};if(t.model)props["Entry Model"]={rich_text:[{text:{content:t.model}}]};if(t.confluences.length)props["Confluences"]={multi_select:t.confluences.map(c=>({name:c}))};
+  const body={parent:{database_id:DB_ID},properties:props};
+  if(t.screenshot){body.children=[{object:'block',type:'paragraph',paragraph:{rich_text:[{type:'text',text:{content:'📸 Screenshot: '+t.screenshot,link:{url:t.screenshot}}}]}}];}
+  try {
+    const data=await notionPost('/pages',body);
+    if(data.id){
+      const msg=document.getElementById('success-msg');msg.style.display='block';msg.textContent=`✓ Trade logged! ${tradeName} · ${t.grade} · ${t.pnl>=0?'+':''}$${Math.abs(t.pnl).toLocaleString()}`;
+      document.getElementById('review-panel').style.display='none';
+      resetForm();
+    } else {
+      const m=data.message||'';alert('\u26a0\ufe0f '+(m.includes('Status')?'Please select an Outcome.':m.includes('Instrument')?'Please select an Instrument.':m.includes('Direction')?'Please select a Direction.':'Please fill in all required fields.'));
+    }
+  } catch(e){alert('Submit failed: '+e.message);}
+  btn.disabled=false; btn.textContent='✓ Confirm & Submit to Notion';
+}
+
+function resetForm() {
+  ['f-instrument','f-direction','f-session','f-timeframe','f-outcome','f-htf','f-model','f-entry','f-exit','f-sl','f-tp','f-contracts','f-entry-time','f-exit-time','f-notes','f-mistakes','f-lessons','f-screenshot'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('partial-row').style.display='none';
+  document.getElementById('partial-tp-rows').innerHTML='';
+  document.getElementById('partial-pnl-preview').textContent='';
+  document.getElementById('f-date').value=new Date().toISOString().split('T')[0];
+  clearConf('conf-dropdown','conf-label','conf-tags');
+}
+</script>
+<script>if('serviceWorker' in navigator){navigator.serviceWorker.register('../sw.js');}</script>
+</body>
+</html>
