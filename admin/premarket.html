@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pre-Market — FTJ Admin</title>
+<link rel="manifest" href="../manifest.json">
+<meta name="theme-color" content="#0a0a0a">
+<link rel="icon" type="image/png" href="https://i.imgur.com/ZP2pTk2.png">
+<link rel="stylesheet" href="../mobile.css">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0a0a;--surface:#111;--surface2:#181818;--border:#1a1a1a;--border2:#2a2a2a;--text:#e8e8e8;--text2:#888;--text3:#444;--green:#00e676;--red:#ff4444;--yellow:#ffd740;--accent:#c8ff00;--mono:'Space Mono',monospace;--sans:'DM Sans',sans-serif;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;min-height:100vh;}
+::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+#main{padding-left:64px;}
+.page{max-width:800px;margin:0 auto;padding:3rem 2rem 5rem;}
+.sidenav-admin{position:fixed;left:0;top:0;bottom:0;width:64px;background:var(--bg);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:1.5rem 0;z-index:200;}
+.nav-logo-a{font-family:var(--mono);font-size:9px;letter-spacing:0.1em;color:var(--accent);writing-mode:vertical-rl;margin-bottom:2rem;}
+.nav-admin-tag{font-family:var(--mono);font-size:8px;letter-spacing:0.12em;color:var(--red);writing-mode:vertical-rl;margin-top:auto;}
+.back-btn{font-family:var(--mono);font-size:10px;letter-spacing:0.1em;color:var(--text3);background:none;border:1px solid var(--border2);padding:6px 14px;cursor:pointer;text-transform:uppercase;transition:all 0.15s;text-decoration:none;display:inline-block;margin-bottom:2rem;}
+.back-btn:hover{color:var(--accent);border-color:var(--accent);}
+.page-eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:0.2em;color:var(--accent);text-transform:uppercase;margin-bottom:8px;}
+.page-title{font-family:var(--mono);font-size:28px;font-weight:700;line-height:1.1;margin-bottom:2rem;}
+.pma-step{margin-bottom:1px;}
+.pma-step-header{background:var(--surface2);padding:10px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;border:1px solid var(--border);}
+.pma-step-header:hover{border-color:var(--border2);}
+.pma-step-num{font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--accent);text-transform:uppercase;background:rgba(200,255,0,0.1);padding:2px 8px;border:1px solid rgba(200,255,0,0.3);}
+.pma-step-title{font-family:var(--mono);font-size:11px;color:var(--text);letter-spacing:0.06em;}
+.pma-step-status{font-family:var(--mono);font-size:9px;color:var(--text3);margin-left:auto;}
+.pma-step-body{display:none;background:var(--surface);border:1px solid var(--border);border-top:none;padding:1.25rem;}
+.pma-step-body.open{display:block;}
+.pma-section-label{font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--text3);text-transform:uppercase;margin-bottom:8px;margin-top:14px;}
+.pma-section-label:first-child{margin-top:0;}
+.pma-correlated{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);margin-bottom:4px;}
+.pma-inst-col{background:var(--surface2);padding:10px 12px;}
+.pma-inst-label{font-family:var(--mono);font-size:9px;letter-spacing:0.1em;margin-bottom:8px;}
+.pma-btn-row{display:flex;gap:4px;flex-wrap:wrap;}
+.pma-btn{font-family:var(--mono);font-size:9px;letter-spacing:0.06em;text-transform:uppercase;padding:6px 10px;background:var(--surface);border:1px solid var(--border2);color:var(--text3);cursor:pointer;transition:all 0.15s;}
+.pma-btn:hover{border-color:var(--text2);color:var(--text);}
+.pma-btn.selected-bull{border-color:var(--green);color:var(--green);background:rgba(0,230,118,0.08);}
+.pma-btn.selected-bear{border-color:var(--red);color:var(--red);background:rgba(255,68,68,0.08);}
+.pma-btn.selected-range{border-color:var(--yellow);color:var(--yellow);background:rgba(255,215,64,0.08);}
+.pma-btn.selected-neutral{border-color:var(--text2);color:var(--text2);background:rgba(136,136,136,0.08);}
+.pma-btn.selected-no{border-color:var(--text3);color:var(--text3);}
+.pma-next-btn{font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;padding:8px 20px;background:none;border:1px solid var(--border2);color:var(--text2);cursor:pointer;transition:all 0.15s;margin-top:1rem;}
+.pma-next-btn:hover{border-color:var(--accent);color:var(--accent);}
+.pma-dol-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:4px;}
+.pma-dol-btn{font-family:var(--mono);font-size:9px;letter-spacing:0.06em;text-transform:uppercase;padding:8px 6px;background:var(--surface);border:1px solid var(--border2);color:var(--text3);cursor:pointer;transition:all 0.15s;text-align:center;}
+.pma-dol-btn:hover{border-color:var(--text2);color:var(--text);}
+.pma-dol-btn.selected{border-color:var(--accent);color:var(--accent);background:rgba(200,255,0,0.07);}
+.pma-output{background:var(--surface);border:1px solid var(--border2);margin-top:1.5rem;display:none;}
+.pma-output-header{padding:10px 16px;border-bottom:1px solid var(--border2);background:var(--surface2);display:flex;align-items:center;gap:8px;}
+.pma-output-title{font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--accent);text-transform:uppercase;}
+.pma-output-body{padding:1.25rem;}
+.pma-bias-result{font-family:var(--mono);font-size:32px;font-weight:700;margin-bottom:6px;}
+.pma-confidence{font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;padding:3px 10px;border:1px solid;display:inline-block;margin-bottom:1rem;}
+.pma-confidence.high{color:var(--green);border-color:rgba(0,230,118,0.4);}
+.pma-confidence.medium{color:var(--yellow);border-color:rgba(255,215,64,0.4);}
+.pma-confidence.low{color:var(--text3);border-color:var(--border2);}
+.pma-reasoning{font-size:13px;color:var(--text2);line-height:1.8;margin-bottom:1rem;}
+.pma-dol-result{font-family:var(--mono);font-size:11px;color:var(--text2);margin-bottom:1.25rem;padding:8px 12px;background:var(--surface2);border:1px solid var(--border2);}
+.pma-notes{font-family:var(--sans);font-size:13px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:10px 12px;width:100%;outline:none;resize:none;min-height:70px;margin-bottom:1rem;line-height:1.6;transition:border-color 0.15s;}
+.pma-notes:focus{border-color:var(--accent);}
+.pma-set-bias-btn{font-family:var(--mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;padding:12px 24px;background:var(--accent);color:#000;border:none;cursor:pointer;font-weight:700;width:100%;transition:opacity 0.15s;}
+.pma-set-bias-btn:hover{opacity:0.85;}
+.pma-set-bias-btn:disabled{opacity:0.35;cursor:not-allowed;}
+@media(max-width:600px){.pma-correlated{grid-template-columns:1fr;}.pma-dol-grid{grid-template-columns:repeat(2,1fr);}#main{padding-left:0;}}
+</style>
+</head>
+<body>
+<div id="main">
+  <nav class="sidenav-admin">
+    <div class="nav-logo-a">// FTJ</div>
+    <div class="nav-admin-tag">ADMIN</div>
+  </nav>
+  <div class="page">
+    <a href="admin.html" class="back-btn">← Back to Admin</a>
+    <div class="page-eyebrow">// Admin</div>
+    <div class="page-title">Pre-Market Analysis</div>
+    <p style="font-size:13px;color:var(--text2);margin:0 0 1.5rem;line-height:1.7;">Work through your top-down analysis step by step. NQ and ES side-by-side. Complete all steps to generate your bias and DOL for the day.</p>
+
+    <!-- STEP 1 -->
+    <div class="pma-step">
+      <div class="pma-step-header" onclick="pmaToggleStep(1)"><span class="pma-step-num">Step 1</span><span class="pma-step-title">Daily — Market Structure & Price Position</span><span class="pma-step-status" id="pma-status-1">—</span></div>
+      <div class="pma-step-body open" id="pma-body-1">
+        <div class="pma-section-label">Market Structure (NQ & ES)</div>
+        <div class="pma-correlated">
+          <div class="pma-inst-col"><div class="pma-inst-label" style="color:#c8ff00;">NQ — Daily Structure</div><div class="pma-btn-row"><button class="pma-btn" onclick="pmaSelect('d_nq_struct','Bullish',this,'selected-bull')">Bullish</button><button class="pma-btn" onclick="pmaSelect('d_nq_struct','Bearish',this,'selected-bear')">Bearish</button><button class="pma-btn" onclick="pmaSelect('d_nq_struct','Ranging',this,'selected-range')">Ranging</button></div></div>
+          <div class="pma-inst-col"><div class="pma-inst-label" style="color:#40c4ff;">ES — Daily Structure</div><div class="pma-btn-row"><button class="pma-btn" onclick="pmaSelect('d_es_struct','Bullish',this,'selected-bull')">Bullish</button><button class="pma-btn" onclick="pmaSelect('d_es_struct','Bearish',this,'selected-bear')">Bearish</button><button class="pma-btn" onclick="pmaSelect('d_es_struct','Ranging',this,'selected-range')">Ranging</button></div></div>
+        </div>
+        <div class="pma-section-label">Price Position</div>
+        <div class="pma-btn-row"><button class="pma-btn" onclick="pmaSelect('d_price_pos','Premium',this,'selected-bear')">Premium (look for shorts)</button><button class="pma-btn" onclick="pmaSelect('d_price_pos','Discount',this,'selected-bull')">Discount (look for longs)</button><button class="pma-btn" onclick="pmaSelect('d_price_pos','Equilibrium',this,'selected-neutral')">At Equilibrium (~50%)</button></div>
+        <div class="pma-section-label">Previous Day Levels</div>
+        <div class="pma-btn-row"><button class="pma-btn" onclick="pmaSelect('d_pdh','Intact',this,'selected-no')">PDH Intact</button><button class="pma-btn" onclick="pmaSelect('d_pdh','Taken',this,'selected-bull')">PDH Taken (BSL swept)</button></div>
+        <div class="pma-btn-row" style="margin-top:4px;"><button class="pma-btn" onclick="pmaSelect('d_pdl','Intact',this,'selected-no')">PDL Intact</button><button class="pma-btn" onclick="pmaSelect('d_pdl','Taken',this,'selected-bear')">PDL Taken (SSL swept)</button></div>
+        <button class="pma-next-btn" onclick="pmaNext(1,2)">Next: 4H →</button>
+      </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="pma-step">
+      <div class="pma-step-header" onclick="pmaToggleStep(2)"><span class="pma-step-num">Step 2</span><span class="pma-step-title">4H — Structure, PDAs & Equal Levels</span><span class="pma-step-status" id="pma-status-2">—</span></div>
+      <div class="pma-step-body" id="pma-body-2">
+        <div class="pma-section-label">4H Market Structure</div>
+        <div class="pma-correlated">
+          <div class="pma-inst-col"><div class="pma-inst-label" style="color:#c8ff00;">NQ — 4H Structure</div><div class="pma-btn-row"><button class="pma-btn" onclick="pmaSelect('h4_nq_struct','Bullish',this,'selected-bull')">Bullish</button><button class="pma-btn" onclick="pmaSelect('h4_nq_struct','Bearish',this,'selected-bear')">Bearish</button><button class="pma-btn" onclick="pmaSelect('h4_nq_struct','Ranging',this,'selected-range')">Ranging</button></div></div>
+          <div class="pma-inst-col"><div class="pma-inst-label" style="color:#40c4ff;">ES — 4H Structure</div><div class="pma-btn-row"><button class="pma-btn" onclick="pmaSelect('h4_es_struct','Bullish',this,'selected-bull')">Bullish</button><button class="pma-btn" onclick="pmaSelect('h4_es_struct','Bearish',this,'selected-bear')">Bearish</button><button class="pma-btn" onclick="pmaSelect('h4_es_struct','Ranging',this,'selected-range')">Ranging</button></div></div>
+        </div>
+        <div class="pma-section-label">Nearest Unmitigated FVG / IFVG</div>
+        <div class="pma-btn-row"><button class="pma-btn" onclick="pmaSelect('h4_fvg','Above',this,'selected-bear')">FVG / IFVG Above (bearish magnet)</button><button class="pma-btn" onclick="pmaSelect('h4_fvg','Below',this,'selected-bull')">FVG / IFVG Below (bullish magnet)</button><button class="pma-btn" onclick="pmaSelect('h4_fvg','Both',this,'selected-neutral')">Both sides</button><button class="pma-btn" onclick="pmaSelect('h4_fvg','None',this,'selected-no')">None nearby</button></div>
+        <div class="pma-section-label">Equal Highs / Equal Lows</div>
+        <div class="pma-btn-row"><button class="pma-btn" onclick="pmaSelect('h4_eql','EQH Above',this,'selected-bear')">EQH Above (BSL target)</button><button class="pma-btn" onclick="pmaSelect('h4_eql','EQL Below',this,'selected-bull')">EQL Below (SSL target)</button><button class="pma-btn" onclick="pmaSelect('h4_eql','Both',this,'selected-neutral')">Both</button><button class="pma-btn" onclick="pmaSelect('h4_eql','None',this,'selected-no')">None</button></div>
+        <button class="pma-next-btn" onclick="pmaNext(2,3)">Next: 1H →</button>
+      </div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="pma-step">
+      <div class="pma-step-header" onclick="pmaToggleStep(3)"><span class="pma-step-num">Step 3</span><span class="pma-step-title">1H — Structure, SMT & HTF PDAs</span><span class="pma-step-status" id="pma-status-3">—</span></div>
+      <div class="pma-step-body" id="pma-body-3">
+        <div class="pma-section-label">1H Market Structure</div>
+        <div class="pma-correlated">
+          <div class="pma-inst-col"><div class="pma-inst-label" style="color:#c8ff00;">NQ — 1H Structure</div><div class="pma-btn-row"><button class="pma-btn" onclick="pmaSelect('h1_nq_struct','Bullish',this,'selected-bull')">Bullish</button><button class="pma-btn" onclick="pmaSelect('h1_nq_struct','Bearish',this,'selected-bear')">Bearish</button><button class="pma-btn" onclick="pmaSelect('h1_nq_struct','Ranging',this,'selected-range')">Ranging</button></div></div>
+          <div class="pma-inst-col"><div class="pma-inst-label" style="color:#40c4ff;">ES — 1H Structure</div><div class="pma-btn-row"><button class="pma-btn" onclick="pmaSelect('h1_es_struct','Bullish',this,'selected-bull')">Bullish</button><button class="pma-btn" onclick="pmaSelect('h1_es_struct','Bearish',this,'selected-bear')">Bearish</button><button class="pma-btn" onclick="pmaSelect('h1_es_struct','Ranging',this,'selected-range')">Ranging</button></div></div>
+        </div>
+        <div class="pma-section-label">SMT Divergence (NQ vs ES)</div>
+        <div class="pma-btn-row"><button class="pma-btn" onclick="pmaSelect('h1_smt','Bullish SMT',this,'selected-bull')">Bullish SMT (NQ stronger at lows)</button><button class="pma-btn" onclick="pmaSelect('h1_smt','Bearish SMT',this,'selected-bear')">Bearish SMT (ES stronger at highs)</button><button class="pma-btn" onclick="pmaSelect('h1_smt','None',this,'selected-no')">No SMT</button></div>
+        <div class="pma-section-label">HTF PDA (1H FVG, IFVG or OB)</div>
+        <div class="pma-btn-row"><button class="pma-btn" onclick="pmaSelect('h1_htf_pda','Above',this,'selected-bear')">HTF PDA Above price</button><button class="pma-btn" onclick="pmaSelect('h1_htf_pda','Below',this,'selected-bull')">HTF PDA Below price</button><button class="pma-btn" onclick="pmaSelect('h1_htf_pda','At PDA',this,'selected-neutral')">Price AT a HTF PDA now</button><button class="pma-btn" onclick="pmaSelect('h1_htf_pda','None',this,'selected-no')">None identified</button></div>
+        <button class="pma-next-btn" onclick="pmaNext(3,4)">Next: 15m →</button>
+      </div>
+    </div>
+
+    <!-- STEP 4 -->
+    <div class="pma-step">
+      <div class="pma-step-header" onclick="pmaToggleStep(4)"><span class="pma-step-num">Step 4</span><span class="pma-step-title">15m — Session Context & Current Delivery</span><span class="pma-step-status" id="pma-status-4">—</span></div>
+      <div class="pma-step-body" id="pma-body-4">
+        <div class="pma-section-label">Price vs Midnight Open</div>
+        <div class="pma-btn-row"><button class="pma-btn" onclick="pmaSelect('m15_midnight','Above',this,'selected-bull')">Above midnight open (bullish lean)</button><button class="pma-btn" onclick="pmaSelect('m15_midnight','Below',this,'selected-bear')">Below midnight open (bearish lean)</button></div>
+        <div class="pma-section-label">Price vs London Open</div>
+        <div class="pma-btn-row"><button class="pma-btn" onclick="pmaSelect('m15_london','Above',this,'selected-bull')">Above London open</button><button class="pma-btn" onclick="pmaSelect('m15_london','Below',this,'selected-bear')">Below London open</button><button class="pma-btn" onclick="pmaSelect('m15_london','Pre-London',this,'selected-neutral')">Pre-London</button></div>
+        <div class="pma-section-label">Current 15m Delivery</div>
+        <div class="pma-btn-row"><button class="pma-btn" onclick="pmaSelect('m15_delivery','Bullish',this,'selected-bull')">Bullish delivery</button><button class="pma-btn" onclick="pmaSelect('m15_delivery','Bearish',this,'selected-bear')">Bearish delivery</button><button class="pma-btn" onclick="pmaSelect('m15_delivery','Consolidating',this,'selected-range')">Consolidating / Choppy</button></div>
+        <div class="pma-section-label">Resting Liquidity</div>
+        <div class="pma-btn-row"><button class="pma-btn" onclick="pmaSelect('m15_liq','BSL Above',this,'selected-bear')">BSL resting above</button><button class="pma-btn" onclick="pmaSelect('m15_liq','SSL Below',this,'selected-bull')">SSL resting below</button><button class="pma-btn" onclick="pmaSelect('m15_liq','Both',this,'selected-neutral')">Both sides</button></div>
+        <button class="pma-next-btn" onclick="pmaNext(4,5)">Next: DOL →</button>
+      </div>
+    </div>
+
+    <!-- STEP 5 -->
+    <div class="pma-step">
+      <div class="pma-step-header" onclick="pmaToggleStep(5)"><span class="pma-step-num">Step 5</span><span class="pma-step-title">Draw on Liquidity — Select Your Target</span><span class="pma-step-status" id="pma-status-5">—</span></div>
+      <div class="pma-step-body" id="pma-body-5">
+        <p style="font-size:12px;color:var(--text3);margin-bottom:12px;line-height:1.6;">Where is price most likely drawing to today?</p>
+        <div class="pma-dol-grid" id="pma-dol-grid">
+          <button class="pma-dol-btn" onclick="pmaDOL('Previous Day High (PDH)',this)">Previous Day High<br><span style="color:var(--text3);font-size:8px;">PDH</span></button>
+          <button class="pma-dol-btn" onclick="pmaDOL('Previous Day Low (PDL)',this)">Previous Day Low<br><span style="color:var(--text3);font-size:8px;">PDL</span></button>
+          <button class="pma-dol-btn" onclick="pmaDOL('Weekly High',this)">Weekly High<br><span style="color:var(--text3);font-size:8px;">WH</span></button>
+          <button class="pma-dol-btn" onclick="pmaDOL('Weekly Low',this)">Weekly Low<br><span style="color:var(--text3);font-size:8px;">WL</span></button>
+          <button class="pma-dol-btn" onclick="pmaDOL('Equal Highs (EQH)',this)">Equal Highs<br><span style="color:var(--text3);font-size:8px;">EQH</span></button>
+          <button class="pma-dol-btn" onclick="pmaDOL('Equal Lows (EQL)',this)">Equal Lows<br><span style="color:var(--text3);font-size:8px;">EQL</span></button>
+          <button class="pma-dol-btn" onclick="pmaDOL('HTF FVG Above',this)">HTF FVG Above<br><span style="color:var(--text3);font-size:8px;">Bearish target</span></button>
+          <button class="pma-dol-btn" onclick="pmaDOL('HTF FVG Below',this)">HTF FVG Below<br><span style="color:var(--text3);font-size:8px;">Bullish target</span></button>
+          <button class="pma-dol-btn" onclick="pmaDOL('All-Time High (ATH)',this)">All-Time High<br><span style="color:var(--text3);font-size:8px;">ATH</span></button>
+          <button class="pma-dol-btn" onclick="pmaDOL('Monthly High',this)">Monthly High<br><span style="color:var(--text3);font-size:8px;">MH</span></button>
+          <button class="pma-dol-btn" onclick="pmaDOL('Monthly Low',this)">Monthly Low<br><span style="color:var(--text3);font-size:8px;">ML</span></button>
+          <button class="pma-dol-btn" onclick="pmaDOL('Key FVG / IFVG Level',this)">Key FVG / IFVG<br><span style="color:var(--text3);font-size:8px;">Major level</span></button>
+        </div>
+        <button class="pma-next-btn" style="margin-top:1rem;" onclick="pmaGenerateOutput()">⚡ Generate Bias & DOL</button>
+      </div>
+    </div>
+
+    <!-- OUTPUT -->
+    <div class="pma-output" id="pma-output">
+      <div class="pma-output-header"><span style="color:var(--accent);">⚡</span><div class="pma-output-title">Pre-Market Analysis Output</div></div>
+      <div class="pma-output-body">
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--text3);text-transform:uppercase;margin-bottom:8px;">Bias</div>
+        <div class="pma-bias-result" id="pma-bias-result">—</div>
+        <div id="pma-confidence-badge"></div>
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--text3);text-transform:uppercase;margin-top:1rem;margin-bottom:6px;">Draw on Liquidity</div>
+        <div class="pma-dol-result" id="pma-dol-result">—</div>
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--text3);text-transform:uppercase;margin-bottom:8px;">Reasoning</div>
+        <div class="pma-reasoning" id="pma-reasoning"></div>
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--text3);text-transform:uppercase;margin-bottom:6px;">Your Notes</div>
+        <textarea class="pma-notes" id="pma-notes-input" placeholder="Add your own reasoning, key levels to watch, notes about today's session..."></textarea>
+        <button class="pma-set-bias-btn" id="pma-set-bias-btn" onclick="pmaSetAsBias()">Set as Today's Bias in Notion</button>
+        <div style="font-family:var(--mono);font-size:11px;color:var(--green);text-align:center;margin-top:8px;display:none;" id="pma-success">✓ Bias set successfully!</div>
+      </div>
+    </div>
+
+    <div style="margin-top:1rem;">
+      <button onclick="pmaReset()" style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;padding:6px 14px;background:none;border:1px solid var(--border2);color:var(--text3);cursor:pointer;transition:all 0.15s;" onmouseover="this.style.color='var(--accent)';this.style.borderColor='var(--accent)'" onmouseout="this.style.color='var(--text3)';this.style.borderColor='var(--border2)'">↺ Reset Analysis</button>
+    </div>
+  </div>
+</div>
+
+<script src="admin-core.js"></script>
+<script>
+if (!requireAuth()) { /* redirected */ }
+
+const pmaData = {};
+let pmaDOLSelected = null;
+
+function pmaToggleStep(n){document.getElementById(`pma-body-${n}`).classList.toggle('open');}
+
+function pmaSelect(key,value,btn,styleClass){
+  const parent=btn.closest('.pma-inst-col')?btn.closest('.pma-inst-col'):btn.closest('.pma-btn-row');
+  if(parent)parent.querySelectorAll('.pma-btn').forEach(b=>b.className='pma-btn');
+  btn.className=`pma-btn ${styleClass}`;
+  pmaData[key]=value;
+  pmaUpdateStatus();
+}
+
+function pmaDOL(value,btn){
+  document.querySelectorAll('#pma-dol-grid .pma-dol-btn').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');pmaDOLSelected=value;pmaData['dol']=value;pmaUpdateStatus();
+}
+
+function pmaUpdateStatus(){
+  const checkStep=(keys,id)=>{const done=keys.filter(k=>pmaData[k]).length,el=document.getElementById(`pma-status-${id}`);if(el)el.textContent=done>=keys.length?'✓ Done':`${done}/${keys.length}`;};
+  checkStep(['d_nq_struct','d_es_struct','d_price_pos'],1);
+  checkStep(['h4_nq_struct','h4_es_struct','h4_fvg'],2);
+  checkStep(['h1_nq_struct','h1_es_struct','h1_smt'],3);
+  checkStep(['m15_midnight','m15_delivery'],4);
+  checkStep(['dol'],5);
+}
+
+function pmaNext(current,next){
+  document.getElementById(`pma-body-${current}`).classList.remove('open');
+  const nb=document.getElementById(`pma-body-${next}`);nb.classList.add('open');nb.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function pmaGenerateOutput(){
+  if(!pmaDOLSelected){alert('Please select a Draw on Liquidity target first.');return;}
+  let bullScore=0,bearScore=0;const p=pmaData;
+  if(p.d_nq_struct==='Bullish')bullScore+=2;if(p.d_nq_struct==='Bearish')bearScore+=2;if(p.d_es_struct==='Bullish')bullScore+=2;if(p.d_es_struct==='Bearish')bearScore+=2;
+  if(p.d_price_pos==='Discount')bullScore+=1;if(p.d_price_pos==='Premium')bearScore+=1;if(p.d_pdh==='Taken')bullScore+=1;if(p.d_pdl==='Taken')bearScore+=1;
+  if(p.h4_nq_struct==='Bullish')bullScore+=2;if(p.h4_nq_struct==='Bearish')bearScore+=2;if(p.h4_es_struct==='Bullish')bullScore+=2;if(p.h4_es_struct==='Bearish')bearScore+=2;
+  if(p.h4_fvg==='Below')bullScore+=1;if(p.h4_fvg==='Above')bearScore+=1;if(p.h4_eql==='EQL Below')bullScore+=1;if(p.h4_eql==='EQH Above')bearScore+=1;
+  if(p.h1_nq_struct==='Bullish')bullScore+=2;if(p.h1_nq_struct==='Bearish')bearScore+=2;if(p.h1_es_struct==='Bullish')bullScore+=2;if(p.h1_es_struct==='Bearish')bearScore+=2;
+  if(p.h1_smt==='Bullish SMT')bullScore+=2;if(p.h1_smt==='Bearish SMT')bearScore+=2;if(p.h1_htf_pda==='Below')bullScore+=1;if(p.h1_htf_pda==='Above')bearScore+=1;if(p.h1_htf_pda==='At PDA'){bullScore+=0.5;bearScore+=0.5;}
+  if(p.m15_midnight==='Above')bullScore+=1;if(p.m15_midnight==='Below')bearScore+=1;if(p.m15_london==='Above')bullScore+=1;if(p.m15_london==='Below')bearScore+=1;
+  if(p.m15_delivery==='Bullish')bullScore+=1;if(p.m15_delivery==='Bearish')bearScore+=1;if(p.m15_liq==='SSL Below')bullScore+=1;if(p.m15_liq==='BSL Above')bearScore+=1;
+  const total=bullScore+bearScore,bullPct=total>0?bullScore/total:0;
+  let bias,biasColor,confidence,confClass;
+  const isRanging=p.d_nq_struct==='Ranging'&&p.d_es_struct==='Ranging';
+  if(isRanging||(bullPct>=0.4&&bullPct<=0.6&&!p.h1_smt)){bias='Ranging';biasColor='var(--yellow)';confidence='Low';confClass='low';}
+  else if(bullPct>=0.65){bias='Bullish';biasColor='var(--green)';confidence=bullPct>=0.8?'High':'Medium';confClass=bullPct>=0.8?'high':'medium';}
+  else if(bullPct<=0.35){bias='Bearish';biasColor='var(--red)';confidence=bullPct<=0.2?'High':'Medium';confClass=bullPct<=0.2?'high':'medium';}
+  else{bias='Waiting';biasColor='var(--text3)';confidence='Low';confClass='low';}
+  const reasons=[];
+  if(p.d_nq_struct&&p.d_es_struct){if(p.d_nq_struct===p.d_es_struct)reasons.push(`Daily structure is ${p.d_nq_struct} on both NQ and ES — correlated`);else reasons.push(`Daily divergence: NQ is ${p.d_nq_struct}, ES is ${p.d_es_struct}`);}
+  if(p.d_price_pos)reasons.push(`Price in ${p.d_price_pos}${p.d_price_pos==='Discount'?' — favor longs':p.d_price_pos==='Premium'?' — favor shorts':''}`);
+  if(p.d_pdh==='Taken')reasons.push('PDH taken — BSL swept, potential reversal or continuation push');
+  if(p.d_pdl==='Taken')reasons.push('PDL taken — SSL swept, potential reversal or continuation drop');
+  if(p.h4_nq_struct&&p.h4_es_struct){if(p.h4_nq_struct===p.h4_es_struct)reasons.push(`4H structure aligned: both ${p.h4_nq_struct}`);else reasons.push(`4H mixed: NQ ${p.h4_nq_struct}, ES ${p.h4_es_struct}`);}
+  if(p.h4_fvg&&p.h4_fvg!=='None')reasons.push(`4H FVG/IFVG ${p.h4_fvg.toLowerCase()} price — delivery target`);
+  if(p.h4_eql&&p.h4_eql!=='None')reasons.push(`${p.h4_eql} on 4H — liquidity target`);
+  if(p.h1_smt&&p.h1_smt!=='None')reasons.push(`${p.h1_smt} on 1H — strong directional signal`);
+  if(p.h1_htf_pda==='At PDA')reasons.push('Price currently at a 1H HTF PDA — watch for reaction');
+  if(p.m15_midnight)reasons.push(`Price ${p.m15_midnight.toLowerCase()} midnight open — ${p.m15_midnight==='Above'?'bullish':'bearish'} lean`);
+  if(p.m15_delivery&&p.m15_delivery!=='Consolidating')reasons.push(`15m delivering ${p.m15_delivery.toLowerCase()}`);
+  if(p.m15_delivery==='Consolidating')reasons.push('15m in consolidation — wait for expansion');
+  if(p.m15_liq&&p.m15_liq!=='Both')reasons.push(`${p.m15_liq} — clear session target`);
+  if(pmaDOLSelected)reasons.push(`DOL: ${pmaDOLSelected}`);
+  document.getElementById('pma-bias-result').textContent=bias;document.getElementById('pma-bias-result').style.color=biasColor;
+  document.getElementById('pma-confidence-badge').innerHTML=`<span class="pma-confidence ${confClass}">${confidence} Confidence — ${Math.round(bullPct*100)}% bullish / ${Math.round((1-bullPct)*100)}% bearish</span>`;
+  document.getElementById('pma-dol-result').textContent=`🎯 Draw on Liquidity: ${pmaDOLSelected}`;
+  document.getElementById('pma-reasoning').innerHTML=reasons.map(r=>`<div style="padding:4px 0;border-bottom:1px solid var(--border);color:var(--text2);">→ ${r}</div>`).join('');
+  document.getElementById('pma-output').style.display='block';document.getElementById('pma-output').scrollIntoView({behavior:'smooth'});
+  pmaData._bias=bias;pmaData._confidence=confidence;pmaData._reasons=reasons;
+}
+
+async function pmaSetAsBias(){
+  const bias=pmaData._bias;if(!bias){alert('Generate output first');return;}
+  const btn=document.getElementById('pma-set-bias-btn');btn.disabled=true;btn.textContent='Setting bias...';
+  const notes=document.getElementById('pma-notes-input').value.trim(),reasoning=(pmaData._reasons||[]).slice(0,5).join(' | ');
+  const fullNotes=[notes,`Pre-market: ${pmaData._confidence} confidence. ${reasoning}`].filter(Boolean).join('\n').substring(0,2000);
+  try{
+    for(const inst of['NQ','ES']){
+      const props={"Title":{title:[{text:{content:`${inst} ${bias} — ${TODAY} (Pre-Market)`}}]},"Instrument":{select:{name:inst}},"Bias":{select:{name:bias}},"Date":{date:{start:TODAY}},"switched":{checkbox:false}};
+      if(fullNotes)props["Notes"]={rich_text:[{text:{content:fullNotes}}]};
+      await notionPost('/pages',{parent:{database_id:BIAS_DB},properties:props});
+    }
+    document.getElementById('pma-success').style.display='block';btn.textContent='✓ Bias Set';
+  }catch(e){btn.disabled=false;btn.textContent="Set as Today's Bias in Notion";alert('Error: '+e.message);}
+}
+
+function pmaReset(){
+  document.querySelectorAll('.pma-btn').forEach(b=>b.className='pma-btn');
+  document.querySelectorAll('.pma-dol-btn').forEach(b=>b.classList.remove('selected'));
+  document.querySelectorAll('.pma-step-body').forEach(b=>b.classList.remove('open'));
+  document.querySelectorAll('[id^="pma-status-"]').forEach(el=>el.textContent='—');
+  Object.keys(pmaData).forEach(k=>delete pmaData[k]);pmaDOLSelected=null;
+  document.getElementById('pma-output').style.display='none';document.getElementById('pma-notes-input').value='';document.getElementById('pma-success').style.display='none';
+  const btn=document.getElementById('pma-set-bias-btn');btn.disabled=false;btn.textContent="Set as Today's Bias in Notion";
+  document.getElementById('pma-body-1').classList.add('open');
+}
+</script>
+<script>if('serviceWorker' in navigator){navigator.serviceWorker.register('../sw.js');}</script>
+</body>
+</html>
