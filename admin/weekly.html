@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weekly Review — FTJ Admin</title>
+<link rel="manifest" href="../manifest.json">
+<meta name="theme-color" content="#0a0a0a">
+<link rel="icon" type="image/png" href="https://i.imgur.com/ZP2pTk2.png">
+<link rel="stylesheet" href="../mobile.css">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0a0a;--surface:#111;--surface2:#181818;--border:#1a1a1a;--border2:#2a2a2a;--text:#e8e8e8;--text2:#888;--text3:#444;--green:#00e676;--red:#ff4444;--yellow:#ffd740;--accent:#c8ff00;--mono:'Space Mono',monospace;--sans:'DM Sans',sans-serif;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;min-height:100vh;}
+::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+#main{padding-left:64px;}
+.page{max-width:800px;margin:0 auto;padding:3rem 2rem 5rem;}
+.sidenav-admin{position:fixed;left:0;top:0;bottom:0;width:64px;background:var(--bg);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:1.5rem 0;z-index:200;}
+.nav-logo-a{font-family:var(--mono);font-size:9px;letter-spacing:0.1em;color:var(--accent);writing-mode:vertical-rl;margin-bottom:2rem;}
+.nav-admin-tag{font-family:var(--mono);font-size:8px;letter-spacing:0.12em;color:var(--red);writing-mode:vertical-rl;margin-top:auto;}
+.back-btn{font-family:var(--mono);font-size:10px;letter-spacing:0.1em;color:var(--text3);background:none;border:1px solid var(--border2);padding:6px 14px;cursor:pointer;text-transform:uppercase;transition:all 0.15s;text-decoration:none;display:inline-block;margin-bottom:2rem;}
+.back-btn:hover{color:var(--accent);border-color:var(--accent);}
+.page-eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:0.2em;color:var(--accent);text-transform:uppercase;margin-bottom:8px;}
+.page-title{font-family:var(--mono);font-size:28px;font-weight:700;line-height:1.1;margin-bottom:2rem;}
+.wstats{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--border);margin-bottom:2rem;border:1px solid var(--border);}
+.wstat{background:var(--surface);padding:1.25rem 1.5rem;}
+.wstat-label{font-family:var(--mono);font-size:9px;letter-spacing:0.14em;color:var(--text3);text-transform:uppercase;margin-bottom:8px;}
+.wstat-val{font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text);line-height:1.1;}
+.wtextarea{font-family:var(--sans);font-size:13px;background:var(--surface);border:1px solid var(--border2);color:var(--text);padding:12px 14px;width:100%;outline:none;resize:vertical;min-height:90px;line-height:1.7;transition:border-color 0.15s;}
+.wtextarea:focus{border-color:var(--accent);}
+.wfield-label{font-family:var(--mono);font-size:9px;letter-spacing:0.14em;color:var(--text3);text-transform:uppercase;margin-bottom:3px;}
+.wfield-val{font-size:13px;color:var(--text2);line-height:1.8;}
+.wstar-row{display:flex;align-items:center;gap:2px;flex-wrap:wrap;}
+.wstar{font-size:20px;cursor:pointer;transition:all 0.1s;color:var(--border2);user-select:none;line-height:1;}
+.wstar:hover{color:#ffd740;transform:scale(1.1);}
+.wstar-label{font-family:var(--mono);font-size:11px;color:var(--text3);margin-left:10px;font-weight:700;}
+.w-analyze-btn{font-family:var(--mono);font-size:11px;letter-spacing:0.12em;text-transform:uppercase;padding:14px 24px;background:var(--accent);color:#000;border:none;cursor:pointer;font-weight:700;width:100%;transition:opacity 0.15s;margin-top:1.5rem;}
+.w-analyze-btn:hover{opacity:0.85;}
+.w-analyze-btn:disabled{opacity:0.35;cursor:not-allowed;}
+.w-submit-btn{font-family:var(--mono);font-size:11px;letter-spacing:0.12em;text-transform:uppercase;padding:14px 24px;background:var(--green);color:#000;border:none;cursor:pointer;font-weight:700;width:100%;transition:opacity 0.15s;margin-top:8px;}
+.w-submit-btn:hover{opacity:0.85;}
+.w-submit-btn:disabled{opacity:0.35;cursor:not-allowed;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+.loading{animation:blink 1s infinite;}
+@media(max-width:600px){.wstats{grid-template-columns:repeat(2,1fr);}#main{padding-left:0;}}
+</style>
+</head>
+<body>
+<div id="main">
+  <nav class="sidenav-admin">
+    <div class="nav-logo-a">// FTJ</div>
+    <div class="nav-admin-tag">ADMIN</div>
+  </nav>
+  <div class="page">
+    <a href="admin.html" class="back-btn">← Back to Admin</a>
+    <div class="page-eyebrow">// Admin</div>
+    <div class="page-title">Weekly Review</div>
+
+    <!-- WEEK HEADER -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;padding-bottom:1rem;border-bottom:1px solid var(--border);">
+      <div>
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.2em;color:var(--accent);text-transform:uppercase;margin-bottom:6px;">// Current Week</div>
+        <div style="font-family:var(--mono);font-size:16px;font-weight:700;color:var(--text);" id="w-week-label">Loading...</div>
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="wstats" id="w-stats">
+      <div class="wstat"><div class="wstat-label">Trades</div><div class="wstat-val">—</div></div>
+      <div class="wstat"><div class="wstat-label">Win Rate</div><div class="wstat-val">—</div></div>
+      <div class="wstat"><div class="wstat-label">Total P&L</div><div class="wstat-val">—</div></div>
+      <div class="wstat"><div class="wstat-label">Best Trade</div><div class="wstat-val">—</div></div>
+      <div class="wstat"><div class="wstat-label">Worst Trade</div><div class="wstat-val">—</div></div>
+    </div>
+
+    <!-- GRADE + CONFLUENCE + BREACHES -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);margin-bottom:2rem;">
+      <div style="background:var(--surface);padding:1.25rem;">
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--accent);text-transform:uppercase;margin-bottom:10px;">Grade Breakdown</div>
+        <div id="w-grades" style="display:flex;flex-wrap:wrap;gap:6px;min-height:24px;"></div>
+      </div>
+      <div style="background:var(--surface);padding:1.25rem;">
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--accent);text-transform:uppercase;margin-bottom:10px;">Top Confluences</div>
+        <div id="w-confs" style="display:flex;flex-wrap:wrap;gap:6px;min-height:24px;"></div>
+      </div>
+      <div style="background:var(--surface);padding:1.25rem;grid-column:1/-1;">
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--accent);text-transform:uppercase;margin-bottom:10px;">Rule Breaches Detected</div>
+        <div id="w-breaches"></div>
+      </div>
+    </div>
+
+    <!-- LOCKED VIEW -->
+    <div id="w-locked" style="display:none;">
+      <div style="background:rgba(0,230,118,0.04);border:1px solid rgba(0,230,118,0.2);margin-bottom:1.5rem;">
+        <div style="padding:10px 16px;border-bottom:1px solid rgba(0,230,118,0.15);display:flex;align-items:center;gap:8px;">
+          <span style="color:var(--green);font-size:12px;">✓</span>
+          <span style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--green);text-transform:uppercase;">Weekly review submitted & locked</span>
+        </div>
+        <div style="padding:1.25rem;" id="w-locked-content"></div>
+      </div>
+      <div id="w-addnote" style="display:none;background:var(--surface);border:1px solid var(--border2);padding:1.25rem;margin-bottom:1rem;">
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--text3);text-transform:uppercase;margin-bottom:8px;">Add a note</div>
+        <textarea class="wtextarea" id="w-extra-note" placeholder="Add extra thoughts for this week..." style="min-height:60px;"></textarea>
+        <button onclick="wSaveNote()" style="font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;padding:8px 20px;background:none;border:1px solid var(--border2);color:var(--text2);cursor:pointer;margin-top:8px;transition:all 0.15s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text2)'" id="w-note-btn">Save Note</button>
+      </div>
+    </div>
+
+    <!-- FORM -->
+    <div id="w-form">
+      <div style="background:var(--surface);border:1px solid var(--border2);margin-bottom:1px;">
+        <div style="padding:10px 16px;border-bottom:1px solid var(--border2);background:var(--surface2);">
+          <span style="font-family:var(--mono);font-size:9px;letter-spacing:0.18em;color:var(--accent);text-transform:uppercase;">Your Reflection</span>
+        </div>
+        <div style="padding:1.25rem;display:flex;flex-direction:column;gap:14px;">
+          <div><div style="font-family:var(--mono);font-size:9px;letter-spacing:0.14em;color:var(--text3);text-transform:uppercase;margin-bottom:5px;">What went well this week?</div><textarea class="wtextarea" id="w-went-well" placeholder="Trades you executed well, setups you read correctly, discipline wins..."></textarea></div>
+          <div><div style="font-family:var(--mono);font-size:9px;letter-spacing:0.14em;color:var(--text3);text-transform:uppercase;margin-bottom:5px;">What needs improvement?</div><textarea class="wtextarea" id="w-improve" placeholder="Mistakes made, rules broken, things you struggled with..."></textarea></div>
+          <div><div style="font-family:var(--mono);font-size:9px;letter-spacing:0.14em;color:var(--text3);text-transform:uppercase;margin-bottom:5px;">Goal for next week</div><textarea class="wtextarea" id="w-goal" placeholder="One clear, specific goal for next week..." style="min-height:60px;"></textarea></div>
+          <div><div style="font-family:var(--mono);font-size:9px;letter-spacing:0.14em;color:var(--text3);text-transform:uppercase;margin-bottom:5px;">Confluences / setups to focus on next week</div><textarea class="wtextarea" id="w-focus" placeholder="e.g. Only take IFVG + HTF PDA Delivery. Wait for liquidity sweep before entry..." style="min-height:60px;"></textarea></div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);margin-bottom:1px;">
+        <div style="background:var(--surface);padding:1.25rem;">
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--accent);text-transform:uppercase;margin-bottom:12px;">Mental State</div>
+          <div class="wstar-row" id="w-stars-mental">
+            <span class="wstar" data-val="0.5" onclick="wSetStar('mental',0.5)">⯨</span><span class="wstar" data-val="1" onclick="wSetStar('mental',1)">★</span>
+            <span class="wstar" data-val="1.5" onclick="wSetStar('mental',1.5)">⯨</span><span class="wstar" data-val="2" onclick="wSetStar('mental',2)">★</span>
+            <span class="wstar" data-val="2.5" onclick="wSetStar('mental',2.5)">⯨</span><span class="wstar" data-val="3" onclick="wSetStar('mental',3)">★</span>
+            <span class="wstar" data-val="3.5" onclick="wSetStar('mental',3.5)">⯨</span><span class="wstar" data-val="4" onclick="wSetStar('mental',4)">★</span>
+            <span class="wstar" data-val="4.5" onclick="wSetStar('mental',4.5)">⯨</span><span class="wstar" data-val="5" onclick="wSetStar('mental',5)">★</span>
+            <span class="wstar-label" id="w-mental-val">0 / 5</span>
+          </div>
+        </div>
+        <div style="background:var(--surface);padding:1.25rem;">
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--accent);text-transform:uppercase;margin-bottom:12px;">Discipline</div>
+          <div class="wstar-row" id="w-stars-discipline">
+            <span class="wstar" data-val="0.5" onclick="wSetStar('discipline',0.5)">⯨</span><span class="wstar" data-val="1" onclick="wSetStar('discipline',1)">★</span>
+            <span class="wstar" data-val="1.5" onclick="wSetStar('discipline',1.5)">⯨</span><span class="wstar" data-val="2" onclick="wSetStar('discipline',2)">★</span>
+            <span class="wstar" data-val="2.5" onclick="wSetStar('discipline',2.5)">⯨</span><span class="wstar" data-val="3" onclick="wSetStar('discipline',3)">★</span>
+            <span class="wstar" data-val="3.5" onclick="wSetStar('discipline',3.5)">⯨</span><span class="wstar" data-val="4" onclick="wSetStar('discipline',4)">★</span>
+            <span class="wstar" data-val="4.5" onclick="wSetStar('discipline',4.5)">⯨</span><span class="wstar" data-val="5" onclick="wSetStar('discipline',5)">★</span>
+            <span class="wstar-label" id="w-discipline-val">0 / 5</span>
+          </div>
+        </div>
+      </div>
+      <button class="w-analyze-btn" id="w-analyze-btn" onclick="wAnalyze()">⚡ Get AI Coaching</button>
+      <div id="w-ai-section" style="display:none;margin-top:1px;background:var(--surface);border:1px solid var(--border2);">
+        <div style="padding:10px 16px;border-bottom:1px solid var(--border2);background:var(--surface2);display:flex;align-items:center;gap:8px;">
+          <span style="color:var(--accent);">⚡</span>
+          <span style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--accent);text-transform:uppercase;">AI Coach Feedback</span>
+        </div>
+        <div style="padding:1.25rem;" id="w-ai-content"></div>
+      </div>
+      <button class="w-submit-btn" id="w-submit-btn" style="display:none;margin-top:1px;" onclick="wSubmit()">✓ Submit & Lock Weekly Review</button>
+    </div>
+
+    <!-- HISTORY -->
+    <div style="margin-top:2.5rem;">
+      <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.2em;color:var(--text3);text-transform:uppercase;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border);">Past Weekly Reviews</div>
+      <div id="w-history" style="border:1px solid var(--border);"><div style="font-family:var(--mono);font-size:11px;color:var(--text3);padding:2rem;text-align:center;background:var(--surface);">Loading history...</div></div>
+    </div>
+  </div>
+</div>
+
+<script src="admin-core.js"></script>
+<script>
+if (!requireAuth()) { /* redirected */ }
+
+const YT_RESOURCES={
+  'htf_bias':[{creator:'ICT',title:'HTF Bias & Top Down Analysis',url:'https://www.youtube.com/@InnerCircleTrader'},{creator:'Dodgy',title:'HTF Bias with iFVG Model',url:'https://www.youtube.com/@DodgyFX'},{creator:'BionicNQ',title:'Top Down Analysis NQ',url:'https://www.youtube.com/@BionicNQ'}],
+  'entry_model':[{creator:'Dodgy',title:'iFVG Ultimate+ Entry Model',url:'https://www.youtube.com/@DodgyFX'},{creator:'Lumi Traders',title:'FVG & IFVG Entries',url:'https://www.youtube.com/@LumiTraders'},{creator:'Tizz Trades',title:'ICT Entry Models Explained',url:'https://www.youtube.com/@TizzTrades'}],
+  'stop_loss':[{creator:'BionicNQ',title:'Stop Loss Placement & Management',url:'https://www.youtube.com/@BionicNQ'},{creator:'PBTrades',title:'SL Management ICT Style',url:'https://www.youtube.com/@PBTrades'},{creator:'ICT',title:'Stop Hunt & SL Concepts',url:'https://www.youtube.com/@InnerCircleTrader'}],
+  'trailing':[{creator:'BionicNQ',title:'Trade Management & Trailing',url:'https://www.youtube.com/@BionicNQ'},{creator:'PBTrades',title:'Exit Strategy & TSL',url:'https://www.youtube.com/@PBTrades'},{creator:'Lumi Traders',title:'Managing Winning Trades',url:'https://www.youtube.com/@LumiTraders'}],
+  'discipline':[{creator:'ICT',title:'Trading Psychology & Discipline',url:'https://www.youtube.com/@InnerCircleTrader'},{creator:'Tizz Trades',title:'Trader Mindset',url:'https://www.youtube.com/@TizzTrades'},{creator:'BionicNQ',title:'Consistency & Process',url:'https://www.youtube.com/@BionicNQ'}],
+  'liquidity':[{creator:'ICT',title:'Liquidity Concepts & Sweeps',url:'https://www.youtube.com/@InnerCircleTrader'},{creator:'Dodgy',title:'Liquidity in iFVG Model',url:'https://www.youtube.com/@DodgyFX'},{creator:'Lumi Traders',title:'BSL SSL Explained',url:'https://www.youtube.com/@LumiTraders'}],
+  'smt':[{creator:'ICT',title:'SMT Divergence Deep Dive',url:'https://www.youtube.com/@InnerCircleTrader'},{creator:'BionicNQ',title:'SMT NQ vs ES',url:'https://www.youtube.com/@BionicNQ'},{creator:'Tizz Trades',title:'Using SMT for Entries',url:'https://www.youtube.com/@TizzTrades'}],
+  'consolidation':[{creator:'BionicNQ',title:'Avoiding Consolidation Traps',url:'https://www.youtube.com/@BionicNQ'},{creator:'PBTrades',title:'Range vs Trend Identification',url:'https://www.youtube.com/@PBTrades'},{creator:'Lumi Traders',title:'Reading Market Structure',url:'https://www.youtube.com/@LumiTraders'}],
+  'general':[{creator:'Dodgy',title:'Full iFVG Model Breakdown',url:'https://www.youtube.com/@DodgyFX'},{creator:'ICT',title:'ICT Mentorship Series',url:'https://www.youtube.com/@InnerCircleTrader'},{creator:'BionicNQ',title:'NQ Futures Trading',url:'https://www.youtube.com/@BionicNQ'}]
+};
+
+let wState={existing:null,trades:[],weekStart:null,weekEnd:null,stats:null,aiCoaching:null};
+let wSelected={mental:0,discipline:0};
+
+async function init(){
+  const{start,end}=getWeekRange();
+  wState.weekStart=start;wState.weekEnd=end;
+  document.getElementById('w-week-label').textContent=`Week of ${new Date(start+'T12:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric'})} – ${new Date(end+'T12:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}`;
+  await wLoadTrades();
+  await wCheckExisting();
+  await wLoadHistory();
+}
+
+async function wLoadTrades(){
+  try{
+    const data=await notionPost(`/databases/${DB_ID}/query`,{page_size:100});
+    wState.trades=(data.results||[]).filter(p=>{const d=p.properties['Date']?.date?.start||'';return d>=wState.weekStart&&d<=wState.weekEnd;});
+    wRenderStats();
+  }catch(e){console.error('wLoadTrades',e);}
+}
+
+function wRenderStats(){
+  const trades=wState.trades,total=trades.length,wins=trades.filter(t=>t.properties['Status']?.select?.name==='Closed - Win').length;
+  const pnls=trades.map(t=>t.properties['P&L ($)']?.number||0),totalPnl=pnls.reduce((a,b)=>a+b,0),best=total?Math.max(...pnls):0,worst=total?Math.min(...pnls):0,wr=total?Math.round((wins/total)*100):0;
+  wState.stats={total,wins,totalPnl,best,worst,wr};
+  const pClass=totalPnl>=0?'color:var(--green)':'color:var(--red)',pStr=(totalPnl>=0?'+':'-')+'$'+Math.abs(totalPnl).toLocaleString();
+  document.getElementById('w-stats').innerHTML=`<div class="wstat"><div class="wstat-label">Trades</div><div class="wstat-val">${total}</div></div><div class="wstat"><div class="wstat-label">Win Rate</div><div class="wstat-val">${wr}%</div></div><div class="wstat"><div class="wstat-label">Total P&L</div><div class="wstat-val" style="${pClass}">${pStr}</div></div><div class="wstat"><div class="wstat-label">Best Trade</div><div class="wstat-val" style="color:var(--green)">+$${best.toLocaleString()}</div></div><div class="wstat"><div class="wstat-label">Worst Trade</div><div class="wstat-val" style="color:var(--red)">${worst<=0?'-':''}$${Math.abs(worst).toLocaleString()}</div></div>`;
+  const grades={};trades.forEach(t=>{const g=t.properties['Setup Grade']?.select?.name;if(g)grades[g]=(grades[g]||0)+1;});
+  const gradeColors={'A++':'#c8ff00','A+':'#00e676','A':'#40c4ff','B':'#ffd740','C':'#ff6d00','D':'#ff4444'};
+  document.getElementById('w-grades').innerHTML=Object.entries(grades).length?Object.entries(grades).map(([g,c])=>`<span style="font-family:var(--mono);font-size:10px;padding:3px 8px;border:1px solid;color:${gradeColors[g]||'#888'};border-color:${gradeColors[g]||'#888'}33;">${g}: ${c}</span>`).join(''):'<span style="font-family:var(--mono);font-size:10px;color:var(--text3);">No trades this week</span>';
+  const confs={};trades.forEach(t=>{(t.properties['Confluences']?.multi_select||[]).forEach(c=>confs[c.name]=(confs[c.name]||0)+1);});
+  document.getElementById('w-confs').innerHTML=Object.entries(confs).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([c,n])=>`<span style="font-family:var(--mono);font-size:10px;padding:2px 8px;border:1px solid var(--border2);color:var(--text3);">${c} (${n})</span>`).join('')||'<span style="font-family:var(--mono);font-size:10px;color:var(--text3);">None</span>';
+  const breaks=[];
+  trades.forEach(t=>{const txt=[wExtractText(t.properties['Mistakes']?.rich_text),wExtractText(t.properties['Notes']?.rich_text)].join(' ').toLowerCase();if(txt.match(/stop.*(be|breakeven|moved)/)||txt.match(/(be|breakeven).*stop/))breaks.push('SL moved to BE early');if(txt.match(/bias|against|htf/))breaks.push('HTF bias not followed');if(txt.match(/trail.*(soon|tight)|tsl/))breaks.push('Trailed too soon/tight');if(txt.match(/fomo|impatient|chased/))breaks.push('FOMO / impatient entry');if(txt.match(/consolidat/))breaks.push('Traded in consolidation');});
+  const ub=[...new Set(breaks)];
+  document.getElementById('w-breaches').innerHTML=ub.length?ub.map(b=>`<div style="font-family:var(--mono);font-size:10px;color:var(--red);padding:3px 0;">❌ ${b}</div>`).join(''):'<div style="font-family:var(--mono);font-size:10px;color:var(--green);">✅ No clear breaches detected</div>';
+}
+
+async function wCheckExisting(){
+  try{
+    const data=await notionPost(`/databases/${WEEKLY_DB}/query`,{filter:{property:'Week Start',date:{equals:wState.weekStart}},page_size:5});
+    const existing=(data.results||[])[0];
+    if(existing){wState.existing=existing;if(existing.properties['Submitted']?.checkbox){wShowLocked(existing);}else{wPreFill(existing);}}
+  }catch(e){console.error('wCheckExisting',e);}
+}
+
+function wShowLocked(page){
+  const props=page.properties;
+  document.getElementById('w-form').style.display='none';document.getElementById('w-locked').style.display='block';
+  document.getElementById('w-locked-content').innerHTML=`<div style="font-family:var(--mono);font-size:10px;color:var(--green);margin-bottom:1rem;">✓ Weekly review submitted — locked</div><div class="wfield-label">What went well</div><div class="wfield-val">${wExtractText(props['What Went Well']?.rich_text)||'—'}</div><div class="wfield-label" style="margin-top:12px;">Needs improvement</div><div class="wfield-val">${wExtractText(props['Needs Improvement']?.rich_text)||'—'}</div><div class="wfield-label" style="margin-top:12px;">Next week goal</div><div class="wfield-val">${wExtractText(props['Next Week Goal']?.rich_text)||'—'}</div><div class="wfield-label" style="margin-top:12px;">Focus confluences</div><div class="wfield-val">${wExtractText(props['Focus Confluences']?.rich_text)||'—'}</div><div class="wfield-label" style="margin-top:12px;">Mental State</div><div class="wfield-val">${wRenderStarsDisplay(props['Mental State']?.number||0)}</div><div class="wfield-label" style="margin-top:8px;">Discipline</div><div class="wfield-val">${wRenderStarsDisplay(props['Discipline']?.number||0)}</div>`;
+  document.getElementById('w-addnote').style.display='block';
+}
+
+function wPreFill(page){
+  const props=page.properties;
+  document.getElementById('w-went-well').value=wExtractText(props['What Went Well']?.rich_text)||'';
+  document.getElementById('w-improve').value=wExtractText(props['Needs Improvement']?.rich_text)||'';
+  document.getElementById('w-goal').value=wExtractText(props['Next Week Goal']?.rich_text)||'';
+  document.getElementById('w-focus').value=wExtractText(props['Focus Confluences']?.rich_text)||'';
+  const mental=props['Mental State']?.number||0,disc=props['Discipline']?.number||0;
+  if(mental)wSetStar('mental',mental);if(disc)wSetStar('discipline',disc);
+}
+
+function wRenderStarsDisplay(val){
+  let html='';for(let i=1;i<=5;i++){const full=val>=i,half=!full&&val>=i-0.5;html+=`<span style="color:${full||half?'#ffd740':'#333'};font-size:16px;">${half?'⯨':'★'}</span>`;}
+  return html+` <span style="font-family:var(--mono);font-size:10px;color:var(--text3);">${val}/5</span>`;
+}
+
+function wSetStar(type,val){
+  wSelected[type]=val;
+  document.getElementById(`w-stars-${type}`).querySelectorAll('.wstar').forEach(s=>{s.style.color=parseFloat(s.dataset.val)<=val?'#ffd740':'#333';});
+  document.getElementById(`w-${type}-val`).textContent=val+'/5';
+}
+
+async function wAnalyze(){
+  const wentWell=document.getElementById('w-went-well').value.trim(),improve=document.getElementById('w-improve').value.trim(),goal=document.getElementById('w-goal').value.trim(),focus=document.getElementById('w-focus').value.trim(),mental=wSelected.mental,discipline=wSelected.discipline;
+  if(!wentWell&&!improve){alert('Please fill in at least "What went well" and "Needs improvement"');return;}
+  if(!mental||!discipline){alert('Please set your mental state and discipline ratings');return;}
+  const btn=document.getElementById('w-analyze-btn');btn.disabled=true;btn.textContent='Analyzing...';
+  document.getElementById('w-ai-section').style.display='block';
+  document.getElementById('w-ai-content').innerHTML='<div style="font-family:var(--mono);font-size:11px;color:var(--text3);animation:blink 1s infinite;">AI coach is reviewing your week...</div>';
+  const stats=wState.stats,breaches=document.getElementById('w-breaches').innerText;
+  const prompt=`You are a professional ICT futures trading coach reviewing a trader's week. Give detailed, honest, actionable coaching. Be specific to their data.\n\nWeek summary:\n- Trades: ${stats?.total||0} | Wins: ${stats?.wins||0} | Win Rate: ${stats?.wr||0}% | Total P&L: $${stats?.totalPnl||0}\n- Best trade: $${stats?.best||0} | Worst trade: $${stats?.worst||0}\n- Rule breaches detected: ${breaches}\n- Mental state rating: ${mental}/5\n- Discipline rating: ${discipline}/5\n\nTrader's own notes:\n- What went well: ${wentWell}\n- Needs improvement: ${improve}\n- Next week goal: ${goal}\n- Focus confluences: ${focus}\n\nTheir trading model: ICT concepts + Dodgy's iFVG Ultimate+ model. They trade NQ and ES futures on 1m/3m timeframes, primarily London and NY AM sessions.\n\nProvide:\n1. STRENGTHS (2-3 specific things they did well)\n2. AREAS TO WORK ON (3-4 specific, detailed coaching points)\n3. FOCUS FOR NEXT WEEK (2-3 concrete actionable tasks)\n4. MINDSET NOTE (1 paragraph on their mental state/discipline)\n\nBe detailed and specific. Reference their actual data. Format with clear headers.`;
+  try{
+    const data=await verifyTrade(prompt);
+    const text=data.result||'No response.';
+    const lower=(improve+breaches+text).toLowerCase();
+    let ytTopics=[];
+    if(lower.includes('bias')||lower.includes('htf'))ytTopics.push('htf_bias');
+    if(lower.includes('entry')||lower.includes('fvg')||lower.includes('ifvg'))ytTopics.push('entry_model');
+    if(lower.includes('stop')||lower.includes('sl')||lower.includes('breakeven'))ytTopics.push('stop_loss');
+    if(lower.includes('trail')||lower.includes('tsl')||lower.includes('exit'))ytTopics.push('trailing');
+    if(lower.includes('fomo')||lower.includes('emotion')||lower.includes('discipline'))ytTopics.push('discipline');
+    if(lower.includes('liquid')||lower.includes('bsl')||lower.includes('ssl'))ytTopics.push('liquidity');
+    if(lower.includes('smt'))ytTopics.push('smt');
+    if(lower.includes('consolid')||lower.includes('chop')||lower.includes('rang'))ytTopics.push('consolidation');
+    if(ytTopics.length===0)ytTopics.push('general');
+    ytTopics=[...new Set(ytTopics)].slice(0,3);
+    const resources=ytTopics.flatMap(t=>YT_RESOURCES[t]||[]).slice(0,6);
+    const ytHtml=resources.map(r=>`<a href="${r.url}" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--surface2);border:1px solid var(--border2);text-decoration:none;margin-bottom:4px;transition:border-color 0.15s;" onmouseover="this.style.borderColor='#ff0000'" onmouseout="this.style.borderColor='var(--border2)'"><svg viewBox="0 0 24 24" width="14" height="14" fill="#ff4444" style="flex-shrink:0;"><path d="M23.5 6.19a3.02 3.02 0 0 0-2.12-2.14C19.53 3.5 12 3.5 12 3.5s-7.53 0-9.38.55A3.02 3.02 0 0 0 .5 6.19C0 8.05 0 12 0 12s0 3.95.5 5.81a3.02 3.02 0 0 0 2.12 2.14C4.47 20.5 12 20.5 12 20.5s7.53 0 9.38-.55a3.02 3.02 0 0 0 2.12-2.14C24 15.95 24 12 24 12s0-3.95-.5-5.81zM9.75 15.52V8.48L15.86 12l-6.11 3.52z"/></svg><div><div style="font-family:var(--mono);font-size:10px;color:var(--accent);">${r.creator}</div><div style="font-size:11px;color:var(--text2);">${r.title}</div></div><span style="margin-left:auto;font-family:var(--mono);font-size:9px;color:var(--text3);">↗</span></a>`).join('');
+    document.getElementById('w-ai-content').innerHTML=`<div style="font-size:13px;color:var(--text2);line-height:1.9;margin-bottom:1.5rem;">${text.replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</div><div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--text3);text-transform:uppercase;margin-bottom:8px;">Recommended watching this week</div>${ytHtml}`;
+    wState.aiCoaching=text;document.getElementById('w-submit-btn').style.display='block';
+  }catch(e){document.getElementById('w-ai-content').innerHTML=`<div style="color:var(--red);font-size:12px;">Error: ${e.message}</div>`;}
+  btn.disabled=false;btn.textContent='⚡ Get AI Coaching';
+}
+
+async function wSubmit(){
+  const btn=document.getElementById('w-submit-btn');btn.disabled=true;btn.textContent='Submitting...';
+  const wentWell=document.getElementById('w-went-well').value.trim(),improve=document.getElementById('w-improve').value.trim(),goal=document.getElementById('w-goal').value.trim(),focus=document.getElementById('w-focus').value.trim(),stats=wState.stats||{};
+  const props={"Title":{title:[{text:{content:`Week of ${wState.weekStart}`}}]},"Week Start":{date:{start:wState.weekStart}},"Week End":{date:{start:wState.weekEnd}},"Trade Count":{number:stats.total||0},"Win Rate":{number:(stats.wr||0)/100},"Total P&L":{number:stats.totalPnl||0},"Best Trade":{number:stats.best||0},"Worst Trade":{number:stats.worst||0},"Mental State":{number:wSelected.mental},"Discipline":{number:wSelected.discipline},"Submitted":{checkbox:true}};
+  if(wentWell)props["What Went Well"]={rich_text:[{text:{content:wentWell}}]};
+  if(improve)props["Needs Improvement"]={rich_text:[{text:{content:improve}}]};
+  if(goal)props["Next Week Goal"]={rich_text:[{text:{content:goal}}]};
+  if(focus)props["Focus Confluences"]={rich_text:[{text:{content:focus}}]};
+  if(wState.aiCoaching)props["AI Coaching"]={rich_text:[{text:{content:wState.aiCoaching.substring(0,2000)}}]};
+  try{
+    let data;
+    if(wState.existing&&!wState.existing.properties['Submitted']?.checkbox){data=await notionPatch(`/pages/${wState.existing.id}`,{properties:props});}
+    else{data=await notionPost('/pages',{parent:{database_id:WEEKLY_DB},properties:props});}
+    if(data.id){wState.existing=data;wShowLocked(data);wLoadHistory();}
+  }catch(e){alert('Submit error: '+e.message);}
+  btn.disabled=false;btn.textContent='✓ Submit Weekly Review';
+}
+
+async function wSaveNote(){
+  const note=document.getElementById('w-extra-note').value.trim();if(!note||!wState.existing)return;
+  const btn=document.getElementById('w-note-btn');btn.disabled=true;btn.textContent='Saving...';
+  try{await notionPatch(`/pages/${wState.existing.id}`,{properties:{"Extra Note":{rich_text:[{text:{content:note}}]}}});btn.textContent='Saved ✓';setTimeout(()=>{btn.disabled=false;btn.textContent='Save Note';},2000);}
+  catch(e){btn.disabled=false;btn.textContent='Save Note';alert('Error: '+e.message);}
+}
+
+async function wLoadHistory(){
+  const container=document.getElementById('w-history');
+  try{
+    const data=await notionPost(`/databases/${WEEKLY_DB}/query`,{page_size:20});
+    const pages=(data.results||[]).sort((a,b)=>(b.properties['Week Start']?.date?.start||'').localeCompare(a.properties['Week Start']?.date?.start||''));
+    if(!pages.length){container.innerHTML='<div style="font-family:var(--mono);font-size:11px;color:var(--text3);padding:1.5rem;background:var(--surface);text-align:center;">No weekly reviews yet</div>';return;}
+    container.innerHTML=pages.map((p,i)=>{
+      const props=p.properties,ws=props['Week Start']?.date?.start||'',we=props['Week End']?.date?.start||'',pnl=props['Total P&L']?.number||0,wr=Math.round((props['Win Rate']?.number||0)*100),tc=props['Trade Count']?.number||0,mental=props['Mental State']?.number||0,disc=props['Discipline']?.number||0;
+      const pClass=pnl>=0?'color:var(--green)':'color:var(--red)',pStr=(pnl>=0?'+':'-')+'$'+Math.abs(pnl).toLocaleString();
+      const wsFmt=ws?new Date(ws+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'}):'—',weFmt=we?new Date(we+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'—';
+      return `<div style="background:var(--surface);border-bottom:1px solid var(--border);">
+        <div style="display:grid;grid-template-columns:160px 80px 80px 80px 1fr auto;gap:12px;align-items:center;padding:12px 16px;cursor:pointer;" onclick="wToggleExpand(${i})">
+          <div style="font-family:var(--mono);font-size:11px;color:var(--text2);">${wsFmt} – ${weFmt}</div>
+          <div style="font-family:var(--mono);font-size:12px;font-weight:700;${pClass}">${pStr}</div>
+          <div style="font-family:var(--mono);font-size:11px;color:var(--text2);">${wr}% WR</div>
+          <div style="font-family:var(--mono);font-size:11px;color:var(--text3);">${tc} trades</div>
+          <div style="font-family:var(--mono);font-size:10px;color:var(--text3);">${wRenderStarsDisplay(mental)} · ${wRenderStarsDisplay(disc)}</div>
+          <div style="font-family:var(--mono);font-size:10px;color:var(--text3);" id="w-expand-arrow-${i}">▼</div>
+        </div>
+        <div id="w-expand-${i}" style="display:none;padding:0 16px 16px;border-top:1px solid var(--border);">
+          ${wExtractText(props['What Went Well']?.rich_text)?`<div class="wfield-label" style="margin-top:12px;">What went well</div><div class="wfield-val">${wExtractText(props['What Went Well']?.rich_text)}</div>`:''}
+          ${wExtractText(props['Needs Improvement']?.rich_text)?`<div class="wfield-label" style="margin-top:10px;">Needs improvement</div><div class="wfield-val">${wExtractText(props['Needs Improvement']?.rich_text)}</div>`:''}
+          ${wExtractText(props['Next Week Goal']?.rich_text)?`<div class="wfield-label" style="margin-top:10px;">Goal</div><div class="wfield-val">${wExtractText(props['Next Week Goal']?.rich_text)}</div>`:''}
+          ${wExtractText(props['AI Coaching']?.rich_text)?`<div class="wfield-label" style="margin-top:10px;">AI Coaching</div><div class="wfield-val" style="white-space:pre-wrap;">${wExtractText(props['AI Coaching']?.rich_text)}</div>`:''}
+          ${wExtractText(props['Extra Note']?.rich_text)?`<div class="wfield-label" style="margin-top:10px;">Extra note</div><div class="wfield-val">${wExtractText(props['Extra Note']?.rich_text)}</div>`:''}
+        </div>
+      </div>`;
+    }).join('');
+  }catch(e){container.innerHTML=`<div style="color:var(--red);font-size:12px;padding:1rem;">Error: ${e.message}</div>`;}
+}
+
+function wToggleExpand(i){
+  const el=document.getElementById(`w-expand-${i}`),arrow=document.getElementById(`w-expand-arrow-${i}`),open=el.style.display!=='none';
+  el.style.display=open?'none':'block';arrow.textContent=open?'▼':'▲';
+}
+
+init();
+</script>
+<script>if('serviceWorker' in navigator){navigator.serviceWorker.register('../sw.js');}</script>
+</body>
+</html>
