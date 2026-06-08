@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — FTJ</title>
+<link rel="manifest" href="../manifest.json">
+<meta name="theme-color" content="#0a0a0a">
+<link rel="icon" type="image/png" href="https://i.imgur.com/ZP2pTk2.png">
+<link rel="stylesheet" href="../mobile.css">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0a0a;--surface:#111;--surface2:#181818;--border:#1a1a1a;--border2:#2a2a2a;--text:#e8e8e8;--text2:#888;--text3:#444;--green:#00e676;--red:#ff4444;--yellow:#ffd740;--accent:#c8ff00;--mono:'Space Mono',monospace;--sans:'DM Sans',sans-serif;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;min-height:100vh;}
+::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+
+/* AUTH */
+#auth-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:999;}
+.auth-box{background:var(--surface);border:1px solid var(--border2);padding:2.5rem;width:360px;display:flex;flex-direction:column;gap:16px;}
+.auth-logo{font-family:var(--mono);font-size:11px;letter-spacing:0.15em;color:var(--accent);}
+.auth-title{font-family:var(--mono);font-size:18px;font-weight:700;}
+.auth-sub{font-size:12px;color:var(--text3);}
+.auth-input{font-family:var(--mono);font-size:13px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:10px 12px;width:100%;outline:none;letter-spacing:0.1em;transition:border-color 0.15s;}
+.auth-input:focus{border-color:var(--accent);}
+.auth-btn{font-family:var(--mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;padding:10px;background:var(--accent);color:#000;border:none;cursor:pointer;font-weight:700;}
+.auth-btn:hover{opacity:0.85;}
+.auth-error{font-family:var(--mono);font-size:10px;color:var(--red);display:none;}
+
+/* LAYOUT */
+#main{display:none;padding-left:64px;}
+.page{max-width:860px;margin:0 auto;padding:3rem 2rem 5rem;}
+.sidenav-admin{position:fixed;left:0;top:0;bottom:0;width:64px;background:var(--bg);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:1.5rem 0;z-index:200;}
+.nav-logo-a{font-family:var(--mono);font-size:9px;letter-spacing:0.1em;color:var(--accent);writing-mode:vertical-rl;margin-bottom:2rem;}
+.nav-admin-tag{font-family:var(--mono);font-size:8px;letter-spacing:0.12em;color:var(--red);writing-mode:vertical-rl;margin-top:auto;}
+.back-btn{font-family:var(--mono);font-size:10px;letter-spacing:0.1em;color:var(--text3);background:none;border:1px solid var(--border2);padding:6px 14px;cursor:pointer;text-transform:uppercase;transition:all 0.15s;text-decoration:none;display:inline-block;}
+.back-btn:hover{color:var(--accent);border-color:var(--accent);}
+.page-eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:0.2em;color:var(--accent);text-transform:uppercase;margin-bottom:8px;margin-top:2rem;}
+.page-title{font-family:var(--mono);font-size:28px;font-weight:700;line-height:1.1;margin-bottom:2rem;}
+
+/* DASHBOARD STATS */
+.dash-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:2rem;}
+.dash-stat{background:var(--surface);padding:1.25rem 1.5rem;}
+.dash-stat-label{font-family:var(--mono);font-size:9px;letter-spacing:0.14em;color:var(--text3);text-transform:uppercase;margin-bottom:8px;}
+.dash-stat-val{font-family:var(--mono);font-size:20px;font-weight:700;color:var(--text);}
+.dash-stat-val.pos{color:var(--green);}
+.dash-stat-val.neg{color:var(--red);}
+
+/* BIAS BANNER */
+.bias-banner{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:2rem;}
+.bias-card{background:var(--surface);padding:1.25rem 1.5rem;display:flex;align-items:center;justify-content:space-between;}
+.bias-card-left{}
+.bias-inst{font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--text3);text-transform:uppercase;margin-bottom:6px;}
+.bias-val{font-family:var(--mono);font-size:24px;font-weight:700;line-height:1;}
+.bias-notes{font-size:11px;color:var(--text3);margin-top:4px;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.bias-switched{font-family:var(--mono);font-size:9px;color:var(--yellow);margin-top:3px;}
+.b-bull{color:var(--green);}
+.b-bear{color:var(--red);}
+.b-range{color:var(--yellow);}
+.b-wait{color:var(--text3);}
+.b-none{color:var(--border2);}
+.bias-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.b-bull-dot{background:var(--green);}
+.b-bear-dot{background:var(--red);}
+.b-range-dot{background:var(--yellow);}
+.b-wait-dot{background:var(--text3);}
+.b-none-dot{background:var(--border2);}
+.bias-banner-footer{grid-column:1/-1;background:var(--surface2);padding:6px 16px;display:flex;align-items:center;justify-content:space-between;}
+.bias-footer-date{font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:0.08em;}
+.bias-refresh{font-family:var(--mono);font-size:9px;color:var(--text3);background:none;border:none;cursor:pointer;letter-spacing:0.08em;text-transform:uppercase;transition:color 0.15s;}
+.bias-refresh:hover{color:var(--accent);}
+.bias-no-entry{font-family:var(--mono);font-size:10px;color:var(--text3);padding:1rem 1.5rem;}
+
+/* NAV CARDS */
+.section-label{font-family:var(--mono);font-size:9px;letter-spacing:0.2em;color:var(--text3);text-transform:uppercase;margin-bottom:10px;}
+.nav-cards{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--border);border:1px solid var(--border);}
+.nav-card{background:var(--surface);padding:1.5rem;text-decoration:none;display:flex;flex-direction:column;gap:8px;transition:background 0.15s;cursor:pointer;border:none;text-align:left;width:100%;}
+.nav-card:hover{background:var(--surface2);}
+.nav-card-icon{font-size:18px;margin-bottom:4px;}
+.nav-card-title{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--accent);letter-spacing:0.06em;}
+.nav-card-desc{font-size:12px;color:var(--text2);line-height:1.6;}
+.nav-card-arrow{font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:4px;}
+
+/* LOADING */
+.loading{font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:0.1em;animation:blink 1s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+
+@media(max-width:600px){#main{padding-left:0;}.dash-stats{grid-template-columns:repeat(2,1fr);}.bias-banner{grid-template-columns:1fr;}.nav-cards{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<!-- AUTH -->
+<div id="auth-screen">
+  <div class="auth-box">
+    <div class="auth-logo">// FTJ</div>
+    <div class="auth-title">Admin Access</div>
+    <div class="auth-sub">Enter your password to access the admin panel.</div>
+    <input class="auth-input" type="password" id="pw-input" placeholder="Password">
+    <div class="auth-error" id="auth-error">Incorrect password. Try again.</div>
+    <button class="auth-btn" onclick="checkAuth()">Unlock →</button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div id="main">
+  <nav class="sidenav-admin">
+    <div class="nav-logo-a">// FTJ</div>
+    <div class="nav-admin-tag">ADMIN</div>
+  </nav>
+  <div class="page">
+    <a href="../index.html" class="back-btn">← Back to Journal</a>
+    <div class="page-eyebrow">// Admin</div>
+    <div class="page-title">Admin Panel</div>
+
+    <!-- WEEKLY STATS -->
+    <div class="section-label">This week</div>
+    <div class="dash-stats" id="dash-stats">
+      <div class="dash-stat"><div class="dash-stat-label">Trades</div><div class="dash-stat-val loading" id="ds-trades">...</div></div>
+      <div class="dash-stat"><div class="dash-stat-label">Win Rate</div><div class="dash-stat-val loading" id="ds-wr">...</div></div>
+      <div class="dash-stat"><div class="dash-stat-label">Total P&L</div><div class="dash-stat-val loading" id="ds-pnl">...</div></div>
+      <div class="dash-stat"><div class="dash-stat-label">Avg Grade</div><div class="dash-stat-val loading" id="ds-grade">...</div></div>
+    </div>
+
+    <!-- TODAY'S BIAS -->
+    <div class="section-label">Today's bias</div>
+    <div class="bias-banner" id="bias-banner">
+      <div class="bias-card">
+        <div class="bias-card-left">
+          <div class="bias-inst">NQ</div>
+          <div class="bias-val b-none loading" id="bv-nq">...</div>
+          <div class="bias-switched" id="bs-nq" style="display:none;">↺ Switched</div>
+          <div class="bias-notes" id="bn-nq"></div>
+        </div>
+        <div class="bias-dot b-none-dot" id="bd-nq"></div>
+      </div>
+      <div class="bias-card">
+        <div class="bias-card-left">
+          <div class="bias-inst">ES</div>
+          <div class="bias-val b-none loading" id="bv-es">...</div>
+          <div class="bias-switched" id="bs-es" style="display:none;">↺ Switched</div>
+          <div class="bias-notes" id="bn-es"></div>
+        </div>
+        <div class="bias-dot b-none-dot" id="bd-es"></div>
+      </div>
+      <div class="bias-banner-footer">
+        <div class="bias-footer-date" id="bias-date"></div>
+        <button class="bias-refresh" onclick="loadBias()">↺ Refresh</button>
+      </div>
+    </div>
+
+    <!-- NAV CARDS -->
+    <div class="section-label" style="margin-top:2rem;">Sections</div>
+    <div class="nav-cards">
+      <a class="nav-card" href="log-trade.html">
+        <div class="nav-card-icon">◈</div>
+        <div class="nav-card-title">Log Trade</div>
+        <div class="nav-card-desc">Submit a new trade. AI grades, verifies rules, and calculates P&L before saving to Notion.</div>
+        <div class="nav-card-arrow">Open →</div>
+      </a>
+      <a class="nav-card" href="edit-trade.html">
+        <div class="nav-card-icon">✎</div>
+        <div class="nav-card-title">Edit Trade</div>
+        <div class="nav-card-desc">Edit a previously submitted trade. Re-verifies and updates Notion with the corrected data.</div>
+        <div class="nav-card-arrow">Open →</div>
+      </a>
+      <a class="nav-card" href="bias.html">
+        <div class="nav-card-icon">◑</div>
+        <div class="nav-card-title">Bias Board</div>
+        <div class="nav-card-desc">Set your daily HTF bias for NQ and ES. Locked once set with one switch allowed per day.</div>
+        <div class="nav-card-arrow">Open →</div>
+      </a>
+      <a class="nav-card" href="premarket.html">
+        <div class="nav-card-icon">◎</div>
+        <div class="nav-card-title">Pre-Market Analysis</div>
+        <div class="nav-card-desc">Top-down analysis step by step. Generates your bias and DOL from structure and delivery context.</div>
+        <div class="nav-card-arrow">Open →</div>
+      </a>
+      <a class="nav-card" href="weekly.html">
+        <div class="nav-card-icon">◐</div>
+        <div class="nav-card-title">Weekly Review</div>
+        <div class="nav-card-desc">Reflect on the week, get AI coaching, and submit your weekly review to lock it in Notion.</div>
+        <div class="nav-card-arrow">Open →</div>
+      </a>
+    </div>
+  </div>
+</div>
+
+<script src="admin-core.js"></script>
+<script>
+// ── AUTH ──────────────────────────────────────────────────────────────────────
+function checkAuth() {
+  const val = document.getElementById('pw-input').value;
+  if (checkPassword(val)) {
+    setAuth();
+    document.getElementById('auth-screen').style.display = 'none';
+    document.getElementById('main').style.display = 'block';
+    loadDashboard();
+  } else {
+    document.getElementById('auth-error').style.display = 'block';
+    document.getElementById('pw-input').value = '';
+    document.getElementById('pw-input').focus();
+  }
+}
+document.getElementById('pw-input').addEventListener('keydown', e => { if (e.key === 'Enter') checkAuth(); });
+
+// Auto-unlock if already authenticated this session
+if (sessionStorage.getItem('ftj_admin_auth') === 'true') {
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('main').style.display = 'block';
+  loadDashboard();
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────────────────────────
+function loadDashboard() {
+  loadBias();
+  loadWeeklyStats();
+}
+
+// ── BIAS ──────────────────────────────────────────────────────────────────────
+function biasClass(b)    { return {'Bullish':'b-bull','Bearish':'b-bear','Ranging':'b-range','Waiting':'b-wait'}[b]||'b-none'; }
+function biasDotClass(b) { return {'Bullish':'b-bull-dot','Bearish':'b-bear-dot','Ranging':'b-range-dot','Waiting':'b-wait-dot'}[b]||'b-none-dot'; }
+
+async function loadBias() {
+  document.getElementById('bias-date').textContent = new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+  try {
+    const data = await notionPost(`/databases/${BIAS_DB}/query`, {
+      filter: { property: 'Date', date: { equals: TODAY } },
+      page_size: 10
+    });
+    ['NQ','ES'].forEach(inst => {
+      const instL = inst.toLowerCase();
+      const all      = (data.results||[]).filter(p=>p.properties['Instrument']?.select?.name===inst);
+      const original = all.find(p=>!p.properties['switched']?.checkbox);
+      const switched = all.find(p=>p.properties['switched']?.checkbox);
+      const effective = switched || original;
+      const valEl  = document.getElementById(`bv-${instL}`);
+      const dotEl  = document.getElementById(`bd-${instL}`);
+      const swEl   = document.getElementById(`bs-${instL}`);
+      const notesEl= document.getElementById(`bn-${instL}`);
+      valEl.classList.remove('loading');
+      if (effective) {
+        const bias = effective.properties['Bias']?.select?.name || '—';
+        const notes= (effective.properties['Notes']?.rich_text||[]).map(r=>r.plain_text||'').join('');
+        valEl.textContent  = bias;
+        valEl.className    = 'bias-val ' + biasClass(bias);
+        dotEl.className    = 'bias-dot ' + biasDotClass(bias);
+        swEl.style.display = switched ? 'block' : 'none';
+        notesEl.textContent= notes;
+      } else {
+        valEl.textContent = 'Not set';
+        valEl.className   = 'bias-val b-none';
+        dotEl.className   = 'bias-dot b-none-dot';
+        swEl.style.display= 'none';
+        notesEl.textContent = '';
+      }
+    });
+  } catch(e) {
+    ['nq','es'].forEach(i => {
+      const el = document.getElementById(`bv-${i}`);
+      el.textContent = 'Error'; el.classList.remove('loading');
+    });
+  }
+}
+
+// ── WEEKLY STATS ──────────────────────────────────────────────────────────────
+async function loadWeeklyStats() {
+  try {
+    const { start, end } = getWeekRange();
+    const data = await notionPost(`/databases/${DB_ID}/query`, { page_size: 100 });
+    const trades = (data.results||[]).filter(p => {
+      const d = p.properties['Date']?.date?.start||'';
+      return d >= start && d <= end;
+    });
+    const total = trades.length;
+    const wins  = trades.filter(t=>t.properties['Status']?.select?.name==='Closed - Win').length;
+    const pnls  = trades.map(t=>t.properties['P&L ($)']?.number||0);
+    const totalPnl = pnls.reduce((a,b)=>a+b,0);
+    const wr    = total ? Math.round((wins/total)*100) : 0;
+
+    // Most common grade
+    const grades = {};
+    trades.forEach(t => { const g=t.properties['Setup Grade']?.select?.name; if(g) grades[g]=(grades[g]||0)+1; });
+    const topGrade = Object.entries(grades).sort((a,b)=>b[1]-a[1])[0]?.[0] || '—';
+
+    const pnlEl = document.getElementById('ds-pnl');
+    pnlEl.textContent = total ? (totalPnl>=0?'+':'-')+'$'+Math.abs(totalPnl).toLocaleString() : '—';
+    pnlEl.className = 'dash-stat-val' + (totalPnl>0?' pos':totalPnl<0?' neg':'');
+
+    document.getElementById('ds-trades').textContent = total || '0';
+    document.getElementById('ds-wr').textContent     = total ? wr+'%' : '—';
+    document.getElementById('ds-grade').textContent  = topGrade;
+    ['ds-trades','ds-wr','ds-grade'].forEach(id => {
+      document.getElementById(id).classList.remove('loading');
+    });
+  } catch(e) {
+    ['ds-trades','ds-wr','ds-pnl','ds-grade'].forEach(id => {
+      const el = document.getElementById(id);
+      el.textContent = 'Err'; el.classList.remove('loading');
+    });
+  }
+}
+</script>
+<script>if('serviceWorker' in navigator){navigator.serviceWorker.register('../sw.js');}</script>
+</body>
+</html>
