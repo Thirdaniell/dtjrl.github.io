@@ -353,5 +353,5 @@ function navToggleTheme(){
 }
 
 function navAdminAccess(){
-  window.location.href='admin.html';
+  window.location.href='admin/admin.html';
 }
