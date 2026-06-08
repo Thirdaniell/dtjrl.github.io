@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Edit Trade — FTJ Admin</title>
+<link rel="manifest" href="../manifest.json">
+<meta name="theme-color" content="#0a0a0a">
+<link rel="icon" type="image/png" href="https://i.imgur.com/ZP2pTk2.png">
+<link rel="stylesheet" href="../mobile.css">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0a0a;--surface:#111;--surface2:#181818;--border:#1a1a1a;--border2:#2a2a2a;--text:#e8e8e8;--text2:#888;--text3:#444;--green:#00e676;--red:#ff4444;--yellow:#ffd740;--accent:#c8ff00;--mono:'Space Mono',monospace;--sans:'DM Sans',sans-serif;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;min-height:100vh;}
+::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+#main{padding-left:64px;}
+.page{max-width:800px;margin:0 auto;padding:3rem 2rem 5rem;}
+.sidenav-admin{position:fixed;left:0;top:0;bottom:0;width:64px;background:var(--bg);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:1.5rem 0;z-index:200;}
+.nav-logo-a{font-family:var(--mono);font-size:9px;letter-spacing:0.1em;color:var(--accent);writing-mode:vertical-rl;margin-bottom:2rem;}
+.nav-admin-tag{font-family:var(--mono);font-size:8px;letter-spacing:0.12em;color:var(--red);writing-mode:vertical-rl;margin-top:auto;}
+.back-btn{font-family:var(--mono);font-size:10px;letter-spacing:0.1em;color:var(--text3);background:none;border:1px solid var(--border2);padding:6px 14px;cursor:pointer;text-transform:uppercase;transition:all 0.15s;text-decoration:none;display:inline-block;margin-bottom:2rem;}
+.back-btn:hover{color:var(--accent);border-color:var(--accent);}
+.page-eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:0.2em;color:var(--accent);text-transform:uppercase;margin-bottom:8px;}
+.page-title{font-family:var(--mono);font-size:28px;font-weight:700;line-height:1.1;margin-bottom:2rem;}
+/* TRADE LIST */
+.trade-list{border:1px solid var(--border2);}
+.trade-list-header{display:grid;grid-template-columns:130px 1fr 90px 55px auto;gap:12px;padding:8px 16px;background:var(--surface2);border-bottom:1px solid var(--border);}
+.trade-list-header div{font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--text3);text-transform:uppercase;}
+.trade-row{display:grid;grid-template-columns:130px 1fr 90px 55px auto;gap:12px;align-items:center;padding:12px 16px;background:var(--surface);border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.12s;}
+.trade-row:hover{background:var(--surface2);}
+.trade-row:last-child{border-bottom:none;}
+/* FORM */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);margin-bottom:2rem;}
+.form-full{grid-column:1/-1;}
+.field{background:var(--surface);padding:1rem 1.25rem;}
+.field label{font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--text3);text-transform:uppercase;display:block;margin-bottom:6px;}
+.field input,.field select,.field textarea{font-family:var(--mono);font-size:12px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:8px 10px;width:100%;outline:none;transition:border-color 0.15s;appearance:none;}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent);}
+.field textarea{resize:vertical;min-height:70px;font-family:var(--sans);font-size:13px;line-height:1.6;}
+.field select option{background:var(--surface2);}
+.conf-wrap{position:relative;}
+.conf-btn{font-family:var(--mono);font-size:11px;background:var(--surface2);border:1px solid var(--border2);color:var(--text2);padding:8px 10px;width:100%;text-align:left;cursor:pointer;transition:border-color 0.15s;display:flex;justify-content:space-between;align-items:center;}
+.conf-btn.open{border-color:var(--accent);}
+.conf-dropdown{display:none;position:absolute;top:100%;left:0;right:0;background:var(--surface);border:1px solid var(--accent);border-top:none;z-index:100;max-height:260px;overflow-y:auto;}
+.conf-dropdown.open{display:block;}
+.conf-group-lbl{font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--text3);text-transform:uppercase;padding:7px 10px 3px;border-top:1px solid var(--border2);}
+.conf-group-lbl:first-child{border-top:none;}
+.conf-opt{display:flex;align-items:center;gap:8px;padding:6px 10px;cursor:pointer;font-size:12px;color:var(--text2);transition:background 0.1s;}
+.conf-opt:hover{background:var(--surface2);}
+.conf-opt input{accent-color:var(--accent);width:12px;height:12px;flex-shrink:0;}
+.conf-opt.selected{color:var(--text);}
+.conf-clear{width:100%;font-family:var(--mono);font-size:9px;color:var(--text3);background:none;border:none;border-top:1px solid var(--border2);padding:7px;cursor:pointer;text-transform:uppercase;}
+.conf-clear:hover{color:var(--accent);}
+.conf-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;min-height:24px;}
+.conf-tag{font-family:var(--mono);font-size:9px;padding:2px 8px;border:1px solid var(--border2);color:var(--text3);}
+.save-btn{font-family:var(--mono);font-size:12px;letter-spacing:0.1em;text-transform:uppercase;padding:14px 28px;background:var(--accent);color:#000;border:none;cursor:pointer;font-weight:700;transition:opacity 0.15s;width:100%;}
+.save-btn:hover{opacity:0.85;}
+.save-btn:disabled{opacity:0.4;cursor:not-allowed;}
+.success-msg{display:none;background:rgba(0,230,118,0.08);border:1px solid rgba(0,230,118,0.3);padding:1rem 1.25rem;font-family:var(--mono);font-size:12px;color:var(--green);text-align:center;margin-top:1rem;}
+.loading{font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:0.1em;animation:blink 1s infinite;padding:2rem;text-align:center;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+@media(max-width:600px){.form-grid{grid-template-columns:1fr;}#main{padding-left:0;}.trade-list-header,.trade-row{grid-template-columns:1fr 1fr auto;}.trade-list-header div:nth-child(3),.trade-list-header div:nth-child(4),.trade-row>*:nth-child(3),.trade-row>*:nth-child(4){display:none;}}
+</style>
+</head>
+<body>
+<div id="main">
+  <nav class="sidenav-admin">
+    <div class="nav-logo-a">// FTJ</div>
+    <div class="nav-admin-tag">ADMIN</div>
+  </nav>
+  <div class="page">
+    <a href="admin.html" class="back-btn">← Back to Admin</a>
+    <div class="page-eyebrow">// Admin</div>
+    <div class="page-title">Edit Trade</div>
+    <p style="font-size:13px;color:var(--text2);margin:0 0 1.5rem;line-height:1.7;">Select a recent trade to edit. All fields pre-fill from Notion. Changes are saved back and re-verified automatically.</p>
+
+    <!-- TRADE LIST -->
+    <div id="trade-list-wrap">
+      <div class="loading">Loading recent trades...</div>
+    </div>
+
+    <!-- EDIT FORM -->
+    <div id="edit-form-wrap" style="display:none;margin-top:1.5rem;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;padding-bottom:1rem;border-bottom:1px solid var(--border);">
+        <div>
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.2em;color:var(--accent);text-transform:uppercase;margin-bottom:4px;">Editing</div>
+          <div style="font-family:var(--mono);font-size:14px;font-weight:700;color:var(--text);" id="edit-trade-title">—</div>
+        </div>
+        <button onclick="cancelEdit()" style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;padding:6px 14px;background:none;border:1px solid var(--border2);color:var(--text3);cursor:pointer;transition:all 0.15s;" onmouseover="this.style.color='var(--red)';this.style.borderColor='var(--red)'" onmouseout="this.style.color='var(--text3)';this.style.borderColor='var(--border2)'">✕ Cancel</button>
+      </div>
+      <div class="form-grid">
+        <div class="field"><label>Instrument</label><select id="ef-instrument"><option value="">Select...</option><option>NQ</option><option>ES</option><option>MNQ</option><option>MES</option><option>CL</option><option>GC</option><option>RTY</option></select></div>
+        <div class="field"><label>Direction</label><select id="ef-direction"><option value="">Select...</option><option>Long</option><option>Short</option></select></div>
+        <div class="field"><label>Session</label><select id="ef-session"><option value="">Select...</option><option>Asia</option><option>London</option><option>NY AM</option><option>NY Lunch</option><option>NY PM</option><option>Overnight</option></select></div>
+        <div class="field"><label>Timeframe</label><select id="ef-timeframe"><option value="">Select...</option><option>1m</option><option>3m</option><option>5m</option><option>15m</option><option>1h</option><option>4h</option><option>Daily</option></select></div>
+        <div class="field"><label>HTF Timeframe</label><input type="text" id="ef-htf" placeholder="e.g. 4H, 1H, 15m"></div>
+        <div class="field"><label>Entry Model</label><input type="text" id="ef-model" placeholder="e.g. 1m IFVG retracement"></div>
+        <div class="field"><label>Date</label><input type="date" id="ef-date"></div>
+        <div class="field"><label>Outcome</label><select id="ef-outcome"><option value="">Select...</option><option value="Closed - Win">Win</option><option value="Closed - Loss">Loss</option><option value="Breakeven">Breakeven</option></select></div>
+        <div class="field"><label>Entry Price</label><input type="number" id="ef-entry" step="0.25"></div>
+        <div class="field"><label>Entry Time</label><input type="text" id="ef-entry-time" placeholder="e.g. 9:40 AM"></div>
+        <div class="field"><label>Exit Price</label><input type="number" id="ef-exit" step="0.25"></div>
+        <div class="field"><label>Exit Time</label><input type="text" id="ef-exit-time" placeholder="e.g. 10:01 AM"></div>
+        <div class="field"><label>Stop Loss</label><input type="number" id="ef-sl" step="0.25"></div>
+        <div class="field"><label>Take Profit</label><input type="number" id="ef-tp" step="0.25"></div>
+        <div class="field"><label>Contracts</label><input type="number" id="ef-contracts" min="1"></div>
+        <div class="field"><label>Screenshot Link</label><input type="text" id="ef-screenshot" placeholder="imgur or TradingView URL"></div>
+        <div class="field form-full">
+          <label>Confluences</label>
+          <div class="conf-wrap" id="ef-conf-wrap">
+            <button class="conf-btn" id="ef-conf-btn" onclick="toggleEditConf()" type="button"><span id="ef-conf-label">Select confluences...</span><span>▼</span></button>
+            <div class="conf-dropdown" id="ef-conf-dropdown"></div>
+          </div>
+          <div class="conf-tags" id="ef-conf-tags"></div>
+        </div>
+        <div class="field form-full"><label>Notes</label><textarea id="ef-notes" placeholder="What happened during this trade?"></textarea></div>
+        <div class="field form-full"><label>Mistakes</label><textarea id="ef-mistakes" placeholder="What did you do wrong?"></textarea></div>
+        <div class="field form-full"><label>Lessons Learned</label><textarea id="ef-lessons" placeholder="What will you do differently?"></textarea></div>
+      </div>
+      <button class="save-btn" id="ef-save-btn" onclick="saveEdit()">✓ Save Changes & Re-Verify</button>
+      <div class="success-msg" id="edit-success-msg"></div>
+    </div>
+  </div>
+</div>
+
+<script src="admin-core.js"></script>
+<script>
+if (!requireAuth()) { /* redirected */ }
+
+let editPageId = null;
+let editConfOpen = false;
+
+// Build confluence dropdown
+buildConfDropdown('ef-conf-btn','ef-conf-dropdown','ef-conf-label','ef-conf-tags','updateEditConf');
+
+function toggleEditConf() {
+  editConfOpen = !editConfOpen;
+  document.getElementById('ef-conf-dropdown').classList.toggle('open', editConfOpen);
+  document.getElementById('ef-conf-btn').classList.toggle('open', editConfOpen);
+}
+document.addEventListener('click', e => {
+  const wrap = document.getElementById('ef-conf-wrap');
+  if (wrap && !wrap.contains(e.target)) {
+    editConfOpen = false;
+    document.getElementById('ef-conf-dropdown')?.classList.remove('open');
+    document.getElementById('ef-conf-btn')?.classList.remove('open');
+  }
+});
+function updateEditConf() { updateConfDisplay('ef-conf-dropdown','ef-conf-label','ef-conf-tags'); }
+
+// ── LOAD TRADE LIST ───────────────────────────────────────────────────────────
+async function loadTradeList() {
+  const wrap = document.getElementById('trade-list-wrap');
+  try {
+    const data = await notionPost(`/databases/${DB_ID}/query`, {
+      page_size: 20,
+      sorts: [{ property: 'Date', direction: 'descending' }]
+    });
+    const pages = data.results || [];
+    if (!pages.length) { wrap.innerHTML = `<div style="font-family:var(--mono);font-size:11px;color:var(--text3);padding:2rem;text-align:center;background:var(--surface);border:1px solid var(--border2);">No trades found</div>`; return; }
+    const gradeColors = {'A++':'#c8ff00','A+':'#00e676','A':'#40c4ff','A-':'#40c4ff','B+':'#ffd740','B':'#ffd740','B-':'#ffab40','C':'#ff6d00','D':'#ff4444'};
+    const rows = pages.map(p => {
+      const props=p.properties,id=p.id;
+      const name=(props['Trade Name']?.title||[]).map(r=>r.plain_text||'').join('')||'—';
+      const date=props['Date']?.date?.start||'—';
+      const pnl=props['P&L ($)']?.number;
+      const grade=props['Setup Grade']?.select?.name||'—';
+      const pnlStr=pnl!=null?(pnl>=0?'+':'-')+'$'+Math.abs(pnl).toLocaleString():'—';
+      const pnlCol=pnl>0?'var(--green)':pnl<0?'var(--red)':'var(--text2)';
+      const gradeCol=gradeColors[grade]||'var(--text3)';
+      const d=new Date(date+'T12:00:00');
+      const dateStr=isNaN(d)?date:d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+      return `<div class="trade-row" onclick="loadEditTrade('${id}')">
+        <div style="font-family:var(--mono);font-size:10px;color:var(--text2);">${dateStr}</div>
+        <div style="font-family:var(--mono);font-size:11px;color:var(--text);">${name}</div>
+        <div style="font-family:var(--mono);font-size:11px;font-weight:700;color:${pnlCol};">${pnlStr}</div>
+        <div style="font-family:var(--mono);font-size:10px;color:${gradeCol};">${grade}</div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--accent);letter-spacing:0.08em;text-transform:uppercase;">Edit →</div>
+      </div>`;
+    }).join('');
+    wrap.innerHTML = `<div class="trade-list">
+      <div class="trade-list-header"><div>Date</div><div>Trade</div><div>P&L</div><div>Grade</div><div></div></div>
+      ${rows}
+    </div>`;
+  } catch(e) {
+    wrap.innerHTML = `<div style="color:var(--red);font-family:var(--mono);font-size:11px;padding:1rem;">Error: ${e.message}</div>`;
+  }
+}
+
+// ── LOAD TRADE INTO FORM ──────────────────────────────────────────────────────
+async function loadEditTrade(pageId) {
+  editPageId = pageId;
+  const btn = document.getElementById('ef-save-btn');
+  btn.disabled = true; btn.textContent = 'Loading...';
+  document.getElementById('edit-success-msg').style.display = 'none';
+  try {
+    const page = await notionGet(`/pages/${pageId}`);
+    const p = page.properties;
+    const getText = key => (p[key]?.rich_text||[]).map(r=>r.plain_text||'').join('');
+    const getN    = key => p[key]?.number ?? '';
+    const getSel  = key => p[key]?.select?.name || '';
+    const setV = (id, v) => { const el=document.getElementById(id); if(el) el.value=v; };
+    setV('ef-instrument', getSel('Instrument'));
+    setV('ef-direction',  getSel('Direction'));
+    setV('ef-session',    getSel('Session'));
+    setV('ef-timeframe',  getSel('Timeframe'));
+    setV('ef-outcome',    getSel('Status'));
+    setV('ef-htf',        getText('HTF Timeframe'));
+    setV('ef-model',      getText('Entry Model'));
+    setV('ef-date',       p['Date']?.date?.start||'');
+    setV('ef-entry',      getN('Entry Price'));
+    setV('ef-exit',       getN('Exit Price'));
+    setV('ef-sl',         getN('Stop Loss'));
+    setV('ef-tp',         getN('Take Profit'));
+    setV('ef-contracts',  getN('Contracts')||1);
+    setV('ef-entry-time', getText('Entry Time'));
+    setV('ef-exit-time',  getText('Exit Time'));
+    setV('ef-notes',      getText('Notes'));
+    setV('ef-mistakes',   getText('Mistakes'));
+    setV('ef-lessons',    getText('Lessons Learned'));
+    // Screenshot
+    try {
+      const bdata = await notionGet(`/blocks/${pageId}/children`);
+      let screenshot = '';
+      for (const b of (bdata.results||[])) {
+        const texts = b[b.type]?.rich_text||[];
+        for (const t of texts) {
+          const plain = t.plain_text||'';
+          if (plain.includes('Screenshot:')) { screenshot = plain.replace('📸 Screenshot: ','').trim(); }
+        }
+      }
+      setV('ef-screenshot', screenshot);
+    } catch(e) {}
+    // Confluences
+    const confs = (p['Confluences']?.multi_select||[]).map(c=>c.name);
+    setCheckedConf('ef-conf-dropdown','ef-conf-label','ef-conf-tags', confs);
+    // Title
+    const tradeName = (p['Trade Name']?.title||[]).map(r=>r.plain_text||'').join('')||'Trade';
+    document.getElementById('edit-trade-title').textContent = tradeName;
+    document.getElementById('edit-form-wrap').style.display = 'block';
+    document.getElementById('edit-form-wrap').scrollIntoView({behavior:'smooth'});
+  } catch(e) { alert('Failed to load trade: '+e.message); }
+  btn.disabled = false; btn.textContent = '✓ Save Changes & Re-Verify';
+}
+
+// ── SAVE EDIT ─────────────────────────────────────────────────────────────────
+async function saveEdit() {
+  if (!editPageId) return;
+  const btn = document.getElementById('ef-save-btn');
+  btn.disabled = true; btn.textContent = 'Saving & Re-Verifying...';
+  document.getElementById('edit-success-msg').style.display = 'none';
+
+  const instrument  = getField('ef-instrument'), direction = getField('ef-direction');
+  const session     = getField('ef-session'),    timeframe = getField('ef-timeframe');
+  const outcome     = getField('ef-outcome'),    htf       = getField('ef-htf');
+  const model       = getField('ef-model'),      date      = getField('ef-date');
+  const entry       = parseFloat(document.getElementById('ef-entry').value)||null;
+  const exit        = parseFloat(document.getElementById('ef-exit').value)||null;
+  const sl          = parseFloat(document.getElementById('ef-sl').value)||null;
+  const tp          = parseFloat(document.getElementById('ef-tp').value)||null;
+  const contracts   = parseInt(document.getElementById('ef-contracts').value)||1;
+  const entryTime   = getField('ef-entry-time'), exitTime  = getField('ef-exit-time');
+  const notes       = getField('ef-notes'),      mistakes  = getField('ef-mistakes');
+  const lessons     = getField('ef-lessons'),    screenshot= getField('ef-screenshot');
+  const confluences = getCheckedConf('ef-conf-dropdown');
+  const pnl = (entry&&exit&&instrument&&direction) ? calcPnL(entry,exit,contracts,instrument,direction) : null;
+  const rr  = calcRR(entry,sl,tp);
+
+  // Re-verify
+  let grade = '', followedRules = 'Partially ⚠️';
+  try {
+    const tradeStr = [`Instrument: ${instrument}`,`Direction: ${direction}`,`Session: ${session}`,`Timeframe: ${timeframe}`,`HTF Timeframe: ${htf}`,`Entry Model: ${model}`,`Date: ${date}`,`Entry Price: ${entry} at ${entryTime}`,`Exit Price: ${exit} at ${exitTime}`,`Stop Loss: ${sl}`,`Take Profit: ${tp}`,`Contracts: ${contracts}`,`R:R: ${rr||''}`,`P&L: $${pnl}`,`Status: ${outcome}`,`Confluences: ${confluences.join(', ')}`,`Notes: ${notes}`,`Mistakes: ${mistakes}`,`Lessons Learned: ${lessons}`].filter(l=>!l.endsWith(': ')&&!l.endsWith(': null')&&!l.endsWith(': undefined')).join('\n');
+    const vdata = await verifyTrade(tradeStr);
+    if (vdata.grade) grade = vdata.grade;
+    const frMap = {'YES':'Yes ✅','PARTIALLY':'Partially ⚠️','NO':'No ❌'};
+    if (vdata.followedRules) followedRules = frMap[vdata.followedRules]||'Partially ⚠️';
+  } catch(e) {
+    grade = autoGradeLocal(confluences, mistakes);
+    followedRules = autoFollowedRulesLocal(mistakes);
+  }
+
+  const tradeName = `${instrument} ${direction} — ${session}`;
+  const props = {};
+  props["Trade Name"] = {title:[{text:{content:tradeName}}]};
+  if(instrument)  props["Instrument"]     = {select:{name:instrument}};
+  if(direction)   props["Direction"]      = {select:{name:direction}};
+  if(session)     props["Session"]        = {select:{name:session}};
+  if(timeframe)   props["Timeframe"]      = {select:{name:timeframe}};
+  if(outcome)     props["Status"]         = {select:{name:outcome}};
+  if(date)        props["Date"]           = {date:{start:date}};
+  if(contracts)   props["Contracts"]      = {number:contracts};
+  if(pnl!=null)   props["P&L ($)"]        = {number:pnl};
+  if(rr)          props["R:R"]            = {number:rr};
+  if(entry)       props["Entry Price"]    = {number:entry};
+  if(exit)        props["Exit Price"]     = {number:exit};
+  if(sl)          props["Stop Loss"]      = {number:sl};
+  if(tp)          props["Take Profit"]    = {number:tp};
+  if(entryTime)   props["Entry Time"]     = {rich_text:[{text:{content:entryTime}}]};
+  if(exitTime)    props["Exit Time"]      = {rich_text:[{text:{content:exitTime}}]};
+  if(notes)       props["Notes"]          = {rich_text:[{text:{content:notes}}]};
+  if(mistakes)    props["Mistakes"]       = {rich_text:[{text:{content:mistakes}}]};
+  if(lessons)     props["Lessons Learned"]= {rich_text:[{text:{content:lessons}}]};
+  if(htf)         props["HTF Timeframe"]  = {rich_text:[{text:{content:htf}}]};
+  if(model)       props["Entry Model"]    = {rich_text:[{text:{content:model}}]};
+  if(grade)       props["Setup Grade"]    = {select:{name:grade}};
+  props["Followed Rules"] = {select:{name:followedRules}};
+  if(confluences.length) props["Confluences"] = {multi_select:confluences.map(c=>({name:c}))};
+
+  try {
+    const data = await notionPatch(`/pages/${editPageId}`, {properties:props});
+    if (data.id) {
+      const msg = document.getElementById('edit-success-msg');
+      msg.style.display = 'block';
+      msg.textContent = `✓ Updated! ${tradeName} · ${grade} · ${followedRules}`;
+      await loadTradeList();
+    } else { alert('Update failed: '+JSON.stringify(data)); }
+  } catch(e) { alert('Save failed: '+e.message); }
+  btn.disabled = false; btn.textContent = '✓ Save Changes & Re-Verify';
+}
+
+function cancelEdit() {
+  editPageId = null;
+  document.getElementById('edit-form-wrap').style.display = 'none';
+  document.getElementById('edit-success-msg').style.display = 'none';
+}
+
+loadTradeList();
+</script>
+<script>if('serviceWorker' in navigator){navigator.serviceWorker.register('../sw.js');}</script>
+</body>
+</html>
