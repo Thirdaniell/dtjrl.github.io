@@ -1,4 +1,4 @@
-const CACHE = 'ftj-v1';
+const CACHE = 'ftj-v2';
 const STATIC = [
   '/dtjrl.github.io/',
   '/dtjrl.github.io/index.html',
@@ -11,6 +11,13 @@ const STATIC = [
   '/dtjrl.github.io/mobile.css',
   '/dtjrl.github.io/icon-192.png',
   '/dtjrl.github.io/icon-512.png',
+  '/dtjrl.github.io/admin/admin.html',
+  '/dtjrl.github.io/admin/admin-core.js',
+  '/dtjrl.github.io/admin/log-trade.html',
+  '/dtjrl.github.io/admin/edit-trade.html',
+  '/dtjrl.github.io/admin/bias.html',
+  '/dtjrl.github.io/admin/weekly.html',
+  '/dtjrl.github.io/admin/premarket.html',
   'https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap'
 ];
 
@@ -41,6 +48,12 @@ self.addEventListener('fetch', e => {
     url.hostname.includes('api.notion')
   ) {
     e.respondWith(fetch(e.request));
+    return;
+  }
+
+  // Always go network for admin pages — never serve stale cached redirects
+  if (url.pathname.includes('/admin')) {
+    e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
     return;
   }
 
