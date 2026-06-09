@@ -51,13 +51,27 @@ self.addEventListener('fetch', e => {
     return;
   }
 
-  // Always go network for admin pages — never serve stale cached redirects
-  if (url.pathname.includes('/admin')) {
-    e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
+  // Network-first for HTML and JS — always get latest, fall back to cache offline
+  if (url.pathname.endsWith('.html') || url.pathname.endsWith('.js') || url.pathname === '/dtjrl.github.io/') {
+    e.respondWith(
+      fetch(e.request).then(res => {
+        if (res && res.status === 200) {
+          const clone = res.clone();
+          caches.open(CACHE).then(c => c.put(e.request, clone));
+        }
+        return res;
+      }).catch(() => {
+        // Offline — serve from cache, fallback to index.html for navigation
+        return caches.match(e.request).then(cached => {
+          if (cached) return cached;
+          if (e.request.mode === 'navigate') return caches.match('/dtjrl.github.io/index.html');
+        });
+      })
+    );
     return;
   }
 
-  // Cache first for everything else
+  // Cache-first for everything else (images, fonts, CSS)
   e.respondWith(
     caches.match(e.request).then(cached => {
       if (cached) return cached;
@@ -67,11 +81,6 @@ self.addEventListener('fetch', e => {
         caches.open(CACHE).then(c => c.put(e.request, clone));
         return res;
       });
-    }).catch(() => {
-      // Offline fallback — return index.html for navigation requests
-      if (e.request.mode === 'navigate') {
-        return caches.match('/dtjrl.github.io/index.html');
-      }
     })
   );
 });
