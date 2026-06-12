@@ -579,6 +579,60 @@
     animation: blink 1s infinite;
   }
 
+  /* CHART OVERLAY */
+  .chart-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.92);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+  }
+  .chart-overlay.open { display: flex; }
+  .chart-overlay-box {
+    position: relative;
+    width: 95vw;
+    max-width: 1400px;
+    height: 85vh;
+    background: var(--bg);
+    border: 1px solid var(--border2);
+  }
+  .chart-overlay iframe, .chart-overlay img {
+    display: none;
+    width: 100%;
+    height: 100%;
+    border: none;
+    object-fit: contain;
+    background: #131722;
+  }
+  .chart-overlay-close {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    background: var(--bg);
+    border: 1px solid var(--border2);
+    color: var(--text2);
+    cursor: pointer;
+    z-index: 1;
+    transition: all 0.15s;
+  }
+  .chart-overlay-close:hover { color: var(--accent); border-color: var(--accent); }
+  .chart-overlay-hint {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text3);
+    margin-top: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
   @media (max-width: 600px) {
     .container { padding: 1rem; }
     .stats-row { grid-template-columns: repeat(2, 1fr); }
@@ -720,6 +774,16 @@
     <span class="badge-legend-item">❌ Rules broken</span>
   </div>
   <div id="main"></div>
+</div>
+
+<!-- CHART OVERLAY -->
+<div class="chart-overlay" id="chart-overlay" onclick="if(event.target===this)closeChartOverlay()">
+  <div class="chart-overlay-box">
+    <iframe id="chart-iframe" src=""></iframe>
+    <img id="chart-overlay-img" src="" alt="Trade chart">
+    <button class="chart-overlay-close" onclick="closeChartOverlay()">✕ Close</button>
+  </div>
+  <div class="chart-overlay-hint">Click outside or press ESC to close</div>
 </div>
 
 <script>
@@ -906,12 +970,12 @@ function renderCard(t) {
     const isImage = /\.(png|jpg|jpeg|gif|webp)(\?.*)?$/i.test(url) || url.includes('i.imgur.com') || (url.includes('imgur.com') && !url.includes('gallery'));
     if (isImage) {
       const imgUrl = url.includes('imgur.com/') && !url.includes('i.imgur.com') ? url.replace('imgur.com/', 'i.imgur.com/') : url;
-      return `<img class="chart-img" src="${imgUrl}" alt="Trade chart" loading="lazy" />`;
+      return `<img class="chart-img" src="${imgUrl}" alt="Trade chart" loading="lazy" onclick="openChartOverlay('${imgUrl.replace(/'/g, "\\'")}')" style="cursor:pointer;" />`;
     }
-    return `<a class="chart-link" href="${url}" target="_blank" rel="noopener">
+    return `<button class="chart-link" onclick="openChartOverlay('${url.replace(/'/g, "\\'")}')" style="width:100%;background:none;cursor:pointer;">
       <span>View chart on TradingView</span>
-      <span class="chart-link-arrow">↗</span>
-    </a>`;
+      <span class="chart-link-arrow">⤢</span>
+    </button>`;
   }
   const chartHtml = buildChartHtml(t.screenshotUrl);
 
@@ -1203,6 +1267,41 @@ function clearConfFilter() {
   document.querySelectorAll('#conf-dropdown input[type=checkbox]').forEach(cb => cb.checked = false);
   updateConfFilter();
 }
+
+// ---- Chart Overlay ----
+function openChartOverlay(url) {
+  const overlay = document.getElementById('chart-overlay');
+  const iframe  = document.getElementById('chart-iframe');
+  const img     = document.getElementById('chart-overlay-img');
+  const isImage = /\.(png|jpg|jpeg|gif|webp)(\?.*)?$/i.test(url) || url.includes('i.imgur.com');
+  if (isImage) {
+    iframe.style.display = 'none';
+    iframe.src = '';
+    img.src = url;
+    img.style.display = 'block';
+  } else {
+    img.style.display = 'none';
+    img.src = '';
+    iframe.src = url;
+    iframe.style.display = 'block';
+  }
+  overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeChartOverlay() {
+  const overlay = document.getElementById('chart-overlay');
+  const iframe  = document.getElementById('chart-iframe');
+  const img     = document.getElementById('chart-overlay-img');
+  overlay.classList.remove('open');
+  iframe.src = '';
+  img.src = '';
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeChartOverlay();
+});
 
 function renderAll() {
   const filtered = getFiltered();
