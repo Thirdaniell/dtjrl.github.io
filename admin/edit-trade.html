@@ -60,6 +60,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
 .success-msg{display:none;background:rgba(0,230,118,0.08);border:1px solid rgba(0,230,118,0.3);padding:1rem 1.25rem;font-family:var(--mono);font-size:12px;color:var(--green);text-align:center;margin-top:1rem;}
 .loading{font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:0.1em;animation:blink 1s infinite;padding:2rem;text-align:center;}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+/* PARTIAL EXITS */
+.partial-row{display:none;background:rgba(200,255,0,0.03);border:1px solid rgba(200,255,0,0.15);padding:1rem 1.25rem;}
 @media(max-width:600px){.form-grid{grid-template-columns:1fr;}#main{padding-left:0;}.trade-list-header,.trade-row{grid-template-columns:1fr 1fr auto;}.trade-list-header div:nth-child(3),.trade-list-header div:nth-child(4),.trade-row>*:nth-child(3),.trade-row>*:nth-child(4){display:none;}}
 </style>
 </head>
@@ -100,8 +102,17 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
         <div class="field"><label>Outcome</label><select id="ef-outcome"><option value="">Select...</option><option value="Closed - Win">Win</option><option value="Closed - Loss">Loss</option><option value="Breakeven">Breakeven</option></select></div>
         <div class="field"><label>Entry Price</label><input type="number" id="ef-entry" step="0.25"></div>
         <div class="field"><label>Entry Time</label><input type="text" id="ef-entry-time" placeholder="e.g. 9:40 AM"></div>
-        <div class="field"><label>Exit Price</label><input type="number" id="ef-exit" step="0.25"></div>
+        <div class="field"><label>Exit Price <span style="color:var(--text3);font-size:9px;">(final, if no partials)</span></label><input type="number" id="ef-exit" step="0.25"></div>
         <div class="field"><label>Exit Time</label><input type="text" id="ef-exit-time" placeholder="e.g. 10:01 AM"></div>
+        <!-- PARTIAL EXITS -->
+        <div class="field form-full partial-row" id="ef-partial-row">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+            <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--accent);text-transform:uppercase;">Partial Exits</div>
+            <div style="font-family:var(--mono);font-size:9px;color:var(--text3);" id="ef-partial-contracts-remaining"></div>
+          </div>
+          <div id="ef-partial-tp-rows"></div>
+          <div style="font-family:var(--mono);font-size:10px;color:var(--green);margin-top:10px;line-height:1.8;" id="ef-partial-pnl-preview"></div>
+        </div>
         <div class="field"><label>Stop Loss</label><input type="number" id="ef-sl" step="0.25"></div>
         <div class="field"><label>Take Profit</label><input type="number" id="ef-tp" step="0.25"></div>
         <div class="field"><label>Contracts</label><input type="number" id="ef-contracts" min="1"></div>
@@ -130,6 +141,7 @@ if (!requireAuth()) { /* redirected */ }
 
 let editPageId = null;
 let editConfOpen = false;
+const EF_TP_LABELS = ['TP1','TP2','TP3','TP4','TP5','TP6','TP7','TP8','TP9','TP10'];
 
 // Build confluence dropdown
 buildConfDropdown('ef-conf-btn','ef-conf-dropdown','ef-conf-label','ef-conf-tags','updateEditConf');
@@ -148,6 +160,124 @@ document.addEventListener('click', e => {
   }
 });
 function updateEditConf() { updateConfDisplay('ef-conf-dropdown','ef-conf-label','ef-conf-tags'); }
+
+// ── PARTIAL EXITS UI (mirrors log-trade.html) ─────────────────────────────────
+document.getElementById('ef-contracts').addEventListener('input', efTogglePartialRow);
+
+function efTogglePartialRow() {
+  const contracts = parseInt(document.getElementById('ef-contracts').value) || 1;
+  const row = document.getElementById('ef-partial-row');
+  if (contracts <= 1) {
+    row.style.display = 'none';
+    document.getElementById('ef-partial-tp-rows').innerHTML = '';
+    document.getElementById('ef-partial-pnl-preview').textContent = '';
+    return;
+  }
+  row.style.display = 'block';
+  const existingRows = document.querySelectorAll('#ef-partial-tp-rows [id^="ef-tp-row-"]').length;
+  if (existingRows !== Math.min(contracts, 10)) {
+    renderEditTPRows(contracts);
+  } else {
+    onEditTPInput();
+  }
+}
+
+function buildEditTPRow(i, remainingBefore) {
+  const inp=`style="font-family:var(--mono);font-size:12px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:8px 10px;width:100%;outline:none;"`;
+  const lbl=`style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;color:var(--text3);text-transform:uppercase;display:block;margin-bottom:4px;"`;
+  return `<div id="ef-tp-row-${i}" style="margin-bottom:10px;padding:12px;background:var(--surface2);border:1px solid var(--border2);">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+      <div style="font-family:var(--mono);font-size:9px;color:var(--accent);text-transform:uppercase;">${EF_TP_LABELS[i-1]||'TP'+i}</div>
+      <div style="font-family:var(--mono);font-size:9px;color:var(--text3);" id="ef-tp-remaining-${i}">${remainingBefore} contract${remainingBefore>1?'s':''} available</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+      <div><label ${lbl}>Exit Price</label><input type="number" id="ef-tp${i}-price" step="0.25" ${inp} oninput="onEditTPInput()"></div>
+      <div><label ${lbl}>Exit Time</label><input type="text" id="ef-tp${i}-time" placeholder="e.g. 10:01 AM" ${inp}></div>
+      <div><label ${lbl}>Contracts off</label><input type="number" id="ef-tp${i}-contracts" min="1" max="${remainingBefore}" ${inp} oninput="onEditTPInput()"></div>
+    </div>
+    <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:6px;" id="ef-tp-note-${i}"></div>
+  </div>`;
+}
+
+function renderEditTPRows(total) {
+  let html = ''; for(let i=1;i<=Math.min(total,10);i++) html+=buildEditTPRow(i,total);
+  document.getElementById('ef-partial-tp-rows').innerHTML = html;
+  document.getElementById('ef-partial-contracts-remaining').textContent = `${total} contracts total`;
+  onEditTPInput();
+}
+
+function onEditTPInput() {
+  const total = parseInt(document.getElementById('ef-contracts').value) || 1;
+  const entry = parseFloat(document.getElementById('ef-entry').value) || null;
+  const sl    = parseFloat(document.getElementById('ef-sl').value) || null;
+  const inst  = getField('ef-instrument');
+  const dir   = getField('ef-direction');
+  let used = 0, allExited = false;
+  for (let i=1; i<=Math.min(total,10); i++) {
+    const rowEl = document.getElementById(`ef-tp-row-${i}`);
+    const remEl = document.getElementById(`ef-tp-remaining-${i}`);
+    const noteEl = document.getElementById(`ef-tp-note-${i}`);
+    if (!rowEl) break;
+    if (allExited) { rowEl.style.display = 'none'; continue; }
+    rowEl.style.display = 'block';
+    const avail = total - used;
+    if (remEl) remEl.textContent = `${avail} contract${avail>1?'s':''} available`;
+    const c = parseInt(document.getElementById(`ef-tp${i}-contracts`)?.value) || 0;
+    const p = parseFloat(document.getElementById(`ef-tp${i}-price`)?.value) || null;
+    if (c > avail) { const el = document.getElementById(`ef-tp${i}-contracts`); if (el) el.value = avail; }
+    let note = '';
+    if (p && entry && c > 0) {
+      const isAtSL = sl && Math.abs(p-sl) < 0.5;
+      const isAtBE = Math.abs(p-entry) < 1.0 && !isAtSL;
+      if (isAtBE) note = '⚡ BE exit';
+      else if (isAtSL) note = '⛔ Stop loss hit';
+      else if (inst && dir) {
+        const pnl = calcPnL(entry, p, c, inst, dir);
+        note = `${pnl>=0?'+':'-'}$${Math.abs(pnl).toLocaleString()} on ${c} contract${c>1?'s':''}`;
+      }
+    }
+    if (noteEl) { noteEl.textContent = note; noteEl.style.color = note.includes('BE') ? 'var(--yellow)' : note.includes('Stop') ? 'var(--red)' : 'var(--green)'; }
+    used += c;
+    if (used >= total) allExited = true;
+  }
+  document.getElementById('ef-partial-contracts-remaining').textContent = used>0 ? `${used}/${total} exited${allExited?' — fully closed':` · ${total-used} running`}` : `${total} contracts total`;
+  updateEditPartialPreview();
+}
+
+function getEditTPRows() {
+  const total = parseInt(document.getElementById('ef-contracts').value) || 1;
+  const rows = [];
+  for (let i=1; i<=Math.min(total,10); i++) {
+    const p = parseFloat(document.getElementById(`ef-tp${i}-price`)?.value);
+    const c = parseInt(document.getElementById(`ef-tp${i}-contracts`)?.value);
+    if (p && c) rows.push({ price:p, time:getField(`ef-tp${i}-time`), contracts:c, label: EF_TP_LABELS[i-1]||`TP${i}` });
+  }
+  return rows;
+}
+
+function updateEditPartialPreview() {
+  const preview = document.getElementById('ef-partial-pnl-preview');
+  if (!preview) return;
+  const entry = parseFloat(document.getElementById('ef-entry').value) || null;
+  const sl    = parseFloat(document.getElementById('ef-sl').value) || null;
+  const inst  = getField('ef-instrument');
+  const dir   = getField('ef-direction');
+  if (!entry || !inst || !dir) { preview.innerHTML = ''; return; }
+  const rows = getEditTPRows();
+  if (!rows.length) { preview.innerHTML = ''; return; }
+  let total = 0, lines = [];
+  rows.forEach(r => {
+    const isAtSL = sl && Math.abs(r.price-sl) < 0.5;
+    const isAtBE = Math.abs(r.price-entry) < 1.0 && !isAtSL;
+    const pnl = calcPnL(entry, r.price, r.contracts, inst, dir);
+    total += pnl;
+    lines.push(`${r.label}${isAtBE?' [BE]':isAtSL?' [SL]':''}: ${pnl>=0?'+':'-'}$${Math.abs(pnl).toLocaleString()} · ${r.contracts} @ ${r.price.toLocaleString()}`);
+  });
+  lines.push('──────────────────────');
+  lines.push(`Total: ${total>=0?'+':'-'}$${Math.abs(total).toLocaleString()}`);
+  preview.innerHTML = lines.join('<br>');
+  preview.style.color = total>=0 ? 'var(--green)' : 'var(--red)';
+}
 
 // ── LOAD TRADE LIST ───────────────────────────────────────────────────────────
 async function loadTradeList() {
@@ -194,6 +324,11 @@ async function loadEditTrade(pageId) {
   const btn = document.getElementById('ef-save-btn');
   btn.disabled = true; btn.textContent = 'Loading...';
   document.getElementById('edit-success-msg').style.display = 'none';
+  // Reset partial exits UI before loading
+  document.getElementById('ef-partial-row').style.display = 'none';
+  document.getElementById('ef-partial-tp-rows').innerHTML = '';
+  document.getElementById('ef-partial-pnl-preview').textContent = '';
+  document.getElementById('ef-partial-contracts-remaining').textContent = '';
   try {
     const page = await notionGet(`/pages/${pageId}`);
     const p = page.properties;
@@ -213,10 +348,38 @@ async function loadEditTrade(pageId) {
     setV('ef-exit',       getN('Exit Price'));
     setV('ef-sl',         getN('Stop Loss'));
     setV('ef-tp',         getN('Take Profit'));
-    setV('ef-contracts',  getN('Contracts')||1);
+    const contracts = getN('Contracts')||1;
+    setV('ef-contracts',  contracts);
     setV('ef-entry-time', getText('Entry Time'));
     setV('ef-exit-time',  getText('Exit Time'));
-    setV('ef-notes',      getText('Notes'));
+
+    // ── Parse partial exits out of Notes ──
+    const notesRaw = getText('Notes');
+    const breakdownMatch = notesRaw.match(/Exit breakdown:\s*(.+?)(?:\n|$)/i);
+    const cleanNotes = notesRaw.replace(/\n?Exit breakdown:.+/i, '').trim();
+    setV('ef-notes', cleanNotes);
+
+    if (breakdownMatch && contracts > 1) {
+      document.getElementById('ef-partial-row').style.display = 'block';
+      renderEditTPRows(contracts);
+      const parts = breakdownMatch[1].split('·').map(s=>s.trim()).filter(Boolean);
+      parts.forEach((part, i) => {
+        const m = part.match(/[\w\d]+:\s*(\d+)\s*contract[s]?\s*@\s*([\d.]+)(?:\s*at\s*([\d:]+\s*[AP]M))?/i);
+        if (m) {
+          const elC = document.getElementById(`ef-tp${i+1}-contracts`);
+          const elP = document.getElementById(`ef-tp${i+1}-price`);
+          const elT = document.getElementById(`ef-tp${i+1}-time`);
+          if (elC) elC.value = m[1];
+          if (elP) elP.value = m[2];
+          if (elT && m[3]) elT.value = m[3];
+        }
+      });
+      onEditTPInput();
+    } else if (contracts > 1) {
+      document.getElementById('ef-partial-row').style.display = 'block';
+      renderEditTPRows(contracts);
+    }
+
     setV('ef-mistakes',   getText('Mistakes'));
     setV('ef-lessons',    getText('Lessons Learned'));
     // Screenshot
@@ -264,7 +427,18 @@ async function saveEdit() {
   const notes       = getField('ef-notes'),      mistakes  = getField('ef-mistakes');
   const lessons     = getField('ef-lessons'),    screenshot= getField('ef-screenshot');
   const confluences = getCheckedConf('ef-conf-dropdown');
-  const pnl = (entry&&exit&&instrument&&direction) ? calcPnL(entry,exit,contracts,instrument,direction) : null;
+
+  // ── P&L calc — use partial exits if present, else single entry/exit ──
+  const tpRows = (contracts > 1) ? getEditTPRows().filter(r => r.price && r.contracts) : [];
+  let pnl = null;
+  if (entry) {
+    if (tpRows.length > 0) {
+      pnl = 0;
+      tpRows.forEach(r => { pnl += calcPnL(entry, r.price, r.contracts, instrument, direction); });
+    } else if (exit) {
+      pnl = calcPnL(entry, exit, contracts, instrument, direction);
+    }
+  }
   const rr  = calcRR(entry,sl,tp);
 
   // Re-verify
@@ -279,6 +453,12 @@ async function saveEdit() {
     grade = autoGradeLocal(confluences, mistakes);
     followedRules = autoFollowedRulesLocal(mistakes);
   }
+
+  // ── Rebuild Notes with exit breakdown if partials exist ──
+  const exitBreakdown = (tpRows.length > 0)
+    ? 'Exit breakdown: ' + tpRows.map(r => `${r.label}: ${r.contracts} contract${r.contracts>1?'s':''} @ ${r.price}${r.time?' at '+r.time:''}`).join(' · ')
+    : null;
+  const fullNotes = [notes, exitBreakdown].filter(Boolean).join('\n');
 
   const tradeName = `${instrument} ${direction} — ${session}`;
   const props = {};
@@ -298,7 +478,7 @@ async function saveEdit() {
   if(tp)          props["Take Profit"]    = {number:tp};
   if(entryTime)   props["Entry Time"]     = {rich_text:[{text:{content:entryTime}}]};
   if(exitTime)    props["Exit Time"]      = {rich_text:[{text:{content:exitTime}}]};
-  if(notes)       props["Notes"]          = {rich_text:[{text:{content:notes}}]};
+  if(fullNotes)   props["Notes"]          = {rich_text:[{text:{content:fullNotes}}]};
   if(mistakes)    props["Mistakes"]       = {rich_text:[{text:{content:mistakes}}]};
   if(lessons)     props["Lessons Learned"]= {rich_text:[{text:{content:lessons}}]};
   if(htf)         props["HTF Timeframe"]  = {rich_text:[{text:{content:htf}}]};
@@ -312,7 +492,8 @@ async function saveEdit() {
     if (data.id) {
       const msg = document.getElementById('edit-success-msg');
       msg.style.display = 'block';
-      msg.textContent = `✓ Updated! ${tradeName} · ${grade} · ${followedRules}`;
+      const pnlStr = pnl!=null ? (pnl>=0?'+':'-')+'$'+Math.abs(pnl).toLocaleString() : '—';
+      msg.textContent = `✓ Updated! ${tradeName} · ${pnlStr} · ${grade} · ${followedRules}`;
       await loadTradeList();
     } else { alert('Update failed: '+JSON.stringify(data)); }
   } catch(e) { alert('Save failed: '+e.message); }
