@@ -599,11 +599,10 @@
     background: var(--bg);
     border: 1px solid var(--border2);
   }
-  .chart-overlay iframe, .chart-overlay img {
-    display: none;
+  .chart-overlay img {
+    display: block;
     width: 100%;
     height: 100%;
-    border: none;
     object-fit: contain;
     background: #131722;
   }
@@ -776,10 +775,9 @@
   <div id="main"></div>
 </div>
 
-<!-- CHART OVERLAY -->
+<!-- CHART OVERLAY (images only — TradingView blocks iframe embedding) -->
 <div class="chart-overlay" id="chart-overlay" onclick="if(event.target===this)closeChartOverlay()">
   <div class="chart-overlay-box">
-    <iframe id="chart-iframe" src=""></iframe>
     <img id="chart-overlay-img" src="" alt="Trade chart">
     <button class="chart-overlay-close" onclick="closeChartOverlay()">✕ Close</button>
   </div>
@@ -972,10 +970,10 @@ function renderCard(t) {
       const imgUrl = url.includes('imgur.com/') && !url.includes('i.imgur.com') ? url.replace('imgur.com/', 'i.imgur.com/') : url;
       return `<img class="chart-img" src="${imgUrl}" alt="Trade chart" loading="lazy" onclick="openChartOverlay('${imgUrl.replace(/'/g, "\\'")}')" style="cursor:pointer;" />`;
     }
-    return `<button class="chart-link" onclick="openChartOverlay('${url.replace(/'/g, "\\'")}')" style="width:100%;background:none;cursor:pointer;">
+    return `<a class="chart-link" href="${url}" target="_blank" rel="noopener">
       <span>View chart on TradingView</span>
-      <span class="chart-link-arrow">⤢</span>
-    </button>`;
+      <span class="chart-link-arrow">↗</span>
+    </a>`;
   }
   const chartHtml = buildChartHtml(t.screenshotUrl);
 
@@ -1268,33 +1266,19 @@ function clearConfFilter() {
   updateConfFilter();
 }
 
-// ---- Chart Overlay ----
+// ---- Chart Overlay (images only) ----
 function openChartOverlay(url) {
   const overlay = document.getElementById('chart-overlay');
-  const iframe  = document.getElementById('chart-iframe');
   const img     = document.getElementById('chart-overlay-img');
-  const isImage = /\.(png|jpg|jpeg|gif|webp)(\?.*)?$/i.test(url) || url.includes('i.imgur.com');
-  if (isImage) {
-    iframe.style.display = 'none';
-    iframe.src = '';
-    img.src = url;
-    img.style.display = 'block';
-  } else {
-    img.style.display = 'none';
-    img.src = '';
-    iframe.src = url;
-    iframe.style.display = 'block';
-  }
+  img.src = url;
   overlay.classList.add('open');
   document.body.style.overflow = 'hidden';
 }
 
 function closeChartOverlay() {
   const overlay = document.getElementById('chart-overlay');
-  const iframe  = document.getElementById('chart-iframe');
   const img     = document.getElementById('chart-overlay-img');
   overlay.classList.remove('open');
-  iframe.src = '';
   img.src = '';
   document.body.style.overflow = '';
 }
