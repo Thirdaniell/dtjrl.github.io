@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prop Firm — FTJ Admin</title>
+<link rel="manifest" href="../manifest.json">
+<meta name="theme-color" content="#0a0a0a">
+<link rel="icon" type="image/png" href="https://i.imgur.com/ZP2pTk2.png">
+<link rel="stylesheet" href="../mobile.css">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0a0a;--surface:#111;--surface2:#181818;--border:#1a1a1a;--border2:#2a2a2a;--text:#e8e8e8;--text2:#888;--text3:#444;--green:#00e676;--red:#ff4444;--yellow:#ffd740;--orange:#ff6d00;--accent:#c8ff00;--mono:'Space Mono',monospace;--sans:'DM Sans',sans-serif;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;min-height:100vh;}
+::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+#main{padding-left:64px;}
+.page{max-width:860px;margin:0 auto;padding:3rem 2rem 5rem;}
+.sidenav-admin{position:fixed;left:0;top:0;bottom:0;width:64px;background:var(--bg);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:1.5rem 0;z-index:200;}
+.nav-logo-a{font-family:var(--mono);font-size:9px;letter-spacing:0.1em;color:var(--accent);writing-mode:vertical-rl;margin-bottom:2rem;}
+.nav-admin-tag{font-family:var(--mono);font-size:8px;letter-spacing:0.12em;color:var(--red);writing-mode:vertical-rl;margin-top:auto;}
+.back-btn{font-family:var(--mono);font-size:10px;letter-spacing:0.1em;color:var(--text3);background:none;border:1px solid var(--border2);padding:6px 14px;cursor:pointer;text-transform:uppercase;transition:all 0.15s;text-decoration:none;display:inline-block;margin-bottom:2rem;}
+.back-btn:hover{color:var(--accent);border-color:var(--accent);}
+.page-eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:0.2em;color:var(--accent);text-transform:uppercase;margin-bottom:8px;}
+.page-title{font-family:var(--mono);font-size:28px;font-weight:700;line-height:1.1;margin-bottom:0.5rem;}
+.section-label{font-family:var(--mono);font-size:9px;letter-spacing:0.2em;color:var(--text3);text-transform:uppercase;margin-bottom:10px;margin-top:2rem;}
+
+/* ALERT BANNER */
+.alert-banner{padding:14px 20px;font-family:var(--mono);font-size:12px;letter-spacing:0.05em;display:none;align-items:center;gap:12px;margin-bottom:1.5rem;border:1px solid;}
+.alert-banner.show{display:flex;}
+.alert-red{background:rgba(255,68,68,0.1);border-color:rgba(255,68,68,0.4);color:var(--red);}
+.alert-yellow{background:rgba(255,215,64,0.08);border-color:rgba(255,215,64,0.4);color:var(--yellow);}
+.alert-green{background:rgba(0,230,118,0.08);border-color:rgba(0,230,118,0.4);color:var(--green);}
+
+/* STATS GRID */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--border);}
+.stat-block{background:var(--surface);padding:1.25rem 1.5rem;}
+.stat-lbl{font-family:var(--mono);font-size:9px;letter-spacing:0.14em;color:var(--text3);text-transform:uppercase;margin-bottom:8px;}
+.stat-val{font-family:var(--mono);font-size:22px;font-weight:700;line-height:1;}
+.stat-sub{font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:5px;}
+.green{color:var(--green);}.red{color:var(--red);}.yellow{color:var(--yellow);}.orange{color:var(--orange);}.accent{color:var(--accent);}
+
+/* DRAWDOWN BAR */
+.dd-bar-wrap{background:var(--surface);border:1px solid var(--border);padding:1.5rem;}
+.dd-bar-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px;}
+.dd-bar-title{font-family:var(--mono);font-size:10px;letter-spacing:0.15em;color:var(--text3);text-transform:uppercase;}
+.dd-bar-pct{font-family:var(--mono);font-size:20px;font-weight:700;}
+.dd-track{width:100%;height:12px;background:var(--surface2);border:1px solid var(--border2);position:relative;margin-bottom:10px;}
+.dd-fill{height:100%;transition:width 0.4s ease,background 0.3s;}
+.dd-zones{display:flex;justify-content:space-between;margin-top:4px;}
+.dd-zone-lbl{font-family:var(--mono);font-size:8px;letter-spacing:0.06em;color:var(--text3);text-transform:uppercase;}
+.dd-legend{display:flex;gap:16px;margin-top:10px;}
+.dd-legend-item{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:9px;color:var(--text3);}
+.dd-dot{width:8px;height:8px;border-radius:0;}
+
+/* PAYOUT TRACKER */
+.payout-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);border:1px solid var(--border);}
+.payout-block{background:var(--surface);padding:1.25rem 1.5rem;}
+.days-dots{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
+.day-dot{width:28px;height:28px;border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:9px;cursor:pointer;transition:all 0.15s;}
+.day-dot.filled{background:var(--green);border-color:var(--green);color:#000;}
+.day-dot.today{border-color:var(--accent);color:var(--accent);}
+.payout-meter{display:flex;flex-direction:column;gap:6px;margin-top:10px;}
+.payout-cycle-item{display:flex;align-items:center;gap:8px;}
+.payout-cycle-icon{width:20px;height:20px;border-radius:0;border:1px solid;font-family:var(--mono);font-size:9px;display:flex;align-items:center;justify-content:center;}
+.payout-cycle-icon.done{background:var(--green);border-color:var(--green);color:#000;}
+.payout-cycle-icon.active{border-color:var(--accent);color:var(--accent);}
+.payout-cycle-icon.pending{border-color:var(--border2);color:var(--text3);}
+
+/* EMOTION CHECK */
+.emotion-checks{display:flex;flex-direction:column;gap:1px;background:var(--border);border:1px solid var(--border);}
+.emotion-check{background:var(--surface);padding:1rem 1.5rem;display:flex;align-items:center;gap:14px;cursor:pointer;transition:background 0.12s;user-select:none;}
+.emotion-check:hover{background:var(--surface2);}
+.ec-icon{font-size:18px;flex-shrink:0;width:24px;text-align:center;}
+.ec-text{flex:1;}
+.ec-label{font-family:var(--mono);font-size:11px;color:var(--text);letter-spacing:0.04em;}
+.ec-desc{font-size:11px;color:var(--text3);margin-top:2px;line-height:1.5;}
+.ec-check{width:20px;height:20px;border:1px solid var(--border2);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all 0.15s;}
+.ec-check.checked{background:var(--green);border-color:var(--green);color:#000;}
+.ec-hard-block{background:rgba(255,68,68,0.06);border-left:3px solid var(--red) !important;}
+.ec-hard-block .ec-label{color:var(--red);}
+.ec-verdict{padding:1rem 1.5rem;background:var(--surface2);border-top:1px solid var(--border);text-align:center;font-family:var(--mono);font-size:12px;letter-spacing:0.08em;text-transform:uppercase;}
+
+/* RULES */
+.rules-list{display:flex;flex-direction:column;gap:1px;background:var(--border);border:1px solid var(--border);}
+.rule-item{background:var(--surface);padding:10px 16px;display:flex;align-items:flex-start;gap:12px;}
+.rule-num{font-family:var(--mono);font-size:9px;color:var(--accent);flex-shrink:0;padding-top:1px;}
+.rule-text{font-size:12px;color:var(--text2);line-height:1.6;}
+
+/* MANUAL UPDATE */
+.update-form{background:var(--surface);border:1px solid var(--border);padding:1.5rem;display:flex;flex-direction:column;gap:12px;}
+.update-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.update-field label{font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--text3);text-transform:uppercase;display:block;margin-bottom:5px;}
+.update-field input{font-family:var(--mono);font-size:13px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:9px 12px;width:100%;outline:none;transition:border-color 0.15s;}
+.update-field input:focus{border-color:var(--accent);}
+.update-btn{font-family:var(--mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;padding:12px;background:var(--accent);color:#000;border:none;cursor:pointer;font-weight:700;transition:opacity 0.15s;}
+.update-btn:hover{opacity:0.85;}
+.last-updated{font-family:var(--mono);font-size:9px;color:var(--text3);text-align:right;}
+
+/* TODAY BLOCK */
+.today-trades{background:var(--surface);border:1px solid var(--border);}
+.today-header{background:var(--surface2);padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.today-row{padding:10px 16px;display:grid;grid-template-columns:100px 1fr 80px 60px;gap:12px;align-items:center;border-bottom:1px solid var(--border);font-family:var(--mono);font-size:10px;color:var(--text2);}
+.today-row:last-child{border-bottom:none;}
+
+@media(max-width:600px){.stats-grid{grid-template-columns:repeat(2,1fr);}.payout-grid{grid-template-columns:1fr;}.update-row{grid-template-columns:1fr;}#main{padding-left:0;}}
+</style>
+</head>
+<body>
+<div id="main">
+  <nav class="sidenav-admin">
+    <div class="nav-logo-a">// FTJ</div>
+    <div class="nav-admin-tag">ADMIN</div>
+  </nav>
+  <div class="page">
+    <a href="admin.html" class="back-btn">← Back to Admin</a>
+    <div class="page-eyebrow">// Prop Firm</div>
+    <div class="page-title">Lucid Flex — 25K</div>
+    <div style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:0.1em;margin-bottom:2rem;">EOD TRAILING DRAWDOWN · NO DLL · 90/10 SPLIT · $1,500 MLL</div>
+
+    <!-- ALERT BANNER -->
+    <div class="alert-banner alert-red" id="alert-danger">
+      <span style="font-size:20px;">🛑</span>
+      <div>
+        <div style="font-weight:700;margin-bottom:3px;">DANGER ZONE — DO NOT TRADE</div>
+        <div id="alert-danger-msg" style="opacity:0.8;font-size:10px;"></div>
+      </div>
+    </div>
+    <div class="alert-banner alert-yellow" id="alert-warning">
+      <span style="font-size:20px;">⚠️</span>
+      <div>
+        <div style="font-weight:700;margin-bottom:3px;">CAUTION — REDUCE SIZE</div>
+        <div id="alert-warning-msg" style="opacity:0.8;font-size:10px;"></div>
+      </div>
+    </div>
+    <div class="alert-banner alert-green" id="alert-good">
+      <span style="font-size:20px;">✅</span>
+      <div>
+        <div style="font-weight:700;margin-bottom:3px;" id="alert-good-msg">ACCOUNT HEALTHY</div>
+      </div>
+    </div>
+
+    <!-- KEY STATS -->
+    <div class="section-label">Account Status</div>
+    <div class="stats-grid">
+      <div class="stat-block">
+        <div class="stat-lbl">Current Balance</div>
+        <div class="stat-val accent" id="s-balance">—</div>
+        <div class="stat-sub" id="s-balance-sub"></div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-lbl">Max Loss Limit (MLL)</div>
+        <div class="stat-val" id="s-mll">—</div>
+        <div class="stat-sub" id="s-mll-sub"></div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-lbl">Room to MLL</div>
+        <div class="stat-val" id="s-room">—</div>
+        <div class="stat-sub" id="s-room-sub"></div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-lbl">Total Profit</div>
+        <div class="stat-val" id="s-profit">—</div>
+        <div class="stat-sub" id="s-profit-sub"></div>
+      </div>
+    </div>
+
+    <!-- DRAWDOWN BAR -->
+    <div class="dd-bar-wrap" style="margin-top:1px;">
+      <div class="dd-bar-header">
+        <div class="dd-bar-title">Drawdown Used</div>
+        <div class="dd-bar-pct" id="dd-pct">—</div>
+      </div>
+      <div class="dd-track">
+        <div class="dd-fill" id="dd-fill" style="width:0%;background:var(--green);"></div>
+      </div>
+      <div class="dd-zones">
+        <div class="dd-zone-lbl">0%</div>
+        <div class="dd-zone-lbl" style="color:var(--yellow);">50% caution</div>
+        <div class="dd-zone-lbl" style="color:var(--orange);">75% danger</div>
+        <div class="dd-zone-lbl" style="color:var(--red);">100% blown</div>
+      </div>
+      <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:10px;" id="dd-mll-locked"></div>
+    </div>
+
+    <!-- TODAY'S TRADES FROM NOTION -->
+    <div class="section-label">Today's Session</div>
+    <div class="today-trades">
+      <div class="today-header">
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--text3);text-transform:uppercase;" id="today-date-lbl">Loading...</div>
+        <div style="font-family:var(--mono);font-size:11px;font-weight:700;" id="today-pnl-total">—</div>
+      </div>
+      <div id="today-trades-list">
+        <div style="font-family:var(--mono);font-size:10px;color:var(--text3);padding:1.5rem;text-align:center;">Loading today's trades...</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border-top:1px solid var(--border);">
+        <div style="background:var(--surface2);padding:10px 14px;"><div style="font-family:var(--mono);font-size:8px;color:var(--text3);text-transform:uppercase;margin-bottom:4px;">Trades</div><div style="font-family:var(--mono);font-size:16px;font-weight:700;" id="today-count">—</div></div>
+        <div style="background:var(--surface2);padding:10px 14px;"><div style="font-family:var(--mono);font-size:8px;color:var(--text3);text-transform:uppercase;margin-bottom:4px;">Wins</div><div style="font-family:var(--mono);font-size:16px;font-weight:700;color:var(--green);" id="today-wins">—</div></div>
+        <div style="background:var(--surface2);padding:10px 14px;"><div style="font-family:var(--mono);font-size:8px;color:var(--text3);text-transform:uppercase;margin-bottom:4px;">Losses</div><div style="font-family:var(--mono);font-size:16px;font-weight:700;color:var(--red);" id="today-losses">—</div></div>
+        <div style="background:var(--surface2);padding:10px 14px;"><div style="font-family:var(--mono);font-size:8px;color:var(--text3);text-transform:uppercase;margin-bottom:4px;">Status</div><div style="font-family:var(--mono);font-size:10px;font-weight:700;" id="today-status">—</div></div>
+      </div>
+    </div>
+
+    <!-- PAYOUT TRACKER -->
+    <div class="section-label">Payout Progress</div>
+    <div class="payout-grid">
+      <div class="payout-block">
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--accent);text-transform:uppercase;margin-bottom:10px;">Profitable Days This Cycle</div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-bottom:10px;">Need 5 profitable days to request payout · Click to toggle</div>
+        <div class="days-dots" id="days-dots"></div>
+        <div style="font-family:var(--mono);font-size:11px;margin-top:12px;" id="days-status">—</div>
+      </div>
+      <div class="payout-block">
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--accent);text-transform:uppercase;margin-bottom:10px;">Payout Cycles → LucidLive</div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-bottom:10px;">6 payouts to transition to real capital</div>
+        <div class="payout-meter" id="payout-cycles"></div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:12px;">Max per request: <span style="color:var(--accent);">$1,000</span> · Min: <span style="color:var(--text2);">$500</span></div>
+      </div>
+    </div>
+
+    <!-- EMOTIONAL CIRCUIT BREAKERS -->
+    <div class="section-label">Pre-Trade Mental Check</div>
+    <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-bottom:10px;line-height:1.8;">Complete this before every session. All must be ✓ to trade. Red items are hard blocks — if you check them, the session is over.</div>
+    <div class="emotion-checks" id="emotion-checks">
+      <!-- Injected by JS -->
+    </div>
+    <div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:8px;text-align:right;" id="reset-checks-btn">
+      <button onclick="resetChecks()" style="font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:0.1em;background:none;border:1px solid var(--border2);color:var(--text3);padding:5px 12px;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.color='var(--accent)';this.style.borderColor='var(--accent)'" onmouseout="this.style.color='var(--text3)';this.style.borderColor='var(--border2)'">↺ Reset Checks</button>
+    </div>
+
+    <!-- LUCID RULES -->
+    <div class="section-label">LucidFlex Funded Rules — Know These</div>
+    <div class="rules-list">
+      <div class="rule-item"><div class="rule-num">01</div><div class="rule-text"><strong style="color:var(--text);">EOD Trailing Drawdown — $1,500 MLL.</strong> Your Max Loss Limit only updates at market close (4:45 PM EST). Intraday dips don't tighten it. But your EOD closing balance determines tomorrow's floor.</div></div>
+      <div class="rule-item"><div class="rule-num">02</div><div class="rule-text"><strong style="color:var(--text);">MLL locks once you reach starting balance.</strong> Once your EOD balance brings the trailing floor up to $25,000, the MLL locks there permanently. From that point, drawdown can never breach below your starting balance.</div></div>
+      <div class="rule-item"><div class="rule-num">03</div><div class="rule-text"><strong style="color:var(--text);">No daily loss limit.</strong> You can be down intraday and recover. But don't use this as an excuse to let losers run — the EOD balance is what counts.</div></div>
+      <div class="rule-item"><div class="rule-num">04</div><div class="rule-text"><strong style="color:var(--text);">Payout requires 5 profitable trading days in the cycle.</strong> Days reset after each approved payout. Max request: $1,000. Min request: $500. You keep 90%.</div></div>
+      <div class="rule-item"><div class="rule-num">05</div><div class="rule-text"><strong style="color:var(--text);">6 payouts = LucidLive (real capital).</strong> Every payout gets you closer. Stay consistent, protect the account, and compound your way there.</div></div>
+      <div class="rule-item" style="background:rgba(255,68,68,0.04);border-left:2px solid var(--red);"><div class="rule-num" style="color:var(--red);">⚠</div><div class="rule-text"><strong style="color:var(--red);">You failed last time from emotion — not skill.</strong> FOMO, forced entries, and revenge trading. The account rules didn't beat you. You beat yourself. This time: one loss = walk away. Two losses = session over. Period.</div></div>
+    </div>
+
+    <!-- MANUAL BALANCE UPDATE -->
+    <div class="section-label">Update Account Balance</div>
+    <div class="update-form">
+      <div style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:0.1em;">Update your balance each day after market close. The MLL and drawdown bar recalculate automatically.</div>
+      <div class="update-row">
+        <div class="update-field">
+          <label>Current Balance ($)</label>
+          <input type="number" id="input-balance" placeholder="e.g. 26500" step="1">
+        </div>
+        <div class="update-field">
+          <label>Payouts Completed</label>
+          <input type="number" id="input-payouts" placeholder="0" min="0" max="6" step="1">
+        </div>
+      </div>
+      <button class="update-btn" onclick="saveAccountData()">✓ Update Balance</button>
+      <div class="last-updated" id="last-updated-lbl"></div>
+    </div>
+  </div>
+</div>
+
+<script src="admin-core.js"></script>
+<script>
+if (!requireAuth()) { /* redirected */ }
+
+// ── CONSTANTS ─────────────────────────────────────────────────────────────────
+const STARTING_BALANCE = 25000;
+const INITIAL_MLL      = STARTING_BALANCE - 1500; // $23,500
+const STORAGE_KEY      = 'ftj_lucid_25k';
+const TODAY_STR        = new Date().toISOString().split('T')[0];
+
+// ── EMOTION CHECKS CONFIG ──────────────────────────────────────────────────────
+const CHECKS = [
+  { id:'c-bias',    icon:'◑', label:'Bias is set for today',              desc:'NQ and ES bias confirmed before this session.',                         hard:false },
+  { id:'c-plan',    icon:'◈', label:'I have a clear trade plan',          desc:'I know my entry model, DOL, and invalidation. No guessing.',            hard:false },
+  { id:'c-rested',  icon:'🧠', label:'I am rested and focused',           desc:'Not tired, not stressed, not distracted.',                              hard:false },
+  { id:'c-win',     icon:'💰', label:'I have not had a big win today',     desc:'After a significant win, the rules say stop. Protect the P&L.',        hard:false },
+  { id:'c-loss2',   icon:'🛑', label:'I have not had 2 losses today',     desc:'2 losses = session over. No exceptions.',                               hard:true  },
+  { id:'c-fomo',    icon:'🚨', label:'I am NOT in FOMO mode',             desc:'Not chasing a missed move. Not trying to "make back" anything.',        hard:true  },
+  { id:'c-revenge', icon:'🚨', label:'I am NOT revenge trading',          desc:'Not entering because of anger, frustration, or a desire to recover losses.', hard:true },
+  { id:'c-ddroom',  icon:'📊', label:'I have checked my drawdown room',   desc:'I know exactly how much room I have before hitting MLL.',               hard:false },
+];
+
+// ── LOAD / SAVE STATE ─────────────────────────────────────────────────────────
+function loadState() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch(e) { return {}; }
+}
+
+function saveState(state) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+// ── CALCULATE MLL (EOD TRAILING) ─────────────────────────────────────────────
+// MLL trails up from 23,500 as balance grows, locks once it reaches 25,000
+function calcMLL(balance) {
+  const trailing = balance - 1500;
+  if (trailing >= STARTING_BALANCE) return STARTING_BALANCE; // locked
+  if (trailing < INITIAL_MLL) return INITIAL_MLL; // floor
+  return trailing;
+}
+
+// ── RENDER DASHBOARD ──────────────────────────────────────────────────────────
+function renderDashboard() {
+  const state = loadState();
+  const balance   = state.balance || STARTING_BALANCE;
+  const payouts   = state.payouts || 0;
+  const updatedAt = state.updatedAt || null;
+
+  // Pre-fill update form
+  document.getElementById('input-balance').value = balance;
+  document.getElementById('input-payouts').value = payouts;
+  if (updatedAt) {
+    const d = new Date(updatedAt);
+    document.getElementById('last-updated-lbl').textContent = `Last updated: ${d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'})} at ${d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})}`;
+  }
+
+  const mll    = calcMLL(balance);
+  const room   = balance - mll;
+  const profit = balance - STARTING_BALANCE;
+  const mllLocked = mll >= STARTING_BALANCE;
+
+  // Stats
+  document.getElementById('s-balance').textContent = '$'+balance.toLocaleString();
+  document.getElementById('s-balance').className   = 'stat-val '+(balance >= STARTING_BALANCE ? 'accent' : 'red');
+
+  document.getElementById('s-mll').textContent     = '$'+mll.toLocaleString();
+  document.getElementById('s-mll').className       = 'stat-val '+(mllLocked ? 'green' : 'yellow');
+  document.getElementById('s-mll-sub').textContent = mllLocked ? '🔒 Locked at starting balance' : 'Trailing — updates EOD';
+
+  document.getElementById('s-room').textContent    = '$'+room.toLocaleString();
+  document.getElementById('s-room').className      = 'stat-val '+(room > 1000 ? 'green' : room > 500 ? 'yellow' : 'red');
+  document.getElementById('s-room-sub').textContent = room+' pts NQ room (approx '+(Math.floor(room/20))+' pts)';
+
+  document.getElementById('s-profit').textContent  = (profit >= 0 ? '+' : '')+profit.toLocaleString();
+  document.getElementById('s-profit').className    = 'stat-val '+(profit > 0 ? 'green' : profit < 0 ? 'red' : '');
+  document.getElementById('s-profit-sub').textContent = profit > 0 ? '🟢 In profit — protect it' : profit < 0 ? '🔴 In drawdown' : 'At starting balance';
+
+  // Drawdown bar
+  const ddUsed = ((1500 - room) / 1500) * 100;
+  const ddPct  = Math.max(0, Math.min(100, ddUsed));
+  const ddFill = document.getElementById('dd-fill');
+  ddFill.style.width = ddPct + '%';
+  ddFill.style.background = ddPct < 50 ? 'var(--green)' : ddPct < 75 ? 'var(--yellow)' : 'var(--red)';
+  document.getElementById('dd-pct').textContent = Math.round(ddPct) + '% used';
+  document.getElementById('dd-pct').className   = 'dd-bar-pct '+(ddPct < 50 ? 'green' : ddPct < 75 ? 'yellow' : 'red');
+  document.getElementById('dd-mll-locked').textContent = mllLocked
+    ? '🔒 MLL is locked at $25,000 — account is permanently protected from drawdown breach below starting balance.'
+    : `MLL will lock once your EOD balance reaches $26,500+ (balance that makes trailing floor = $25,000).`;
+
+  // Alerts
+  const dangerEl  = document.getElementById('alert-danger');
+  const warningEl = document.getElementById('alert-warning');
+  const goodEl    = document.getElementById('alert-good');
+  dangerEl.classList.remove('show');
+  warningEl.classList.remove('show');
+  goodEl.classList.remove('show');
+
+  if (room < 300) {
+    dangerEl.classList.add('show');
+    document.getElementById('alert-danger-msg').textContent = `Only $${room} left before hitting your MLL of $${mll.toLocaleString()}. One bad EOD close could end the account. Stop trading today.`;
+  } else if (room < 750) {
+    warningEl.classList.add('show');
+    document.getElementById('alert-warning-msg').textContent = `$${room} remaining before MLL. Reduce contract size. No revenge trades. Protect the floor.`;
+  } else {
+    goodEl.classList.add('show');
+    document.getElementById('alert-good-msg').textContent = `Account healthy — $${room.toLocaleString()} room to MLL${mllLocked ? ' · MLL locked at starting balance 🔒' : ''}`;
+  }
+
+  // Payout tracker — days
+  const profitDays = state.profitDays || 0;
+  const daysContainer = document.getElementById('days-dots');
+  daysContainer.innerHTML = '';
+  for (let i=1; i<=10; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'day-dot' + (i <= profitDays ? ' filled' : '');
+    dot.textContent = i;
+    dot.onclick = () => toggleProfitDay(i);
+    daysContainer.appendChild(dot);
+  }
+  const daysEl = document.getElementById('days-status');
+  if (profitDays >= 5) {
+    daysEl.textContent = '✅ Payout eligible — ' + profitDays + ' profitable days logged';
+    daysEl.style.color = 'var(--green)';
+  } else {
+    daysEl.textContent = `${profitDays}/5 profitable days · Need ${5-profitDays} more`;
+    daysEl.style.color = 'var(--text3)';
+  }
+
+  // Payout cycles
+  const cyclesContainer = document.getElementById('payout-cycles');
+  cyclesContainer.innerHTML = '';
+  for (let i=1; i<=6; i++) {
+    const done = i <= payouts;
+    const active = i === payouts + 1;
+    const div = document.createElement('div');
+    div.className = 'payout-cycle-item';
+    div.innerHTML = `
+      <div class="payout-cycle-icon ${done?'done':active?'active':'pending'}">${done?'✓':i}</div>
+      <div style="font-family:var(--mono);font-size:10px;color:${done?'var(--green)':active?'var(--accent)':'var(--text3)'};">
+        ${done ? 'Payout '+i+' — completed' : active ? 'Payout '+i+' — in progress' : 'Payout '+i+' — locked'}
+        ${i===6?' → <span style="color:var(--accent)">LucidLive</span>':''}
+      </div>`;
+    cyclesContainer.appendChild(div);
+  }
+}
+
+function toggleProfitDay(i) {
+  const state = loadState();
+  const current = state.profitDays || 0;
+  // toggle: if i <= current, set to i-1; else set to i
+  state.profitDays = i <= current ? i - 1 : i;
+  saveState(state);
+  renderDashboard();
+}
+
+function saveAccountData() {
+  const balance = parseFloat(document.getElementById('input-balance').value);
+  const payouts = parseInt(document.getElementById('input-payouts').value) || 0;
+  if (isNaN(balance) || balance <= 0) { alert('Enter a valid balance'); return; }
+  const state = loadState();
+  state.balance   = balance;
+  state.payouts   = payouts;
+  state.updatedAt = new Date().toISOString();
+  saveState(state);
+  renderDashboard();
+}
+
+// ── EMOTION CHECKS ────────────────────────────────────────────────────────────
+function renderChecks() {
+  const container = document.getElementById('emotion-checks');
+  const state = loadState();
+  const checked = state.checks || {};
+  container.innerHTML = '';
+
+  let allSoftPassed = true, anyHardFailed = false;
+
+  CHECKS.forEach(c => {
+    const isChecked = !!checked[c.id];
+    const isFailed  = c.hard && isChecked; // hard block = checking it = bad
+    if (!isChecked && !c.hard) allSoftPassed = false;
+    if (isFailed) anyHardFailed = true;
+
+    const div = document.createElement('div');
+    div.className = 'emotion-check' + (c.hard ? ' ec-hard-block' : '');
+    div.innerHTML = `
+      <div class="ec-icon">${c.icon}</div>
+      <div class="ec-text">
+        <div class="ec-label">${c.label}</div>
+        <div class="ec-desc">${c.desc}</div>
+      </div>
+      <div class="ec-check ${isChecked ? 'checked' : ''}">${isChecked ? '✓' : ''}</div>`;
+    div.onclick = () => toggleCheck(c.id, c.hard);
+    container.appendChild(div);
+  });
+
+  // Verdict
+  const verdict = document.createElement('div');
+  verdict.className = 'ec-verdict';
+  if (anyHardFailed) {
+    verdict.style.background = 'rgba(255,68,68,0.1)';
+    verdict.style.color = 'var(--red)';
+    verdict.innerHTML = '🛑 SESSION BLOCKED — Emotional breach detected. Close the platform now.';
+  } else if (allSoftPassed) {
+    verdict.style.background = 'rgba(0,230,118,0.07)';
+    verdict.style.color = 'var(--green)';
+    verdict.innerHTML = '✅ ALL CHECKS PASSED — You are clear to trade. Stay disciplined.';
+  } else {
+    verdict.style.color = 'var(--text3)';
+    verdict.innerHTML = '◈ Complete all checks before trading';
+  }
+  container.appendChild(verdict);
+}
+
+function toggleCheck(id, isHard) {
+  const state = loadState();
+  if (!state.checks) state.checks = {};
+  if (isHard) {
+    // Hard blocks: checking = confirming the bad thing is happening
+    state.checks[id] = !state.checks[id];
+  } else {
+    state.checks[id] = !state.checks[id];
+  }
+  saveState(state);
+  renderChecks();
+}
+
+function resetChecks() {
+  const state = loadState();
+  state.checks = {};
+  saveState(state);
+  renderChecks();
+}
+
+// ── TODAY'S TRADES FROM NOTION ─────────────────────────────────────────────────
+async function loadTodayTrades() {
+  document.getElementById('today-date-lbl').textContent = new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'}).toUpperCase();
+  try {
+    const data = await notionPost(`/databases/${DB_ID}/query`, {
+      filter: { property: 'Date', date: { equals: TODAY_STR } },
+      sorts:  [{ property: 'Date', direction: 'ascending' }],
+      page_size: 20
+    });
+    const trades = data.results || [];
+    const totalPnl = trades.reduce((s,t) => s + (t.properties['P&L ($)']?.number||0), 0);
+    const wins   = trades.filter(t => t.properties['Status']?.select?.name === 'Closed - Win').length;
+    const losses = trades.filter(t => t.properties['Status']?.select?.name === 'Closed - Loss').length;
+
+    document.getElementById('today-pnl-total').textContent = trades.length ? (totalPnl>=0?'+':'-')+'$'+Math.abs(totalPnl).toLocaleString() : '—';
+    document.getElementById('today-pnl-total').style.color = totalPnl > 0 ? 'var(--green)' : totalPnl < 0 ? 'var(--red)' : 'var(--text2)';
+    document.getElementById('today-count').textContent = trades.length;
+    document.getElementById('today-wins').textContent  = wins;
+    document.getElementById('today-losses').textContent = losses;
+
+    let statusText = '—', statusColor = 'var(--text3)';
+    if (losses >= 2) { statusText = '🛑 STOP'; statusColor = 'var(--red)'; }
+    else if (losses === 1 && totalPnl < 0) { statusText = '⚠️ CAUTION'; statusColor = 'var(--yellow)'; }
+    else if (trades.length >= 4) { statusText = '⚠️ MAX TRADES'; statusColor = 'var(--yellow)'; }
+    else if (totalPnl > 1000) { statusText = '✅ GOOD WIN'; statusColor = 'var(--green)'; }
+    else if (trades.length > 0) { statusText = '✅ TRADING'; statusColor = 'var(--green)'; }
+    document.getElementById('today-status').textContent  = statusText;
+    document.getElementById('today-status').style.color  = statusColor;
+
+    const listEl = document.getElementById('today-trades-list');
+    if (!trades.length) {
+      listEl.innerHTML = `<div style="font-family:var(--mono);font-size:10px;color:var(--text3);padding:1.5rem;text-align:center;">No trades logged today</div>`;
+      return;
+    }
+    const gradeColors={'A++':'#c8ff00','A+':'#00e676','A':'#40c4ff','A-':'#40c4ff','B+':'#ffd740','B':'#ffd740','B-':'#ffab40','C':'#ff6d00','D':'#ff4444'};
+    listEl.innerHTML = trades.map(t => {
+      const p    = t.properties;
+      const name = (p['Trade Name']?.title||[]).map(r=>r.plain_text||'').join('')||'Trade';
+      const pnl  = p['P&L ($)']?.number;
+      const grade= p['Setup Grade']?.select?.name||'—';
+      const inst = p['Instrument']?.select?.name||'—';
+      const dir  = p['Direction']?.select?.name||'—';
+      const pnlStr = pnl!=null?(pnl>=0?'+':'-')+'$'+Math.abs(pnl).toLocaleString():'—';
+      return `<div class="today-row">
+        <div style="color:var(--text3);">${inst} ${dir}</div>
+        <div style="color:var(--text);">${name}</div>
+        <div style="color:${pnl>0?'var(--green)':pnl<0?'var(--red)':'var(--text2)'};font-weight:700;">${pnlStr}</div>
+        <div style="color:${gradeColors[grade]||'var(--text3)'};">${grade}</div>
+      </div>`;
+    }).join('');
+
+    // Auto-warn if 2 losses
+    if (losses >= 2) {
+      const dangerEl = document.getElementById('alert-danger');
+      dangerEl.classList.add('show');
+      document.getElementById('alert-danger-msg').textContent = `2 losses today. Your rules say stop. Close the platform.`;
+    }
+  } catch(e) {
+    document.getElementById('today-trades-list').innerHTML = `<div style="color:var(--red);font-family:var(--mono);font-size:10px;padding:1rem;">Error: ${e.message}</div>`;
+  }
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+renderDashboard();
+renderChecks();
+loadTodayTrades();
+</script>
+<script>if('serviceWorker' in navigator){navigator.serviceWorker.register('../sw.js');}</script>
+</body>
+</html>
