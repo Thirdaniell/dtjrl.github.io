@@ -239,7 +239,49 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
       <div class="rule-item" style="background:rgba(255,68,68,0.04);border-left:2px solid var(--red);"><div class="rule-num" style="color:var(--red);">⚠</div><div class="rule-text"><strong style="color:var(--red);">You failed last time from emotion — not skill.</strong> FOMO, forced entries, and revenge trading. The account rules didn't beat you. You beat yourself. This time: one loss = walk away. Two losses = session over. Period.</div></div>
     </div>
 
-    <!-- MANUAL BALANCE UPDATE -->
+    <!-- POSITION SIZE CALCULATOR -->
+    <div class="section-label">Position Size Calculator</div>
+    <div style="background:var(--surface);border:1px solid var(--border);padding:1.5rem;display:flex;flex-direction:column;gap:14px;">
+      <div style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:0.1em;">Based on your current balance and risk %. Enter your stop distance in ticks or points.</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+        <div>
+          <label style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--text3);text-transform:uppercase;display:block;margin-bottom:5px;">Balance ($)</label>
+          <input type="number" id="ps-balance" placeholder="e.g. 25000" style="font-family:var(--mono);font-size:12px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:9px 12px;width:100%;outline:none;transition:border-color 0.15s;" oninput="calcPositionSize()" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border2)'">
+        </div>
+        <div>
+          <label style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--text3);text-transform:uppercase;display:block;margin-bottom:5px;">Risk %</label>
+          <input type="number" id="ps-risk" placeholder="1" value="1" min="0.1" max="5" step="0.1" style="font-family:var(--mono);font-size:12px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:9px 12px;width:100%;outline:none;transition:border-color 0.15s;" oninput="calcPositionSize()" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border2)'">
+        </div>
+        <div>
+          <label style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--text3);text-transform:uppercase;display:block;margin-bottom:5px;">Stop (points)</label>
+          <input type="number" id="ps-stop" placeholder="e.g. 10" step="0.25" style="font-family:var(--mono);font-size:12px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:9px 12px;width:100%;outline:none;transition:border-color 0.15s;" oninput="calcPositionSize()" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border2)'">
+        </div>
+      </div>
+      <!-- Results -->
+      <div id="ps-results" style="display:none;">
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--accent);text-transform:uppercase;margin-bottom:10px;padding-top:4px;border-top:1px solid var(--border2);">Results</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);">
+          <div style="background:var(--surface2);padding:10px 12px;">
+            <div style="font-family:var(--mono);font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px;">$ at Risk</div>
+            <div style="font-family:var(--mono);font-size:16px;font-weight:700;color:var(--yellow);" id="ps-dollar-risk">—</div>
+          </div>
+          <div style="background:var(--surface2);padding:10px 12px;">
+            <div style="font-family:var(--mono);font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px;">NQ / MNQ</div>
+            <div style="font-family:var(--mono);font-size:16px;font-weight:700;color:var(--accent);" id="ps-nq">—</div>
+          </div>
+          <div style="background:var(--surface2);padding:10px 12px;">
+            <div style="font-family:var(--mono);font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px;">ES / MES</div>
+            <div style="font-family:var(--mono);font-size:16px;font-weight:700;color:var(--accent);" id="ps-es">—</div>
+          </div>
+          <div style="background:var(--surface2);padding:10px 12px;">
+            <div style="font-family:var(--mono);font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px;">MLL Buffer</div>
+            <div style="font-family:var(--mono);font-size:16px;font-weight:700;" id="ps-mll-check">—</div>
+          </div>
+        </div>
+        <div style="margin-top:8px;font-family:var(--mono);font-size:9px;color:var(--text3);line-height:1.8;" id="ps-breakdown"></div>
+        <div style="margin-top:8px;padding:8px 12px;font-family:var(--mono);font-size:10px;display:none;" id="ps-warning"></div>
+      </div>
+    </div>
     <div class="section-label">Update Account Balance</div>
     <div class="update-form">
       <div style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:0.1em;">Update your balance each day after market close. The MLL and drawdown bar recalculate automatically.</div>
@@ -553,10 +595,89 @@ async function loadTodayTrades() {
   }
 }
 
+// ── POSITION SIZE CALCULATOR ──────────────────────────────────────────────────
+// Tick values: NQ=$20/pt, MNQ=$2/pt, ES=$50/pt, MES=$5/pt
+function calcPositionSize() {
+  const balance = parseFloat(document.getElementById('ps-balance').value);
+  const riskPct = parseFloat(document.getElementById('ps-risk').value);
+  const stopPts = parseFloat(document.getElementById('ps-stop').value);
+  const resultsEl = document.getElementById('ps-results');
+
+  if (!balance || !riskPct || !stopPts) { resultsEl.style.display='none'; return; }
+  resultsEl.style.display = 'block';
+
+  const dollarRisk = balance * (riskPct / 100);
+  const state = loadState();
+  const currentBalance = state.balance || STARTING_BALANCE;
+  const mll = calcMLL(currentBalance);
+  const room = currentBalance - mll;
+
+  // Contracts = dollarRisk / (stopPts * tickValue)
+  const nqContracts  = Math.floor(dollarRisk / (stopPts * 20));   // NQ $20/pt
+  const mnqContracts = Math.floor(dollarRisk / (stopPts * 2));    // MNQ $2/pt
+  const esContracts  = Math.floor(dollarRisk / (stopPts * 50));   // ES $50/pt
+  const mesContracts = Math.floor(dollarRisk / (stopPts * 5));    // MES $5/pt
+
+  document.getElementById('ps-dollar-risk').textContent = '$'+Math.round(dollarRisk).toLocaleString();
+
+  const nqEl = document.getElementById('ps-nq');
+  const esEl = document.getElementById('ps-es');
+
+  if (nqContracts >= 1) {
+    nqEl.textContent = nqContracts+'×NQ';
+    nqEl.style.color = 'var(--accent)';
+  } else {
+    nqEl.textContent = mnqContracts+'×MNQ';
+    nqEl.style.color = 'var(--text2)';
+  }
+
+  if (esContracts >= 1) {
+    esEl.textContent = esContracts+'×ES';
+    esEl.style.color = 'var(--accent)';
+  } else {
+    esEl.textContent = mesContracts+'×MES';
+    esEl.style.color = 'var(--text2)';
+  }
+
+  // MLL safety check — does this risk exceed available room?
+  const mllEl = document.getElementById('ps-mll-check');
+  const warningEl = document.getElementById('ps-warning');
+  if (dollarRisk > room) {
+    mllEl.textContent = '⛔ UNSAFE';
+    mllEl.style.color = 'var(--red)';
+    warningEl.style.display = 'block';
+    warningEl.style.background = 'rgba(255,68,68,0.08)';
+    warningEl.style.color = 'var(--red)';
+    warningEl.textContent = `⚠ Risk $${Math.round(dollarRisk).toLocaleString()} exceeds your $${room.toLocaleString()} MLL room. Reduce stop or risk %.`;
+  } else if (dollarRisk > room * 0.5) {
+    mllEl.textContent = '⚠ CAUTION';
+    mllEl.style.color = 'var(--yellow)';
+    warningEl.style.display = 'block';
+    warningEl.style.background = 'rgba(255,215,64,0.06)';
+    warningEl.style.color = 'var(--yellow)';
+    warningEl.textContent = `This trade uses ${Math.round((dollarRisk/room)*100)}% of your MLL room ($${room.toLocaleString()} remaining). Consider reducing size.`;
+  } else {
+    mllEl.textContent = '✓ SAFE';
+    mllEl.style.color = 'var(--green)';
+    warningEl.style.display = 'none';
+  }
+
+  // Breakdown text
+  const nqRisk  = (nqContracts >= 1 ? nqContracts : mnqContracts) * stopPts * (nqContracts >= 1 ? 20 : 2);
+  const esRisk  = (esContracts >= 1 ? esContracts : mesContracts) * stopPts * (esContracts >= 1 ? 50 : 5);
+  document.getElementById('ps-breakdown').innerHTML =
+    `NQ: ${nqContracts>=1?nqContracts+'×NQ':mnqContracts+'×MNQ'} · ${stopPts}pt stop · max loss $${nqRisk.toLocaleString()}&nbsp;&nbsp;|&nbsp;&nbsp;` +
+    `ES: ${esContracts>=1?esContracts+'×ES':mesContracts+'×MES'} · ${stopPts}pt stop · max loss $${esRisk.toLocaleString()}&nbsp;&nbsp;|&nbsp;&nbsp;` +
+    `MLL room: $${room.toLocaleString()} of $1,500`;
+}
+
 // ── INIT ──────────────────────────────────────────────────────────────────────
 renderDashboard();
 renderChecks();
 loadTodayTrades();
+// Pre-fill position size calculator with saved balance
+const _state = loadState();
+if (_state.balance) document.getElementById('ps-balance').value = _state.balance;
 </script>
 <script>if('serviceWorker' in navigator){navigator.serviceWorker.register('../sw.js');}</script>
 </body>
