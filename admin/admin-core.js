@@ -3,6 +3,7 @@ const WORKER   = 'https://trade-journal-proxy.daniel-mouldd.workers.dev';
 const DB_ID    = '5398f956345943b7b12b2298bbb6e127';
 const BIAS_DB  = 'c163f7373bb44be19ae4f4a886384ddf';
 const WEEKLY_DB= '6d1309c6e6174f489e32293e253ae729';
+const VIOLATIONS_DB = '088306685cd045c1a37a468002fee680';
 const PASS     = 'Pammolad123#';
 const TODAY    = new Date().toISOString().split('T')[0];
 
