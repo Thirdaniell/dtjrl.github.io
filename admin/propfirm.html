@@ -338,7 +338,7 @@ if (!requireAuth()) { /* redirected */ }
 
 // ── CONSTANTS ─────────────────────────────────────────────────────────────────
 const STARTING_BALANCE = 25000;
-const INITIAL_MLL      = STARTING_BALANCE - 1000; // $23,500
+const INITIAL_MLL      = STARTING_BALANCE - 1500; // $23,500
 const STORAGE_KEY      = 'ftj_lucid_25k';
 const TODAY_STR        = new Date().toISOString().split('T')[0];
 
@@ -702,7 +702,7 @@ function calcPositionSize() {
     `MLL room: $${room.toLocaleString()} of $1,500`;
 }
 
-// ── VIOLATION & PUNISHMENT SYSTEM ─────────────────────────────────────────────
+// ── VIOLATION & PUNISHMENT SYSTEM (Notion-backed) ─────────────────────────────
 const PUNISHMENTS = [
   { name: '50 Burpees',            desc: 'No stopping until all 50 are done. Slow is fine. Stopping is not.', type: 'task' },
   { name: 'Cold Shower — 3 min',   desc: 'Full cold water. No warm water until the timer ends.',            type: 'timer', seconds: 180 },
@@ -716,40 +716,56 @@ const PUNISHMENTS = [
   { name: '75 Burpees',            desc: 'The bigger one. You broke a hard rule — this is the cost.',          type: 'task' },
 ];
 
-const VIO_KEY = 'ftj_violations';
-
-function loadViolations() {
-  try { return JSON.parse(localStorage.getItem(VIO_KEY)) || []; } catch(e) { return []; }
-}
-function saveViolations(arr) {
-  localStorage.setItem(VIO_KEY, JSON.stringify(arr));
-}
-
 let vioTimerInterval = null;
+let _vioCache = []; // local cache of fetched violations, refreshed on load
 
-function logViolation() {
-  const violations = loadViolations();
+async function logViolation() {
   // Check for an already-active uncompleted violation
-  const active = violations.find(v => !v.completed);
+  const active = _vioCache.find(v => !v.completed);
   if (active) {
     alert('You have an uncompleted penalty already. Finish it before logging a new one.');
     showActivePunishment(active);
     return;
   }
   const punishment = PUNISHMENTS[Math.floor(Math.random() * PUNISHMENTS.length)];
-  const entry = {
-    id: Date.now(),
-    date: new Date().toISOString(),
-    punishment: punishment.name,
-    desc: punishment.desc,
-    type: punishment.type,
-    seconds: punishment.seconds || null,
-    completed: false
+  const btn = document.getElementById('vio-log-btn');
+  btn.disabled = true; btn.textContent = 'Logging...';
+
+  const props = {
+    "Punishment": punishment.name,
+    "Description": punishment.desc,
+    "Type": punishment.type,
+    "Completed": "__NO__",
+    "date:Date:start": new Date().toISOString(),
+    "date:Date:is_datetime": 1
   };
-  violations.unshift(entry);
-  saveViolations(violations);
-  renderViolations();
-  showActivePunishment(entry);
+
+  try {
+    const data = await notionPost('/pages', {
+      parent: { database_id: VIOLATIONS_DB },
+      properties: props
+    });
+    if (data.id) {
+      const entry = {
+        id: data.id,
+        date: new Date().toISOString(),
+        punishment: punishment.name,
+        desc: punishment.desc,
+        type: punishment.type,
+        seconds: punishment.seconds || null,
+        completed: false
+      };
+      _vioCache.unshift(entry);
+      renderViolationStats();
+      showActivePunishment(entry);
+    } else {
+      alert('Failed to log violation: ' + JSON.stringify(data));
+      btn.disabled = false; btn.textContent = '🛑 I Broke A Rule — Log Violation';
+    }
+  } catch(e) {
+    alert('Error logging violation: ' + e.message);
+    btn.disabled = false; btn.textContent = '🛑 I Broke A Rule — Log Violation';
+  }
 }
 
 function showActivePunishment(entry) {
@@ -796,65 +812,104 @@ function startVioTimer() {
   }, 1000);
 }
 
-function completeViolation() {
+async function completeViolation() {
   const entry = window._activeVioEntry;
   if (!entry) return;
-  const violations = loadViolations();
-  const found = violations.find(v => v.id === entry.id);
-  if (found) { found.completed = true; found.completedAt = new Date().toISOString(); }
-  saveViolations(violations);
-  document.getElementById('vio-active').style.display = 'none';
-  document.getElementById('vio-log-btn').disabled = false;
-  document.getElementById('vio-log-btn').style.opacity = '1';
-  window._activeVioEntry = null;
-  renderViolations();
+  const btn = document.getElementById('vio-complete-btn');
+  btn.disabled = true; btn.textContent = 'Saving...';
+  try {
+    await notionPatch(`/pages/${entry.id}`, {
+      properties: {
+        "Completed": "__YES__",
+        "date:Completed At:start": new Date().toISOString(),
+        "date:Completed At:is_datetime": 1
+      }
+    });
+    const cached = _vioCache.find(v => v.id === entry.id);
+    if (cached) { cached.completed = true; cached.completedAt = new Date().toISOString(); }
+    document.getElementById('vio-active').style.display = 'none';
+    document.getElementById('vio-log-btn').disabled = false;
+    document.getElementById('vio-log-btn').style.opacity = '1';
+    document.getElementById('vio-log-btn').textContent = '🛑 I Broke A Rule — Log Violation';
+    window._activeVioEntry = null;
+    renderViolationStats();
+    renderViolationHistory();
+  } catch(e) {
+    alert('Error completing violation: ' + e.message);
+    btn.disabled = false; btn.textContent = '✓ Done — I Completed It';
+  }
 }
 
-function renderViolations() {
-  const violations = loadViolations();
+async function loadViolationsFromNotion() {
+  const historyEl = document.getElementById('vio-history');
+  historyEl.innerHTML = `<div style="background:var(--surface);padding:1.5rem;text-align:center;font-family:var(--mono);font-size:10px;color:var(--text3);">Loading violation log...</div>`;
+  try {
+    const data = await notionPost(`/databases/${VIOLATIONS_DB}/query`, {
+      page_size: 50,
+      sorts: [{ property: 'Date', direction: 'descending' }]
+    });
+    const pages = data.results || [];
+    _vioCache = pages.map(p => {
+      const props = p.properties;
+      const name = (props['Punishment']?.title||[]).map(r=>r.plain_text||'').join('')||'—';
+      return {
+        id: p.id,
+        date: props['Date']?.date?.start || p.created_time,
+        punishment: name,
+        desc: (props['Description']?.rich_text||[]).map(r=>r.plain_text||'').join(''),
+        type: props['Type']?.select?.name || 'task',
+        completed: !!props['Completed']?.checkbox,
+        completedAt: props['Completed At']?.date?.start || null
+      };
+    });
+    renderViolationStats();
+    renderViolationHistory();
+    // Re-show active punishment if one exists (e.g. after page reload)
+    const active = _vioCache.find(v => !v.completed);
+    if (active) showActivePunishment(active);
+  } catch(e) {
+    historyEl.innerHTML = `<div style="color:var(--red);font-family:var(--mono);font-size:10px;padding:1rem;">Error loading violations: ${e.message}</div>`;
+  }
+}
+
+function renderViolationStats() {
   const weekAgo = Date.now() - 7*24*60*60*1000;
+  document.getElementById('vio-total').textContent = _vioCache.length;
+  document.getElementById('vio-week').textContent  = _vioCache.filter(v => new Date(v.date).getTime() > weekAgo).length;
 
-  document.getElementById('vio-total').textContent = violations.length;
-  document.getElementById('vio-week').textContent  = violations.filter(v => new Date(v.date).getTime() > weekAgo).length;
-
-  // Days clean = days since most recent violation
   let cleanDays = '—';
-  if (violations.length > 0) {
-    const lastDate = new Date(violations[0].date);
+  if (_vioCache.length > 0) {
+    const lastDate = new Date(_vioCache[0].date);
     const diffMs = Date.now() - lastDate.getTime();
     cleanDays = Math.floor(diffMs / (24*60*60*1000));
   }
   document.getElementById('vio-clean-days').textContent = cleanDays;
+}
 
+function renderViolationHistory() {
   const historyEl = document.getElementById('vio-history');
-  if (!violations.length) {
+  if (!_vioCache.length) {
     historyEl.innerHTML = `<div style="background:var(--surface);padding:1.5rem;text-align:center;font-family:var(--mono);font-size:10px;color:var(--text3);">No violations logged. Keep it that way.</div>`;
-  } else {
-    historyEl.innerHTML = violations.slice(0,10).map(v => {
-      const d = new Date(v.date);
-      const dateStr = d.toLocaleDateString('en-US',{month:'short',day:'numeric'}) + ' · ' + d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
-      const statusBadge = v.completed
-        ? `<span style="color:var(--green);">✓ done</span>`
-        : `<span style="color:var(--red);">⛔ pending</span>`;
-      return `<div style="background:var(--surface);padding:10px 16px;display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:10px;">
-        <div><span style="color:var(--text2);">${dateStr}</span> — <span style="color:var(--text);">${v.punishment}</span></div>
-        <div>${statusBadge}</div>
-      </div>`;
-    }).join('');
+    return;
   }
-
-  // Re-show active punishment if one exists and isn't completed (e.g. after page reload)
-  const active = violations.find(v => !v.completed);
-  if (active) {
-    showActivePunishment(active);
-  }
+  historyEl.innerHTML = _vioCache.slice(0,10).map(v => {
+    const d = new Date(v.date);
+    const dateStr = d.toLocaleDateString('en-US',{month:'short',day:'numeric'}) + ' · ' + d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+    const statusBadge = v.completed
+      ? `<span style="color:var(--green);">✓ done</span>`
+      : `<span style="color:var(--red);">⛔ pending</span>`;
+    return `<div style="background:var(--surface);padding:10px 16px;display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:10px;">
+      <div><span style="color:var(--text2);">${dateStr}</span> — <span style="color:var(--text);">${v.punishment}</span></div>
+      <div>${statusBadge}</div>
+    </div>`;
+  }).join('');
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
 renderDashboard();
 renderChecks();
 loadTodayTrades();
-renderViolations();
+loadViolationsFromNotion();
 // Pre-fill position size calculator with saved balance
 const _state = loadState();
 if (_state.balance) document.getElementById('ps-balance').value = _state.balance;
