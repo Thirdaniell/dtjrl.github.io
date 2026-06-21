@@ -116,7 +116,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
     <a href="admin.html" class="back-btn">← Back to Admin</a>
     <div class="page-eyebrow">// Prop Firm</div>
     <div class="page-title">Lucid Flex — 25K</div>
-    <div style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:0.1em;margin-bottom:2rem;">EOD TRAILING DRAWDOWN · NO DLL · 90/10 SPLIT · $1,500 MLL</div>
+    <div style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:0.1em;margin-bottom:2rem;">EOD TRAILING DRAWDOWN · NO DLL · 90/10 SPLIT · $1,000 MLL</div>
 
     <!-- ALERT BANNER -->
     <div class="alert-banner alert-red" id="alert-danger">
@@ -231,7 +231,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
     <!-- LUCID RULES -->
     <div class="section-label">LucidFlex Funded Rules — Know These</div>
     <div class="rules-list">
-      <div class="rule-item"><div class="rule-num">01</div><div class="rule-text"><strong style="color:var(--text);">EOD Trailing Drawdown — $1,500 MLL.</strong> Your Max Loss Limit only updates at market close (4:45 PM EST). Intraday dips don't tighten it. But your EOD closing balance determines tomorrow's floor.</div></div>
+      <div class="rule-item"><div class="rule-num">01</div><div class="rule-text"><strong style="color:var(--text);">EOD Trailing Drawdown — $1,000 MLL.</strong> Your Max Loss Limit only updates at market close (4:45 PM EST). Intraday dips don't tighten it. But your EOD closing balance determines tomorrow's floor.</div></div>
       <div class="rule-item"><div class="rule-num">02</div><div class="rule-text"><strong style="color:var(--text);">MLL locks once you reach starting balance.</strong> Once your EOD balance brings the trailing floor up to $25,000, the MLL locks there permanently. From that point, drawdown can never breach below your starting balance.</div></div>
       <div class="rule-item"><div class="rule-num">03</div><div class="rule-text"><strong style="color:var(--text);">No daily loss limit.</strong> You can be down intraday and recover. But don't use this as an excuse to let losers run — the EOD balance is what counts.</div></div>
       <div class="rule-item"><div class="rule-num">04</div><div class="rule-text"><strong style="color:var(--text);">Payout requires 5 profitable trading days in the cycle.</strong> Days reset after each approved payout. Max request: $1,000. Min request: $500. You keep 90%.</div></div>
@@ -319,7 +319,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
       <div class="update-row">
         <div class="update-field">
           <label>Current Balance ($)</label>
-          <input type="number" id="input-balance" placeholder="e.g. 26500" step="1">
+          <input type="number" id="input-balance" placeholder="e.g. 26000" step="1">
         </div>
         <div class="update-field">
           <label>Payouts Completed</label>
@@ -338,7 +338,7 @@ if (!requireAuth()) { /* redirected */ }
 
 // ── CONSTANTS ─────────────────────────────────────────────────────────────────
 const STARTING_BALANCE = 25000;
-const INITIAL_MLL      = STARTING_BALANCE - 1500; // $23,500
+const INITIAL_MLL      = STARTING_BALANCE - 1000; // $24,000
 const STORAGE_KEY      = 'ftj_lucid_25k';
 const TODAY_STR        = new Date().toISOString().split('T')[0];
 
@@ -364,9 +364,9 @@ function saveState(state) {
 }
 
 // ── CALCULATE MLL (EOD TRAILING) ─────────────────────────────────────────────
-// MLL trails up from 23,500 as balance grows, locks once it reaches 25,000
+// MLL trails up from 24,000 as balance grows, locks once it reaches 25,000
 function calcMLL(balance) {
-  const trailing = balance - 1500;
+  const trailing = balance - 1000;
   if (trailing >= STARTING_BALANCE) return STARTING_BALANCE; // locked
   if (trailing < INITIAL_MLL) return INITIAL_MLL; // floor
   return trailing;
@@ -409,7 +409,7 @@ function renderDashboard() {
   document.getElementById('s-profit-sub').textContent = profit > 0 ? '🟢 In profit — protect it' : profit < 0 ? '🔴 In drawdown' : 'At starting balance';
 
   // Drawdown bar
-  const ddUsed = ((1500 - room) / 1500) * 100;
+  const ddUsed = ((1000 - room) / 1000) * 100;
   const ddPct  = Math.max(0, Math.min(100, ddUsed));
   const ddFill = document.getElementById('dd-fill');
   ddFill.style.width = ddPct + '%';
@@ -418,7 +418,7 @@ function renderDashboard() {
   document.getElementById('dd-pct').className   = 'dd-bar-pct '+(ddPct < 50 ? 'green' : ddPct < 75 ? 'yellow' : 'red');
   document.getElementById('dd-mll-locked').textContent = mllLocked
     ? '🔒 MLL is locked at $25,000 — account is permanently protected from drawdown breach below starting balance.'
-    : `MLL will lock once your EOD balance reaches $26,500+ (balance that makes trailing floor = $25,000).`;
+    : `MLL will lock once your EOD balance reaches $26,000+ (balance that makes trailing floor = $25,000).`;
 
   // Alerts
   const dangerEl  = document.getElementById('alert-danger');
@@ -699,7 +699,7 @@ function calcPositionSize() {
   document.getElementById('ps-breakdown').innerHTML =
     `NQ: ${nqContracts>=1?nqContracts+'×NQ':mnqContracts+'×MNQ'} · ${stopPts}pt stop · max loss $${nqRisk.toLocaleString()}&nbsp;&nbsp;|&nbsp;&nbsp;` +
     `ES: ${esContracts>=1?esContracts+'×ES':mesContracts+'×MES'} · ${stopPts}pt stop · max loss $${esRisk.toLocaleString()}&nbsp;&nbsp;|&nbsp;&nbsp;` +
-    `MLL room: $${room.toLocaleString()} of $1,500`;
+    `MLL room: $${room.toLocaleString()} of $1,000`;
 }
 
 // ── VIOLATION & PUNISHMENT SYSTEM (Notion-backed) ─────────────────────────────
