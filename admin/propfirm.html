@@ -743,7 +743,13 @@ async function logViolation() {
   try {
     const data = await notionPost('/pages', {
       parent: { database_id: VIOLATIONS_DB },
-      properties: props
+      properties: {
+        "Punishment":    { title: [{ text: { content: punishment.name } }] },
+        "Description":   { rich_text: [{ text: { content: punishment.desc } }] },
+        "Type":          { select: { name: punishment.type } },
+        "Completed":     { checkbox: false },
+        "Date":          { date: { start: new Date().toISOString().split('T')[0] } }
+      }
     });
     if (data.id) {
       const entry = {
@@ -820,9 +826,8 @@ async function completeViolation() {
   try {
     await notionPatch(`/pages/${entry.id}`, {
       properties: {
-        "Completed": "__YES__",
-        "date:Completed At:start": new Date().toISOString(),
-        "date:Completed At:is_datetime": 1
+        "Completed":     { checkbox: true },
+        "Completed At":  { date: { start: new Date().toISOString().split('T')[0] } }
       }
     });
     const cached = _vioCache.find(v => v.id === entry.id);
@@ -851,15 +856,32 @@ async function loadViolationsFromNotion() {
     const pages = data.results || [];
     _vioCache = pages.map(p => {
       const props = p.properties;
-      const name = (props['Punishment']?.title||[]).map(r=>r.plain_text||'').join('')||'—';
+      const name = (props['Punishment']?.title||[]).map(r=>r.plain_text||'').join('')
+                || (props['Name']?.title||[]).map(r=>r.plain_text||'').join('')
+                || '—';
+      const desc = (props['Description']?.rich_text||[]).map(r=>r.plain_text||'').join('');
+      const type = props['Type']?.select?.name || 'task';
+      const completed = !!props['Completed']?.checkbox;
+      const date = props['Date']?.date?.start || p.created_time;
+      const completedAt = props['Completed At']?.date?.start || null;
+
+      // seconds from type — needed for timer display
+      const secondsMap = {
+        'Cold Shower — 3 min': 180,
+        'Plank — 5 min total': 300,
+        'Cold Shower — 5 min': 300,
+        '20 Min Cardio': 1200,
+      };
+
       return {
         id: p.id,
-        date: props['Date']?.date?.start || p.created_time,
+        date,
         punishment: name,
-        desc: (props['Description']?.rich_text||[]).map(r=>r.plain_text||'').join(''),
-        type: props['Type']?.select?.name || 'task',
-        completed: !!props['Completed']?.checkbox,
-        completedAt: props['Completed At']?.date?.start || null
+        desc,
+        type,
+        seconds: secondsMap[name] || null,
+        completed,
+        completedAt
       };
     });
     renderViolationStats();
