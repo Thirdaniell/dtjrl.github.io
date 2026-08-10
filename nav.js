@@ -105,6 +105,12 @@ const NAV_CSS = `
   color:#c8ff00;
 }
 
+.nav-link[data-page="index"]{
+  -webkit-touch-callout:none;
+  -webkit-user-select:none;
+  user-select:none;
+}
+
 .nav-link.active::before{
   content:'';
   position:absolute;
@@ -384,9 +390,14 @@ function initSecretMobileAdmin(){
     }
   };
 
-  trigger.addEventListener('touchstart', start, {passive:true});
+  const blockContextMenu = function(e){
+    e.preventDefault();
+  };
+
+  trigger.addEventListener('touchstart', start, {passive:false});
   trigger.addEventListener('touchend', cancel);
   trigger.addEventListener('touchmove', cancel);
   trigger.addEventListener('touchcancel', cancel);
   trigger.addEventListener('click', clickGuard);
+  trigger.addEventListener('contextmenu', blockContextMenu);
 }
