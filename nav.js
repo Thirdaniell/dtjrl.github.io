@@ -336,6 +336,8 @@ function initNav(activePage){
       btn.textContent='☾';
     }
   }
+
+  initSecretMobileAdmin();
 }
 
 function navToggleTheme(){
@@ -354,4 +356,37 @@ function navToggleTheme(){
 
 function navAdminAccess(){
   window.location.href='admin/admin.html';
+}
+
+function initSecretMobileAdmin(){
+  const trigger = document.querySelector('.nav-link[data-page="index"]');
+  if(!trigger) return;
+
+  let pressTimer = null;
+  let longPressFired = false;
+
+  const start = function(e){
+    longPressFired = false;
+    pressTimer = setTimeout(function(){
+      longPressFired = true;
+      navAdminAccess();
+    }, 800);
+  };
+
+  const cancel = function(e){
+    clearTimeout(pressTimer);
+  };
+
+  const clickGuard = function(e){
+    if(longPressFired){
+      e.preventDefault();
+      longPressFired = false;
+    }
+  };
+
+  trigger.addEventListener('touchstart', start, {passive:true});
+  trigger.addEventListener('touchend', cancel);
+  trigger.addEventListener('touchmove', cancel);
+  trigger.addEventListener('touchcancel', cancel);
+  trigger.addEventListener('click', clickGuard);
 }
