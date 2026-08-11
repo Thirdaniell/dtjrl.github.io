@@ -116,7 +116,18 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
         <div class="field"><label>Stop Loss</label><input type="number" id="ef-sl" step="0.25"></div>
         <div class="field"><label>Take Profit</label><input type="number" id="ef-tp" step="0.25"></div>
         <div class="field"><label>Contracts</label><input type="number" id="ef-contracts" min="1"></div>
-        <div class="field"><label>Screenshot Link</label><input type="text" id="ef-screenshot" placeholder="imgur or TradingView URL"></div>
+        <div class="field form-full">
+          <label>Chart Screenshot</label>
+          <div id="ef-upload-zone" style="border:1px dashed var(--border2);padding:1.5rem;text-align:center;cursor:pointer;transition:border-color 0.15s;background:var(--surface2);margin-bottom:6px;" ondragover="event.preventDefault();document.getElementById('ef-upload-zone').style.borderColor='var(--accent)'" ondragleave="document.getElementById('ef-upload-zone').style.borderColor='var(--border2)'" ondrop="handleImgDrop(event,'ef')" onclick="document.getElementById('ef-img-file').click()">
+            <input type="file" id="ef-img-file" accept="image/*" style="display:none;" onchange="handleImgFile(event,'ef')">
+            <div id="ef-upload-preview" style="display:none;margin-bottom:10px;"><img id="ef-upload-img" style="max-height:140px;max-width:100%;object-fit:contain;border:1px solid var(--border2);" src=""></div>
+            <div id="ef-upload-label" style="font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:0.08em;">📎 Drag & drop or click to replace chart image</div>
+            <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:4px;">PNG, JPG, WEBP · Uploads directly to Notion</div>
+          </div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-bottom:4px;text-align:center;">— or paste a link instead —</div>
+          <input type="text" id="ef-screenshot" placeholder="TradingView or imgur URL" style="font-family:var(--mono);font-size:12px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:8px 10px;width:100%;outline:none;transition:border-color 0.15s;">
+          <div style="font-family:var(--mono);font-size:9px;color:var(--accent);margin-top:5px;display:none;" id="ef-upload-status"></div>
+        </div>
         <div class="field form-full">
           <label>Confluences</label>
           <div class="conf-wrap" id="ef-conf-wrap">
@@ -490,6 +501,8 @@ async function saveEdit() {
   try {
     const data = await notionPatch(`/pages/${editPageId}`, {properties:props});
     if (data.id) {
+      // Upload new image if one was selected
+      if (pendingImgFile) await uploadImgToNotion(editPageId, 'ef');
       const msg = document.getElementById('edit-success-msg');
       msg.style.display = 'block';
       const pnlStr = pnl!=null ? (pnl>=0?'+':'-')+'$'+Math.abs(pnl).toLocaleString() : '—';
@@ -504,6 +517,61 @@ function cancelEdit() {
   editPageId = null;
   document.getElementById('edit-form-wrap').style.display = 'none';
   document.getElementById('edit-success-msg').style.display = 'none';
+}
+
+// ── IMAGE UPLOAD ──────────────────────────────────────────────────────────────
+let pendingImgFile = null;
+
+function handleImgDrop(event, prefix) {
+  event.preventDefault();
+  document.getElementById(`${prefix}-upload-zone`).style.borderColor = 'var(--border2)';
+  const file = event.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) previewImg(file, prefix);
+}
+
+function handleImgFile(event, prefix) {
+  const file = event.target.files[0];
+  if (file) previewImg(file, prefix);
+}
+
+function previewImg(file, prefix) {
+  pendingImgFile = file;
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById(`${prefix}-upload-img`).src = e.target.result;
+    document.getElementById(`${prefix}-upload-preview`).style.display = 'block';
+    document.getElementById(`${prefix}-upload-label`).textContent = `✓ ${file.name} ready to upload`;
+    document.getElementById(`${prefix}-screenshot`).value = '';
+  };
+  reader.readAsDataURL(file);
+}
+
+async function uploadImgToNotion(pageId, prefix) {
+  if (!pendingImgFile) return null;
+  const statusEl = document.getElementById(`${prefix}-upload-status`);
+  statusEl.style.display = 'block';
+  statusEl.textContent = '⏳ Uploading image to Notion...';
+  try {
+    const res = await fetch(
+      `${WORKER}/upload-image?page_id=${pageId}&filename=${encodeURIComponent(pendingImgFile.name)}`,
+      { method: 'POST', headers: { 'Content-Type': pendingImgFile.type }, body: pendingImgFile }
+    );
+    const data = await res.json();
+    if (data.success) {
+      statusEl.textContent = '✓ Image uploaded to Notion';
+      statusEl.style.color = 'var(--green)';
+      pendingImgFile = null;
+      return data.url || null;
+    } else {
+      statusEl.textContent = '⚠ Upload failed — trade saved without image';
+      statusEl.style.color = 'var(--yellow)';
+      return null;
+    }
+  } catch(e) {
+    statusEl.textContent = '⚠ Upload failed: ' + e.message;
+    statusEl.style.color = 'var(--yellow)';
+    return null;
+  }
 }
 
 loadTradeList();
