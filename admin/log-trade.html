@@ -119,13 +119,14 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
       <div class="field"><label>Take Profit</label><input type="number" id="f-tp" placeholder="e.g. 27453.75" step="0.25"></div>
       <div class="field"><label>Contracts</label><input type="number" id="f-contracts" placeholder="e.g. 2" min="1"></div>
       <div class="field form-full">
-        <label>Chart Screenshot</label>
-        <div id="f-upload-zone" style="border:1px dashed var(--border2);padding:1.5rem;text-align:center;cursor:pointer;transition:border-color 0.15s;background:var(--surface2);margin-bottom:6px;" ondragover="event.preventDefault();document.getElementById('f-upload-zone').style.borderColor='var(--accent)'" ondragleave="document.getElementById('f-upload-zone').style.borderColor='var(--border2)'" ondrop="handleImgDrop(event,'f')" onclick="document.getElementById('f-img-file').click()">
-          <input type="file" id="f-img-file" accept="image/*" style="display:none;" onchange="handleImgFile(event,'f')">
-          <div id="f-upload-preview" style="display:none;margin-bottom:10px;"><img id="f-upload-img" style="max-height:140px;max-width:100%;object-fit:contain;border:1px solid var(--border2);" src=""></div>
-          <div id="f-upload-label" style="font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:0.08em;">📎 Drag & drop, Ctrl+V, or click to upload chart image</div>
-          <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:4px;">PNG, JPG, WEBP · Uploads directly to Notion</div>
+        <label>Chart Screenshots <span style="color:var(--text3);font-size:9px;">(up to 5 images)</span></label>
+        <div id="f-upload-zone" style="border:1px dashed var(--border2);padding:1.25rem;text-align:center;cursor:pointer;transition:border-color 0.15s;background:var(--surface2);margin-bottom:8px;" ondragover="event.preventDefault();document.getElementById('f-upload-zone').style.borderColor='var(--accent)'" ondragleave="document.getElementById('f-upload-zone').style.borderColor='var(--border2)'" ondrop="handleImgDrop(event,'f')" onclick="document.getElementById('f-img-file').click()">
+          <input type="file" id="f-img-file" accept="image/*" multiple style="display:none;" onchange="handleImgFile(event,'f')">
+          <div id="f-upload-label" style="font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:0.08em;">📎 Drag & drop, Ctrl+V, or click to upload</div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:3px;">PNG, JPG, WEBP · Multiple images supported</div>
         </div>
+        <!-- Image preview grid with delete buttons -->
+        <div id="f-img-previews" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;"></div>
         <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-bottom:4px;text-align:center;">— or paste a link instead —</div>
         <input type="text" id="f-screenshot" placeholder="TradingView or imgur URL (optional if image uploaded)" style="font-family:var(--mono);font-size:12px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:8px 10px;width:100%;outline:none;transition:border-color 0.15s;">
         <div style="font-family:var(--mono);font-size:9px;color:var(--accent);margin-top:5px;display:none;" id="f-upload-status"></div>
@@ -164,20 +165,19 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
 <script>
 if (!requireAuth()) { /* redirected */ }
 
-// ── IMAGE UPLOAD (Imgur anonymous — permanent, no account needed) ─────────────
+// ── IMAGE UPLOAD (multi-file, Imgur anonymous) ────────────────────────────────
 const IMGUR_CLIENT_ID = '546c25a59c58ad7';
-let pendingImgFile = null;
+let pendingImgFiles = []; // array of File objects
 
 function handleImgDrop(event, prefix) {
   event.preventDefault();
   document.getElementById(`${prefix}-upload-zone`).style.borderColor = 'var(--border2)';
-  const file = event.dataTransfer.files[0];
-  if (file && file.type.startsWith('image/')) previewImg(file, prefix);
+  addImgFiles(Array.from(event.dataTransfer.files).filter(f => f.type.startsWith('image/')), prefix);
 }
 
 function handleImgFile(event, prefix) {
-  const file = event.target.files[0];
-  if (file) previewImg(file, prefix);
+  addImgFiles(Array.from(event.target.files), prefix);
+  event.target.value = ''; // reset so same file can be re-added
 }
 
 // CTRL+V paste from clipboard
@@ -188,133 +188,113 @@ document.addEventListener('paste', e => {
     if (item.type.startsWith('image/')) {
       const file = item.getAsFile();
       if (file) {
-        previewImg(file, 'f');
+        addImgFiles([file], 'f');
         const zone = document.getElementById('f-upload-zone');
-        zone.style.borderColor = 'var(--accent)';
-        setTimeout(() => zone.style.borderColor = 'var(--border2)', 800);
+        if (zone) { zone.style.borderColor='var(--accent)'; setTimeout(()=>zone.style.borderColor='var(--border2)',800); }
       }
       break;
     }
   }
 });
 
-function previewImg(file, prefix) {
-  pendingImgFile = file;
-  const reader = new FileReader();
-  reader.onload = e => {
-    const imgEl = document.getElementById(`${prefix}-upload-img`);
-    imgEl.src = e.target.result;
-    document.getElementById(`${prefix}-upload-preview`).style.display = 'block';
-    document.getElementById(`${prefix}-upload-label`).textContent = `✓ ${file.name || 'screenshot'} ready — uploads on submit`;
-    document.getElementById(`${prefix}-upload-status`).style.display = 'none';
-    const screenshotEl = document.getElementById(`${prefix}-screenshot`);
-    if (screenshotEl) screenshotEl.value = '';
-  };
-  reader.readAsDataURL(file);
+function addImgFiles(files, prefix) {
+  const max = 5;
+  for (const file of files) {
+    if (pendingImgFiles.length >= max) break;
+    pendingImgFiles.push(file);
+  }
+  renderImgPreviews(prefix);
+  document.getElementById(`${prefix}-screenshot`).value = '';
 }
 
-async function uploadImgToNotion(pageId, prefix) {
-  if (!pendingImgFile) return null;
+function removeImgFile(index, prefix) {
+  pendingImgFiles.splice(index, 1);
+  renderImgPreviews(prefix);
+}
+
+function renderImgPreviews(prefix) {
+  const container = document.getElementById(`${prefix}-img-previews`);
+  const labelEl   = document.getElementById(`${prefix}-upload-label`);
+  if (!container) return;
+  if (!pendingImgFiles.length) {
+    container.innerHTML = '';
+    if (labelEl) labelEl.textContent = '📎 Drag & drop, Ctrl+V, or click to upload';
+    return;
+  }
+  if (labelEl) labelEl.textContent = `✓ ${pendingImgFiles.length} image${pendingImgFiles.length>1?'s':''} selected — uploads on submit`;
+  container.innerHTML = '';
+  pendingImgFiles.forEach((file, i) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const wrap = document.createElement('div');
+      wrap.style.cssText = 'position:relative;width:120px;flex-shrink:0;';
+      wrap.innerHTML = `
+        <img src="${e.target.result}" style="width:120px;height:80px;object-fit:cover;border:1px solid var(--border2);display:block;">
+        <button onclick="removeImgFile(${i},'${prefix}')" style="position:absolute;top:2px;right:2px;font-family:var(--mono);font-size:9px;background:rgba(0,0,0,0.8);border:1px solid var(--red);color:var(--red);padding:2px 5px;cursor:pointer;line-height:1;">✕</button>
+        <div style="font-family:var(--mono);font-size:8px;color:var(--text3);padding:2px 4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${file.name||'image'}</div>`;
+      container.appendChild(wrap);
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+async function uploadAllImgsToNotion(pageId, prefix) {
+  if (!pendingImgFiles.length) return [];
   const statusEl = document.getElementById(`${prefix}-upload-status`);
   statusEl.style.display = 'block';
   statusEl.style.color = 'var(--accent)';
-  statusEl.textContent = '⏳ Uploading image...';
-  try {
-    // Step 1 — Upload to Imgur anonymously (permanent, free)
-    const formData = new FormData();
-    formData.append('image', pendingImgFile);
-    const imgurRes = await fetch('https://api.imgur.com/3/image', {
-      method: 'POST',
-      headers: { 'Authorization': `Client-ID ${IMGUR_CLIENT_ID}` },
-      body: formData
-    });
-    const imgurData = await imgurRes.json();
-    if (!imgurData.success) throw new Error('Imgur upload failed: ' + (imgurData.data?.error || 'unknown'));
-    const imgUrl = imgurData.data.link;
-
-    // Step 2 — Add image block to the Notion page so it shows in Notion
-    await fetch(`${WORKER}/notion/blocks/${pageId}/children`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        children: [{
-          object: 'block',
-          type: 'image',
-          image: { type: 'external', external: { url: imgUrl } }
-        }]
-      })
-    });
-
-    // Step 3 — Save URL back into screenshot field so index.html shows it too
-    const screenshotEl = document.getElementById(`${prefix}-screenshot`);
-    if (screenshotEl) screenshotEl.value = imgUrl;
-
-    statusEl.textContent = '✓ Image uploaded successfully';
-    statusEl.style.color = 'var(--green)';
-    pendingImgFile = null;
-    return imgUrl;
-  } catch(e) {
-    statusEl.textContent = '⚠ Upload failed: ' + e.message;
-    statusEl.style.color = 'var(--yellow)';
-    return null;
-  }
-}
-
-function resetImgUpload(prefix) {
-  pendingImgFile = null;
-  const previewEl = document.getElementById(`${prefix}-upload-preview`);
-  const labelEl   = document.getElementById(`${prefix}-upload-label`);
-  const statusEl  = document.getElementById(`${prefix}-upload-status`);
-  const imgEl     = document.getElementById(`${prefix}-upload-img`);
-  const fileEl    = document.getElementById(`${prefix}-img-file`);
-  if (previewEl) previewEl.style.display = 'none';
-  if (labelEl)   labelEl.textContent = '📎 Drag & drop, paste (Ctrl+V), or click to upload';
-  if (statusEl)  { statusEl.style.display = 'none'; statusEl.style.color = 'var(--accent)'; }
-  if (imgEl)     imgEl.src = '';
-  if (fileEl)    fileEl.value = '';
-}
-
-async function uploadImgToNotion(pageId, prefix) {
-  if (!pendingImgFile) return null;
-  const statusEl = document.getElementById(`${prefix}-upload-status`);
-  statusEl.style.display = 'block';
-  statusEl.textContent = '⏳ Uploading image to Notion...';
-  try {
-    const res = await fetch(
-      `${WORKER}/upload-image?page_id=${pageId}&filename=${encodeURIComponent(pendingImgFile.name)}`,
-      { method: 'POST', headers: { 'Content-Type': pendingImgFile.type }, body: pendingImgFile }
-    );
-    const data = await res.json();
-    if (data.success) {
-      statusEl.textContent = '✓ Image uploaded to Notion successfully';
-      statusEl.style.color = 'var(--green)';
-      pendingImgFile = null;
-      return data.url || null;
-    } else {
-      statusEl.textContent = '⚠ Image upload failed — trade saved without image';
-      statusEl.style.color = 'var(--yellow)';
-      return null;
+  const urls = [];
+  for (let i = 0; i < pendingImgFiles.length; i++) {
+    const file = pendingImgFiles[i];
+    statusEl.textContent = `⏳ Uploading image ${i+1} of ${pendingImgFiles.length}...`;
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+      const imgurRes = await fetch('https://api.imgur.com/3/image', {
+        method: 'POST',
+        headers: { 'Authorization': `Client-ID ${IMGUR_CLIENT_ID}` },
+        body: formData
+      });
+      const imgurData = await imgurRes.json();
+      if (!imgurData.success) throw new Error(imgurData.data?.error || 'unknown');
+      const imgUrl = imgurData.data.link;
+      urls.push(imgUrl);
+      // Add each as an image block on the Notion page
+      await fetch(`${WORKER}/notion/blocks/${pageId}/children`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          children: [{ object:'block', type:'image', image:{ type:'external', external:{ url:imgUrl } } }]
+        })
+      });
+    } catch(e) {
+      statusEl.textContent = `⚠ Image ${i+1} failed: ${e.message}`;
     }
-  } catch(e) {
-    statusEl.textContent = '⚠ Image upload failed: ' + e.message;
-    statusEl.style.color = 'var(--yellow)';
-    return null;
   }
+  if (urls.length) {
+    // Save first URL to screenshot field so index.html picks it up
+    const screenshotEl = document.getElementById(`${prefix}-screenshot`);
+    if (screenshotEl && !screenshotEl.value) screenshotEl.value = urls[0];
+    statusEl.textContent = `✓ ${urls.length} image${urls.length>1?'s':''} uploaded`;
+    statusEl.style.color = 'var(--green)';
+  }
+  pendingImgFiles = [];
+  return urls;
 }
 
 function resetImgUpload(prefix) {
-  pendingImgFile = null;
-  const previewEl = document.getElementById(`${prefix}-upload-preview`);
+  pendingImgFiles = [];
+  const container = document.getElementById(`${prefix}-img-previews`);
   const labelEl   = document.getElementById(`${prefix}-upload-label`);
   const statusEl  = document.getElementById(`${prefix}-upload-status`);
-  const imgEl     = document.getElementById(`${prefix}-upload-img`);
   const fileEl    = document.getElementById(`${prefix}-img-file`);
-  if (previewEl) previewEl.style.display = 'none';
-  if (labelEl)   labelEl.textContent = '📎 Drag & drop or click to upload chart image';
-  if (statusEl)  { statusEl.style.display = 'none'; statusEl.style.color = 'var(--accent)'; }
-  if (imgEl)     imgEl.src = '';
+  if (container) container.innerHTML = '';
+  if (labelEl)   labelEl.textContent = '📎 Drag & drop, Ctrl+V, or click to upload';
+  if (statusEl)  { statusEl.style.display='none'; statusEl.style.color='var(--accent)'; }
   if (fileEl)    fileEl.value = '';
 }
+
+
 
 buildConfDropdown('conf-btn','conf-dropdown','conf-label','conf-tags','updateConf');
 
@@ -486,8 +466,8 @@ async function submitTrade() {
   try {
     const data=await notionPost('/pages',body);
     if(data.id){
-      // Upload image to Notion if one was selected
-      if (pendingImgFile) await uploadImgToNotion(data.id, 'f');
+      // Upload all images to Notion if any were selected
+      if (pendingImgFiles.length) await uploadAllImgsToNotion(data.id, 'f');
       const msg=document.getElementById('success-msg');msg.style.display='block';msg.textContent=`✓ Trade logged! ${tradeName} · ${t.grade} · ${t.pnl>=0?'+':''}$${Math.abs(t.pnl).toLocaleString()}`;
       document.getElementById('review-panel').style.display='none';
       resetForm();
