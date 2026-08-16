@@ -637,7 +637,6 @@
     .stats-row { grid-template-columns: repeat(2, 1fr); }
     .cards { grid-template-columns: 1fr; }
   }
-
 </style>
 <link rel="icon" type="image/png" href="https://i.imgur.com/ZP2pTk2.png">
 <link rel="stylesheet" href="mobile.css">
@@ -781,8 +780,11 @@
   <div class="chart-overlay-box">
     <img id="chart-overlay-img" src="" alt="Trade chart">
     <button class="chart-overlay-close" onclick="closeChartOverlay()">✕ Close</button>
+    <button id="chart-overlay-prev" onclick="overlayNav(-1)" style="display:none;position:absolute;left:10px;top:50%;transform:translateY(-50%);font-family:var(--mono);font-size:18px;padding:8px 14px;background:rgba(0,0,0,0.6);border:1px solid var(--border2);color:var(--text);cursor:pointer;transition:all 0.15s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border2)'">←</button>
+    <button id="chart-overlay-next" onclick="overlayNav(1)" style="display:none;position:absolute;right:10px;top:50%;transform:translateY(-50%);font-family:var(--mono);font-size:18px;padding:8px 14px;background:rgba(0,0,0,0.6);border:1px solid var(--border2);color:var(--text);cursor:pointer;transition:all 0.15s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border2)'">→</button>
+    <div id="chart-overlay-counter" style="position:absolute;bottom:10px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:10px;color:var(--text2);background:rgba(0,0,0,0.6);padding:4px 10px;letter-spacing:0.1em;"></div>
   </div>
-  <div class="chart-overlay-hint">Click outside or press ESC to close</div>
+  <div class="chart-overlay-hint">Click outside · ESC to close · ← → to navigate</div>
 </div>
 
 <script>
@@ -851,25 +853,61 @@ function parseProps(page) {
 
 function extractTVUrl(blocks) {
   if (!blocks?.results) return null;
+  const urls = [];
   for (const block of blocks.results) {
     const type = block.type;
     const content = block[type];
     if (!content) continue;
 
-    if (type === "bookmark" || type === "embed") {
-      const u = content.url || "";
-      if (u.includes("tradingview.com/x/")) return u;
+    // Image blocks (Imgur uploads via external URL)
+    if (type === 'image') {
+      const url = content.external?.url || content.file?.url || '';
+      if (url) urls.push(url);
+      continue;
     }
 
+    // TradingView bookmark/embed
+    if (type === 'bookmark' || type === 'embed') {
+      const u = content.url || '';
+      if (u.includes('tradingview.com/x/')) return u;
+    }
+
+    // TradingView links in text
     const texts = content.rich_text || content.text || [];
     for (const t of texts) {
-      const plain = t.plain_text || "";
-      const href = t.href || t.text?.link?.url || "";
-      const match = (plain + " " + href).match(/https:\/\/www\.tradingview\.com\/x\/[A-Za-z0-9]+\/?/);
-      if (match) return match[0];
+      const plain = t.plain_text || '';
+      const href = t.href || t.text?.link?.url || '';
+      // Imgur URLs in text blocks
+      const imgurMatch = (plain + ' ' + href).match(/https?:\/\/i?\.?imgur\.com\/[A-Za-z0-9]+\.[a-z]+/);
+      if (imgurMatch) urls.push(imgurMatch[0]);
+      // TradingView snapshot links
+      const tvMatch = (plain + ' ' + href).match(/https:\/\/www\.tradingview\.com\/x\/[A-Za-z0-9]+\/?/);
+      if (tvMatch) return tvMatch[0];
+      // Screenshot: prefix used by older entries
+      if (plain.includes('Screenshot:')) {
+        const u = plain.replace('📸 Screenshot: ', '').trim();
+        if (u.startsWith('http')) urls.push(u);
+      }
     }
   }
-  return null;
+  // Return first image URL found, or null
+  return urls.length > 0 ? urls[0] : null;
+}
+
+// Extract ALL image URLs from blocks (for multi-image support)
+function extractAllImageUrls(blocks) {
+  if (!blocks?.results) return [];
+  const urls = [];
+  for (const block of blocks.results) {
+    const type = block.type;
+    const content = block[type];
+    if (!content) continue;
+    if (type === 'image') {
+      const url = content.external?.url || content.file?.url || '';
+      if (url) urls.push({ url, blockId: block.id });
+    }
+  }
+  return urls;
 }
 
 async function loadTrades() {
@@ -888,7 +926,9 @@ async function loadTrades() {
     const trades = await Promise.all(pages.map(async page => {
       const t = parseProps(page);
       const content = await getPageContent(page.id);
+      const allImgs = extractAllImageUrls(content);
       t.screenshotUrl = extractTVUrl(content);
+      t.allImageUrls = allImgs.map(i => i.url);
       return t;
     }));
 
@@ -964,19 +1004,34 @@ function renderCard(t) {
   const badgeText = t.status === "Closed - Win" ? "Win" : t.status === "Closed - Loss" ? "Loss" : t.status || "Open";
   const dirClass = t.direction === "Long" ? "long" : "short";
 
-  function buildChartHtml(url) {
-    if (!url) return `<div class="no-chart">No chart attached</div>`;
-    const isImage = /\.(png|jpg|jpeg|gif|webp)(\?.*)?$/i.test(url) || url.includes('i.imgur.com') || (url.includes('imgur.com') && !url.includes('gallery'));
-    if (isImage) {
-      const imgUrl = url.includes('imgur.com/') && !url.includes('i.imgur.com') ? url.replace('imgur.com/', 'i.imgur.com/') : url;
-      return `<img class="chart-img" src="${imgUrl}" alt="Trade chart" loading="lazy" onclick="openChartOverlay('${imgUrl.replace(/'/g, "\\'")}')" style="cursor:pointer;" />`;
+  function buildChartHtml(url, allUrls) {
+    // Multi-image: if we have multiple imgur images, show them all as a grid
+    const imgs = (allUrls && allUrls.length > 0) ? allUrls : (url ? [url] : []);
+    if (!imgs.length) return `<div class="no-chart">No chart attached</div>`;
+
+    const isImg = u => /\.(png|jpg|jpeg|gif|webp)(\?.*)?$/i.test(u) || u.includes('imgur.com');
+    const toDirectUrl = u => u.includes('imgur.com/') && !u.includes('i.imgur.com') ? u.replace('imgur.com/', 'i.imgur.com/') : u;
+
+    const imageUrls = imgs.filter(isImg).map(toDirectUrl);
+    const tvUrl = imgs.find(u => u.includes('tradingview.com'));
+
+    if (!imageUrls.length && tvUrl) {
+      return `<a class="chart-link" href="${tvUrl}" target="_blank" rel="noopener">
+        <span>View chart on TradingView</span>
+        <span class="chart-link-arrow">↗</span>
+      </a>`;
     }
-    return `<a class="chart-link" href="${url}" target="_blank" rel="noopener">
-      <span>View chart on TradingView</span>
-      <span class="chart-link-arrow">↗</span>
-    </a>`;
+
+    if (imageUrls.length === 1) {
+      return `<img class="chart-img" src="${imageUrls[0]}" alt="Trade chart" loading="lazy" onclick="openChartOverlay('${imageUrls[0].replace(/'/g,"\\'")}',${JSON.stringify(imageUrls)})" style="cursor:pointer;" />`;
+    }
+
+    // Multiple images — thumbnail strip, click to open overlay at that index
+    return `<div style="display:grid;grid-template-columns:repeat(${Math.min(imageUrls.length,3)},1fr);gap:2px;">
+      ${imageUrls.map((u,i) => `<img src="${u}" alt="Chart ${i+1}" loading="lazy" style="width:100%;aspect-ratio:16/9;object-fit:cover;cursor:pointer;border:1px solid var(--border2);" onclick="openChartOverlay('${u.replace(/'/g,"\\'")}',${JSON.stringify(imageUrls)})">`).join('')}
+    </div>`;
   }
-  const chartHtml = buildChartHtml(t.screenshotUrl);
+  const chartHtml = buildChartHtml(t.screenshotUrl, t.allImageUrls);
 
   const notesHtml = [
     t.notes ? `<div class="note-item"><div class="field-label">Notes</div><div class="field-value">${t.notes}</div></div>` : "",
@@ -1268,24 +1323,47 @@ function clearConfFilter() {
 }
 
 // ---- Chart Overlay (images only) ----
-function openChartOverlay(url) {
+let _overlayUrls = [], _overlayIdx = 0;
+
+function openChartOverlay(url, allUrls) {
+  _overlayUrls = allUrls && allUrls.length > 1 ? allUrls : [url];
+  _overlayIdx = _overlayUrls.indexOf(url);
+  if (_overlayIdx < 0) _overlayIdx = 0;
   const overlay = document.getElementById('chart-overlay');
   const img     = document.getElementById('chart-overlay-img');
-  img.src = url;
+  img.src = _overlayUrls[_overlayIdx];
   overlay.classList.add('open');
   document.body.style.overflow = 'hidden';
+  updateOverlayNav();
+}
+
+function overlayNav(dir) {
+  _overlayIdx = (_overlayIdx + dir + _overlayUrls.length) % _overlayUrls.length;
+  document.getElementById('chart-overlay-img').src = _overlayUrls[_overlayIdx];
+  updateOverlayNav();
+}
+
+function updateOverlayNav() {
+  const counter = document.getElementById('chart-overlay-counter');
+  const prevBtn = document.getElementById('chart-overlay-prev');
+  const nextBtn = document.getElementById('chart-overlay-next');
+  const show = _overlayUrls.length > 1;
+  if (counter) counter.textContent = show ? `${_overlayIdx+1} / ${_overlayUrls.length}` : '';
+  if (prevBtn) prevBtn.style.display = show ? 'block' : 'none';
+  if (nextBtn) nextBtn.style.display = show ? 'block' : 'none';
 }
 
 function closeChartOverlay() {
-  const overlay = document.getElementById('chart-overlay');
-  const img     = document.getElementById('chart-overlay-img');
-  overlay.classList.remove('open');
-  img.src = '';
+  document.getElementById('chart-overlay').classList.remove('open');
+  document.getElementById('chart-overlay-img').src = '';
   document.body.style.overflow = '';
 }
 
 document.addEventListener('keydown', e => {
+  if (!document.getElementById('chart-overlay').classList.contains('open')) return;
   if (e.key === 'Escape') closeChartOverlay();
+  if (e.key === 'ArrowRight') overlayNav(1);
+  if (e.key === 'ArrowLeft') overlayNav(-1);
 });
 
 function renderAll() {
