@@ -245,16 +245,30 @@
     text-transform: uppercase;
   }
 
-  .chart-img {
+  .chart-thumb {
     width: 100%;
     height: 180px;
     object-fit: cover;
-    border: 1px solid var(--border2);
     display: block;
+    border: 1px solid var(--border2);
     cursor: pointer;
     transition: opacity 0.15s;
   }
-  .chart-img:hover { opacity: 0.85; }
+  .chart-thumb:hover { opacity: 0.85; }
+  .chart-expand-badge {
+    position: absolute;
+    bottom: 6px;
+    right: 6px;
+    font-family: var(--mono);
+    font-size: 8px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: rgba(0,0,0,0.75);
+    color: var(--text2);
+    padding: 3px 8px;
+    border: 1px solid var(--border2);
+    pointer-events: none;
+  }
 
   .chart-link {
     display: flex;
@@ -583,55 +597,58 @@
     animation: blink 1s infinite;
   }
 
-  /* CHART OVERLAY */
+  /* CHART OVERLAY — Discord style */
   .chart-overlay {
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.92);
+    background: rgba(0,0,0,0.85);
     z-index: 9999;
     align-items: center;
     justify-content: center;
     flex-direction: column;
+    backdrop-filter: blur(4px);
   }
   .chart-overlay.open { display: flex; }
   .chart-overlay-box {
     position: relative;
-    width: 95vw;
-    max-width: 1400px;
-    height: 85vh;
-    background: var(--bg);
-    border: 1px solid var(--border2);
+    max-width: 95vw;
+    max-height: 90vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   .chart-overlay img {
-    display: block;
-    width: 100%;
-    height: 100%;
+    max-width: 95vw;
+    max-height: 88vh;
+    width: auto;
+    height: auto;
     object-fit: contain;
-    background: #131722;
+    display: block;
+    border: none;
+    box-shadow: 0 8px 48px rgba(0,0,0,0.8);
   }
   .chart-overlay-close {
-    position: absolute;
-    top: 10px;
-    right: 12px;
+    position: fixed;
+    top: 16px;
+    right: 16px;
     font-family: var(--mono);
     font-size: 10px;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     padding: 6px 14px;
-    background: var(--bg);
+    background: rgba(0,0,0,0.6);
     border: 1px solid var(--border2);
     color: var(--text2);
     cursor: pointer;
-    z-index: 1;
     transition: all 0.15s;
   }
   .chart-overlay-close:hover { color: var(--accent); border-color: var(--accent); }
   .chart-overlay-hint {
     font-family: var(--mono);
-    font-size: 10px;
-    color: var(--text3);
-    margin-top: 12px;
+    font-size: 9px;
+    color: rgba(255,255,255,0.3);
+    margin-top: 14px;
     letter-spacing: 0.1em;
     text-transform: uppercase;
   }
@@ -779,15 +796,15 @@
   <div id="main"></div>
 </div>
 
-<!-- CHART OVERLAY (images only — TradingView blocks iframe embedding) -->
-<div class="chart-overlay" id="chart-overlay" onclick="if(event.target===this)closeChartOverlay()">
+<!-- CHART OVERLAY — Discord style -->
+<div class="chart-overlay" id="chart-overlay" onclick="if(event.target===this||event.target.id==='chart-overlay')closeChartOverlay()">
   <div class="chart-overlay-box">
     <img id="chart-overlay-img" src="" alt="Trade chart">
-    <button class="chart-overlay-close" onclick="closeChartOverlay()">✕ Close</button>
-    <button id="chart-overlay-prev" onclick="overlayNav(-1)" style="display:none;position:absolute;left:10px;top:50%;transform:translateY(-50%);font-family:var(--mono);font-size:18px;padding:8px 14px;background:rgba(0,0,0,0.6);border:1px solid var(--border2);color:var(--text);cursor:pointer;transition:all 0.15s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border2)'">←</button>
-    <button id="chart-overlay-next" onclick="overlayNav(1)" style="display:none;position:absolute;right:10px;top:50%;transform:translateY(-50%);font-family:var(--mono);font-size:18px;padding:8px 14px;background:rgba(0,0,0,0.6);border:1px solid var(--border2);color:var(--text);cursor:pointer;transition:all 0.15s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border2)'">→</button>
-    <div id="chart-overlay-counter" style="position:absolute;bottom:10px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:10px;color:var(--text2);background:rgba(0,0,0,0.6);padding:4px 10px;letter-spacing:0.1em;"></div>
+    <button id="chart-overlay-prev" onclick="overlayNav(-1)" style="display:none;position:absolute;left:-50px;top:50%;transform:translateY(-50%);font-family:var(--mono);font-size:20px;padding:10px 16px;background:rgba(0,0,0,0.5);border:1px solid var(--border2);color:var(--text);cursor:pointer;transition:all 0.15s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border2)'">←</button>
+    <button id="chart-overlay-next" onclick="overlayNav(1)" style="display:none;position:absolute;right:-50px;top:50%;transform:translateY(-50%);font-family:var(--mono);font-size:20px;padding:10px 16px;background:rgba(0,0,0,0.5);border:1px solid var(--border2);color:var(--text);cursor:pointer;transition:all 0.15s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border2)'">→</button>
+    <div id="chart-overlay-counter" style="position:absolute;bottom:-28px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:10px;color:rgba(255,255,255,0.4);letter-spacing:0.1em;"></div>
   </div>
+  <button class="chart-overlay-close" onclick="closeChartOverlay()">✕ Close</button>
   <div class="chart-overlay-hint">Click outside · ESC to close · ← → to navigate</div>
 </div>
 
@@ -1000,6 +1017,9 @@ function updateStats(trades) {
   avgEl.className = "stat-value" + (avg > 0 ? " pos" : avg < 0 ? " neg" : "");
 }
 
+// Global map of trade image URLs — avoids inline JSON/quoting issues in onclick
+const tradeImageMap = {};
+
 function renderCard(t) {
   const pnl = t.pnl;
   const pnlStr = pnl != null ? (pnl >= 0 ? "+" : "-") + "$" + Math.abs(pnl).toLocaleString() : "—";
@@ -1007,6 +1027,11 @@ function renderCard(t) {
   const badgeClass = t.status === "Closed - Win" ? "badge-win" : t.status === "Closed - Loss" ? "badge-loss" : "badge-be";
   const badgeText = t.status === "Closed - Win" ? "Win" : t.status === "Closed - Loss" ? "Loss" : t.status || "Open";
   const dirClass = t.direction === "Long" ? "long" : "short";
+
+  // Store images in global map — safe key for onclick
+  const imgKey = t.id.replace(/-/g,'');
+  const allImgs = (t.allImageUrls && t.allImageUrls.length) ? t.allImageUrls : (t.screenshotUrl ? [t.screenshotUrl] : []);
+  tradeImageMap[imgKey] = allImgs;
 
   function buildChartHtml(url, allUrls) {
     const imgs = (allUrls && allUrls.length > 0) ? allUrls : (url ? [url] : []);
@@ -1026,31 +1051,25 @@ function renderCard(t) {
     }
 
     if (imageUrls.length === 1) {
-      const u0 = imageUrls[0].replace(/'/g,"\\'");
-      const allJson = JSON.stringify(imageUrls);
       return `<div style="position:relative;">
         <img src="${imageUrls[0]}" alt="Trade chart" loading="lazy"
-          style="width:100%;height:180px;object-fit:cover;display:block;border:1px solid var(--border2);cursor:pointer;transition:opacity 0.15s;"
-          onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'"
-          onclick="openChartOverlay('${u0}',${allJson})">
-        <div style="position:absolute;bottom:6px;right:6px;font-family:var(--mono);font-size:8px;letter-spacing:0.08em;text-transform:uppercase;background:rgba(0,0,0,0.7);color:var(--text2);padding:3px 8px;border:1px solid var(--border2);pointer-events:none;">⤢ Expand</div>
+          class="chart-thumb"
+          onclick="openChartOverlay('${imgKey}',0)">
+        <div class="chart-expand-badge">⤢ Expand</div>
       </div>`;
     }
 
-    // Multiple images — strip of thumbnails, all same height, click to expand
     return `<div style="display:grid;grid-template-columns:repeat(${Math.min(imageUrls.length,3)},1fr);gap:2px;">
-      ${imageUrls.map((u,i) => {
-        const uEsc = u.replace(/'/g,"\\'");
-        const allJson = JSON.stringify(imageUrls);
-        return `<div style="position:relative;">
+      ${imageUrls.map((u,i) => `
+        <div style="position:relative;">
           <img src="${u}" alt="Chart ${i+1}" loading="lazy"
-            style="width:100%;height:120px;object-fit:cover;display:block;border:1px solid var(--border2);cursor:pointer;transition:opacity 0.15s;"
-            onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'"
-            onclick="openChartOverlay('${uEsc}',${allJson})">
-          ${i===0&&imageUrls.length>1?`<div style="position:absolute;bottom:4px;right:4px;font-family:var(--mono);font-size:8px;background:rgba(0,0,0,0.7);color:var(--text2);padding:2px 6px;pointer-events:none;">1/${imageUrls.length}</div>`:''}
-        </div>`;
-      }).join('')}
+            class="chart-thumb"
+            onclick="openChartOverlay('${imgKey}',${i})">
+          ${i===0&&imageUrls.length>1?`<div class="chart-expand-badge">${imageUrls.length} imgs</div>`:''}
+        </div>`).join('')}
     </div>`;
+  }
+  const chartHtml = buildChartHtml(t.screenshotUrl, t.allImageUrls);
   }
   const chartHtml = buildChartHtml(t.screenshotUrl, t.allImageUrls);
 
@@ -1343,13 +1362,14 @@ function clearConfFilter() {
   updateConfFilter();
 }
 
-// ---- Chart Overlay (images only) ----
+// ---- Chart Overlay (Discord-style — click image to expand, click outside or ESC to close) ----
 let _overlayUrls = [], _overlayIdx = 0;
 
-function openChartOverlay(url, allUrls) {
-  _overlayUrls = allUrls && allUrls.length > 1 ? allUrls : [url];
-  _overlayIdx = _overlayUrls.indexOf(url);
-  if (_overlayIdx < 0) _overlayIdx = 0;
+function openChartOverlay(imgKey, idx) {
+  const urls = tradeImageMap[imgKey] || [];
+  if (!urls.length) return;
+  _overlayUrls = urls;
+  _overlayIdx = idx || 0;
   const overlay = document.getElementById('chart-overlay');
   const img     = document.getElementById('chart-overlay-img');
   img.src = _overlayUrls[_overlayIdx];
