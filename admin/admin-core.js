@@ -94,10 +94,10 @@ function autoFollowedRulesLocal(mistakes) {
 // ── SHARED CONFLUENCE DROPDOWN BUILDER ───────────────────────────────────────
 const CONFLUENCE_GROUPS = [
   { label: 'Structure', items: ['MSS — Market Structure Shift','Displacement'] },
-  { label: 'Entry (PDA Arrays)', items: ['IFVG — Inverse Fair Value Gap','FVG — Fair Value Gap','Order Block','Breaker Block','Mitigation Block','PDA Array'] },
-  { label: 'Liquidity', items: ['Liquidity Sweep','BSL Taken','SSL Taken','Equal Highs/Lows'] },
+  { label: 'Entry (PDA Arrays)', items: ['IFVG — Inverse Fair Value Gap','FVG — Fair Value Gap','First Presented FVG (9:30 AM Open)','Rejection Block','Order Block','Breaker Block','Mitigation Block','PDA Array'] },
+  { label: 'Liquidity', items: ['Liquidity Sweep','Stop Hunt','BSL Taken','SSL Taken','Equal Highs/Lows'] },
   { label: 'Confluence', items: ['SMT Divergence','HTF PDA Delivery','HTF Trend','Retracement','Clear Targets','Volume','ATH — All Time High','Fib Target (-0.5)'] },
-  { label: 'Model', items: ['Market Maker Model','Power of 3','Judas Swing','Kill Zone','NWOG','NDOG','Asian Range','CISD — Change in State of Delivery','LRLR — Low Resistance Liquidity Run'] },
+  { label: 'Model', items: ['Market Maker Model','Power of 3','10 AM Reversal (Power of 3)','Judas Swing','Kill Zone','RTH Gap','NWOG','NDOG','Asian Range','CISD — Change in State of Delivery','LRLR — Low Resistance Liquidity Run'] },
 ];
 
 // Gets the value from a confluence label (text before the dash)
