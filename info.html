@@ -4,8 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Guide — FTJ</title>
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0a0a0a">
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="icon" type="image/png" href="https://i.imgur.com/ZP2pTk2.png">
 <link rel="stylesheet" href="mobile.css">
@@ -31,7 +29,9 @@
   .section-title { font-family: var(--mono); font-size: 11px; letter-spacing: 0.2em; color: var(--accent); text-transform: uppercase; margin-bottom: 1.25rem; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
 
   .info-block { background: var(--surface); border: 1px solid var(--border); padding: 1.25rem 1.5rem; margin-bottom: 1px; }
+  .info-block.new { border-left: 2px solid var(--accent); }
   .info-block-title { font-family: var(--mono); font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+  .info-block-new-tag { font-family: var(--mono); font-size: 8px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); border: 1px solid rgba(200,255,0,0.3); padding: 1px 6px; margin-left: 8px; vertical-align: middle; }
   .info-block-body { font-size: 13px; color: var(--text2); line-height: 1.8; }
   .info-block-body ul { list-style: none; margin-top: 6px; display: flex; flex-direction: column; gap: 4px; }
   .info-block-body ul li::before { content: '—'; color: var(--accent); margin-right: 8px; font-family: var(--mono); font-size: 11px; }
@@ -80,7 +80,6 @@
   ::-webkit-scrollbar-track { background: var(--bg); }
   ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
   ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
-  
 </style>
 </head>
 <body>
@@ -202,7 +201,7 @@
             <li>The <strong>Setup Grade</strong> badge (A++ to D) shows how strong the setup was at entry</li>
             <li>The <strong>Followed Rules</strong> badge (✅ / ⚠️ / ❌) shows whether your trading rules were respected</li>
             <li>Click <strong>⚡ Verify Rules</strong> on any card to run an AI analysis of the trade against your rulebook — it will highlight faults and what you did right</li>
-            <li>If a TradingView screenshot link was logged, it appears as a clickable button. Imgur image links display inline on the card</li>
+            <li>Chart screenshots attached to trades display inline — click to expand to full size. Multiple images can be navigated with ← → arrows</li>
             <li>The stats bar at the top updates live based on your active filters</li>
           </ul>
           <div class="tip-box">
@@ -225,7 +224,7 @@
           <ul>
             <li>Rules tagged <span style="color:#ff4444;font-family:var(--mono);font-size:10px;">REQUIRED</span> are non-negotiable — breaking these will flag your trade as ❌</li>
             <li>Rules tagged <span style="color:#ffab40;font-family:var(--mono);font-size:10px;">PREFERRED</span> are best practice — missing these may flag as ⚠️</li>
-            <li>Rules tagged <span style="color:var(--text3);font-family:var(--mono);font-size:10px;">WORK IN PROGRESS</span> are areas still being developed (e.g. mental discipline)</li>
+            <li>Rules tagged <span style="color:var(--text3);font-family:var(--mono);font-size:10px;">WORK IN PROGRESS</span> are areas still being developed</li>
             <li>The AI verification on the journal page uses these exact rules to grade every trade</li>
           </ul>
         </div>
@@ -243,9 +242,8 @@
           A visual overview of trading performance over time. All charts update automatically from your Notion data.
           <ul>
             <li>Use the <strong>period tabs</strong> (All / Week / Month / 3M) to filter the entire dashboard to a time range</li>
-            <li>The <strong>equity curve</strong> shows your cumulative P&L growing or falling over time — the shape of this line tells you everything about your consistency</li>
-            <li>The <strong>donut chart</strong> shows which instruments you trade most and what percentage of your trades each represents</li>
-            <li>The <strong>P&L calendar</strong> shows your daily profit or loss for each day — green days are profitable, red days are losses. Use the arrows to navigate between months</li>
+            <li>The <strong>equity curve</strong> shows your cumulative P&L growing or falling over time</li>
+            <li>The <strong>P&L calendar</strong> shows your daily profit or loss — green days profitable, red days losses</li>
             <li>The stats bar shows total trades, win rate, total P&L, average P&L per trade, and your best single trade</li>
           </ul>
           <div class="tip-box">
@@ -260,7 +258,7 @@
 
   <div class="divider"></div>
 
-  <!-- WHAT TO KNOW -->
+  <!-- KEY TERMS -->
   <div class="section">
     <div class="section-title">Key Terms & Concepts</div>
     <div style="display:flex;flex-direction:column;gap:1px;background:var(--border);">
@@ -269,61 +267,99 @@
         <div class="info-block-title">PDA Array (Premium / Discount Array)</div>
         <div class="info-block-body">A zone on the chart where price is likely to react. Examples: FVG, IFVG, Order Block, Breaker Block, Mitigation Block. These are the core entry tools in ICT methodology.</div>
       </div>
+
       <div class="info-block">
         <div class="info-block-title">IFVG — Inverse Fair Value Gap</div>
         <div class="info-block-body">A previously filled FVG that has been "inverted" and now acts as a support or resistance zone. Central to Dodgy's iFVG Ultimate+ model. Preferred entry for tightest stop placement.</div>
       </div>
+
       <div class="info-block">
         <div class="info-block-title">FVG — Fair Value Gap</div>
         <div class="info-block-body">A 3-candle imbalance where the middle candle's body leaves a gap between the wicks of the first and third candle. Price tends to return to fill these gaps before continuing.</div>
       </div>
+
+      <div class="info-block new">
+        <div class="info-block-title">First Presented FVG (9:30 AM Open) <span class="info-block-new-tag">new</span></div>
+        <div class="info-block-body">The first Fair Value Gap that forms at or immediately after the 9:30 AM NY open. Must be larger than 5 points to be considered valid. Context determines how you use it:
+          <ul>
+            <li><strong>Created during manipulation</strong> — acts as an IFVG/reversal zone. Fade it — price swept liquidity and is now reversing back through this gap</li>
+            <li><strong>Created during distribution</strong> — confirms continuation. Supports the idea of continued longs or shorts in the direction of the gap</li>
+          </ul>
+          This is a session-specific setup and only applies to the very first FVG of the NY session. Gaps smaller than 5 points are noise and should be ignored.
+        </div>
+      </div>
+
+      <div class="info-block new">
+        <div class="info-block-title">Rejection Block <span class="info-block-new-tag">new</span></div>
+        <div class="info-block-body">A candle or series of candles showing aggressive rejection of a key level, characterized by long wicks and a small body. The body of the rejection candle forms the entry zone, used similarly to an Order Block or Breaker as a PDA. Rejection Blocks signal that institutions defended that level strongly — entering on a retracement back into the body gives a tight stop and high probability of continuation in the rejection direction.</div>
+      </div>
+
       <div class="info-block">
         <div class="info-block-title">MSS — Market Structure Shift</div>
         <div class="info-block-body">A change in the direction of market structure. A bullish MSS occurs when price breaks above a prior swing high after a downtrend. A bearish MSS breaks a prior swing low. Used to confirm bias change.</div>
       </div>
+
       <div class="info-block">
         <div class="info-block-title">SMT — Smart Money Tool / Divergence</div>
         <div class="info-block-body">When two correlated instruments (e.g. NQ and ES) fail to make the same high or low together. This divergence signals that one market is being manipulated and a reversal is likely.</div>
       </div>
+
       <div class="info-block">
         <div class="info-block-title">Liquidity Sweep / BSL & SSL</div>
         <div class="info-block-body">BSL (Buy-Side Liquidity) sits above swing highs where stop losses cluster. SSL (Sell-Side Liquidity) sits below swing lows. Smart money sweeps these levels before reversing — this sweep is a preferred entry signal.</div>
       </div>
+
+      <div class="info-block new">
+        <div class="info-block-title">Stop Hunt <span class="info-block-new-tag">new</span></div>
+        <div class="info-block-body">A sharp, engineered price spike through a key level — a swing high, swing low, equal highs, or equal lows — designed to trigger clustered stop orders before reversing strongly in the opposite direction. Distinct from a general Liquidity Sweep in that a Stop Hunt is deliberate, fast, and typically followed immediately by a strong directional move back the other way. When you identify a Stop Hunt in real time, it significantly strengthens any entry model — the liquidity has been taken, the opposing side is trapped, and price is now free to deliver to the real target.</div>
+      </div>
+
       <div class="info-block">
         <div class="info-block-title">HTF PDA Delivery</div>
         <div class="info-block-body">Price delivering into a higher timeframe (Daily, 4H, 1H) Premium or Discount Array. This gives the trade a strong institutional reason for the reaction, greatly increasing confluence.</div>
       </div>
+
       <div class="info-block">
         <div class="info-block-title">Kill Zone</div>
         <div class="info-block-body">Specific session windows where institutional order flow is highest. London Open (2–5 AM EST) and NY AM (9:30–11 AM EST) are the primary kill zones used in this journal.</div>
       </div>
+
       <div class="info-block">
         <div class="info-block-title">Power of 3 (PO3)</div>
         <div class="info-block-body">ICT's model of Accumulation → Manipulation → Distribution within a session. Price first moves one way to grab liquidity (the Judas Swing), then reverses to deliver to the real target.</div>
       </div>
+
+      <div class="info-block new">
+        <div class="info-block-title">10 AM Reversal (Power of 3) <span class="info-block-new-tag">new</span></div>
+        <div class="info-block-body">A session-based setup where the 9:30–10:00 AM NY window acts as the manipulation/accumulation phase of the daily Power of 3. Price typically spikes sharply in the opposite direction of the day's true intent during the opening 30 minutes — this is the Judas Swing. At or around 10:00 AM, price reverses and begins the real delivery leg of the day. Popularized by the trader Powell, this setup requires identifying the correct bias beforehand and waiting patiently for the 10 AM reversal rather than chasing the opening move. Best used with HTF bias confirmation, a liquidity sweep during the 9:30–10:00 AM window, and an IFVG or FVG left by the reversal candle as the entry.</div>
+      </div>
+
+      <div class="info-block new">
+        <div class="info-block-title">RTH Gap (Regular Trading Hours Gap) <span class="info-block-new-tag">new</span></div>
+        <div class="info-block-body">The price gap between the previous day's 4:00 PM ET close and the current day's 9:30 AM ET open. Because futures trade nearly 24 hours but equity markets close at 4 PM, any significant overnight move creates a visible gap when the regular session opens. Price frequently returns to fill this gap during the session, making it a key magnet for price delivery and a useful reference point for bias confirmation. An unfilled RTH Gap above price supports bullish delivery; one below supports bearish delivery.</div>
+      </div>
+
       <div class="info-block">
         <div class="info-block-title">R:R — Risk to Reward</div>
         <div class="info-block-body">The ratio of potential loss (stop loss distance) to potential gain (take profit distance). A 1:3 R:R means risking $1 to make $3. Higher R:R setups are preferred, especially on A+ and above grades.</div>
       </div>
+
       <div class="info-block">
         <div class="info-block-title">CISD — Change in State of Delivery</div>
         <div class="info-block-body">A concept from ICT where price shifts from delivering bearishly to delivering bullishly (or vice versa) at a key PDA level. On a 1m chart, a CISD looks like price tapping into a PDA, printing a strong rejection candle that closes above (or below for shorts) the previous range, signalling that delivery has flipped. It's often used as a precision entry confirmation after a liquidity sweep — price sweeps SSL, CISD prints bullish, then you enter the IFVG left behind by the CISD candle.</div>
       </div>
+
       <div class="info-block">
         <div class="info-block-title">LRLR — Low Resistance Liquidity Run</div>
         <div class="info-block-body">A term used by Dodgy and other ICT traders to describe a clean, unobstructed path to a liquidity target. When there are no significant opposing PDAs, order blocks, or FVGs between current price and the target, price tends to move there quickly with little resistance. Identifying an LRLR above (for longs) or below (for shorts) before entering gives you a high confidence clear target — price has a clear runway to reach it. This is a strong confluence because it means your TP is likely to be hit without much chop.</div>
       </div>
+
     </div>
   </div>
 
 </div>
 <script>
   document.addEventListener('DOMContentLoaded', () => initNav('info'));
-</script>
-  <script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/dtjrl.github.io/sw.js');
-  }
 </script>
 </body>
 </html>
