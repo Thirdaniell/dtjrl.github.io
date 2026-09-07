@@ -59,8 +59,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
 
     <!-- WEEK HEADER -->
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;padding-bottom:1rem;border-bottom:1px solid var(--border);">
-      <div>
-        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.2em;color:var(--accent);text-transform:uppercase;margin-bottom:6px;">// Current Week</div>
+      <!-- WEEK SELECTOR -->
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.2em;color:var(--accent);text-transform:uppercase;">// Select Week</div>
+        <div style="display:flex;gap:1px;background:var(--border);" id="w-week-tabs"></div>
         <div style="font-family:var(--mono);font-size:16px;font-weight:700;color:var(--text);" id="w-week-label">Loading...</div>
       </div>
     </div>
@@ -166,25 +168,73 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
 <script>
 if (!requireAuth()) { /* redirected */ }
 
-const YT_RESOURCES={
-  'htf_bias':[{creator:'ICT',title:'HTF Bias & Top Down Analysis',url:'https://www.youtube.com/@InnerCircleTrader'},{creator:'Dodgy',title:'HTF Bias with iFVG Model',url:'https://www.youtube.com/@DodgyFX'},{creator:'BionicNQ',title:'Top Down Analysis NQ',url:'https://www.youtube.com/@BionicNQ'}],
-  'entry_model':[{creator:'Dodgy',title:'iFVG Ultimate+ Entry Model',url:'https://www.youtube.com/@DodgyFX'},{creator:'Lumi Traders',title:'FVG & IFVG Entries',url:'https://www.youtube.com/@LumiTraders'},{creator:'Tizz Trades',title:'ICT Entry Models Explained',url:'https://www.youtube.com/@TizzTrades'}],
-  'stop_loss':[{creator:'BionicNQ',title:'Stop Loss Placement & Management',url:'https://www.youtube.com/@BionicNQ'},{creator:'PBTrades',title:'SL Management ICT Style',url:'https://www.youtube.com/@PBTrades'},{creator:'ICT',title:'Stop Hunt & SL Concepts',url:'https://www.youtube.com/@InnerCircleTrader'}],
-  'trailing':[{creator:'BionicNQ',title:'Trade Management & Trailing',url:'https://www.youtube.com/@BionicNQ'},{creator:'PBTrades',title:'Exit Strategy & TSL',url:'https://www.youtube.com/@PBTrades'},{creator:'Lumi Traders',title:'Managing Winning Trades',url:'https://www.youtube.com/@LumiTraders'}],
-  'discipline':[{creator:'ICT',title:'Trading Psychology & Discipline',url:'https://www.youtube.com/@InnerCircleTrader'},{creator:'Tizz Trades',title:'Trader Mindset',url:'https://www.youtube.com/@TizzTrades'},{creator:'BionicNQ',title:'Consistency & Process',url:'https://www.youtube.com/@BionicNQ'}],
-  'liquidity':[{creator:'ICT',title:'Liquidity Concepts & Sweeps',url:'https://www.youtube.com/@InnerCircleTrader'},{creator:'Dodgy',title:'Liquidity in iFVG Model',url:'https://www.youtube.com/@DodgyFX'},{creator:'Lumi Traders',title:'BSL SSL Explained',url:'https://www.youtube.com/@LumiTraders'}],
-  'smt':[{creator:'ICT',title:'SMT Divergence Deep Dive',url:'https://www.youtube.com/@InnerCircleTrader'},{creator:'BionicNQ',title:'SMT NQ vs ES',url:'https://www.youtube.com/@BionicNQ'},{creator:'Tizz Trades',title:'Using SMT for Entries',url:'https://www.youtube.com/@TizzTrades'}],
-  'consolidation':[{creator:'BionicNQ',title:'Avoiding Consolidation Traps',url:'https://www.youtube.com/@BionicNQ'},{creator:'PBTrades',title:'Range vs Trend Identification',url:'https://www.youtube.com/@PBTrades'},{creator:'Lumi Traders',title:'Reading Market Structure',url:'https://www.youtube.com/@LumiTraders'}],
-  'general':[{creator:'Dodgy',title:'Full iFVG Model Breakdown',url:'https://www.youtube.com/@DodgyFX'},{creator:'ICT',title:'ICT Mentorship Series',url:'https://www.youtube.com/@InnerCircleTrader'},{creator:'BionicNQ',title:'NQ Futures Trading',url:'https://www.youtube.com/@BionicNQ'}]
-};
-
 let wState={existing:null,trades:[],weekStart:null,weekEnd:null,stats:null,aiCoaching:null};
 let wSelected={mental:0,discipline:0};
 
+// ── WEEK SELECTOR ─────────────────────────────────────────────────────────────
+function getWeekRangeOffset(weeksBack) {
+  const d = new Date();
+  d.setDate(d.getDate() - weeksBack * 7);
+  const day = d.getDay(), diff = d.getDate() - day;
+  const start = new Date(d); start.setDate(diff);
+  const end = new Date(start); end.setDate(end.getDate() + 6);
+  const fmt = d2 => d2.toISOString().split('T')[0];
+  return { start: fmt(start), end: fmt(end) };
+}
+
+function buildWeekTabs() {
+  const tabs = document.getElementById('w-week-tabs');
+  const labels = ['This Week', 'Last Week', '2 Weeks Ago'];
+  tabs.innerHTML = labels.map((lbl, i) => `
+    <button id="w-tab-${i}" onclick="switchWeek(${i})"
+      style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;padding:8px 16px;background:${i===0?'var(--accent)':'var(--surface)'};color:${i===0?'#000':'var(--text3)'};border:none;cursor:pointer;flex:1;transition:all 0.15s;">
+      ${lbl}
+    </button>`).join('');
+}
+
+let selectedWeekOffset = 0;
+
+async function switchWeek(offset) {
+  selectedWeekOffset = offset;
+  // Update tab styles
+  [0,1,2].forEach(i => {
+    const btn = document.getElementById(`w-tab-${i}`);
+    if (!btn) return;
+    btn.style.background = i === offset ? 'var(--accent)' : 'var(--surface)';
+    btn.style.color = i === offset ? '#000' : 'var(--text3)';
+  });
+  // Reset state
+  wState.existing = null;
+  wState.trades = [];
+  wState.aiCoaching = null;
+  wSelected.mental = 0;
+  wSelected.discipline = 0;
+  document.getElementById('w-locked').style.display = 'none';
+  document.getElementById('w-form').style.display = 'block';
+  document.getElementById('w-ai-section').style.display = 'none';
+  document.getElementById('w-submit-btn').style.display = 'none';
+  document.getElementById('w-went-well').value = '';
+  document.getElementById('w-improve').value = '';
+  document.getElementById('w-goal').value = '';
+  document.getElementById('w-focus').value = '';
+  document.querySelectorAll('.wstar').forEach(s => s.style.color = '#333');
+  document.getElementById('w-mental-val').textContent = '0 / 5';
+  document.getElementById('w-discipline-val').textContent = '0 / 5';
+  // Load the selected week
+  const { start, end } = getWeekRangeOffset(offset);
+  wState.weekStart = start; wState.weekEnd = end;
+  const s = new Date(start+'T12:00:00'), e = new Date(end+'T12:00:00');
+  document.getElementById('w-week-label').textContent = `Week of ${s.toLocaleDateString('en-US',{month:'long',day:'numeric'})} – ${e.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}`;
+  await wLoadTrades();
+  await wCheckExisting();
+}
+
 async function init(){
-  const{start,end}=getWeekRange();
+  buildWeekTabs();
+  const{start,end}=getWeekRangeOffset(0);
   wState.weekStart=start;wState.weekEnd=end;
-  document.getElementById('w-week-label').textContent=`Week of ${new Date(start+'T12:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric'})} – ${new Date(end+'T12:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}`;
+  const s=new Date(start+'T12:00:00'),e=new Date(end+'T12:00:00');
+  document.getElementById('w-week-label').textContent=`Week of ${s.toLocaleDateString('en-US',{month:'long',day:'numeric'})} – ${e.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}`;
   await wLoadTrades();
   await wCheckExisting();
   await wLoadHistory();
@@ -263,21 +313,7 @@ async function wAnalyze(){
   try{
     const data=await verifyTrade(prompt);
     const text=data.result||'No response.';
-    const lower=(improve+breaches+text).toLowerCase();
-    let ytTopics=[];
-    if(lower.includes('bias')||lower.includes('htf'))ytTopics.push('htf_bias');
-    if(lower.includes('entry')||lower.includes('fvg')||lower.includes('ifvg'))ytTopics.push('entry_model');
-    if(lower.includes('stop')||lower.includes('sl')||lower.includes('breakeven'))ytTopics.push('stop_loss');
-    if(lower.includes('trail')||lower.includes('tsl')||lower.includes('exit'))ytTopics.push('trailing');
-    if(lower.includes('fomo')||lower.includes('emotion')||lower.includes('discipline'))ytTopics.push('discipline');
-    if(lower.includes('liquid')||lower.includes('bsl')||lower.includes('ssl'))ytTopics.push('liquidity');
-    if(lower.includes('smt'))ytTopics.push('smt');
-    if(lower.includes('consolid')||lower.includes('chop')||lower.includes('rang'))ytTopics.push('consolidation');
-    if(ytTopics.length===0)ytTopics.push('general');
-    ytTopics=[...new Set(ytTopics)].slice(0,3);
-    const resources=ytTopics.flatMap(t=>YT_RESOURCES[t]||[]).slice(0,6);
-    const ytHtml=resources.map(r=>`<a href="${r.url}" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--surface2);border:1px solid var(--border2);text-decoration:none;margin-bottom:4px;transition:border-color 0.15s;" onmouseover="this.style.borderColor='#ff0000'" onmouseout="this.style.borderColor='var(--border2)'"><svg viewBox="0 0 24 24" width="14" height="14" fill="#ff4444" style="flex-shrink:0;"><path d="M23.5 6.19a3.02 3.02 0 0 0-2.12-2.14C19.53 3.5 12 3.5 12 3.5s-7.53 0-9.38.55A3.02 3.02 0 0 0 .5 6.19C0 8.05 0 12 0 12s0 3.95.5 5.81a3.02 3.02 0 0 0 2.12 2.14C4.47 20.5 12 20.5 12 20.5s7.53 0 9.38-.55a3.02 3.02 0 0 0 2.12-2.14C24 15.95 24 12 24 12s0-3.95-.5-5.81zM9.75 15.52V8.48L15.86 12l-6.11 3.52z"/></svg><div><div style="font-family:var(--mono);font-size:10px;color:var(--accent);">${r.creator}</div><div style="font-size:11px;color:var(--text2);">${r.title}</div></div><span style="margin-left:auto;font-family:var(--mono);font-size:9px;color:var(--text3);">↗</span></a>`).join('');
-    document.getElementById('w-ai-content').innerHTML=`<div style="font-size:13px;color:var(--text2);line-height:1.9;margin-bottom:1.5rem;">${text.replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</div><div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--text3);text-transform:uppercase;margin-bottom:8px;">Recommended watching this week</div>${ytHtml}`;
+    document.getElementById('w-ai-content').innerHTML=`<div style="font-size:13px;color:var(--text2);line-height:1.9;">${text.replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</div>`;
     wState.aiCoaching=text;document.getElementById('w-submit-btn').style.display='block';
   }catch(e){document.getElementById('w-ai-content').innerHTML=`<div style="color:var(--red);font-size:12px;">Error: ${e.message}</div>`;}
   btn.disabled=false;btn.textContent='⚡ Get AI Coaching';
