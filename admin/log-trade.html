@@ -78,6 +78,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
 /* PARTIAL EXITS */
 .partial-row{display:none;background:rgba(200,255,0,0.03);border:1px solid rgba(200,255,0,0.15);padding:1rem 1.25rem;}
+/* EMOTION BUTTONS */
+.emo-btn{font-family:var(--mono);font-size:10px;letter-spacing:0.04em;padding:5px 10px;background:var(--surface2);border:1px solid var(--border2);color:var(--text3);cursor:pointer;transition:all 0.12s;white-space:nowrap;}
+.emo-btn:hover{border-color:var(--text2);color:var(--text);}
+.emo-btn.selected{background:rgba(200,255,0,0.08);border-color:var(--accent);color:var(--accent);}
 @media(max-width:600px){.form-grid{grid-template-columns:1fr;}#main{padding-left:0;}}
 </style>
 </head>
@@ -98,7 +102,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
       <div class="field"><label>Direction</label><select id="f-direction"><option value="">Select...</option><option>Long</option><option>Short</option></select></div>
       <div class="field"><label>Session</label><select id="f-session"><option value="">Select...</option><option>Asia</option><option>London</option><option>NY AM</option><option>NY Lunch</option><option>NY PM</option><option>Overnight</option></select></div>
       <div class="field"><label>Timeframe</label><select id="f-timeframe"><option value="">Select...</option><option>1m</option><option>3m</option><option>5m</option><option>15m</option><option>1h</option><option>4h</option><option>Daily</option></select></div>
-      <div class="field"><label>HTF Timeframe</label><input type="text" id="f-htf" placeholder="e.g. 4H, 1H, 15m"></div>
+      <div class="field"><label>HTF Context</label><input type="text" id="f-htf" placeholder="e.g. 4H Quadrant discount, Daily IFVG, 15m First Presented FVG"></div>
       <div class="field"><label>Entry Model</label><input type="text" id="f-model" placeholder="e.g. 1m IFVG retracement"></div>
       <div class="field"><label>Date</label><input type="date" id="f-date"></div>
       <div class="field"><label>Outcome</label><select id="f-outcome"><option value="">Select...</option><option value="Closed - Win">Win</option><option value="Closed - Loss">Loss</option><option value="Breakeven">Breakeven</option></select></div>
@@ -142,6 +146,24 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
       <div class="field form-full"><label>Notes</label><textarea id="f-notes" placeholder="What happened during this trade?"></textarea></div>
       <div class="field form-full"><label>Mistakes</label><textarea id="f-mistakes" placeholder="What did you do wrong?"></textarea></div>
       <div class="field form-full"><label>Lessons Learned</label><textarea id="f-lessons" placeholder="What will you do differently?"></textarea></div>
+      <div class="field form-full">
+        <label>Emotions During Trade <span style="color:var(--text3);font-size:9px;">(select all that apply)</span></label>
+        <div id="f-emotions-wrap" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;">
+          <button type="button" class="emo-btn" data-emotion="Neutral / Calm" onclick="toggleEmotion(this)">😐 Neutral / Calm</button>
+          <button type="button" class="emo-btn" data-emotion="Focused / In the Zone" onclick="toggleEmotion(this)">🎯 Focused / In the Zone</button>
+          <button type="button" class="emo-btn" data-emotion="Confident" onclick="toggleEmotion(this)">💪 Confident</button>
+          <button type="button" class="emo-btn" data-emotion="Anxious / Nervous" onclick="toggleEmotion(this)">😰 Anxious / Nervous</button>
+          <button type="button" class="emo-btn" data-emotion="Frustrated" onclick="toggleEmotion(this)">😤 Frustrated</button>
+          <button type="button" class="emo-btn" data-emotion="Angry" onclick="toggleEmotion(this)">😠 Angry</button>
+          <button type="button" class="emo-btn" data-emotion="Tilted" onclick="toggleEmotion(this)">🤯 Tilted</button>
+          <button type="button" class="emo-btn" data-emotion="Greedy" onclick="toggleEmotion(this)">🤑 Greedy</button>
+          <button type="button" class="emo-btn" data-emotion="FOMO" onclick="toggleEmotion(this)">😨 FOMO</button>
+          <button type="button" class="emo-btn" data-emotion="Tired / Unfocused" onclick="toggleEmotion(this)">😴 Tired / Unfocused</button>
+          <button type="button" class="emo-btn" data-emotion="Revenge Mode" onclick="toggleEmotion(this)">🛑 Revenge Mode</button>
+          <button type="button" class="emo-btn" data-emotion="Overconfident" onclick="toggleEmotion(this)">😎 Overconfident</button>
+        </div>
+        <textarea id="f-emotion-notes" placeholder="Emotion notes — optional. What were you thinking or feeling? Any context..." style="font-family:var(--sans);font-size:13px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:8px 10px;width:100%;outline:none;resize:vertical;min-height:55px;line-height:1.6;transition:border-color 0.15s;margin-top:8px;" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border2)'"></textarea>
+      </div>
     </div>
 
     <button class="analyze-btn" id="analyze-btn" onclick="analyzeTrade()">⚡ Analyze & Preview Trade</button>
@@ -298,6 +320,15 @@ function resetImgUpload(prefix) {
 
 buildConfDropdown('conf-btn','conf-dropdown','conf-label','conf-tags','updateConf');
 
+function toggleEmotion(btn) { btn.classList.toggle('selected'); }
+function getSelectedEmotions() {
+  return Array.from(document.querySelectorAll('#f-emotions-wrap .emo-btn.selected')).map(b => b.dataset.emotion);
+}
+function resetEmotions() {
+  document.querySelectorAll('#f-emotions-wrap .emo-btn').forEach(b => b.classList.remove('selected'));
+  document.getElementById('f-emotion-notes').value = '';
+}
+
 let confOpen = false;
 let tradeData = {};
 const TP_LABELS = ['TP1','TP2','TP3','TP4','TP5','TP6','TP7','TP8','TP9','TP10'];
@@ -395,11 +426,13 @@ async function analyzeTrade() {
   const entryTime=getField('f-entry-time'),exitTime=getField('f-exit-time'),notes=getField('f-notes'),mistakes=getField('f-mistakes'),lessons=getField('f-lessons');
   const session=getField('f-session'),timeframe=getField('f-timeframe'),htf=getField('f-htf'),model=getField('f-model'),outcome=getField('f-outcome'),date=getField('f-date')||TODAY,screenshot=getField('f-screenshot');
   const confluences=getCheckedConf('conf-dropdown');
+  const emotions=getSelectedEmotions();
+  const emotionNotes=getField('f-emotion-notes');
   const tpRows=(contracts>1)?getTPRows().filter(r=>r.price&&r.contracts):[];
   let pnl=0;
   if(entry){if(tpRows.length>0){tpRows.forEach(r=>{pnl+=calcPnL(entry,r.price,r.contracts,instrument,direction);});}else if(exit){pnl=calcPnL(entry,exit,contracts,instrument,direction);}}
   const rr=calcRR(entry,sl,tp),duration=calcDuration(entryTime,exitTime);
-  tradeData={instrument,direction,session,timeframe,htf,model,date,entry,exit,sl,tp,contracts,entryTime,exitTime,pnl,rr,duration,confluences,grade:'Pending...',followedRules:'Pending...',outcome,notes,mistakes,lessons,screenshot,tpRows};
+  tradeData={instrument,direction,session,timeframe,htf,model,date,entry,exit,sl,tp,contracts,entryTime,exitTime,pnl,rr,duration,confluences,emotions,emotionNotes,grade:'Pending...',followedRules:'Pending...',outcome,notes,mistakes,lessons,screenshot,tpRows};
 
   const btn=document.getElementById('analyze-btn'); btn.disabled=true; btn.textContent='Analyzing...';
   document.getElementById('review-panel').style.display='block';
@@ -426,7 +459,7 @@ async function analyzeTrade() {
   document.getElementById('ai-verdict-badge').innerHTML='';
 
   try {
-    const tradeStr=[`Instrument: ${instrument}`,`Direction: ${direction}`,`Session: ${session}`,`Timeframe: ${timeframe}`,`HTF Timeframe: ${htf}`,`Entry Model: ${model}`,`Date: ${date}`,`Entry Price: ${entry} at ${entryTime}`,`Exit Price: ${exit} at ${exitTime}`,`Stop Loss: ${sl}`,`Take Profit: ${tp}`,`Contracts: ${contracts}`,`R:R: ${rr||''}`,`P&L: $${pnl}`,`Status: ${outcome}`,`Confluences: ${confluences.join(', ')}`,`Notes: ${notes}`,`Mistakes: ${mistakes}`,`Lessons Learned: ${lessons}`].filter(l=>!l.endsWith(': ')&&!l.endsWith(': null')&&!l.endsWith(': undefined')).join('\n');
+    const tradeStr=[`Instrument: ${instrument}`,`Direction: ${direction}`,`Session: ${session}`,`Timeframe: ${timeframe}`,`HTF Context: ${htf}`,`Entry Model: ${model}`,`Date: ${date}`,`Entry Price: ${entry} at ${entryTime}`,`Exit Price: ${exit} at ${exitTime}`,`Stop Loss: ${sl}`,`Take Profit: ${tp}`,`Contracts: ${contracts}`,`R:R: ${rr||''}`,`P&L: $${pnl}`,`Status: ${outcome}`,`Confluences: ${confluences.join(', ')}`,`Notes: ${notes}`,`Mistakes: ${mistakes}`,`Lessons Learned: ${lessons}`].filter(l=>!l.endsWith(': ')&&!l.endsWith(': null')&&!l.endsWith(': undefined')).join('\n');
     const data=await verifyTrade(tradeStr);
     const text=data.result||'No response.';
     if(data.grade&&data.grade!=='Pending...') tradeData.grade=data.grade;
@@ -460,7 +493,7 @@ async function submitTrade() {
   if(t.entry)props["Entry Price"]={number:t.entry};if(t.exit)props["Exit Price"]={number:t.exit};if(t.sl)props["Stop Loss"]={number:t.sl};if(t.tp)props["Take Profit"]={number:t.tp};if(t.rr)props["R:R"]={number:t.rr};if(t.duration)props["Duration (mins)"]={number:t.duration};if(t.entryTime)props["Entry Time"]={rich_text:[{text:{content:t.entryTime}}]};if(t.exitTime)props["Exit Time"]={rich_text:[{text:{content:t.exitTime}}]};
   const exitBreakdown=(t.tpRows&&t.tpRows.length>0)?'Exit breakdown: '+t.tpRows.map(r=>`${r.label}: ${r.contracts} contract${r.contracts>1?'s':''} @ ${r.price}${r.time?' at '+r.time:''}`).join(' · '):null;
   const fullNotes=[t.notes,exitBreakdown].filter(Boolean).join('\n');
-  if(fullNotes)props["Notes"]={rich_text:[{text:{content:fullNotes}}]};if(t.mistakes)props["Mistakes"]={rich_text:[{text:{content:t.mistakes}}]};if(t.lessons)props["Lessons Learned"]={rich_text:[{text:{content:t.lessons}}]};if(t.htf)props["HTF Timeframe"]={rich_text:[{text:{content:t.htf}}]};if(t.model)props["Entry Model"]={rich_text:[{text:{content:t.model}}]};if(t.confluences.length)props["Confluences"]={multi_select:t.confluences.map(c=>({name:c}))};
+  if(fullNotes)props["Notes"]={rich_text:[{text:{content:fullNotes}}]};if(t.mistakes)props["Mistakes"]={rich_text:[{text:{content:t.mistakes}}]};if(t.lessons)props["Lessons Learned"]={rich_text:[{text:{content:t.lessons}}]};if(t.htf)props["HTF Timeframe"]={rich_text:[{text:{content:t.htf}}]};if(t.model)props["Entry Model"]={rich_text:[{text:{content:t.model}}]};if(t.confluences.length)props["Confluences"]={multi_select:t.confluences.map(c=>({name:c}))};if(t.emotions&&t.emotions.length)props["Emotions"]={multi_select:t.emotions.map(e=>({name:e}))};if(t.emotionNotes)props["Emotion Notes"]={rich_text:[{text:{content:t.emotionNotes}}]};
   const body={parent:{database_id:DB_ID},properties:props};
   if(t.screenshot){body.children=[{object:'block',type:'paragraph',paragraph:{rich_text:[{type:'text',text:{content:'📸 Screenshot: '+t.screenshot,link:{url:t.screenshot}}}]}}];}
   try {
@@ -485,6 +518,7 @@ function resetForm() {
   document.getElementById('partial-pnl-preview').textContent='';
   document.getElementById('f-date').value=new Date().toISOString().split('T')[0];
   clearConf('conf-dropdown','conf-label','conf-tags');
+  resetEmotions();
   resetImgUpload('f');
 }
 </script>
