@@ -695,7 +695,9 @@
         <label class="conf-option"><input type="checkbox" value="IFVG" onchange="updateConfFilter()"> IFVG — Inverse Fair Value Gap</label>
         <label class="conf-option"><input type="checkbox" value="FVG" onchange="updateConfFilter()"> FVG — Fair Value Gap</label>
         <label class="conf-option"><input type="checkbox" value="First Presented FVG (9:30 AM Open)" onchange="updateConfFilter()"> First Presented FVG (9:30 AM Open)</label>
+        <label class="conf-option"><input type="checkbox" value="OTE — Optimal Trade Entry" onchange="updateConfFilter()"> OTE — Optimal Trade Entry</label>
         <label class="conf-option"><input type="checkbox" value="Rejection Block" onchange="updateConfFilter()"> Rejection Block</label>
+        <label class="conf-option"><input type="checkbox" value="Suspension Block" onchange="updateConfFilter()"> Suspension Block</label>
         <label class="conf-option"><input type="checkbox" value="CISD" onchange="updateConfFilter()"> CISD — Change in State of Delivery</label>
         <label class="conf-option"><input type="checkbox" value="Order Block" onchange="updateConfFilter()"> Order Block</label>
         <label class="conf-option"><input type="checkbox" value="Breaker Block" onchange="updateConfFilter()"> Breaker Block</label>
@@ -722,6 +724,7 @@
         <label class="conf-option"><input type="checkbox" value="Power of 3" onchange="updateConfFilter()"> Power of 3</label>
         <label class="conf-option"><input type="checkbox" value="10 AM Reversal (Power of 3)" onchange="updateConfFilter()"> 10 AM Reversal (Power of 3)</label>
         <label class="conf-option"><input type="checkbox" value="ATM Model (Asia Session)" onchange="updateConfFilter()"> ATM Model (Asia Session)</label>
+        <label class="conf-option"><input type="checkbox" value="Macro" onchange="updateConfFilter()"> Macro</label>
         <label class="conf-option"><input type="checkbox" value="Judas Swing" onchange="updateConfFilter()"> Judas Swing</label>
         <label class="conf-option"><input type="checkbox" value="Kill Zone" onchange="updateConfFilter()"> Kill Zone</label>
         <label class="conf-option"><input type="checkbox" value="RTH Gap" onchange="updateConfFilter()"> RTH Gap</label>
@@ -939,6 +942,14 @@ function extractAllImageUrls(blocks) {
   return urls;
 }
 
+// Throttle helper — wait ms between calls to avoid Notion 429
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+async function getPageContentThrottled(pageId, delay = 340) {
+  await sleep(delay);
+  return getPageContent(pageId);
+}
+
 async function loadTrades() {
   document.getElementById("main").innerHTML = `<div class="loading-state">Loading trades <span>...</span></div>`;
   document.getElementById("results-count").textContent = "";
@@ -952,14 +963,26 @@ async function loadTrades() {
       cursor = data.has_more ? data.next_cursor : null;
     } while (cursor);
 
-    const trades = await Promise.all(pages.map(async page => {
-      const t = parseProps(page);
-      const content = await getPageContent(page.id);
-      const allImgs = extractAllImageUrls(content);
-      t.screenshotUrl = extractTVUrl(content);
-      t.allImageUrls = allImgs.map(i => i.url);
-      return t;
-    }));
+    // Parse all props first (no API calls)
+    const trades = pages.map(page => parseProps(page));
+
+    // Fetch block content in batches of 5 with 350ms between each
+    // to stay under Notion's 3 req/sec limit
+    const BATCH = 5;
+    const DELAY = 350;
+    for (let i = 0; i < trades.length; i++) {
+      if (i > 0 && i % BATCH === 0) await sleep(1200); // pause between batches
+      else if (i > 0) await sleep(DELAY);
+      try {
+        const content = await getPageContent(pages[i].id);
+        const allImgs = extractAllImageUrls(content);
+        trades[i].screenshotUrl = extractTVUrl(content);
+        trades[i].allImageUrls  = allImgs.map(img => img.url);
+      } catch(e) {
+        trades[i].screenshotUrl = null;
+        trades[i].allImageUrls  = [];
+      }
+    }
 
     allTrades = trades.sort((a, b) => (b.date || "").localeCompare(a.date || ""));
     populateDateFilter();
