@@ -62,6 +62,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
 /* PARTIAL EXITS */
 .partial-row{display:none;background:rgba(200,255,0,0.03);border:1px solid rgba(200,255,0,0.15);padding:1rem 1.25rem;}
+/* EMOTION BUTTONS */
+.emo-btn{font-family:var(--mono);font-size:10px;letter-spacing:0.04em;padding:5px 10px;background:var(--surface2);border:1px solid var(--border2);color:var(--text3);cursor:pointer;transition:all 0.12s;white-space:nowrap;}
+.emo-btn:hover{border-color:var(--text2);color:var(--text);}
+.emo-btn.selected{background:rgba(200,255,0,0.08);border-color:var(--accent);color:var(--accent);}
 @media(max-width:600px){.form-grid{grid-template-columns:1fr;}#main{padding-left:0;}.trade-list-header,.trade-row{grid-template-columns:1fr 1fr auto;}.trade-list-header div:nth-child(3),.trade-list-header div:nth-child(4),.trade-row>*:nth-child(3),.trade-row>*:nth-child(4){display:none;}}
 </style>
 </head>
@@ -96,7 +100,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
         <div class="field"><label>Direction</label><select id="ef-direction"><option value="">Select...</option><option>Long</option><option>Short</option></select></div>
         <div class="field"><label>Session</label><select id="ef-session"><option value="">Select...</option><option>Asia</option><option>London</option><option>NY AM</option><option>NY Lunch</option><option>NY PM</option><option>Overnight</option></select></div>
         <div class="field"><label>Timeframe</label><select id="ef-timeframe"><option value="">Select...</option><option>1m</option><option>3m</option><option>5m</option><option>15m</option><option>1h</option><option>4h</option><option>Daily</option></select></div>
-        <div class="field"><label>HTF Timeframe</label><input type="text" id="ef-htf" placeholder="e.g. 4H, 1H, 15m"></div>
+        <div class="field"><label>HTF Context</label><input type="text" id="ef-htf" placeholder="e.g. 4H Quadrant discount, Daily IFVG, 15m First Presented FVG"></div>
         <div class="field"><label>Entry Model</label><input type="text" id="ef-model" placeholder="e.g. 1m IFVG retracement"></div>
         <div class="field"><label>Date</label><input type="date" id="ef-date"></div>
         <div class="field"><label>Outcome</label><select id="ef-outcome"><option value="">Select...</option><option value="Closed - Win">Win</option><option value="Closed - Loss">Loss</option><option value="Breakeven">Breakeven</option></select></div>
@@ -139,6 +143,24 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
         <div class="field form-full"><label>Notes</label><textarea id="ef-notes" placeholder="What happened during this trade?"></textarea></div>
         <div class="field form-full"><label>Mistakes</label><textarea id="ef-mistakes" placeholder="What did you do wrong?"></textarea></div>
         <div class="field form-full"><label>Lessons Learned</label><textarea id="ef-lessons" placeholder="What will you do differently?"></textarea></div>
+        <div class="field form-full">
+          <label>Emotions During Trade <span style="color:var(--text3);font-size:9px;">(select all that apply)</span></label>
+          <div id="ef-emotions-wrap" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;">
+            <button type="button" class="emo-btn" data-emotion="Neutral / Calm" onclick="toggleEmotion(this)">😐 Neutral / Calm</button>
+            <button type="button" class="emo-btn" data-emotion="Focused / In the Zone" onclick="toggleEmotion(this)">🎯 Focused / In the Zone</button>
+            <button type="button" class="emo-btn" data-emotion="Confident" onclick="toggleEmotion(this)">💪 Confident</button>
+            <button type="button" class="emo-btn" data-emotion="Anxious / Nervous" onclick="toggleEmotion(this)">😰 Anxious / Nervous</button>
+            <button type="button" class="emo-btn" data-emotion="Frustrated" onclick="toggleEmotion(this)">😤 Frustrated</button>
+            <button type="button" class="emo-btn" data-emotion="Angry" onclick="toggleEmotion(this)">😠 Angry</button>
+            <button type="button" class="emo-btn" data-emotion="Tilted" onclick="toggleEmotion(this)">🤯 Tilted</button>
+            <button type="button" class="emo-btn" data-emotion="Greedy" onclick="toggleEmotion(this)">🤑 Greedy</button>
+            <button type="button" class="emo-btn" data-emotion="FOMO" onclick="toggleEmotion(this)">😨 FOMO</button>
+            <button type="button" class="emo-btn" data-emotion="Tired / Unfocused" onclick="toggleEmotion(this)">😴 Tired / Unfocused</button>
+            <button type="button" class="emo-btn" data-emotion="Revenge Mode" onclick="toggleEmotion(this)">🛑 Revenge Mode</button>
+            <button type="button" class="emo-btn" data-emotion="Overconfident" onclick="toggleEmotion(this)">😎 Overconfident</button>
+          </div>
+          <textarea id="ef-emotion-notes" placeholder="Emotion notes — optional." style="font-family:var(--sans);font-size:13px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:8px 10px;width:100%;outline:none;resize:vertical;min-height:55px;line-height:1.6;transition:border-color 0.15s;margin-top:8px;" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border2)'"></textarea>
+        </div>
       </div>
       <button class="save-btn" id="ef-save-btn" onclick="saveEdit()">✓ Save Changes & Re-Verify</button>
       <div class="success-msg" id="edit-success-msg"></div>
@@ -156,6 +178,16 @@ const EF_TP_LABELS = ['TP1','TP2','TP3','TP4','TP5','TP6','TP7','TP8','TP9','TP1
 
 // Build confluence dropdown
 buildConfDropdown('ef-conf-btn','ef-conf-dropdown','ef-conf-label','ef-conf-tags','updateEditConf');
+
+function toggleEmotion(btn) { btn.classList.toggle('selected'); }
+function getSelectedEmotions(prefix) {
+  return Array.from(document.querySelectorAll(`#${prefix}-emotions-wrap .emo-btn.selected`)).map(b => b.dataset.emotion);
+}
+function setEmotions(prefix, values) {
+  document.querySelectorAll(`#${prefix}-emotions-wrap .emo-btn`).forEach(b => {
+    b.classList.toggle('selected', values.includes(b.dataset.emotion));
+  });
+}
 
 function toggleEditConf() {
   editConfOpen = !editConfOpen;
@@ -393,6 +425,10 @@ async function loadEditTrade(pageId) {
 
     setV('ef-mistakes',   getText('Mistakes'));
     setV('ef-lessons',    getText('Lessons Learned'));
+    // Emotions
+    const emotions = (p['Emotions']?.multi_select||[]).map(e=>e.name);
+    setEmotions('ef', emotions);
+    setV('ef-emotion-notes', getText('Emotion Notes'));
     // Screenshot
     try {
       const bdata = await notionGet(`/blocks/${pageId}/children`);
@@ -438,6 +474,8 @@ async function saveEdit() {
   const notes       = getField('ef-notes'),      mistakes  = getField('ef-mistakes');
   const lessons     = getField('ef-lessons'),    screenshot= getField('ef-screenshot');
   const confluences = getCheckedConf('ef-conf-dropdown');
+  const emotions    = getSelectedEmotions('ef');
+  const emotionNotes= getField('ef-emotion-notes');
 
   // ── P&L calc — use partial exits if present, else single entry/exit ──
   const tpRows = (contracts > 1) ? getEditTPRows().filter(r => r.price && r.contracts) : [];
@@ -455,7 +493,7 @@ async function saveEdit() {
   // Re-verify
   let grade = '', followedRules = 'Partially ⚠️';
   try {
-    const tradeStr = [`Instrument: ${instrument}`,`Direction: ${direction}`,`Session: ${session}`,`Timeframe: ${timeframe}`,`HTF Timeframe: ${htf}`,`Entry Model: ${model}`,`Date: ${date}`,`Entry Price: ${entry} at ${entryTime}`,`Exit Price: ${exit} at ${exitTime}`,`Stop Loss: ${sl}`,`Take Profit: ${tp}`,`Contracts: ${contracts}`,`R:R: ${rr||''}`,`P&L: $${pnl}`,`Status: ${outcome}`,`Confluences: ${confluences.join(', ')}`,`Notes: ${notes}`,`Mistakes: ${mistakes}`,`Lessons Learned: ${lessons}`].filter(l=>!l.endsWith(': ')&&!l.endsWith(': null')&&!l.endsWith(': undefined')).join('\n');
+    const tradeStr = [`Instrument: ${instrument}`,`Direction: ${direction}`,`Session: ${session}`,`Timeframe: ${timeframe}`,`HTF Context: ${htf}`,`Entry Model: ${model}`,`Date: ${date}`,`Entry Price: ${entry} at ${entryTime}`,`Exit Price: ${exit} at ${exitTime}`,`Stop Loss: ${sl}`,`Take Profit: ${tp}`,`Contracts: ${contracts}`,`R:R: ${rr||''}`,`P&L: $${pnl}`,`Status: ${outcome}`,`Confluences: ${confluences.join(', ')}`,`Notes: ${notes}`,`Mistakes: ${mistakes}`,`Lessons Learned: ${lessons}`].filter(l=>!l.endsWith(': ')&&!l.endsWith(': null')&&!l.endsWith(': undefined')).join('\n');
     const vdata = await verifyTrade(tradeStr);
     if (vdata.grade) grade = vdata.grade;
     const frMap = {'YES':'Yes ✅','PARTIALLY':'Partially ⚠️','NO':'No ❌'};
@@ -497,6 +535,8 @@ async function saveEdit() {
   if(grade)       props["Setup Grade"]    = {select:{name:grade}};
   props["Followed Rules"] = {select:{name:followedRules}};
   if(confluences.length) props["Confluences"] = {multi_select:confluences.map(c=>({name:c}))};
+  if(emotions.length)    props["Emotions"]    = {multi_select:emotions.map(e=>({name:e}))};
+  if(emotionNotes)       props["Emotion Notes"]= {rich_text:[{text:{content:emotionNotes}}]};
 
   try {
     const data = await notionPatch(`/pages/${editPageId}`, {properties:props});
