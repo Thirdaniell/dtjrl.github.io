@@ -558,9 +558,9 @@ canvas{
     </div>
 
     <div class="period-tabs">
-      <button class="period-tab active" data-period="all">All</button>
+      <button class="period-tab" data-period="all">All</button>
       <button class="period-tab" data-period="week">Week</button>
-      <button class="period-tab" data-period="month">Month</button>
+      <button class="period-tab active" data-period="month">Month</button>
       <button class="period-tab" data-period="3month">3M</button>
     </div>
   </div>
@@ -647,14 +647,16 @@ Chart.defaults.color = '#888';
 Chart.defaults.borderColor = '#2a2a2a';
 Chart.defaults.font.family = 'Space Mono, monospace';
 Chart.defaults.font.size = 11;
-let currentPeriod = 'all';
+let currentPeriod = 'month';
 let equityChart = null;
 let donutChart = null;
 
 async function fetchTrades() {
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
   try {
-    let pages = [], cursor = null;
+    let pages = [], cursor = null, pageNum = 0;
     do {
+      if (pageNum > 0) await sleep(400); // throttle between pages to avoid 429
       const body = { page_size: 100 };
       if (cursor) body.start_cursor = cursor;
       const res = await fetch(`${WORKER_URL}/notion/databases/${DATABASE_ID}/query`, {
@@ -666,6 +668,7 @@ async function fetchTrades() {
       const data = await res.json();
       pages = pages.concat(data.results || []);
       cursor = data.has_more ? data.next_cursor : null;
+      pageNum++;
     } while (cursor);
 
     allTrades = pages.map(page => {
