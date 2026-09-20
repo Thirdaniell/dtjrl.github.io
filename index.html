@@ -993,6 +993,8 @@ async function loadTrades() {
   }
 }
 
+const CARDS_PER_BATCH = 15;
+
 async function loadNextCardBatch(filtered) {
   if (isLoadingCards) return;
   const remaining = filtered.slice(cardCursor, cardCursor + CARDS_PER_BATCH);
@@ -1000,29 +1002,17 @@ async function loadNextCardBatch(filtered) {
   isLoadingCards = true;
 
   const sentinel = document.getElementById("load-more-sentinel");
-  if (sentinel) sentinel.innerHTML =
-    `<div style="font-family:var(--mono);font-size:10px;color:var(--text3);text-align:center;padding:1rem;letter-spacing:0.1em;animation:blink 1s infinite;">Loading ${remaining.length} more...</div>`;
 
-  // Fetch block content for this batch sequentially with small delay
-  for (let i = 0; i < remaining.length; i++) {
-    const t = remaining[i];
-    if (i > 0) await sleep(300);
-    try {
-      const content = await getPageContent(t.id);
-      const allImgs = extractAllImageUrls(content);
-      t.screenshotUrl = extractTVUrl(content);
-      t.allImageUrls  = allImgs.map(img => img.url);
-    } catch(e) {
-      t.screenshotUrl = null;
-      t.allImageUrls  = [];
-    }
-    // Append card to grid as soon as it's ready
-    const grid = document.getElementById("cards-grid");
+  // Step 1 — Render all cards immediately without screenshots
+  const grid = document.getElementById("cards-grid");
+  remaining.forEach(t => {
+    t.screenshotUrl = t.screenshotUrl || null;
+    t.allImageUrls  = t.allImageUrls  || [];
     if (grid) grid.insertAdjacentHTML("beforeend", renderCard(t));
     loadedCards.push(t);
-  }
-
+  });
   cardCursor += remaining.length;
+
   if (sentinel) {
     if (cardCursor >= filtered.length) {
       sentinel.innerHTML = filtered.length > CARDS_PER_BATCH
@@ -1033,6 +1023,31 @@ async function loadNextCardBatch(filtered) {
     }
   }
   isLoadingCards = false;
+
+  // Step 2 — Lazy-load screenshots in background (3 at a time, 250ms apart)
+  // Only fetch for trades that don't already have screenshots
+  const needsScreenshot = remaining.filter(t => !t._screenshotLoaded);
+  for (let i = 0; i < needsScreenshot.length; i++) {
+    const t = needsScreenshot[i];
+    if (i > 0) await sleep(250);
+    try {
+      const content = await getPageContent(t.id);
+      const allImgs = extractAllImageUrls(content);
+      t.screenshotUrl   = extractTVUrl(content);
+      t.allImageUrls    = allImgs.map(img => img.url);
+      t._screenshotLoaded = true;
+      // Update the chart section of this card in-place
+      const cardEl = document.getElementById(`card-${t.id}`);
+      if (cardEl) {
+        const imgKey = t.id.replace(/-/g,'');
+        tradeImageMap[imgKey] = t.allImageUrls.length ? t.allImageUrls : (t.screenshotUrl ? [t.screenshotUrl] : []);
+        const chartSection = cardEl.querySelector('.card-chart-section');
+        if (chartSection) chartSection.innerHTML = buildChartHtml(t.screenshotUrl, t.allImageUrls);
+      }
+    } catch(e) {
+      t._screenshotLoaded = true; // mark as attempted so we don't retry
+    }
+  }
 }
 
 let scrollObserver = null;
@@ -1225,7 +1240,7 @@ function renderCard(t) {
     </div>
     ${t.confluences.length ? `<div class="divider"></div><div class="confs">${t.confluences.map(c => `<span class="conf-tag">${c}</span>`).join("")}</div>` : ""}
     <div class="divider"></div>
-    ${chartHtml}
+    <div class="card-chart-section">${chartHtml}</div>
     ${notesHtml ? `<div class="divider"></div><div class="notes-block">${notesHtml}</div>` : ""}
   </div>`;
 }
