@@ -944,12 +944,11 @@ function extractAllImageUrls(blocks) {
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 // Pagination state
-let allTradeProps = [];   // all trade properties (no blocks) — for stats + filters
-let loadedCards   = [];   // trades with block content loaded — for rendering cards
-let cardCursor    = 0;    // index into allTradeProps for next batch to load
-const CARDS_PER_BATCH = 20;
+let allTradeProps  = [];   // all trade properties (no blocks) — for stats + filters
+let loadedCards    = [];   // cards rendered so far
+let cardCursor     = 0;    // index into filtered for next batch
 let isLoadingCards = false;
-let notionPageMap  = {};  // pageId → raw page object
+let notionPageMap  = {};   // pageId → raw page object
 
 async function loadTrades() {
   document.getElementById("main").innerHTML = `<div class="loading-state">Loading trades <span>...</span></div>`;
