@@ -824,8 +824,6 @@
 const WORKER_URL = "https://trade-journal-proxy.daniel-mouldd.workers.dev";
 const DATABASE_ID = "5398f956345943b7b12b2298bbb6e127";
 
-let allTrades = [];
-
 async function notionQuery(cursor) {
   const body = { page_size: 100 };
   if (cursor) body.start_cursor = cursor;
@@ -942,73 +940,133 @@ function extractAllImageUrls(blocks) {
   return urls;
 }
 
-// Throttle helper — wait ms between calls to avoid Notion 429
+// Throttle helper
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
-async function getPageContentThrottled(pageId, delay = 340) {
-  await sleep(delay);
-  return getPageContent(pageId);
-}
+// Pagination state
+let allTradeProps = [];   // all trade properties (no blocks) — for stats + filters
+let loadedCards   = [];   // trades with block content loaded — for rendering cards
+let cardCursor    = 0;    // index into allTradeProps for next batch to load
+const CARDS_PER_BATCH = 20;
+let isLoadingCards = false;
+let notionPageMap  = {};  // pageId → raw page object
 
 async function loadTrades() {
   document.getElementById("main").innerHTML = `<div class="loading-state">Loading trades <span>...</span></div>`;
   document.getElementById("results-count").textContent = "";
+  allTradeProps = []; loadedCards = []; cardCursor = 0; notionPageMap = {};
 
   try {
-    let pages = [];
-    let cursor = null;
+    // Step 1 — Fetch ALL trade properties (fast, no block fetches)
+    // One paginated query loop — properties only, no screenshots yet
+    let pages = [], cursor = null;
     do {
       const data = await notionQuery(cursor);
-      pages = pages.concat(data.results || []);
+      const batch = data.results || [];
+      batch.forEach(p => { notionPageMap[p.id] = p; });
+      pages = pages.concat(batch);
       cursor = data.has_more ? data.next_cursor : null;
     } while (cursor);
 
-    // Parse all props first (no API calls)
-    const trades = pages.map(page => parseProps(page));
+    // Parse props for all trades
+    allTradeProps = pages.map(p => parseProps(p))
+      .sort((a,b) => (b.date||"").localeCompare(a.date||""));
 
-    // Fetch block content in batches of 5 with 350ms between each
-    // to stay under Notion's 3 req/sec limit
-    const BATCH = 5;
-    const DELAY = 350;
-    for (let i = 0; i < trades.length; i++) {
-      if (i > 0 && i % BATCH === 0) await sleep(1200); // pause between batches
-      else if (i > 0) await sleep(DELAY);
-      try {
-        const content = await getPageContent(pages[i].id);
-        const allImgs = extractAllImageUrls(content);
-        trades[i].screenshotUrl = extractTVUrl(content);
-        trades[i].allImageUrls  = allImgs.map(img => img.url);
-      } catch(e) {
-        trades[i].screenshotUrl = null;
-        trades[i].allImageUrls  = [];
-      }
-    }
+    // Step 2 — Update stats from ALL trades immediately (all-time accurate)
+    updateStats(getFiltered());
+    const filtered = getFiltered();
+    document.getElementById("results-count").textContent =
+      `${filtered.length} trade${filtered.length !== 1 ? "s" : ""}`;
 
-    allTrades = trades.sort((a, b) => (b.date || "").localeCompare(a.date || ""));
-    populateDateFilter();
-    renderAll();
+    // Step 3 — Load first batch of cards with screenshots
+    document.getElementById("main").innerHTML =
+      `<div class="cards" id="cards-grid"></div>
+       <div id="load-more-sentinel" style="height:40px;"></div>`;
+    await loadNextCardBatch(filtered);
+
+    // Step 4 — Set up infinite scroll observer
+    setupInfiniteScroll(filtered);
 
   } catch(e) {
-    document.getElementById("main").innerHTML = `<div class="error-state">Error: ${e.message}<br><br>Make sure your Worker URL is set correctly in the HTML file.</div>`;
+    document.getElementById("main").innerHTML =
+      `<div class="error-state">Error: ${e.message}<br><br>Make sure your Worker URL is set correctly.</div>`;
   }
+}
+
+async function loadNextCardBatch(filtered) {
+  if (isLoadingCards) return;
+  const remaining = filtered.slice(cardCursor, cardCursor + CARDS_PER_BATCH);
+  if (!remaining.length) return;
+  isLoadingCards = true;
+
+  const sentinel = document.getElementById("load-more-sentinel");
+  if (sentinel) sentinel.innerHTML =
+    `<div style="font-family:var(--mono);font-size:10px;color:var(--text3);text-align:center;padding:1rem;letter-spacing:0.1em;animation:blink 1s infinite;">Loading ${remaining.length} more...</div>`;
+
+  // Fetch block content for this batch sequentially with small delay
+  for (let i = 0; i < remaining.length; i++) {
+    const t = remaining[i];
+    if (i > 0) await sleep(300);
+    try {
+      const content = await getPageContent(t.id);
+      const allImgs = extractAllImageUrls(content);
+      t.screenshotUrl = extractTVUrl(content);
+      t.allImageUrls  = allImgs.map(img => img.url);
+    } catch(e) {
+      t.screenshotUrl = null;
+      t.allImageUrls  = [];
+    }
+    // Append card to grid as soon as it's ready
+    const grid = document.getElementById("cards-grid");
+    if (grid) grid.insertAdjacentHTML("beforeend", renderCard(t));
+    loadedCards.push(t);
+  }
+
+  cardCursor += remaining.length;
+  if (sentinel) {
+    if (cardCursor >= filtered.length) {
+      sentinel.innerHTML = filtered.length > CARDS_PER_BATCH
+        ? `<div style="font-family:var(--mono);font-size:10px;color:var(--text3);text-align:center;padding:1rem;letter-spacing:0.1em;">— All ${filtered.length} trades loaded —</div>`
+        : '';
+    } else {
+      sentinel.innerHTML = '';
+    }
+  }
+  isLoadingCards = false;
+}
+
+let scrollObserver = null;
+function setupInfiniteScroll(filtered) {
+  if (scrollObserver) scrollObserver.disconnect();
+  const sentinel = document.getElementById("load-more-sentinel");
+  if (!sentinel) return;
+  scrollObserver = new IntersectionObserver(async entries => {
+    if (entries[0].isIntersecting && !isLoadingCards && cardCursor < filtered.length) {
+      await loadNextCardBatch(filtered);
+    }
+  }, { rootMargin: "200px" });
+  scrollObserver.observe(sentinel);
 }
 
 function populateDateFilter() { /* date range inputs — no population needed */ }
 
-function getFiltered() {
-  const selectedConfs = Array.from(document.querySelectorAll('#conf-dropdown input[type=checkbox]:checked')).map(cb => cb.value);
-  const session = document.getElementById("f-session").value;
-  const dir = document.getElementById("f-dir").value;
-  const inst = document.getElementById("f-inst").value;
-  const outcome = document.getElementById("f-outcome").value;
-  const grade = document.getElementById("f-grade").value;
-  const rules = document.getElementById("f-rules").value;
-  const tf = document.getElementById("f-tf").value;
-  const sort = document.getElementById("f-sort").value;
-  const dateFrom = document.getElementById("f-date-from")?.value || '';
-  const dateTo = document.getElementById("f-date-to")?.value || '';
+let allTrades = []; // kept for backward compat — points to allTradeProps
 
-  let filtered = allTrades.filter(t => {
+function getFiltered() {
+  const trades = allTradeProps.length ? allTradeProps : allTrades;
+  const selectedConfs = Array.from(document.querySelectorAll('#conf-dropdown input[type=checkbox]:checked')).map(cb => cb.value);
+  const session  = document.getElementById("f-session").value;
+  const dir      = document.getElementById("f-dir").value;
+  const inst     = document.getElementById("f-inst").value;
+  const outcome  = document.getElementById("f-outcome").value;
+  const grade    = document.getElementById("f-grade").value;
+  const rules    = document.getElementById("f-rules").value;
+  const tf       = document.getElementById("f-tf").value;
+  const sort     = document.getElementById("f-sort").value;
+  const dateFrom = document.getElementById("f-date-from")?.value || '';
+  const dateTo   = document.getElementById("f-date-to")?.value || '';
+
+  let filtered = trades.filter(t => {
     if (selectedConfs.length > 0 && !selectedConfs.every(sc => t.confluences.includes(sc))) return false;
     if (session && t.session !== session) return false;
     if (dir && t.direction !== dir) return false;
@@ -1028,6 +1086,27 @@ function getFiltered() {
   else filtered.sort((a,b) => b.date.localeCompare(a.date));
 
   return filtered;
+}
+
+function renderAll() {
+  if (!allTradeProps.length && !allTrades.length) return;
+  const filtered = getFiltered();
+  updateStats(filtered);
+  document.getElementById("results-count").textContent =
+    `${filtered.length} trade${filtered.length !== 1 ? "s" : ""}`;
+
+  if (!filtered.length) {
+    document.getElementById("main").innerHTML = `<div class="empty-state">No trades match your filters</div>`;
+    return;
+  }
+
+  // Reset card pagination and reload with new filter
+  loadedCards = []; cardCursor = 0; isLoadingCards = false;
+  if (scrollObserver) scrollObserver.disconnect();
+  document.getElementById("main").innerHTML =
+    `<div class="cards" id="cards-grid"></div>
+     <div id="load-more-sentinel" style="height:40px;"></div>`;
+  loadNextCardBatch(filtered).then(() => setupInfiniteScroll(filtered));
 }
 
 function updateStats(trades) {
@@ -1435,18 +1514,6 @@ document.addEventListener('keydown', e => {
   if (e.key === 'ArrowRight') overlayNav(1);
   if (e.key === 'ArrowLeft') overlayNav(-1);
 });
-
-function renderAll() {
-  const filtered = getFiltered();
-  updateStats(filtered);
-  document.getElementById("results-count").textContent = `${filtered.length} trade${filtered.length !== 1 ? "s" : ""}`;
-
-  if (!filtered.length) {
-    document.getElementById("main").innerHTML = `<div class="empty-state">No trades match your filters</div>`;
-    return;
-  }
-  document.getElementById("main").innerHTML = `<div class="cards">${filtered.map(renderCard).join("")}</div>`;
-}
 
 document.addEventListener("DOMContentLoaded", () => initNav("index"));
 initConfDropdown();
