@@ -1041,7 +1041,7 @@ async function loadNextCardBatch(filtered) {
         const imgKey = t.id.replace(/-/g,'');
         tradeImageMap[imgKey] = t.allImageUrls.length ? t.allImageUrls : (t.screenshotUrl ? [t.screenshotUrl] : []);
         const chartSection = cardEl.querySelector('.card-chart-section');
-        if (chartSection) chartSection.innerHTML = buildChartHtml(t.screenshotUrl, t.allImageUrls);
+        if (chartSection) chartSection.innerHTML = buildChartHtml(t.screenshotUrl, t.allImageUrls, imgKey);
       }
     } catch(e) {
       t._screenshotLoaded = true; // mark as attempted so we don't retry
