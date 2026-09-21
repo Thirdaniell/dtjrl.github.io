@@ -1141,6 +1141,44 @@ function updateStats(trades) {
   avgEl.className = "stat-value" + (avg > 0 ? " pos" : avg < 0 ? " neg" : "");
 }
 
+// ---- Build chart HTML — top-level so lazy-load can call it too ----
+function buildChartHtml(url, allUrls, imgKey) {
+  const imgs = (allUrls && allUrls.length > 0) ? allUrls : (url ? [url] : []);
+  if (!imgs.length) return `<div class="no-chart">No chart attached</div>`;
+
+  const isImg = u => /\.(png|jpg|jpeg|gif|webp)(\?.*)?$/i.test(u) || u.includes('imgur.com');
+  const toDirectUrl = u => u.includes('imgur.com/') && !u.includes('i.imgur.com') ? u.replace('imgur.com/', 'i.imgur.com/') : u;
+
+  const imageUrls = imgs.filter(isImg).map(toDirectUrl);
+  const tvUrl = imgs.find(u => u.includes('tradingview.com'));
+
+  if (!imageUrls.length && tvUrl) {
+    return `<a class="chart-link" href="${tvUrl}" target="_blank" rel="noopener">
+      <span>View chart on TradingView</span>
+      <span class="chart-link-arrow">↗</span>
+    </a>`;
+  }
+
+  if (imageUrls.length === 1) {
+    return `<div style="position:relative;">
+      <img src="${imageUrls[0]}" alt="Trade chart" loading="lazy"
+        class="chart-thumb"
+        onclick="openChartOverlay('${imgKey}',0)">
+      <div class="chart-expand-badge">⤢ Expand</div>
+    </div>`;
+  }
+
+  return `<div style="display:grid;grid-template-columns:repeat(${Math.min(imageUrls.length,3)},1fr);gap:2px;">
+    ${imageUrls.map((u,i) => `
+      <div style="position:relative;">
+        <img src="${u}" alt="Chart ${i+1}" loading="lazy"
+          class="chart-thumb"
+          onclick="openChartOverlay('${imgKey}',${i})">
+        ${i===0&&imageUrls.length>1?`<div class="chart-expand-badge">${imageUrls.length} imgs</div>`:''}
+      </div>`).join('')}
+  </div>`;
+}
+
 // Global map of trade image URLs — avoids inline JSON/quoting issues in onclick
 const tradeImageMap = {};
 
@@ -1157,43 +1195,7 @@ function renderCard(t) {
   const allImgs = (t.allImageUrls && t.allImageUrls.length) ? t.allImageUrls : (t.screenshotUrl ? [t.screenshotUrl] : []);
   tradeImageMap[imgKey] = allImgs;
 
-  function buildChartHtml(url, allUrls) {
-    const imgs = (allUrls && allUrls.length > 0) ? allUrls : (url ? [url] : []);
-    if (!imgs.length) return `<div class="no-chart">No chart attached</div>`;
-
-    const isImg = u => /\.(png|jpg|jpeg|gif|webp)(\?.*)?$/i.test(u) || u.includes('imgur.com');
-    const toDirectUrl = u => u.includes('imgur.com/') && !u.includes('i.imgur.com') ? u.replace('imgur.com/', 'i.imgur.com/') : u;
-
-    const imageUrls = imgs.filter(isImg).map(toDirectUrl);
-    const tvUrl = imgs.find(u => u.includes('tradingview.com'));
-
-    if (!imageUrls.length && tvUrl) {
-      return `<a class="chart-link" href="${tvUrl}" target="_blank" rel="noopener">
-        <span>View chart on TradingView</span>
-        <span class="chart-link-arrow">↗</span>
-      </a>`;
-    }
-
-    if (imageUrls.length === 1) {
-      return `<div style="position:relative;">
-        <img src="${imageUrls[0]}" alt="Trade chart" loading="lazy"
-          class="chart-thumb"
-          onclick="openChartOverlay('${imgKey}',0)">
-        <div class="chart-expand-badge">⤢ Expand</div>
-      </div>`;
-    }
-
-    return `<div style="display:grid;grid-template-columns:repeat(${Math.min(imageUrls.length,3)},1fr);gap:2px;">
-      ${imageUrls.map((u,i) => `
-        <div style="position:relative;">
-          <img src="${u}" alt="Chart ${i+1}" loading="lazy"
-            class="chart-thumb"
-            onclick="openChartOverlay('${imgKey}',${i})">
-          ${i===0&&imageUrls.length>1?`<div class="chart-expand-badge">${imageUrls.length} imgs</div>`:''}
-        </div>`).join('')}
-    </div>`;
-  }
-  const chartHtml = buildChartHtml(t.screenshotUrl, t.allImageUrls);
+  const chartHtml = buildChartHtml(t.screenshotUrl, t.allImageUrls, imgKey);
 
   const notesHtml = [
     t.notes ? `<div class="note-item"><div class="field-label">Notes</div><div class="field-value">${t.notes}</div></div>` : "",
