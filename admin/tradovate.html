@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Import from Tradovate — FTJ Admin</title>
+<link rel="manifest" href="../manifest.json">
+<meta name="theme-color" content="#0a0a0a">
+<link rel="icon" type="image/png" href="https://i.imgur.com/ZP2pTk2.png">
+<link rel="stylesheet" href="../mobile.css">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0a0a;--surface:#111;--surface2:#181818;--border:#1a1a1a;--border2:#2a2a2a;--text:#e8e8e8;--text2:#888;--text3:#444;--green:#00e676;--red:#ff4444;--yellow:#ffd740;--accent:#c8ff00;--mono:'Space Mono',monospace;--sans:'DM Sans',sans-serif;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;min-height:100vh;}
+::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--border2);}
+#main{padding-left:64px;}
+.page{max-width:860px;margin:0 auto;padding:3rem 2rem 5rem;}
+.sidenav-admin{position:fixed;left:0;top:0;bottom:0;width:64px;background:var(--bg);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:1.5rem 0;z-index:200;}
+.nav-logo-a{font-family:var(--mono);font-size:9px;letter-spacing:0.1em;color:var(--accent);writing-mode:vertical-rl;margin-bottom:2rem;}
+.nav-admin-tag{font-family:var(--mono);font-size:8px;letter-spacing:0.12em;color:var(--red);writing-mode:vertical-rl;margin-top:auto;}
+.back-btn{font-family:var(--mono);font-size:10px;letter-spacing:0.1em;color:var(--text3);background:none;border:1px solid var(--border2);padding:6px 14px;cursor:pointer;text-transform:uppercase;transition:all 0.15s;text-decoration:none;display:inline-block;margin-bottom:2rem;}
+.back-btn:hover{color:var(--accent);border-color:var(--accent);}
+.page-eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:0.2em;color:var(--accent);text-transform:uppercase;margin-bottom:8px;}
+.page-title{font-family:var(--mono);font-size:28px;font-weight:700;line-height:1.1;margin-bottom:2rem;}
+/* LOGIN FORM */
+.login-box{background:var(--surface);border:1px solid var(--border2);padding:1.5rem;display:flex;flex-direction:column;gap:12px;max-width:440px;}
+.field label{font-family:var(--mono);font-size:9px;letter-spacing:0.14em;color:var(--text3);text-transform:uppercase;display:block;margin-bottom:5px;}
+.field input{font-family:var(--mono);font-size:12px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:9px 12px;width:100%;outline:none;transition:border-color 0.15s;}
+.field input:focus{border-color:var(--accent);}
+.btn-primary{font-family:var(--mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;padding:12px;background:var(--accent);color:#000;border:none;cursor:pointer;font-weight:700;transition:opacity 0.15s;width:100%;}
+.btn-primary:hover{opacity:0.85;}
+.btn-primary:disabled{opacity:0.35;cursor:not-allowed;}
+.btn-secondary{font-family:var(--mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;padding:10px;background:none;color:var(--text2);border:1px solid var(--border2);cursor:pointer;transition:all 0.15s;width:100%;}
+.btn-secondary:hover{border-color:var(--accent);color:var(--accent);}
+.status-msg{font-family:var(--mono);font-size:10px;letter-spacing:0.08em;padding:8px 12px;display:none;}
+.status-ok{background:rgba(0,230,118,0.07);border:1px solid rgba(0,230,118,0.3);color:var(--green);}
+.status-err{background:rgba(255,68,68,0.07);border:1px solid rgba(255,68,68,0.3);color:var(--red);}
+.status-info{background:rgba(200,255,0,0.04);border:1px solid rgba(200,255,0,0.2);color:var(--accent);}
+/* ACCOUNT SELECTOR */
+.account-row{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--surface);border:1px solid var(--border2);cursor:pointer;transition:background 0.12s;margin-bottom:1px;}
+.account-row:hover,.account-row.selected{background:var(--surface2);border-color:var(--accent);}
+.account-name{font-family:var(--mono);font-size:11px;color:var(--text);}
+.account-badge{font-family:var(--mono);font-size:9px;padding:2px 7px;border:1px solid var(--border2);color:var(--text3);}
+/* TRADE LIST */
+.trade-import-row{display:grid;grid-template-columns:90px 60px 60px 80px 80px 80px auto;gap:10px;align-items:center;padding:10px 14px;background:var(--surface);border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.12s;}
+.trade-import-row:hover{background:var(--surface2);}
+.trade-import-row.selected{background:rgba(200,255,0,0.04);border-left:2px solid var(--accent);}
+.trade-import-header{display:grid;grid-template-columns:90px 60px 60px 80px 80px 80px auto;gap:10px;padding:8px 14px;background:var(--surface2);border-bottom:1px solid var(--border);}
+.trade-import-header div{font-family:var(--mono);font-size:8px;letter-spacing:0.12em;color:var(--text3);text-transform:uppercase;}
+.section-label{font-family:var(--mono);font-size:9px;letter-spacing:0.2em;color:var(--text3);text-transform:uppercase;margin-bottom:8px;margin-top:1.5rem;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+.loading{font-family:var(--mono);font-size:10px;color:var(--text3);animation:blink 1s infinite;padding:1.5rem;text-align:center;}
+@media(max-width:600px){#main{padding-left:0;}.trade-import-row,.trade-import-header{grid-template-columns:80px 50px 50px 70px auto;}.trade-import-header div:nth-child(4),.trade-import-header div:nth-child(5),.trade-import-row>*:nth-child(4),.trade-import-row>*:nth-child(5){display:none;}}
+</style>
+</head>
+<body>
+<div id="main">
+  <nav class="sidenav-admin">
+    <div class="nav-logo-a">// FTJ</div>
+    <div class="nav-admin-tag">ADMIN</div>
+  </nav>
+  <div class="page">
+    <a href="admin.html" class="back-btn">← Back to Admin</a>
+    <div class="page-eyebrow">// Admin</div>
+    <div class="page-title">Import from Tradovate</div>
+    <p style="font-size:13px;color:var(--text2);margin:0 0 1.5rem;line-height:1.7;">Connect your Tradovate account to pull recent trades and pre-fill the log form automatically. Your credentials are stored only in this browser session and never saved anywhere.</p>
+
+    <!-- STEP 1 — LOGIN -->
+    <div id="step-login">
+      <div class="section-label">Step 1 — Connect Tradovate</div>
+      <div class="login-box">
+        <div style="font-family:var(--mono);font-size:9px;color:var(--text3);line-height:1.8;">Enter your Tradovate login credentials. These are sent directly to Tradovate's API — never stored by FTJ.</div>
+        <div class="field"><label>Tradovate Username</label><input type="text" id="tv-username" placeholder="your@email.com" autocomplete="username"></div>
+        <div class="field"><label>Password</label><input type="password" id="tv-password" placeholder="••••••••" autocomplete="current-password"></div>
+        <div class="field"><label>Device ID <span style="color:var(--text3);font-size:9px;">(any unique string, e.g. "ftj-journal")</span></label><input type="text" id="tv-deviceid" placeholder="ftj-journal" value="ftj-journal"></div>
+        <button class="btn-primary" id="tv-login-btn" onclick="tvLogin()">Connect →</button>
+        <div class="status-msg" id="tv-login-status"></div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--text3);line-height:1.7;">Your password is only used for this session. Closing the tab clears it.</div>
+      </div>
+    </div>
+
+    <!-- STEP 2 — SELECT ACCOUNT -->
+    <div id="step-accounts" style="display:none;">
+      <div class="section-label">Step 2 — Select Account</div>
+      <div id="tv-accounts-list"></div>
+      <div class="status-msg" id="tv-accounts-status"></div>
+    </div>
+
+    <!-- STEP 3 — SELECT TRADE -->
+    <div id="step-trades" style="display:none;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <div class="section-label" style="margin:0;">Step 3 — Select a Trade to Import</div>
+        <button onclick="tvRefreshTrades()" style="font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:0.1em;background:none;border:1px solid var(--border2);color:var(--text3);padding:5px 12px;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text3)'">↺ Refresh</button>
+      </div>
+      <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-bottom:10px;line-height:1.8;">Showing your most recent closed trades. Click one to pre-fill the Log Trade form.</div>
+      <div style="border:1px solid var(--border2);">
+        <div class="trade-import-header">
+          <div>Time</div><div>Symbol</div><div>Side</div><div>Entry</div><div>Exit</div><div>P&L</div><div></div>
+        </div>
+        <div id="tv-trades-list"><div class="loading">Loading trades...</div></div>
+      </div>
+      <div class="status-msg" id="tv-trades-status"></div>
+    </div>
+
+    <!-- STEP 4 — CONFIRM & GO TO FORM -->
+    <div id="step-confirm" style="display:none;margin-top:1.5rem;">
+      <div style="background:rgba(200,255,0,0.04);border:1px solid rgba(200,255,0,0.2);padding:1.25rem;">
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--accent);text-transform:uppercase;margin-bottom:10px;">Trade Ready to Import</div>
+        <div id="tv-confirm-details" style="font-family:var(--mono);font-size:11px;color:var(--text2);line-height:2;"></div>
+        <div style="display:flex;gap:8px;margin-top:14px;">
+          <button class="btn-primary" onclick="tvImportToForm()" style="flex:1;">✓ Import to Log Trade Form →</button>
+          <button class="btn-secondary" onclick="document.getElementById('step-confirm').style.display='none'" style="flex:0 0 auto;width:auto;padding:10px 16px;">✕ Cancel</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="admin-core.js"></script>
+<script>
+if (!requireAuth()) { /* redirected */ }
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let tvToken     = null;
+let tvAccountId = null;
+let tvTrades    = [];
+let tvSelected  = null;
+
+const TV_BASE = `${WORKER}/tradovate`;
+
+function tvStatus(id, msg, type) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.className = `status-msg status-${type}`;
+  el.style.display = 'block';
+}
+
+// ── STEP 1 — LOGIN ────────────────────────────────────────────────────────────
+async function tvLogin() {
+  const username = document.getElementById('tv-username').value.trim();
+  const password = document.getElementById('tv-password').value;
+  const deviceId = document.getElementById('tv-deviceid').value.trim() || 'ftj-journal';
+  if (!username || !password) { tvStatus('tv-login-status','Enter your username and password.','err'); return; }
+
+  const btn = document.getElementById('tv-login-btn');
+  btn.disabled = true; btn.textContent = 'Connecting...';
+  tvStatus('tv-login-status', 'Authenticating with Tradovate...', 'info');
+
+  try {
+    const res = await fetch(`${TV_BASE}/auth/accesstokenrequest`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: username,
+        password: password,
+        appId: 'FTJ Journal',
+        appVersion: '1.0',
+        deviceId: deviceId,
+        cid: 0,
+        sec: ''
+      })
+    });
+    const data = await res.json();
+    if (data.accessToken) {
+      tvToken = data.accessToken;
+      tvStatus('tv-login-status', '✓ Connected to Tradovate', 'ok');
+      btn.textContent = '✓ Connected';
+      document.getElementById('step-accounts').style.display = 'block';
+      await tvLoadAccounts();
+    } else if (data['p-ticket']) {
+      // MFA required
+      tvStatus('tv-login-status', '⚠ MFA required — check your email/phone for a code', 'err');
+      btn.disabled = false; btn.textContent = 'Connect →';
+      tvPromptMFA(username, password, deviceId, data['p-ticket']);
+    } else {
+      tvStatus('tv-login-status', 'Login failed: ' + (data.errorText || JSON.stringify(data)), 'err');
+      btn.disabled = false; btn.textContent = 'Connect →';
+    }
+  } catch(e) {
+    tvStatus('tv-login-status', 'Error: ' + e.message, 'err');
+    btn.disabled = false; btn.textContent = 'Connect →';
+  }
+}
+
+function tvPromptMFA(username, password, deviceId, pTicket) {
+  const loginBox = document.querySelector('.login-box');
+  loginBox.insertAdjacentHTML('beforeend', `
+    <div class="field"><label>MFA Code</label><input type="text" id="tv-mfa-code" placeholder="Enter code from email/SMS" style="font-family:var(--mono);font-size:12px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:9px 12px;width:100%;outline:none;"></div>
+    <button class="btn-primary" id="tv-mfa-btn" onclick="tvSubmitMFA('${username}','${password}','${deviceId}','${pTicket}')">Submit MFA Code →</button>
+  `);
+}
+
+async function tvSubmitMFA(username, password, deviceId, pTicket) {
+  const code = document.getElementById('tv-mfa-code')?.value?.trim();
+  if (!code) return;
+  const btn = document.getElementById('tv-mfa-btn');
+  btn.disabled = true; btn.textContent = 'Verifying...';
+  try {
+    const res = await fetch(`${TV_BASE}/auth/accesstokenrequest`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: username, password, appId: 'FTJ Journal', appVersion: '1.0',
+        deviceId, cid: 0, sec: '', 'p-ticket': pTicket, 'p-code': code
+      })
+    });
+    const data = await res.json();
+    if (data.accessToken) {
+      tvToken = data.accessToken;
+      tvStatus('tv-login-status', '✓ Connected to Tradovate', 'ok');
+      document.getElementById('step-accounts').style.display = 'block';
+      await tvLoadAccounts();
+    } else {
+      tvStatus('tv-login-status', 'MFA failed: ' + (data.errorText || 'Invalid code'), 'err');
+      btn.disabled = false; btn.textContent = 'Submit MFA Code →';
+    }
+  } catch(e) {
+    tvStatus('tv-login-status','Error: '+e.message,'err');
+    btn.disabled = false; btn.textContent = 'Submit MFA Code →';
+  }
+}
+
+// ── STEP 2 — ACCOUNTS ────────────────────────────────────────────────────────
+async function tvLoadAccounts() {
+  const listEl = document.getElementById('tv-accounts-list');
+  listEl.innerHTML = '<div class="loading">Loading accounts...</div>';
+  try {
+    const res = await fetch(`${TV_BASE}/account/list`, {
+      headers: { 'Authorization': `Bearer ${tvToken}` }
+    });
+    const accounts = await res.json();
+    if (!accounts.length) { listEl.innerHTML = '<div style="font-family:var(--mono);font-size:11px;color:var(--text3);padding:1rem;">No accounts found</div>'; return; }
+    listEl.innerHTML = accounts.map(a => `
+      <div class="account-row" onclick="tvSelectAccount(${a.id}, '${a.name}', this)">
+        <div class="account-name">${a.name}</div>
+        <div class="account-badge">${a.active ? 'Active' : 'Inactive'}</div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-left:auto;">Select →</div>
+      </div>`).join('');
+  } catch(e) {
+    tvStatus('tv-accounts-status','Error loading accounts: '+e.message,'err');
+  }
+}
+
+async function tvSelectAccount(accountId, accountName, el) {
+  document.querySelectorAll('.account-row').forEach(r => r.classList.remove('selected'));
+  el.classList.add('selected');
+  tvAccountId = accountId;
+  document.getElementById('step-trades').style.display = 'block';
+  await tvRefreshTrades();
+}
+
+// ── STEP 3 — TRADES ──────────────────────────────────────────────────────────
+async function tvRefreshTrades() {
+  const listEl = document.getElementById('tv-trades-list');
+  listEl.innerHTML = '<div class="loading">Loading recent trades...</div>';
+  try {
+    // Get fills for this account
+    const res = await fetch(`${TV_BASE}/fill/list`, {
+      headers: { 'Authorization': `Bearer ${tvToken}` }
+    });
+    const fills = await res.json();
+
+    if (!fills || fills.length === 0) {
+      listEl.innerHTML = '<div style="font-family:var(--mono);font-size:11px;color:var(--text3);padding:1.5rem;text-align:center;">No fills found for this account</div>';
+      return;
+    }
+
+    // Group fills into trades by matching buys and sells on same contract
+    const trades = groupFillsIntoTrades(fills);
+    tvTrades = trades.slice(0, 30); // most recent 30
+
+    if (!tvTrades.length) {
+      listEl.innerHTML = '<div style="font-family:var(--mono);font-size:11px;color:var(--text3);padding:1.5rem;text-align:center;">No closed trades found</div>';
+      return;
+    }
+
+    listEl.innerHTML = tvTrades.map((t, i) => {
+      const pnlStr = t.pnl != null ? (t.pnl >= 0 ? '+' : '') + '$' + Math.abs(t.pnl).toLocaleString() : '—';
+      const pnlCol = t.pnl > 0 ? 'var(--green)' : t.pnl < 0 ? 'var(--red)' : 'var(--text2)';
+      const timeStr = t.entryTime ? new Date(t.entryTime).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}) : '—';
+      const sideCol = t.direction === 'Long' ? 'var(--green)' : 'var(--red)';
+      return `<div class="trade-import-row" onclick="tvSelectTrade(${i}, this)">
+        <div style="font-family:var(--mono);font-size:10px;color:var(--text2);">${timeStr}</div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--text);">${t.symbol}</div>
+        <div style="font-family:var(--mono);font-size:10px;color:${sideCol};">${t.direction}</div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--text2);">${t.entryPrice?.toLocaleString() || '—'}</div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--text2);">${t.exitPrice?.toLocaleString() || '—'}</div>
+        <div style="font-family:var(--mono);font-size:11px;font-weight:700;color:${pnlCol};">${pnlStr}</div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--accent);">Import →</div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    tvStatus('tv-trades-status','Error loading trades: '+e.message,'err');
+  }
+}
+
+// Group raw fills into round-trip trades
+function groupFillsIntoTrades(fills) {
+  // Sort by timestamp
+  const sorted = [...fills].sort((a,b) => new Date(a.timestamp) - new Date(b.timestamp));
+  const trades = [];
+  const open = {}; // symbol → { direction, qty, entryFills[] }
+
+  sorted.forEach(fill => {
+    const sym    = fill.contractId?.name || fill.symbol || 'Unknown';
+    const qty    = fill.qty || 1;
+    const price  = fill.price || 0;
+    const side   = fill.action === 'Buy' ? 'Long' : 'Short';
+    const time   = fill.timestamp;
+
+    if (!open[sym]) {
+      open[sym] = { direction: side, qty: 0, entryFills: [], symbol: sym };
+    }
+    const pos = open[sym];
+
+    if (pos.qty === 0) {
+      pos.direction = side;
+      pos.entryFills = [];
+    }
+
+    if (
+      (pos.direction === 'Long'  && fill.action === 'Buy') ||
+      (pos.direction === 'Short' && fill.action === 'Sell')
+    ) {
+      // Opening / adding
+      pos.qty += qty;
+      pos.entryFills.push({ price, qty, time });
+    } else {
+      // Closing
+      const entryAvg = pos.entryFills.reduce((s,f)=>s+f.price*f.qty,0) /
+                       pos.entryFills.reduce((s,f)=>s+f.qty,0);
+      const contracts = Math.min(qty, pos.qty);
+      const tickVal   = tvTickValue(sym);
+      const pnl       = pos.direction === 'Long'
+        ? Math.round((price - entryAvg) * contracts * tickVal)
+        : Math.round((entryAvg - price) * contracts * tickVal);
+
+      trades.unshift({
+        symbol:     sym,
+        direction:  pos.direction,
+        contracts:  contracts,
+        entryPrice: Math.round(entryAvg * 100) / 100,
+        exitPrice:  price,
+        entryTime:  pos.entryFills[0].time,
+        exitTime:   time,
+        pnl:        pnl
+      });
+
+      pos.qty -= qty;
+      if (pos.qty <= 0) { pos.qty = 0; pos.entryFills = []; }
+    }
+  });
+
+  return trades;
+}
+
+function tvTickValue(symbol) {
+  const s = (symbol || '').toUpperCase();
+  if (s.includes('MNQ')) return 2;
+  if (s.includes('NQ'))  return 20;
+  if (s.includes('MES')) return 5;
+  if (s.includes('ES'))  return 50;
+  if (s.includes('MCL') || s.includes('CL')) return 1000;
+  if (s.includes('MGC') || s.includes('GC')) return 100;
+  if (s.includes('M2K') || s.includes('RTY')) return 50;
+  return 20; // default
+}
+
+// Map Tradovate symbol to FTJ instrument name
+function tvSymbolToInstrument(symbol) {
+  const s = (symbol || '').toUpperCase();
+  if (s.includes('MNQ')) return 'MNQ';
+  if (s.includes('NQ'))  return 'NQ';
+  if (s.includes('MES')) return 'MES';
+  if (s.includes('ES'))  return 'ES';
+  if (s.includes('MCL') || s.includes('CL')) return 'CL';
+  if (s.includes('MGC') || s.includes('GC')) return 'GC';
+  if (s.includes('M2K') || s.includes('RTY')) return 'RTY';
+  return symbol;
+}
+
+// Detect session from entry time (ET)
+function tvDetectSession(isoTime) {
+  if (!isoTime) return 'NY AM';
+  const d = new Date(isoTime);
+  // Convert to ET (UTC-4 in summer, UTC-5 in winter — approximate)
+  const etOffset = -4;
+  const etHour = (d.getUTCHours() + etOffset + 24) % 24;
+  const etMin  = d.getUTCMinutes();
+  const etTime = etHour + etMin / 60;
+  if (etTime >= 2  && etTime < 5)   return 'London';
+  if (etTime >= 9.5 && etTime < 12) return 'NY AM';
+  if (etTime >= 12 && etTime < 13)  return 'NY Lunch';
+  if (etTime >= 13 && etTime < 16)  return 'NY PM';
+  if (etTime >= 18 && etTime < 24)  return 'Asia';
+  return 'NY AM';
+}
+
+function tvSelectTrade(index, el) {
+  document.querySelectorAll('.trade-import-row').forEach(r => r.classList.remove('selected'));
+  el.classList.add('selected');
+  tvSelected = tvTrades[index];
+
+  const t = tvSelected;
+  const inst = tvSymbolToInstrument(t.symbol);
+  const session = tvDetectSession(t.entryTime);
+  const entryDate = t.entryTime ? new Date(t.entryTime).toISOString().split('T')[0] : '';
+  const entryTimeFmt = t.entryTime ? new Date(t.entryTime).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}) : '';
+  const exitTimeFmt  = t.exitTime  ? new Date(t.exitTime ).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}) : '';
+  const pnlStr = t.pnl != null ? (t.pnl >= 0 ? '+' : '') + '$' + Math.abs(t.pnl).toLocaleString() : '—';
+
+  document.getElementById('tv-confirm-details').innerHTML = `
+    <div>Instrument: <span style="color:var(--text)">${inst}</span></div>
+    <div>Direction: <span style="color:${t.direction==='Long'?'var(--green)':'var(--red)'}">${t.direction}</span></div>
+    <div>Date: <span style="color:var(--text)">${entryDate}</span></div>
+    <div>Session: <span style="color:var(--text)">${session}</span></div>
+    <div>Entry: <span style="color:var(--text)">${t.entryPrice} at ${entryTimeFmt}</span></div>
+    <div>Exit: <span style="color:var(--text)">${t.exitPrice} at ${exitTimeFmt}</span></div>
+    <div>Contracts: <span style="color:var(--text)">${t.contracts}</span></div>
+    <div>P&L: <span style="color:${t.pnl>=0?'var(--green)':'var(--red)'}">${pnlStr}</span></div>`;
+
+  // Store parsed values for import
+  tvSelected._parsed = { inst, session, entryDate, entryTimeFmt, exitTimeFmt };
+  document.getElementById('step-confirm').style.display = 'block';
+  document.getElementById('step-confirm').scrollIntoView({behavior:'smooth'});
+}
+
+// ── STEP 4 — IMPORT TO FORM ───────────────────────────────────────────────────
+function tvImportToForm() {
+  const t = tvSelected;
+  if (!t) return;
+  const p = t._parsed;
+
+  // Store in sessionStorage so log-trade.html can pick it up
+  sessionStorage.setItem('tv_import', JSON.stringify({
+    instrument: p.inst,
+    direction:  t.direction,
+    session:    p.session,
+    date:       p.entryDate,
+    entryPrice: t.entryPrice,
+    exitPrice:  t.exitPrice,
+    contracts:  t.contracts,
+    entryTime:  p.entryTimeFmt,
+    exitTime:   p.exitTimeFmt,
+    pnl:        t.pnl,
+    timeframe:  '1m' // default — user can change
+  }));
+
+  // Redirect to log-trade with flag
+  window.location.href = 'log-trade.html?from=tradovate';
+}
+</script>
+<script>if('serviceWorker' in navigator){navigator.serviceWorker.register('../sw.js');}</script>
+</body>
+</html>
