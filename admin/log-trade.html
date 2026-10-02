@@ -320,6 +320,53 @@ function resetImgUpload(prefix) {
 
 buildConfDropdown('conf-btn','conf-dropdown','conf-label','conf-tags','updateConf');
 
+// ── AUTO-FILL FROM TRADOVATE IMPORT ──────────────────────────────────────────
+(function checkTradovateImport() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('from') !== 'tradovate') return;
+  const raw = sessionStorage.getItem('tv_import');
+  if (!raw) return;
+  try {
+    const t = JSON.parse(raw);
+    sessionStorage.removeItem('tv_import');
+
+    const setV = (id, v) => { const el = document.getElementById(id); if (el && v != null) el.value = v; };
+    setV('f-instrument', t.instrument);
+    setV('f-direction',  t.direction);
+    setV('f-session',    t.session);
+    setV('f-timeframe',  t.timeframe || '1m');
+    setV('f-date',       t.date);
+    setV('f-entry',      t.entryPrice);
+    setV('f-exit',       t.exitPrice);
+    setV('f-contracts',  t.contracts);
+    setV('f-entry-time', t.entryTime);
+    setV('f-exit-time',  t.exitTime);
+
+    // Detect outcome from P&L
+    if (t.pnl > 0)      setV('f-outcome', 'Closed - Win');
+    else if (t.pnl < 0) setV('f-outcome', 'Closed - Loss');
+    else                 setV('f-outcome', 'Breakeven');
+
+    // Show partial row if multiple contracts
+    if (t.contracts > 1) {
+      const row = document.getElementById('partial-row');
+      if (row) { row.style.display = 'block'; renderTPRows(t.contracts); }
+    }
+
+    // Banner at top of form
+    const banner = document.createElement('div');
+    banner.style.cssText = 'background:rgba(200,255,0,0.07);border:1px solid rgba(200,255,0,0.3);padding:10px 16px;font-family:var(--mono);font-size:10px;color:var(--accent);letter-spacing:0.08em;margin-bottom:1.5rem;';
+    banner.textContent = `✓ Pre-filled from Tradovate — ${t.instrument} ${t.direction} · ${t.pnl >= 0 ? '+' : ''}$${Math.abs(t.pnl || 0).toLocaleString()} · Add confluences and notes to complete`;
+    const formGrid = document.querySelector('.form-grid');
+    if (formGrid) formGrid.parentNode.insertBefore(banner, formGrid);
+
+    // Clean URL
+    window.history.replaceState({}, '', 'log-trade.html');
+  } catch(e) {
+    console.warn('Tradovate import parse error:', e);
+  }
+})();
+
 function toggleEmotion(btn) { btn.classList.toggle('selected'); }
 function getSelectedEmotions() {
   return Array.from(document.querySelectorAll('#f-emotions-wrap .emo-btn.selected')).map(b => b.dataset.emotion);
