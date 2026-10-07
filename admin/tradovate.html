@@ -70,10 +70,18 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
     <div id="step-login">
       <div class="section-label">Step 1 — Connect Tradovate</div>
       <div class="login-box">
-        <div style="font-family:var(--mono);font-size:9px;color:var(--text3);line-height:1.8;">Enter your Tradovate login credentials. These are sent directly to Tradovate's API — never stored by FTJ.</div>
-        <div class="field"><label>Tradovate Username</label><input type="text" id="tv-username" placeholder="your@email.com" autocomplete="username"></div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--text3);line-height:1.8;">Enter the Tradovate credentials Lucid gave you when you signed up. Your username will look like an account ID (e.g. LFF05073415280001), not an email. These go directly to Tradovate's API — never stored by FTJ.</div>
+        <div class="field"><label>Tradovate Username <span style="color:var(--text3);font-size:9px;">(the username Lucid gave you)</span></label><input type="text" id="tv-username" placeholder="e.g. LFF05073415280001" autocomplete="username"></div>
         <div class="field"><label>Password</label><input type="password" id="tv-password" placeholder="••••••••" autocomplete="current-password"></div>
         <div class="field"><label>Device ID <span style="color:var(--text3);font-size:9px;">(any unique string, e.g. "ftj-journal")</span></label><input type="text" id="tv-deviceid" placeholder="ftj-journal" value="ftj-journal"></div>
+        <div class="field">
+          <label>Environment</label>
+          <div style="display:flex;gap:1px;background:var(--border);">
+            <button type="button" id="env-demo" onclick="setEnv('demo')" style="flex:1;font-family:var(--mono);font-size:10px;padding:8px;background:var(--accent);color:#000;border:none;cursor:pointer;font-weight:700;">Demo / Eval</button>
+            <button type="button" id="env-live" onclick="setEnv('live')" style="flex:1;font-family:var(--mono);font-size:10px;padding:8px;background:var(--surface2);color:var(--text3);border:none;cursor:pointer;">Live</button>
+          </div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:4px;">Lucid eval accounts use Demo. Switch to Live only if you have a fully funded live account.</div>
+        </div>
         <button class="btn-primary" id="tv-login-btn" onclick="tvLogin()">Connect →</button>
         <div class="status-msg" id="tv-login-status"></div>
         <div style="font-family:var(--mono);font-size:9px;color:var(--text3);line-height:1.7;">Your password is only used for this session. Closing the tab clears it.</div>
@@ -127,8 +135,17 @@ let tvToken     = null;
 let tvAccountId = null;
 let tvTrades    = [];
 let tvSelected  = null;
+let tvEnv       = 'demo'; // default to demo for Lucid eval accounts
 
-const TV_BASE = `${WORKER}/tradovate`;
+function TV_BASE() { return `${WORKER}/tradovate/${tvEnv}`; }
+
+function setEnv(env) {
+  tvEnv = env;
+  document.getElementById('env-demo').style.background = env === 'demo' ? 'var(--accent)' : 'var(--surface2)';
+  document.getElementById('env-demo').style.color      = env === 'demo' ? '#000' : 'var(--text3)';
+  document.getElementById('env-live').style.background = env === 'live' ? 'var(--accent)' : 'var(--surface2)';
+  document.getElementById('env-live').style.color      = env === 'live' ? '#000' : 'var(--text3)';
+}
 
 function tvStatus(id, msg, type) {
   const el = document.getElementById(id);
@@ -149,7 +166,7 @@ async function tvLogin() {
   tvStatus('tv-login-status', 'Authenticating with Tradovate...', 'info');
 
   try {
-    const res = await fetch(`${TV_BASE}/auth/accesstokenrequest`, {
+    const res = await fetch(`${TV_BASE()}/auth/accesstokenrequest`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -198,7 +215,7 @@ async function tvSubmitMFA(username, password, deviceId, pTicket) {
   const btn = document.getElementById('tv-mfa-btn');
   btn.disabled = true; btn.textContent = 'Verifying...';
   try {
-    const res = await fetch(`${TV_BASE}/auth/accesstokenrequest`, {
+    const res = await fetch(`${TV_BASE()}/auth/accesstokenrequest`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -227,7 +244,7 @@ async function tvLoadAccounts() {
   const listEl = document.getElementById('tv-accounts-list');
   listEl.innerHTML = '<div class="loading">Loading accounts...</div>';
   try {
-    const res = await fetch(`${TV_BASE}/account/list`, {
+    const res = await fetch(`${TV_BASE()}/account/list`, {
       headers: { 'Authorization': `Bearer ${tvToken}` }
     });
     const accounts = await res.json();
@@ -257,7 +274,7 @@ async function tvRefreshTrades() {
   listEl.innerHTML = '<div class="loading">Loading recent trades...</div>';
   try {
     // Get fills for this account
-    const res = await fetch(`${TV_BASE}/fill/list`, {
+    const res = await fetch(`${TV_BASE()}/fill/list`, {
       headers: { 'Authorization': `Bearer ${tvToken}` }
     });
     const fills = await res.json();
