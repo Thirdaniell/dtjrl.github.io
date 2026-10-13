@@ -4,8 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Import from Tradovate — FTJ Admin</title>
-<link rel="manifest" href="../manifest.json">
-<meta name="theme-color" content="#0a0a0a">
 <link rel="icon" type="image/png" href="https://i.imgur.com/ZP2pTk2.png">
 <link rel="stylesheet" href="../mobile.css">
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
@@ -23,35 +21,63 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
 .back-btn:hover{color:var(--accent);border-color:var(--accent);}
 .page-eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:0.2em;color:var(--accent);text-transform:uppercase;margin-bottom:8px;}
 .page-title{font-family:var(--mono);font-size:28px;font-weight:700;line-height:1.1;margin-bottom:2rem;}
-/* LOGIN FORM */
-.login-box{background:var(--surface);border:1px solid var(--border2);padding:1.5rem;display:flex;flex-direction:column;gap:12px;max-width:440px;}
-.field label{font-family:var(--mono);font-size:9px;letter-spacing:0.14em;color:var(--text3);text-transform:uppercase;display:block;margin-bottom:5px;}
-.field input{font-family:var(--mono);font-size:12px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:9px 12px;width:100%;outline:none;transition:border-color 0.15s;}
-.field input:focus{border-color:var(--accent);}
-.btn-primary{font-family:var(--mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;padding:12px;background:var(--accent);color:#000;border:none;cursor:pointer;font-weight:700;transition:opacity 0.15s;width:100%;}
-.btn-primary:hover{opacity:0.85;}
-.btn-primary:disabled{opacity:0.35;cursor:not-allowed;}
-.btn-secondary{font-family:var(--mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;padding:10px;background:none;color:var(--text2);border:1px solid var(--border2);cursor:pointer;transition:all 0.15s;width:100%;}
-.btn-secondary:hover{border-color:var(--accent);color:var(--accent);}
-.status-msg{font-family:var(--mono);font-size:10px;letter-spacing:0.08em;padding:8px 12px;display:none;}
+.section-label{font-family:var(--mono);font-size:9px;letter-spacing:0.2em;color:var(--text3);text-transform:uppercase;margin-bottom:8px;}
+
+/* DROP ZONE */
+.drop-zone{border:1px dashed var(--border2);padding:2rem;text-align:center;cursor:pointer;transition:border-color 0.15s;background:var(--surface);}
+.drop-zone:hover,.drop-zone.over{border-color:var(--accent);}
+
+/* STATUS */
+.status-msg{font-family:var(--mono);font-size:10px;padding:8px 12px;display:none;margin-top:8px;}
 .status-ok{background:rgba(0,230,118,0.07);border:1px solid rgba(0,230,118,0.3);color:var(--green);}
 .status-err{background:rgba(255,68,68,0.07);border:1px solid rgba(255,68,68,0.3);color:var(--red);}
-.status-info{background:rgba(200,255,0,0.04);border:1px solid rgba(200,255,0,0.2);color:var(--accent);}
-/* ACCOUNT SELECTOR */
-.account-row{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--surface);border:1px solid var(--border2);cursor:pointer;transition:background 0.12s;margin-bottom:1px;}
-.account-row:hover,.account-row.selected{background:var(--surface2);border-color:var(--accent);}
-.account-name{font-family:var(--mono);font-size:11px;color:var(--text);}
-.account-badge{font-family:var(--mono);font-size:9px;padding:2px 7px;border:1px solid var(--border2);color:var(--text3);}
-/* TRADE LIST */
-.trade-import-row{display:grid;grid-template-columns:90px 60px 60px 80px 80px 80px auto;gap:10px;align-items:center;padding:10px 14px;background:var(--surface);border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.12s;}
-.trade-import-row:hover{background:var(--surface2);}
-.trade-import-row.selected{background:rgba(200,255,0,0.04);border-left:2px solid var(--accent);}
-.trade-import-header{display:grid;grid-template-columns:90px 60px 60px 80px 80px 80px auto;gap:10px;padding:8px 14px;background:var(--surface2);border-bottom:1px solid var(--border);}
-.trade-import-header div{font-family:var(--mono);font-size:8px;letter-spacing:0.12em;color:var(--text3);text-transform:uppercase;}
-.section-label{font-family:var(--mono);font-size:9px;letter-spacing:0.2em;color:var(--text3);text-transform:uppercase;margin-bottom:8px;margin-top:1.5rem;}
+
+/* SUMMARY BAR */
+.summary-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:1rem;}
+.sstat{background:var(--surface);padding:10px 14px;}
+.sstat-label{font-family:var(--mono);font-size:8px;letter-spacing:0.12em;color:var(--text3);text-transform:uppercase;margin-bottom:4px;}
+.sstat-value{font-family:var(--mono);font-size:15px;font-weight:700;}
+
+/* TRADE ROWS */
+.trade-list{display:flex;flex-direction:column;gap:1px;background:var(--border);}
+.trade-row{background:var(--surface);display:grid;grid-template-columns:110px 70px 80px 60px 80px auto 100px;align-items:center;gap:0;padding:0;}
+.trade-row.logged{opacity:0.38;}
+.tr-cell{padding:10px 12px;font-family:var(--mono);}
+.tr-date{font-size:10px;color:var(--text2);}
+.tr-date span{display:block;font-size:9px;color:var(--text3);margin-top:2px;}
+.tr-session{font-size:9px;color:var(--text3);letter-spacing:0.06em;}
+.tr-sym{font-size:11px;font-weight:700;color:var(--text);}
+.tr-dir{font-size:9px;font-weight:700;padding:2px 7px;border:1px solid;display:inline-block;}
+.tr-dir.long{color:var(--green);border-color:rgba(0,230,118,0.35);}
+.tr-dir.short{color:var(--red);border-color:rgba(255,68,68,0.35);}
+.tr-qty{font-size:10px;color:var(--text2);}
+.tr-pnl{font-size:13px;font-weight:700;}
+.tr-pnl.pos{color:var(--green);}
+.tr-pnl.neg{color:var(--red);}
+.tr-actions{padding:8px 10px;display:flex;align-items:center;gap:6px;justify-content:flex-end;}
+.tr-log-btn{font-family:var(--mono);font-size:9px;letter-spacing:0.08em;text-transform:uppercase;padding:6px 12px;background:var(--accent);color:#000;border:none;cursor:pointer;font-weight:700;white-space:nowrap;transition:opacity 0.15s;}
+.tr-log-btn:hover{opacity:0.85;}
+.tr-logged-badge{font-family:var(--mono);font-size:9px;color:var(--green);letter-spacing:0.08em;white-space:nowrap;}
+.tr-outcome{font-size:9px;font-weight:700;padding:2px 6px;border:1px solid;}
+.tr-win{color:var(--green);border-color:rgba(0,230,118,0.35);}
+.tr-loss{color:var(--red);border-color:rgba(255,68,68,0.35);}
+.tr-be{color:var(--yellow);border-color:rgba(255,215,64,0.35);}
+
+/* LIST HEADER */
+.list-header{display:grid;grid-template-columns:110px 70px 80px 60px 80px auto 100px;background:var(--surface2);border-bottom:1px solid var(--border2);}
+.lh-cell{font-family:var(--mono);font-size:8px;letter-spacing:0.12em;color:var(--text3);text-transform:uppercase;padding:7px 12px;}
+
+/* BUTTONS */
+.btn-sm{font-family:var(--mono);font-size:9px;letter-spacing:0.08em;text-transform:uppercase;padding:6px 14px;background:none;border:1px solid var(--border2);color:var(--text3);cursor:pointer;transition:all 0.15s;}
+.btn-sm:hover{border-color:var(--text2);color:var(--text2);}
+.btn-sm.danger:hover{border-color:var(--red);color:var(--red);}
+
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
-.loading{font-family:var(--mono);font-size:10px;color:var(--text3);animation:blink 1s infinite;padding:1.5rem;text-align:center;}
-@media(max-width:600px){#main{padding-left:0;}.trade-import-row,.trade-import-header{grid-template-columns:80px 50px 50px 70px auto;}.trade-import-header div:nth-child(4),.trade-import-header div:nth-child(5),.trade-import-row>*:nth-child(4),.trade-import-row>*:nth-child(5){display:none;}}
+@media(max-width:700px){
+  #main{padding-left:0;}
+  .trade-row,.list-header{grid-template-columns:90px 60px 70px 50px 70px auto 90px;}
+  .summary-bar{grid-template-columns:1fr 1fr;}
+}
 </style>
 </head>
 <body>
@@ -64,57 +90,66 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
     <a href="admin.html" class="back-btn">← Back to Admin</a>
     <div class="page-eyebrow">// Admin</div>
     <div class="page-title">Import from Tradovate</div>
-    <p style="font-size:13px;color:var(--text2);margin:0 0 1.5rem;line-height:1.7;">Export your trade history from Tradovate as a CSV and drop it here. FTJ will parse your fills, group them into trades, and let you import any one directly into the log form.</p>
 
     <!-- HOW TO EXPORT -->
     <div style="background:var(--surface);border:1px solid var(--border2);padding:1.25rem;margin-bottom:1.5rem;">
       <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--accent);text-transform:uppercase;margin-bottom:10px;">How to export from Tradovate</div>
-      <ol style="font-family:var(--mono);font-size:10px;color:var(--text2);line-height:2.4;list-style:none;display:flex;flex-direction:column;gap:2px;">
-        <li><span style="color:var(--accent);">01</span> &nbsp;Go to <a href="https://trader.tradovate.com" target="_blank" style="color:var(--accent);">trader.tradovate.com</a> and log in</li>
-        <li><span style="color:var(--accent);">02</span> &nbsp;Click <strong style="color:var(--text);">Activity</strong> in the left sidebar</li>
-        <li><span style="color:var(--accent);">03</span> &nbsp;Click <strong style="color:var(--text);">Performance</strong></li>
-        <li><span style="color:var(--accent);">04</span> &nbsp;Click the <strong style="color:var(--text);">Export</strong> or download icon — save as CSV</li>
-        <li><span style="color:var(--accent);">05</span> &nbsp;Drag the file below or click to browse</li>
-      </ol>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text2);line-height:2.4;">
+        <div><span style="color:var(--accent);">01</span> &nbsp;Go to <a href="https://trader.tradovate.com" target="_blank" style="color:var(--accent);">trader.tradovate.com</a> → log in with your Lucid credentials</div>
+        <div><span style="color:var(--accent);">02</span> &nbsp;Click <strong style="color:var(--text);">Activity</strong> → <strong style="color:var(--text);">Performance</strong></div>
+        <div><span style="color:var(--accent);">03</span> &nbsp;Click the export icon → save as CSV</div>
+        <div><span style="color:var(--accent);">04</span> &nbsp;Drag it below — new trades merge in, already-logged ones stay marked</div>
+      </div>
     </div>
 
-    <!-- STEP 1 — DROP CSV -->
-    <div class="section-label">Step 1 — Upload CSV</div>
-    <div id="csv-drop-zone" style="border:1px dashed var(--border2);padding:2.5rem;text-align:center;cursor:pointer;transition:border-color 0.15s;background:var(--surface);margin-bottom:1rem;"
-      ondragover="event.preventDefault();this.style.borderColor='var(--accent)'"
-      ondragleave="this.style.borderColor='var(--border2)'"
-      ondrop="handleCSVDrop(event)"
-      onclick="document.getElementById('csv-file-input').click()">
-      <input type="file" id="csv-file-input" accept=".csv" style="display:none;" onchange="handleCSVFile(event)">
-      <div style="font-family:var(--mono);font-size:11px;color:var(--text3);letter-spacing:0.08em;">📂 Drag & drop your Performance.csv here or click to browse</div>
-      <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:6px;">Exported from Tradovate → Activity → Performance</div>
+    <!-- DROP ZONE -->
+    <div class="drop-zone" id="drop-zone"
+      ondragover="event.preventDefault();this.classList.add('over')"
+      ondragleave="this.classList.remove('over')"
+      ondrop="handleDrop(event)"
+      onclick="document.getElementById('file-input').click()">
+      <input type="file" id="file-input" accept=".csv" style="display:none;" onchange="handleFile(event)">
+      <div style="font-family:var(--mono);font-size:11px;color:var(--text3);letter-spacing:0.08em;" id="drop-label">📂 Drag & drop Performance.csv here or click to browse</div>
+      <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:5px;">Tradovate → Activity → Performance → Export</div>
     </div>
     <div class="status-msg" id="csv-status"></div>
 
-    <!-- STEP 2 — TRADE LIST -->
-    <div id="step-trades" style="display:none;margin-top:1.5rem;">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-        <div class="section-label" style="margin:0;">Step 2 — Select a Trade to Import</div>
-        <div style="font-family:var(--mono);font-size:9px;color:var(--text3);" id="tv-trade-count"></div>
-      </div>
-      <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-bottom:10px;line-height:1.8;">Click any trade to pre-fill the Log Trade form. Partial exits are grouped together.</div>
-      <div style="border:1px solid var(--border2);">
-        <div class="trade-import-header">
-          <div>Date</div><div>Symbol</div><div>Side</div><div>Entry</div><div>Exit</div><div>P&L</div><div>Qty</div>
-        </div>
-        <div id="tv-trades-list"></div>
-      </div>
-    </div>
+    <!-- TRADE LIST SECTION -->
+    <div id="trades-section" style="display:none;margin-top:2rem;">
 
-    <!-- STEP 3 — CONFIRM -->
-    <div id="step-confirm" style="display:none;margin-top:1.5rem;">
-      <div style="background:rgba(200,255,0,0.04);border:1px solid rgba(200,255,0,0.2);padding:1.25rem;">
-        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--accent);text-transform:uppercase;margin-bottom:10px;">Trade Ready to Import</div>
-        <div id="tv-confirm-details" style="font-family:var(--mono);font-size:11px;color:var(--text2);line-height:2;"></div>
-        <div style="display:flex;gap:8px;margin-top:14px;">
-          <button class="btn-primary" onclick="tvImportToForm()" style="flex:1;">✓ Import to Log Trade Form →</button>
-          <button class="btn-secondary" onclick="document.getElementById('step-confirm').style.display='none'" style="flex:0 0 auto;width:auto;padding:10px 16px;">✕ Cancel</button>
+      <!-- HEADER ROW -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <div>
+          <div class="section-label" style="margin:0 0 3px;">Imported Trades</div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--text3);" id="trades-subtitle"></div>
         </div>
+        <div style="display:flex;gap:6px;">
+          <button class="btn-sm" onclick="clearLogged()">Clear Logged</button>
+          <button class="btn-sm danger" onclick="clearAll()">Clear All</button>
+        </div>
+      </div>
+
+      <!-- SUMMARY -->
+      <div class="summary-bar" id="summary-bar"></div>
+
+      <!-- LIST -->
+      <div style="border:1px solid var(--border2);">
+        <div class="list-header">
+          <div class="lh-cell">Date</div>
+          <div class="lh-cell">Session</div>
+          <div class="lh-cell">Symbol</div>
+          <div class="lh-cell">Qty</div>
+          <div class="lh-cell">P&L</div>
+          <div class="lh-cell">Result</div>
+          <div class="lh-cell"></div>
+        </div>
+        <div class="trade-list" id="trade-list"></div>
+      </div>
+
+      <!-- ALL LOGGED -->
+      <div id="all-logged-msg" style="display:none;background:rgba(0,230,118,0.05);border:1px solid rgba(0,230,118,0.2);padding:1.5rem;text-align:center;margin-top:1rem;">
+        <div style="font-family:var(--mono);font-size:12px;color:var(--green);letter-spacing:0.1em;">✓ All trades logged</div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:5px;">Import a new CSV to continue</div>
       </div>
     </div>
 
@@ -123,67 +158,84 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
 
 <script src="admin-core.js"></script>
 <script>
-if (!requireAuth()) { /* redirected */ }
+if (!requireAuth()) {}
 
-// ── STATE ─────────────────────────────────────────────────────────────────────
-let tvTrades  = [];
-let tvSelected = null;
+const LS_KEY = 'ftj_tv_trades';
+let tvTrades = [];
 
-function tvStatus(id, msg, type) {
-  const el = document.getElementById(id);
-  el.textContent = msg;
-  el.className = `status-msg status-${type}`;
-  el.style.display = 'block';
-}
+// ── INIT — load persisted trades ──────────────────────────────────────────────
+(function init() {
+  try {
+    const saved = localStorage.getItem(LS_KEY);
+    if (saved) {
+      tvTrades = JSON.parse(saved);
+      if (tvTrades.length) renderAll();
+    }
+  } catch(e) {}
 
-// ── CSV HANDLING ──────────────────────────────────────────────────────────────
-function tvStatus(id, msg, type) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.textContent = msg;
-  el.className = `status-msg status-${type}`;
-  el.style.display = 'block';
-}
-
-function handleCSVDrop(event) {
-  event.preventDefault();
-  document.getElementById('csv-drop-zone').style.borderColor = 'var(--border2)';
-  const file = event.dataTransfer.files[0];
-  if (file) parseCSVFile(file);
-}
-
-function handleCSVFile(event) {
-  const file = event.target.files[0];
-  if (file) parseCSVFile(file);
-}
-
-function parseCSVFile(file) {
-  if (!file.name.endsWith('.csv')) {
-    tvStatus('csv-status', '⚠ Please upload a .csv file exported from Tradovate.', 'err');
-    return;
+  // Check if returning from log-trade with a logged index
+  const idx = localStorage.getItem('ftj_tv_logged_index');
+  if (idx != null) {
+    localStorage.removeItem('ftj_tv_logged_index');
+    const i = parseInt(idx);
+    if (!isNaN(i) && tvTrades[i]) {
+      tvTrades[i].logged = true;
+      save();
+      renderAll();
+    }
   }
-  const zone = document.getElementById('csv-drop-zone');
-  zone.style.borderColor = 'var(--accent)';
-  zone.innerHTML = `<div style="font-family:var(--mono);font-size:11px;color:var(--accent);">✓ ${file.name} loaded</div>`;
+})();
 
+// ── FILE HANDLING ─────────────────────────────────────────────────────────────
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('drop-zone').classList.remove('over');
+  const file = e.dataTransfer.files[0];
+  if (file) processFile(file);
+}
+function handleFile(e) {
+  const file = e.target.files[0];
+  if (file) processFile(file);
+  e.target.value = '';
+}
+
+function processFile(file) {
+  if (!file.name.toLowerCase().endsWith('.csv')) {
+    showStatus('Please upload a .csv file from Tradovate.', 'err'); return;
+  }
   const reader = new FileReader();
   reader.onload = e => {
     try {
-      const rows = parseCSV(e.target.result);
-      tvTrades = groupCSVRows(rows);
-      if (!tvTrades.length) {
-        tvStatus('csv-status', '⚠ No trades found in this CSV.', 'err');
-        return;
-      }
-      tvStatus('csv-status', `✓ ${tvTrades.length} trade${tvTrades.length>1?'s':''} found`, 'ok');
-      renderTradeList();
+      const rows   = parseCSV(e.target.result);
+      const parsed = groupRows(rows);
+      if (!parsed.length) { showStatus('No trades found in this file.', 'err'); return; }
+
+      // Merge: preserve logged status for existing trades by key
+      const prevLogged = {};
+      tvTrades.forEach(t => { if (t.logged) prevLogged[t._key] = true; });
+      // Add new trades that don't already exist
+      const existingKeys = new Set(tvTrades.map(t => t._key));
+      let added = 0;
+      parsed.forEach(t => {
+        if (!existingKeys.has(t._key)) {
+          tvTrades.unshift({ ...t, logged: false });
+          added++;
+        }
+      });
+
+      save();
+      document.getElementById('drop-label').textContent = `✓ ${file.name} — ${added} new trade${added!==1?'s':''} added`;
+      document.getElementById('drop-zone').style.borderColor = 'var(--accent)';
+      showStatus(`✓ ${added} new trade${added!==1?'s':''} added · ${tvTrades.length} total`, 'ok');
+      renderAll();
     } catch(err) {
-      tvStatus('csv-status', 'Parse error: ' + err.message, 'err');
+      showStatus('Parse error: ' + err.message, 'err');
     }
   };
   reader.readAsText(file);
 }
 
+// ── CSV PARSING ───────────────────────────────────────────────────────────────
 function parseCSV(text) {
   const lines = text.trim().split('\n');
   if (lines.length < 2) return [];
@@ -196,171 +248,227 @@ function parseCSV(text) {
   }).filter(r => r.symbol);
 }
 
-// Parse Tradovate P&L string: "$139.00" → 139, "$(245.00)" → -245
 function parsePnl(str) {
   if (!str) return 0;
-  const negative = str.includes('(');
-  const num = parseFloat(str.replace(/[$(),]/g, ''));
-  return negative ? -num : num;
+  const neg = str.includes('(');
+  return (neg ? -1 : 1) * parseFloat(str.replace(/[$(),]/g, '') || '0');
 }
 
-// Strip contract expiry suffix: MNQZ6 → MNQ, ESZ6 → ES
-function stripExpiry(symbol) {
-  return symbol.replace(/[FGHJKMNQUVXZ]\d+$/, '').toUpperCase();
+function stripExpiry(sym) {
+  return sym.replace(/[FGHJKMNQUVXZ]\d+$/, '').toUpperCase();
 }
 
-// Detect direction: if buyTimestamp > sellTimestamp → Short (sold first), else Long
 function detectDirection(row) {
-  const buyTs  = new Date(row.boughtTimestamp);
-  const sellTs = new Date(row.soldTimestamp);
-  return sellTs < buyTs ? 'Short' : 'Long';
+  return new Date(row.soldTimestamp) < new Date(row.boughtTimestamp) ? 'Short' : 'Long';
 }
 
-// Detect session from timestamp string "10/08/2026 09:51:42"
 function detectSession(tsStr) {
   if (!tsStr) return 'NY AM';
   const d = new Date(tsStr);
-  // Timestamps are in local/ET — use UTC hour approximation
   const h = d.getHours() + d.getMinutes() / 60;
-  if (h >= 2  && h < 5)   return 'London';
+  if (h >= 2   && h < 5)  return 'London';
   if (h >= 9.5 && h < 12) return 'NY AM';
-  if (h >= 12 && h < 13)  return 'NY Lunch';
-  if (h >= 13 && h < 16)  return 'NY PM';
-  if (h >= 18 || h < 2)   return 'Asia';
-  return 'NY AM';
+  if (h >= 12  && h < 13) return 'NY Lunch';
+  if (h >= 13  && h < 16) return 'NY PM';
+  return 'Asia';
 }
 
-// Format "10/08/2026 09:51:42" → "09:51 AM"
-function fmtTime(tsStr) {
-  if (!tsStr) return '';
-  const d = new Date(tsStr);
-  return d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+function fmtTime(ts) {
+  if (!ts) return '';
+  return new Date(ts).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+}
+function fmtDate(ts) {
+  if (!ts) return '';
+  return new Date(ts).toISOString().split('T')[0];
+}
+function fmtDateShort(ts) {
+  if (!ts) return '';
+  const d = new Date(ts);
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
-// Format "10/08/2026 09:51:42" → "2026-10-08"
-function fmtDate(tsStr) {
-  if (!tsStr) return '';
-  const d = new Date(tsStr);
-  return d.toISOString().split('T')[0];
+function detectDirectionRow(row) {
+  // Short = sold first (soldTimestamp earlier than boughtTimestamp)
+  return new Date(row.soldTimestamp) < new Date(row.boughtTimestamp) ? 'Short' : 'Long';
 }
 
-// Group CSV rows by unique trade (same buyFillId+sellFillId base)
-// Partial exits share buyFillId (longs) or sellFillId (shorts) — group them
-function groupCSVRows(rows) {
-  // Each row is already a matched buy/sell pair from Tradovate
-  // Group rows that share the same entry fill (partial exits)
+function groupRows(rows) {
   const groups = {};
   rows.forEach(row => {
-    const dir = detectDirection(row);
-    // Key: entry fill ID (buyFillId for longs, sellFillId for shorts)
-    const entryKey = dir === 'Long' ? row.sellFillId : row.buyFillId;
-    const key = `${row.symbol}_${entryKey}`;
+    const dir = detectDirectionRow(row);
+    // Entry fill: for Longs = buyFillId (bought first), for Shorts = sellFillId (sold first)
+    const entryFillId = dir === 'Long' ? row.buyFillId : row.sellFillId;
+    const key = `${row.symbol}_${entryFillId}`;
     if (!groups[key]) groups[key] = [];
     groups[key].push(row);
   });
 
   return Object.values(groups).map(grp => {
-    const first     = grp[0];
-    const dir       = detectDirection(first);
-    const symbol    = stripExpiry(first.symbol);
-    const totalQty  = grp.reduce((s, r) => s + parseInt(r.qty || 1), 0);
-    const totalPnl  = grp.reduce((s, r) => s + parsePnl(r.pnl), 0);
+    const first   = grp[0];
+    const dir     = detectDirectionRow(first);
+    const symbol  = stripExpiry(first.symbol);
 
-    // Entry = the first fill in time (sold for shorts, bought for longs)
-    const entryTs   = dir === 'Long' ? first.soldTimestamp  : first.boughtTimestamp;
-    const exitTs    = dir === 'Long' ? grp[grp.length-1].boughtTimestamp : grp[grp.length-1].soldTimestamp;
-    const entryPrice= dir === 'Long' ? parseFloat(first.sellPrice) : parseFloat(first.buyPrice);
-    // Weighted avg exit price across partial exits
-    const exitPriceAvg = grp.reduce((s,r) => {
-      const qty = parseInt(r.qty||1);
-      const px  = dir === 'Long' ? parseFloat(r.buyPrice) : parseFloat(r.sellPrice);
-      return s + px * qty;
-    }, 0) / totalQty;
+    // Entry: the fill where position was opened
+    // Long → bought first → entryPrice = buyPrice, entryTime = boughtTimestamp
+    // Short → sold first → entryPrice = sellPrice, entryTime = soldTimestamp
+    const entryPrice = parseFloat(dir === 'Long' ? first.buyPrice  : first.sellPrice);
+    const entryTime  = dir === 'Long' ? first.boughtTimestamp : first.soldTimestamp;
+    const entryFillId = dir === 'Long' ? first.buyFillId : first.sellFillId;
+
+    // Sort exits by exit timestamp ascending → TP1, TP2, TP3...
+    const exits = grp
+      .map(row => {
+        const exitPrice = parseFloat(dir === 'Long' ? row.sellPrice : row.buyPrice);
+        const exitTime  = dir === 'Long' ? row.soldTimestamp  : row.boughtTimestamp;
+        const qty       = parseInt(row.qty || 1);
+        const pnl       = parsePnl(row.pnl);
+        return { exitPrice, exitTime, qty, pnl };
+      })
+      .sort((a, b) => new Date(a.exitTime) - new Date(b.exitTime));
+
+    const totalQty  = exits.reduce((s, e) => s + e.qty, 0);
+    const totalPnl  = Math.round(exits.reduce((s, e) => s + e.pnl, 0) * 100) / 100;
+    const lastExit  = exits[exits.length - 1];
 
     return {
+      _key:       `${first.symbol}_${entryFillId}`,
       symbol,
       direction:  dir,
       contracts:  totalQty,
       entryPrice: Math.round(entryPrice * 100) / 100,
-      exitPrice:  Math.round(exitPriceAvg * 100) / 100,
-      entryTime:  entryTs,
-      exitTime:   exitTs,
-      pnl:        Math.round(totalPnl * 100) / 100,
-      partials:   grp.length > 1 ? grp.length : 0,
-      _rows:      grp
+      entryTime,
+      exitTime:   lastExit.exitTime,
+      exitPrice:  Math.round(lastExit.exitPrice * 100) / 100,
+      pnl:        totalPnl,
+      outcome:    totalPnl > 0 ? 'Win' : totalPnl < 0 ? 'Loss' : 'Breakeven',
+      session:    detectSession(entryTime),
+      partials:   exits.length, // number of exit fills
+      exits,      // [{exitPrice, exitTime, qty, pnl}, ...]
+      logged:     false
     };
   }).sort((a, b) => new Date(b.entryTime) - new Date(a.entryTime));
 }
 
-// ── RENDER TRADE LIST ────────────────────────────────────────────────────────
-function renderTradeList() {
-  document.getElementById('step-trades').style.display = 'block';
-  document.getElementById('tv-trade-count').textContent = `${tvTrades.length} trade${tvTrades.length>1?'s':''}`;
-  const listEl = document.getElementById('tv-trades-list');
-  listEl.innerHTML = tvTrades.map((t, i) => {
-    const pnlStr = (t.pnl >= 0 ? '+' : '') + '$' + Math.abs(t.pnl).toLocaleString();
-    const pnlCol = t.pnl > 0 ? 'var(--green)' : t.pnl < 0 ? 'var(--red)' : 'var(--text2)';
-    const dirCol = t.direction === 'Long' ? 'var(--green)' : 'var(--red)';
-    const dateStr = fmtDate(t.entryTime);
-    const timeStr = fmtTime(t.entryTime);
-    const partialsLabel = t.partials > 1 ? `<span style="color:var(--text3);font-size:8px;margin-left:4px;">${t.partials} exits</span>` : '';
-    return `<div class="trade-import-row" onclick="tvSelectTrade(${i}, this)">
-      <div style="font-family:var(--mono);font-size:9px;color:var(--text2);">${dateStr}<br><span style="color:var(--text3)">${timeStr}</span></div>
-      <div style="font-family:var(--mono);font-size:10px;color:var(--text);">${t.symbol}${partialsLabel}</div>
-      <div style="font-family:var(--mono);font-size:10px;color:${dirCol};font-weight:700;">${t.direction}</div>
-      <div style="font-family:var(--mono);font-size:10px;color:var(--text2);">${t.entryPrice}</div>
-      <div style="font-family:var(--mono);font-size:10px;color:var(--text2);">${t.exitPrice}</div>
-      <div style="font-family:var(--mono);font-size:11px;font-weight:700;color:${pnlCol};">${pnlStr}</div>
-      <div style="font-family:var(--mono);font-size:10px;color:var(--text2);">${t.contracts}</div>
+// ── RENDER ────────────────────────────────────────────────────────────────────
+function renderAll() {
+  document.getElementById('trades-section').style.display = 'block';
+
+  const pending  = tvTrades.filter(t => !t.logged).length;
+  const total    = tvTrades.length;
+  const logged   = total - pending;
+  document.getElementById('trades-subtitle').textContent =
+    `${pending} pending · ${logged} logged · ${total} total`;
+
+  // Summary
+  const pendingTrades = tvTrades.filter(t => !t.logged);
+  const totalPnl = tvTrades.reduce((s, t) => s + t.pnl, 0);
+  const wins     = tvTrades.filter(t => t.pnl > 0).length;
+  const losses   = tvTrades.filter(t => t.pnl < 0).length;
+  document.getElementById('summary-bar').innerHTML = `
+    <div class="sstat"><div class="sstat-label">Total Trades</div><div class="sstat-value">${total}</div></div>
+    <div class="sstat"><div class="sstat-label">Total P&L</div><div class="sstat-value" style="color:${totalPnl>=0?'var(--green)':'var(--red)'}">${totalPnl>=0?'+':''}$${Math.abs(Math.round(totalPnl)).toLocaleString()}</div></div>
+    <div class="sstat"><div class="sstat-label">Win / Loss</div><div class="sstat-value">${wins}W / ${losses}L</div></div>
+    <div class="sstat"><div class="sstat-label">Pending</div><div class="sstat-value" style="color:${pending>0?'var(--yellow)':'var(--green)'}">${pending}</div></div>`;
+
+  // Trade rows
+  document.getElementById('trade-list').innerHTML = tvTrades.map((t, i) => {
+    const pnlStr  = (t.pnl >= 0 ? '+' : '') + '$' + Math.abs(t.pnl).toLocaleString();
+    const pnlCls  = t.pnl > 0 ? 'pos' : 'neg';
+    const dirCls  = t.direction === 'Long' ? 'long' : 'short';
+    const outCls  = t.pnl > 0 ? 'tr-win' : t.pnl < 0 ? 'tr-loss' : 'tr-be';
+    const logCls  = t.logged ? 'logged' : '';
+    const actions = t.logged
+      ? `<div style="display:flex;align-items:center;gap:6px;"><div class="tr-logged-badge">✓ Logged</div><button onclick="removeTrade(${i})" title="Remove" style="font-family:var(--mono);font-size:9px;background:none;border:1px solid var(--border2);color:var(--text3);padding:3px 7px;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.borderColor='var(--red)';this.style.color='var(--red)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text3)'">✕</button></div>`
+      : `<div style="display:flex;align-items:center;gap:6px;"><button class="tr-log-btn" onclick="logTrade(${i})">Log →</button><button onclick="removeTrade(${i})" title="Remove" style="font-family:var(--mono);font-size:9px;background:none;border:1px solid var(--border2);color:var(--text3);padding:3px 7px;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.borderColor='var(--red)';this.style.color='var(--red)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text3)'">✕</button></div>`;
+    return `<div class="trade-row ${logCls}">
+      <div class="tr-cell tr-date">${fmtDateShort(t.entryTime)}<span>${fmtTime(t.entryTime)}</span></div>
+      <div class="tr-cell tr-session">${t.session}</div>
+      <div class="tr-cell" style="display:flex;flex-direction:column;gap:4px;">
+        <div style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--text);">${t.symbol}</div>
+        <div class="tr-dir ${dirCls}">${t.direction}</div>
+      </div>
+      <div class="tr-cell tr-qty">${t.contracts}x<span style="display:block;font-size:8px;color:var(--text3);">${t.partials>1?t.partials+' exits':'1 exit'}</span></div>
+      <div class="tr-cell tr-pnl ${pnlCls}">${pnlStr}</div>
+      <div class="tr-cell"><span class="tr-outcome ${outCls}">${t.outcome}</span></div>
+      <div class="tr-actions">${actions}</div>
     </div>`;
   }).join('');
+
+  // All logged check
+  const allDone = total > 0 && tvTrades.every(t => t.logged);
+  document.getElementById('all-logged-msg').style.display = allDone ? 'block' : 'none';
 }
 
-// ── SELECT & CONFIRM ─────────────────────────────────────────────────────────
-function tvSelectTrade(index, el) {
-  document.querySelectorAll('.trade-import-row').forEach(r => r.classList.remove('selected'));
-  el.classList.add('selected');
-  tvSelected = tvTrades[index];
-  const t = tvSelected;
-  const session  = detectSession(t.entryTime);
-  const dateStr  = fmtDate(t.entryTime);
-  const entryFmt = fmtTime(t.entryTime);
-  const exitFmt  = fmtTime(t.exitTime);
-  const pnlStr   = (t.pnl >= 0 ? '+' : '') + '$' + Math.abs(t.pnl).toLocaleString();
-
-  document.getElementById('tv-confirm-details').innerHTML = `
-    <div>Instrument: <span style="color:var(--text)">${t.symbol}</span></div>
-    <div>Direction: <span style="color:${t.direction==='Long'?'var(--green)':'var(--red)'}">${t.direction}</span></div>
-    <div>Date: <span style="color:var(--text)">${dateStr}</span></div>
-    <div>Session (detected): <span style="color:var(--text)">${session}</span></div>
-    <div>Entry: <span style="color:var(--text)">${t.entryPrice} at ${entryFmt}</span></div>
-    <div>Exit: <span style="color:var(--text)">${t.exitPrice} at ${exitFmt}</span></div>
-    <div>Contracts: <span style="color:var(--text)">${t.contracts}</span></div>
-    ${t.partials > 1 ? `<div>Partial exits: <span style="color:var(--text)">${t.partials}</span></div>` : ''}
-    <div>P&L: <span style="color:${t.pnl>=0?'var(--green)':'var(--red)'}">${pnlStr}</span></div>`;
-
-  document.getElementById('step-confirm').style.display = 'block';
-  document.getElementById('step-confirm').scrollIntoView({ behavior: 'smooth' });
-}
-
-// ── IMPORT TO FORM ────────────────────────────────────────────────────────────
-function tvImportToForm() {
-  const t = tvSelected;
-  if (!t) return;
+// ── LOG TRADE ─────────────────────────────────────────────────────────────────
+function logTrade(index) {
+  const t = tvTrades[index];
   sessionStorage.setItem('tv_import', JSON.stringify({
     instrument: t.symbol,
     direction:  t.direction,
-    session:    detectSession(t.entryTime),
+    session:    t.session,
     date:       fmtDate(t.entryTime),
     entryPrice: t.entryPrice,
-    exitPrice:  t.exitPrice,
     contracts:  t.contracts,
     entryTime:  fmtTime(t.entryTime),
     exitTime:   fmtTime(t.exitTime),
+    exitPrice:  t.exitPrice,
     pnl:        t.pnl,
-    timeframe:  '1m'
+    timeframe:  '1m',
+    _tvIndex:   index,
+    // Pass partial exits so log-trade.html can pre-fill TP rows
+    exits: t.exits.map((e, i) => ({
+      tp:    i + 1,
+      qty:   e.qty,
+      price: e.exitPrice,
+      time:  fmtTime(e.exitTime),
+      pnl:   e.pnl
+    }))
   }));
+  localStorage.setItem('ftj_tv_pending_index', index);
   window.location.href = 'log-trade.html?from=tradovate';
+}
+
+// ── SAVE / CLEAR ──────────────────────────────────────────────────────────────
+function removeTrade(index) {
+  tvTrades.splice(index, 1);
+  save();
+  if (!tvTrades.length) {
+    document.getElementById('trades-section').style.display = 'none';
+  } else {
+    renderAll();
+  }
+}
+
+function save() {
+  localStorage.setItem(LS_KEY, JSON.stringify(tvTrades));
+}
+
+function clearLogged() {
+  tvTrades = tvTrades.filter(t => !t.logged);
+  save();
+  if (!tvTrades.length) {
+    document.getElementById('trades-section').style.display = 'none';
+  } else {
+    renderAll();
+  }
+  showStatus('✓ Logged trades cleared', 'ok');
+}
+
+function clearAll() {
+  if (!confirm('Clear all imported trades? This cannot be undone.')) return;
+  tvTrades = [];
+  localStorage.removeItem(LS_KEY);
+  document.getElementById('trades-section').style.display = 'none';
+  document.getElementById('drop-label').textContent = '📂 Drag & drop Performance.csv here or click to browse';
+  document.getElementById('drop-zone').style.borderColor = 'var(--border2)';
+  document.getElementById('csv-status').style.display = 'none';
+}
+
+function showStatus(msg, type) {
+  const el = document.getElementById('csv-status');
+  el.textContent = msg;
+  el.className = `status-msg status-${type}`;
+  el.style.display = 'block';
 }
 </script>
 <script>if('serviceWorker' in navigator){navigator.serviceWorker.register('../sw.js');}</script>
