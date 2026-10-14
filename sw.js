@@ -50,7 +50,8 @@ self.addEventListener('fetch', e => {
     url.hostname.includes('notion.com') ||
     url.hostname.includes('api.notion') ||
     url.hostname.includes('imgur.com') ||
-    url.hostname.includes('api.imgur.com')
+    url.hostname.includes('api.imgur.com') ||
+    url.hostname.includes('supabase.co')
   ) {
     e.respondWith(fetch(e.request.clone()));
     return;
