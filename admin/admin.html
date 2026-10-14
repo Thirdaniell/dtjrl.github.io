@@ -15,20 +15,8 @@
 body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;min-height:100vh;}
 ::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
 
-/* AUTH */
-#auth-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:999;}
-.auth-box{background:var(--surface);border:1px solid var(--border2);padding:2.5rem;width:360px;display:flex;flex-direction:column;gap:16px;}
-.auth-logo{font-family:var(--mono);font-size:11px;letter-spacing:0.15em;color:var(--accent);}
-.auth-title{font-family:var(--mono);font-size:18px;font-weight:700;}
-.auth-sub{font-size:12px;color:var(--text3);}
-.auth-input{font-family:var(--mono);font-size:13px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:10px 12px;width:100%;outline:none;letter-spacing:0.1em;transition:border-color 0.15s;}
-.auth-input:focus{border-color:var(--accent);}
-.auth-btn{font-family:var(--mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;padding:10px;background:var(--accent);color:#000;border:none;cursor:pointer;font-weight:700;}
-.auth-btn:hover{opacity:0.85;}
-.auth-error{font-family:var(--mono);font-size:10px;color:var(--red);display:none;}
-
 /* LAYOUT */
-#main{display:none;padding-left:64px;}
+#main{display:block;padding-left:64px;}
 .page{max-width:860px;margin:0 auto;padding:3rem 2rem 5rem;}
 .sidenav-admin{position:fixed;left:0;top:0;bottom:0;width:64px;background:var(--bg);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:1.5rem 0;z-index:200;}
 .nav-logo-a{font-family:var(--mono);font-size:9px;letter-spacing:0.1em;color:var(--accent);writing-mode:vertical-rl;margin-bottom:2rem;}
@@ -90,23 +78,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
 </head>
 <body>
 
-<!-- AUTH -->
-<div id="auth-screen">
-  <div class="auth-box">
-    <div class="auth-logo">// FTJ</div>
-    <div class="auth-title">Admin Access</div>
-    <div class="auth-sub">Enter your password to access the admin panel.</div>
-    <input class="auth-input" type="password" id="pw-input" placeholder="Password">
-    <div class="auth-error" id="auth-error">Incorrect password. Try again.</div>
-    <button class="auth-btn" onclick="checkAuth()">Unlock →</button>
-  </div>
-</div>
-
 <!-- MAIN -->
 <div id="main">
   <nav class="sidenav-admin">
     <div class="nav-logo-a">// FTJ</div>
     <div class="nav-admin-tag">ADMIN</div>
+    <button onclick="signOut()" title="Sign out" style="font-family:var(--mono);font-size:8px;letter-spacing:0.12em;color:var(--text3);writing-mode:vertical-rl;background:none;border:none;cursor:pointer;text-transform:uppercase;margin-top:12px;transition:color 0.15s;" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--text3)'">Sign Out</button>
   </nav>
   <div class="page">
     <a href="../index.html" class="back-btn">← Back to Journal</a>
@@ -200,38 +177,15 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
 
 <script src="admin-core.js"></script>
 <script>
-// ── AUTH ──────────────────────────────────────────────────────────────────────
-async function checkAuth() {
-  const val = document.getElementById('pw-input').value;
-  const btn = document.querySelector('.pw-btn');
-  if (btn) { btn.disabled = true; btn.textContent = 'Checking...'; }
-  const ok = await checkPassword(val);
-  if (btn) { btn.disabled = false; btn.textContent = 'Enter'; }
-  if (ok) {
-    setAuth();
-    document.getElementById('auth-screen').style.display = 'none';
-    document.getElementById('main').style.display = 'block';
-    loadDashboard();
-  } else {
-    document.getElementById('auth-error').style.display = 'block';
-    document.getElementById('pw-input').value = '';
-    document.getElementById('pw-input').focus();
-  }
-}
-document.getElementById('pw-input').addEventListener('keydown', e => { if (e.key === 'Enter') checkAuth(); });
-
-// Auto-unlock if already authenticated this session
-if (sessionStorage.getItem('ftj_admin_auth') === 'true') {
-  document.getElementById('auth-screen').style.display = 'none';
-  document.getElementById('main').style.display = 'block';
-  loadDashboard();
-}
+// Redirect to login if no valid session
+requireAuth();
 
 // ── DASHBOARD ─────────────────────────────────────────────────────────────────
 function loadDashboard() {
   loadBias();
   loadWeeklyStats();
 }
+loadDashboard();
 
 // ── BIAS ──────────────────────────────────────────────────────────────────────
 function biasClass(b)    { return {'Bullish':'b-bull','Bearish':'b-bear','Ranging':'b-range','Waiting':'b-wait'}[b]||'b-none'; }
