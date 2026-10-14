@@ -7,7 +7,7 @@ const VIOLATIONS_DB = '3882ac472cd280a0a446d576c20fb20c';
 const TODAY    = new Date().toISOString().split('T')[0];
 
 // ── AUTH ──────────────────────────────────────────────────────────────────────
-const SUPABASE_URL  = 'https://lcpcapiifIkbttghmnzp.supabase.co';
+const SUPABASE_URL  = 'https://lcpcapiiflkbttghmnzp.supabase.co';
 const SUPABASE_ANON = 'sb_publishable_1oAJYzDXoMuUmH_D8PqADA_Vnh6JnVD';
 
 function getSession() {
