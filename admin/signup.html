@@ -202,7 +202,14 @@ async function signup() {
     const res = await fetch(`${SUPABASE_URL}/auth/v1/signup`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON },
-      body: JSON.stringify({ email, password, data: { username } })
+      body: JSON.stringify({
+        email,
+        password,
+        data: { username },
+        options: {
+          emailRedirectTo: 'https://thirdaniell.github.io/dtjrl.github.io/confirm.html'
+        }
+      })
     });
     const data = await res.json();
 
