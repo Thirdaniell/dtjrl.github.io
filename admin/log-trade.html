@@ -76,7 +76,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
 .success-msg{display:none;background:rgba(0,230,118,0.08);border:1px solid rgba(0,230,118,0.3);padding:1rem 1.25rem;font-family:var(--mono);font-size:12px;color:var(--green);text-align:center;margin-top:1rem;letter-spacing:0.05em;}
 .loading-msg{font-family:var(--mono);font-size:11px;color:var(--text3);letter-spacing:0.1em;text-align:center;padding:1rem;animation:blink 1s infinite;}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+/* PARTIAL EXITS */
 .partial-row{display:none;background:rgba(200,255,0,0.03);border:1px solid rgba(200,255,0,0.15);padding:1rem 1.25rem;}
+/* EMOTION BUTTONS */
 .emo-btn{font-family:var(--mono);font-size:10px;letter-spacing:0.04em;padding:5px 10px;background:var(--surface2);border:1px solid var(--border2);color:var(--text3);cursor:pointer;transition:all 0.12s;white-space:nowrap;}
 .emo-btn:hover{border-color:var(--text2);color:var(--text);}
 .emo-btn.selected{background:rgba(200,255,0,0.08);border-color:var(--accent);color:var(--accent);}
@@ -93,7 +95,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
     <a href="admin.html" class="back-btn">← Back to Admin</a>
     <div class="page-eyebrow">// Admin</div>
     <div class="page-title">Log Trade</div>
-    <p style="font-size:13px;color:var(--text2);margin:0 0 2rem;line-height:1.7;">Fill in your trade details. The AI will grade, verify, and calculate all values — then show you a preview before submitting.</p>
+    <p style="font-size:13px;color:var(--text2);margin:0 0 2rem;line-height:1.7;">Fill in your trade details. The AI will grade, verify, and calculate all values — then show you a preview before submitting to Notion.</p>
 
     <div class="form-grid">
       <div class="field"><label>Instrument</label><select id="f-instrument"><option value="">Select...</option><option>NQ</option><option>ES</option><option>MNQ</option><option>MES</option><option>CL</option><option>GC</option><option>RTY</option></select></div>
@@ -108,6 +110,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
       <div class="field"><label>Entry Time</label><input type="text" id="f-entry-time" placeholder="e.g. 9:40 AM"></div>
       <div class="field"><label>Exit Price</label><input type="number" id="f-exit" placeholder="e.g. 27419.75" step="0.25"></div>
       <div class="field"><label>Exit Time <span style="color:var(--text3);font-size:9px;">(final)</span></label><input type="text" id="f-exit-time" placeholder="e.g. 10:01 AM"></div>
+      <!-- PARTIAL EXITS -->
       <div class="field form-full partial-row" id="partial-row">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
           <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--accent);text-transform:uppercase;">Partial Exits</div>
@@ -126,6 +129,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
           <div id="f-upload-label" style="font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:0.08em;">📎 Drag & drop, Ctrl+V, or click to upload</div>
           <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:3px;">PNG, JPG, WEBP · Multiple images supported</div>
         </div>
+        <!-- Image preview grid with delete buttons -->
         <div id="f-img-previews" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;"></div>
         <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-bottom:4px;text-align:center;">— or paste a link instead —</div>
         <input type="text" id="f-screenshot" placeholder="TradingView or imgur URL (optional if image uploaded)" style="font-family:var(--mono);font-size:12px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:8px 10px;width:100%;outline:none;transition:border-color 0.15s;">
@@ -170,7 +174,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
         <div class="review-grid" id="review-grid"></div>
         <div class="ai-section"><div class="ai-title">AI Rule Verification</div><div class="ai-result" id="ai-result"></div><div id="ai-verdict-badge"></div></div>
         <div class="review-actions">
-          <button class="confirm-btn" id="confirm-btn" onclick="submitTrade()">✓ Confirm & Submit</button>
+          <button class="confirm-btn" id="confirm-btn" onclick="submitTrade()">✓ Confirm & Submit Trade</button>
           <button class="edit-btn" onclick="document.getElementById('review-panel').style.display='none'">← Edit</button>
         </div>
       </div>
@@ -183,8 +187,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
 <script>
 if (!requireAuth()) { /* redirected */ }
 
+// ── IMAGE UPLOAD (multi-file, Imgur anonymous) ────────────────────────────────
 const IMGUR_CLIENT_ID = '546c25a59c58ad7';
-let pendingImgFiles = [];
+let pendingImgFiles = []; // array of File objects
 
 function handleImgDrop(event, prefix) {
   event.preventDefault();
@@ -194,9 +199,10 @@ function handleImgDrop(event, prefix) {
 
 function handleImgFile(event, prefix) {
   addImgFiles(Array.from(event.target.files), prefix);
-  event.target.value = '';
+  event.target.value = ''; // reset so same file can be re-added
 }
 
+// CTRL+V paste from clipboard
 document.addEventListener('paste', e => {
   const items = e.clipboardData?.items;
   if (!items) return;
@@ -254,7 +260,7 @@ function renderImgPreviews(prefix) {
   });
 }
 
-async function uploadImgsToImgur(prefix) {
+async function uploadAllImgsToNotion(pageId, prefix) {
   if (!pendingImgFiles.length) return [];
   const statusEl = document.getElementById(`${prefix}-upload-status`);
   statusEl.style.display = 'block';
@@ -266,19 +272,29 @@ async function uploadImgsToImgur(prefix) {
     try {
       const formData = new FormData();
       formData.append('image', file);
-      const res = await fetch('https://api.imgur.com/3/image', {
+      const imgurRes = await fetch('https://api.imgur.com/3/image', {
         method: 'POST',
         headers: { 'Authorization': `Client-ID ${IMGUR_CLIENT_ID}` },
         body: formData
       });
-      const data = await res.json();
-      if (!data.success) throw new Error(data.data?.error || 'unknown');
-      urls.push(data.data.link);
+      const imgurData = await imgurRes.json();
+      if (!imgurData.success) throw new Error(imgurData.data?.error || 'unknown');
+      const imgUrl = imgurData.data.link;
+      urls.push(imgUrl);
+      // Add each as an image block on the Notion page
+      await fetch(`${WORKER}/notion/blocks/${pageId}/children`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          children: [{ object:'block', type:'image', image:{ type:'external', external:{ url:imgUrl } } }]
+        })
+      });
     } catch(e) {
       statusEl.textContent = `⚠ Image ${i+1} failed: ${e.message}`;
     }
   }
   if (urls.length) {
+    // Save first URL to screenshot field so index.html picks it up
     const screenshotEl = document.getElementById(`${prefix}-screenshot`);
     if (screenshotEl && !screenshotEl.value) screenshotEl.value = urls[0];
     statusEl.textContent = `✓ ${urls.length} image${urls.length>1?'s':''} uploaded`;
@@ -300,8 +316,11 @@ function resetImgUpload(prefix) {
   if (fileEl)    fileEl.value = '';
 }
 
+
+
 buildConfDropdown('conf-btn','conf-dropdown','conf-label','conf-tags','updateConf');
 
+// ── AUTO-FILL FROM TRADOVATE IMPORT ──────────────────────────────────────────
 (function checkTradovateImport() {
   const params = new URLSearchParams(window.location.search);
   if (params.get('from') !== 'tradovate') return;
@@ -310,6 +329,7 @@ buildConfDropdown('conf-btn','conf-dropdown','conf-label','conf-tags','updateCon
   try {
     const t = JSON.parse(raw);
     sessionStorage.removeItem('tv_import');
+
     const setV = (id, v) => { const el = document.getElementById(id); if (el && v != null) el.value = v; };
     setV('f-instrument', t.instrument);
     setV('f-direction',  t.direction);
@@ -321,14 +341,20 @@ buildConfDropdown('conf-btn','conf-dropdown','conf-label','conf-tags','updateCon
     setV('f-contracts',  t.contracts);
     setV('f-entry-time', t.entryTime);
     setV('f-exit-time',  t.exitTime);
+
+    // Detect outcome from P&L
     if (t.pnl > 0)      setV('f-outcome', 'Closed - Win');
     else if (t.pnl < 0) setV('f-outcome', 'Closed - Loss');
     else                 setV('f-outcome', 'Breakeven');
+
+    // Pre-fill partial exits if exits array provided
     if (t.exits && t.exits.length > 0) {
       const partialRow = document.getElementById('partial-row');
       if (partialRow) {
         partialRow.style.display = 'block';
+        // Render TP rows first
         if (typeof renderTPRows === 'function') renderTPRows(t.contracts);
+        // Wait a tick then fill in the values
         setTimeout(() => {
           t.exits.forEach((exit, i) => {
             const tpNum = i + 1;
@@ -339,6 +365,7 @@ buildConfDropdown('conf-btn','conf-dropdown','conf-label','conf-tags','updateCon
             if (priceEl) priceEl.value = exit.price;
             if (timeEl)  timeEl.value  = exit.time;
           });
+          // Trigger P&L preview recalc if available
           if (typeof calcPartialPnl === 'function') calcPartialPnl();
         }, 100);
       }
@@ -346,11 +373,16 @@ buildConfDropdown('conf-btn','conf-dropdown','conf-label','conf-tags','updateCon
       const row = document.getElementById('partial-row');
       if (row) { row.style.display = 'block'; if (typeof renderTPRows === 'function') renderTPRows(t.contracts); }
     }
+
+    // Banner at top of form
     const banner = document.createElement('div');
     banner.style.cssText = 'background:rgba(200,255,0,0.07);border:1px solid rgba(200,255,0,0.3);padding:10px 16px;font-family:var(--mono);font-size:10px;color:var(--accent);letter-spacing:0.08em;margin-bottom:1.5rem;';
     banner.textContent = `✓ Pre-filled from Tradovate — ${t.instrument} ${t.direction} · ${t.pnl >= 0 ? '+' : ''}$${Math.abs(t.pnl || 0).toLocaleString()} · Add confluences and notes to complete`;
     const formGrid = document.querySelector('.form-grid');
     if (formGrid) formGrid.parentNode.insertBefore(banner, formGrid);
+
+    // Index is already stored in localStorage by tradovate.html before redirect
+    // Clean URL
     window.history.replaceState({}, '', 'log-trade.html');
   } catch(e) {
     console.warn('Tradovate import parse error:', e);
@@ -526,83 +558,59 @@ async function analyzeTrade() {
 async function submitTrade() {
   const btn=document.getElementById('confirm-btn'); btn.disabled=true; btn.textContent='Submitting...';
   const t=tradeData, tradeName=`${t.instrument} ${t.direction} — ${t.session}`;
-
-  // Upload images first
-  let screenshotUrls = [];
-  if (pendingImgFiles.length) {
-    screenshotUrls = await uploadImgsToImgur('f');
-  }
-  const screenshotUrl = screenshotUrls[0] || t.screenshot || null;
-
-  const exitBreakdown = (t.tpRows && t.tpRows.length > 0)
-    ? 'Exit breakdown: ' + t.tpRows.map(r=>`${r.label}: ${r.contracts} contract${r.contracts>1?'s':''} @ ${r.price}${r.time?' at '+r.time:''}`).join(' · ')
-    : null;
-  const fullNotes = [t.notes, exitBreakdown].filter(Boolean).join('\n');
-
-  const session = getSession();
-  const userId = session?.user?.id;
-
-  const payload = {
-    user_id:         userId,
-    trade_name:      tradeName,
-    instrument:      t.instrument,
-    direction:       t.direction,
-    status:          t.outcome     || null,
-    session:         t.session     || null,
-    timeframe:       t.timeframe   || null,
-    date:            t.date        || null,
-    contracts:       t.contracts   || null,
-    pnl:             t.pnl,
-    followed_rules:  t.followedRules || null,
-    setup_grade:     t.grade       || null,
-    entry_price:     t.entry       || null,
-    exit_price:      t.exit        || null,
-    stop_loss:       t.sl          || null,
-    take_profit:     t.tp          || null,
-    rr:              t.rr          || null,
-    duration_mins:   t.duration    || null,
-    entry_time:      t.entryTime   || null,
-    exit_time:       t.exitTime    || null,
-    notes:           fullNotes     || null,
-    mistakes:        t.mistakes    || null,
-    lessons:         t.lessons     || null,
-    htf_context:     t.htf         || null,
-    entry_model:     t.model       || null,
-    confluences:     t.confluences.length ? t.confluences : null,
-    emotions:        t.emotions && t.emotions.length ? t.emotions : null,
-    emotion_notes:   t.emotionNotes || null,
-    screenshot_url:  screenshotUrl,
-    screenshot_urls: screenshotUrls.length ? screenshotUrls : null,
+  const exitBreakdown=(t.tpRows&&t.tpRows.length>0)?'Exit breakdown: '+t.tpRows.map(r=>`${r.label}: ${r.contracts} contract${r.contracts>1?'s':''} @ ${r.price}${r.time?' at '+r.time:''}`).join(' · '):null;
+  const fullNotes=[t.notes,exitBreakdown].filter(Boolean).join('\n');
+  const payload={
+    trade_name: tradeName,
+    instrument: t.instrument,
+    direction: t.direction,
+    outcome: t.outcome,
+    session: t.session,
+    timeframe: t.timeframe,
+    date: t.date,
+    contracts: t.contracts,
+    pnl: t.pnl,
+    followed_rules: t.followedRules,
+    grade: t.grade,
+    entry_price: t.entry||null,
+    exit_price: t.exit||null,
+    stop_loss: t.sl||null,
+    take_profit: t.tp||null,
+    rr: t.rr||null,
+    duration_mins: t.duration||null,
+    entry_time: t.entryTime||null,
+    exit_time: t.exitTime||null,
+    notes: fullNotes||null,
+    mistakes: t.mistakes||null,
+    lessons: t.lessons||null,
+    htf_timeframe: t.htf||null,
+    entry_model: t.model||null,
+    confluences: t.confluences.length ? t.confluences : null,
+    emotions: (t.emotions&&t.emotions.length) ? t.emotions : null,
+    emotion_notes: t.emotionNotes||null,
+    screenshot: t.screenshot||null,
   };
-
   try {
-    const res = await fetch(`${WORKER}/sb/trades`, {
-      method: 'POST',
-      headers: authHeaders(),
-      body: JSON.stringify(payload)
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || data.message || 'Insert failed');
-
+    const res=await fetch(`${WORKER}/sb/trades`,{method:'POST',headers:authHeaders(),body:JSON.stringify(payload)});
+    const data=await res.json();
+    if(data.error){alert('⚠️ '+data.error);btn.disabled=false;btn.textContent='✓ Confirm & Submit Trade';return;}
     const tvPendingIdx = localStorage.getItem('ftj_tv_pending_index');
     if (tvPendingIdx != null) {
       localStorage.setItem('ftj_tv_logged_index', tvPendingIdx);
       localStorage.removeItem('ftj_tv_pending_index');
     }
     const fromTV = tvPendingIdx != null;
-    const msg = document.getElementById('success-msg');
-    msg.style.display = 'block';
+    const msg=document.getElementById('success-msg');
+    msg.style.display='block';
     if (fromTV) {
-      msg.innerHTML = `✓ Trade logged! ${tradeName} · ${t.grade} · ${t.pnl>=0?'+':''}$${Math.abs(t.pnl).toLocaleString()} &nbsp;<a href="tradovate.html" style="font-family:var(--mono);font-size:10px;color:#000;background:var(--accent);padding:4px 12px;text-decoration:none;margin-left:8px;">← Back to Importer</a>`;
+      msg.innerHTML=`✓ Trade logged! ${tradeName} · ${t.grade} · ${t.pnl>=0?'+':''}$${Math.abs(t.pnl).toLocaleString()} &nbsp;<a href="tradovate.html" style="font-family:var(--mono);font-size:10px;color:#000;background:var(--accent);padding:4px 12px;text-decoration:none;margin-left:8px;">← Back to Importer</a>`;
     } else {
-      msg.textContent = `✓ Trade logged! ${tradeName} · ${t.grade} · ${t.pnl>=0?'+':''}$${Math.abs(t.pnl).toLocaleString()}`;
+      msg.textContent=`✓ Trade logged! ${tradeName} · ${t.grade} · ${t.pnl>=0?'+':''}$${Math.abs(t.pnl).toLocaleString()}`;
     }
-    document.getElementById('review-panel').style.display = 'none';
+    document.getElementById('review-panel').style.display='none';
     resetForm();
-  } catch(e) {
-    alert('Submit failed: ' + e.message);
-  }
-  btn.disabled = false; btn.textContent = '✓ Confirm & Submit';
+  } catch(e){alert('Submit failed: '+e.message);}
+  btn.disabled=false; btn.textContent='✓ Confirm & Submit Trade';
 }
 
 function resetForm() {
