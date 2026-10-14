@@ -4,7 +4,6 @@ const DB_ID    = '5398f956345943b7b12b2298bbb6e127';
 const BIAS_DB  = 'c163f7373bb44be19ae4f4a886384ddf';
 const WEEKLY_DB= '6d1309c6e6174f489e32293e253ae729';
 const VIOLATIONS_DB = '3882ac472cd280a0a446d576c20fb20c';
-const PASS     = 'Pammolad123#';
 const TODAY    = new Date().toISOString().split('T')[0];
 
 // ── AUTH ──────────────────────────────────────────────────────────────────────
@@ -22,8 +21,18 @@ function setAuth() {
   sessionStorage.setItem('ftj_admin_auth', 'true');
 }
 
-function checkPassword(val) {
-  return val === PASS;
+// Password is validated server-side — never stored in frontend code
+async function checkPassword(val) {
+  try {
+    const res = await fetch(`${WORKER}/verify-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: val })
+    });
+    return res.ok;
+  } catch(e) {
+    return false;
+  }
 }
 
 // ── SHARED CALCULATIONS ───────────────────────────────────────────────────────
