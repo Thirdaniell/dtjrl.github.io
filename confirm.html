@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FTJ — Email Confirmed</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0a; --surface: #111111; --border: #222222; --border2: #2a2a2a;
+    --text: #e8e8e8; --text2: #888; --text3: #444;
+    --accent: #c8ff00; --red: #ff4444; --green: #00e676;
+    --mono: 'Space Mono', monospace; --sans: 'DM Sans', sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg); color: var(--text); font-family: var(--sans);
+    font-size: 14px; min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .wrap { width: 100%; max-width: 360px; padding: 2rem; }
+  .logo { font-family: var(--mono); font-size: 13px; letter-spacing: 0.15em; color: var(--accent); text-transform: uppercase; margin-bottom: 2.5rem; }
+  .logo-sub { font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; color: var(--text3); text-transform: uppercase; margin-top: 4px; }
+  .divider { height: 1px; background: var(--border); margin-bottom: 2rem; }
+  .msg {
+    font-family: var(--mono); font-size: 10px; letter-spacing: 0.06em;
+    padding: 12px; margin-bottom: 20px;
+  }
+  .msg.success { border: 1px solid rgba(0,230,118,0.3); background: rgba(0,230,118,0.06); color: var(--green); }
+  .msg.error   { border: 1px solid rgba(255,68,68,0.3);  background: rgba(255,68,68,0.06);  color: var(--red); }
+  .msg.loading { border: 1px solid var(--border2); background: var(--surface); color: var(--text3); }
+  .label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em; color: var(--text3); text-transform: uppercase; margin-bottom: 16px; }
+  .btn {
+    display: block; width: 100%; padding: 11px;
+    background: var(--accent); color: #000; border: none;
+    font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em;
+    text-transform: uppercase; cursor: pointer; text-decoration: none;
+    text-align: center; transition: opacity 0.15s;
+  }
+  .btn:hover { opacity: 0.85; }
+  .btn-ghost {
+    display: block; width: 100%; padding: 11px; margin-top: 10px;
+    background: none; color: var(--text3); border: 1px solid var(--border2);
+    font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em;
+    text-transform: uppercase; cursor: pointer; text-decoration: none;
+    text-align: center; transition: border-color 0.15s, color 0.15s;
+  }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo">
+    // FTJ
+    <div class="logo-sub">Futures Trading Journal</div>
+  </div>
+  <div class="divider"></div>
+
+  <div class="msg loading" id="msg">Verifying your email...</div>
+  <div class="label" id="label"></div>
+  <div id="actions"></div>
+</div>
+
+<script>
+const SUPABASE_URL  = 'https://lcpcapiiflkbttghmnzp.supabase.co';
+const SUPABASE_ANON = 'sb_publishable_1oAJYzDXoMuUmH_D8PqADA_Vnh6JnVD';
+
+async function handleConfirm() {
+  const hash   = new URLSearchParams(window.location.hash.slice(1));
+  const params = new URLSearchParams(window.location.search);
+  const msg    = document.getElementById('msg');
+  const label  = document.getElementById('label');
+  const actions = document.getElementById('actions');
+
+  // Supabase puts token_hash + type in query params for PKCE, or access_token in hash for implicit
+  const tokenHash = params.get('token_hash');
+  const type      = params.get('type');
+  const accessToken = hash.get('access_token');
+  const errorDesc   = hash.get('error_description') || params.get('error_description');
+
+  if (errorDesc) {
+    msg.className = 'msg error';
+    msg.textContent = decodeURIComponent(errorDesc).replace(/\+/g, ' ');
+    label.textContent = 'The link may have expired. Request a new one from the login page.';
+    actions.innerHTML = '<a class="btn-ghost" href="login.html">Back to Login</a>';
+    return;
+  }
+
+  if (tokenHash && type === 'email') {
+    // Verify OTP
+    try {
+      const res = await fetch(`${SUPABASE_URL}/auth/v1/verify`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON },
+        body: JSON.stringify({ token_hash: tokenHash, type: 'email' })
+      });
+      const data = await res.json();
+      if (res.ok && data.access_token) {
+        localStorage.setItem('ftj_session', JSON.stringify({
+          access_token: data.access_token,
+          refresh_token: data.refresh_token,
+          user: data.user
+        }));
+        msg.className = 'msg success';
+        msg.textContent = 'Email confirmed. You\'re good to go.';
+        actions.innerHTML = '<a class="btn" href="admin/admin.html">Open Journal →</a>';
+      } else {
+        throw new Error(data.msg || data.error_description || 'Verification failed');
+      }
+    } catch(e) {
+      msg.className = 'msg error';
+      msg.textContent = e.message;
+      actions.innerHTML = '<a class="btn-ghost" href="login.html">Back to Login</a>';
+    }
+    return;
+  }
+
+  if (accessToken) {
+    // Implicit flow — token already in URL, just store it
+    localStorage.setItem('ftj_session', JSON.stringify({
+      access_token: accessToken,
+      refresh_token: hash.get('refresh_token'),
+      user: null
+    }));
+    msg.className = 'msg success';
+    msg.textContent = 'Email confirmed. You\'re good to go.';
+    actions.innerHTML = '<a class="btn" href="admin/admin.html">Open Journal →</a>';
+    return;
+  }
+
+  // No token found
+  msg.className = 'msg error';
+  msg.textContent = 'Invalid or missing confirmation token.';
+  actions.innerHTML = '<a class="btn-ghost" href="login.html">Back to Login</a>';
+}
+
+handleConfirm();
+</script>
+</body>
+</html>
