@@ -18,6 +18,7 @@ const STATIC = [
   '/dtjrl.github.io/admin/bias.html',
   '/dtjrl.github.io/admin/weekly.html',
   '/dtjrl.github.io/admin/premarket.html',
+  '/dtjrl.github.io/confirm.html',
   'https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap'
 ];
 
