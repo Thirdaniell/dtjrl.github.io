@@ -7,32 +7,44 @@ const VIOLATIONS_DB = '3882ac472cd280a0a446d576c20fb20c';
 const TODAY    = new Date().toISOString().split('T')[0];
 
 // ── AUTH ──────────────────────────────────────────────────────────────────────
-// Pages call requireAuth() on load. If not authenticated, redirect to hub.
+const SUPABASE_URL  = 'https://lcpcapiifIkbttghmnzp.supabase.co';
+const SUPABASE_ANON = 'sb_publishable_1oAJYzDXoMuUmH_D8PqADA_Vnh6JnVD';
+
+function getSession() {
+  try {
+    const s = JSON.parse(localStorage.getItem('ftj_session') || 'null');
+    if (!s || !s.access_token) return null;
+    if (s.expires_at < Math.floor(Date.now() / 1000)) {
+      localStorage.removeItem('ftj_session');
+      return null;
+    }
+    return s;
+  } catch(e) { return null; }
+}
+
+function getCurrentUser() {
+  const s = getSession();
+  return s ? s.user : null;
+}
+
 function requireAuth() {
-  const authed = sessionStorage.getItem('ftj_admin_auth');
-  if (authed !== 'true') {
-    window.location.href = 'admin.html';
+  const s = getSession();
+  if (!s) {
+    window.location.href = 'login.html';
     return false;
   }
   return true;
 }
 
-function setAuth() {
-  sessionStorage.setItem('ftj_admin_auth', 'true');
+function signOut() {
+  localStorage.removeItem('ftj_session');
+  window.location.href = 'login.html';
 }
 
-// Password is validated server-side — never stored in frontend code
-async function checkPassword(val) {
-  try {
-    const res = await fetch(`${WORKER}/verify-password`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ password: val })
-    });
-    return res.ok;
-  } catch(e) {
-    return false;
-  }
+// Auth header for worker calls that need user identity
+function authHeaders() {
+  const s = getSession();
+  return s ? { 'Authorization': `Bearer ${s.access_token}`, 'Content-Type': 'application/json' } : { 'Content-Type': 'application/json' };
 }
 
 // ── SHARED CALCULATIONS ───────────────────────────────────────────────────────
