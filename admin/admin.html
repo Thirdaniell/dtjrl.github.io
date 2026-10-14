@@ -201,9 +201,13 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
 <script src="admin-core.js"></script>
 <script>
 // ── AUTH ──────────────────────────────────────────────────────────────────────
-function checkAuth() {
+async function checkAuth() {
   const val = document.getElementById('pw-input').value;
-  if (checkPassword(val)) {
+  const btn = document.querySelector('.pw-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Checking...'; }
+  const ok = await checkPassword(val);
+  if (btn) { btn.disabled = false; btn.textContent = 'Enter'; }
+  if (ok) {
     setAuth();
     document.getElementById('auth-screen').style.display = 'none';
     document.getElementById('main').style.display = 'block';
