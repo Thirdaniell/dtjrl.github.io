@@ -79,7 +79,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
     <a href="admin.html" class="back-btn">← Back to Admin</a>
     <div class="page-eyebrow">// Admin</div>
     <div class="page-title">Edit Trade</div>
-    <p style="font-size:13px;color:var(--text2);margin:0 0 1.5rem;line-height:1.7;">Select a recent trade to edit. All fields pre-fill from Notion. Changes are saved back and re-verified automatically.</p>
+    <p style="font-size:13px;color:var(--text2);margin:0 0 1.5rem;line-height:1.7;">Select a recent trade to edit. All fields pre-fill from Supabase. Changes are saved back and re-verified automatically.</p>
 
     <!-- TRADE LIST -->
     <div id="trade-list-wrap">
@@ -172,7 +172,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
 <script>
 if (!requireAuth()) { /* redirected */ }
 
-let editPageId = null;
+let editPageId = null; // Supabase UUID
 let editConfOpen = false;
 const EF_TP_LABELS = ['TP1','TP2','TP3','TP4','TP5','TP6','TP7','TP8','TP9','TP10'];
 
@@ -326,25 +326,21 @@ function updateEditPartialPreview() {
 async function loadTradeList() {
   const wrap = document.getElementById('trade-list-wrap');
   try {
-    const data = await notionPost(`/databases/${DB_ID}/query`, {
-      page_size: 20,
-      sorts: [{ property: 'Date', direction: 'descending' }]
-    });
-    const pages = data.results || [];
-    if (!pages.length) { wrap.innerHTML = `<div style="font-family:var(--mono);font-size:11px;color:var(--text3);padding:2rem;text-align:center;background:var(--surface);border:1px solid var(--border2);">No trades found</div>`; return; }
+    const res = await fetch(`${WORKER}/sb/trades?select=id,trade_name,date,pnl,grade&order=date.desc,created_at.desc&limit=20`, { headers: authHeaders() });
+    const trades = await res.json();
+    if (!Array.isArray(trades) || !trades.length) { wrap.innerHTML = `<div style="font-family:var(--mono);font-size:11px;color:var(--text3);padding:2rem;text-align:center;background:var(--surface);border:1px solid var(--border2);">No trades found</div>`; return; }
     const gradeColors = {'A++':'#c8ff00','A+':'#00e676','A':'#40c4ff','A-':'#40c4ff','B+':'#ffd740','B':'#ffd740','B-':'#ffab40','C':'#ff6d00','D':'#ff4444'};
-    const rows = pages.map(p => {
-      const props=p.properties,id=p.id;
-      const name=(props['Trade Name']?.title||[]).map(r=>r.plain_text||'').join('')||'—';
-      const date=props['Date']?.date?.start||'—';
-      const pnl=props['P&L ($)']?.number;
-      const grade=props['Setup Grade']?.select?.name||'—';
-      const pnlStr=pnl!=null?(pnl>=0?'+':'-')+'$'+Math.abs(pnl).toLocaleString():'—';
-      const pnlCol=pnl>0?'var(--green)':pnl<0?'var(--red)':'var(--text2)';
-      const gradeCol=gradeColors[grade]||'var(--text3)';
-      const d=new Date(date+'T12:00:00');
-      const dateStr=isNaN(d)?date:d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
-      return `<div class="trade-row" onclick="loadEditTrade('${id}')">
+    const rows = trades.map(t => {
+      const name = t.trade_name || '—';
+      const date = t.date || '—';
+      const pnl = t.pnl;
+      const grade = t.grade || '—';
+      const pnlStr = pnl!=null ? (pnl>=0?'+':'-')+'$'+Math.abs(pnl).toLocaleString() : '—';
+      const pnlCol = pnl>0?'var(--green)':pnl<0?'var(--red)':'var(--text2)';
+      const gradeCol = gradeColors[grade]||'var(--text3)';
+      const d = new Date(date+'T12:00:00');
+      const dateStr = isNaN(d)?date:d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+      return `<div class="trade-row" onclick="loadEditTrade('${t.id}')">
         <div style="font-family:var(--mono);font-size:10px;color:var(--text2);">${dateStr}</div>
         <div style="font-family:var(--mono);font-size:11px;color:var(--text);">${name}</div>
         <div style="font-family:var(--mono);font-size:11px;font-weight:700;color:${pnlCol};">${pnlStr}</div>
@@ -361,47 +357,43 @@ async function loadTradeList() {
   }
 }
 
-// ── LOAD TRADE INTO FORM ──────────────────────────────────────────────────────
-async function loadEditTrade(pageId) {
-  editPageId = pageId;
+// ── LOAD TRADE INTO FORM ────────────────────────────────────────────
+async function loadEditTrade(id) {
+  editPageId = id;
   const btn = document.getElementById('ef-save-btn');
   btn.disabled = true; btn.textContent = 'Loading...';
   document.getElementById('edit-success-msg').style.display = 'none';
-  // Reset partial exits UI before loading
   document.getElementById('ef-partial-row').style.display = 'none';
   document.getElementById('ef-partial-tp-rows').innerHTML = '';
   document.getElementById('ef-partial-pnl-preview').textContent = '';
   document.getElementById('ef-partial-contracts-remaining').textContent = '';
   try {
-    const page = await notionGet(`/pages/${pageId}`);
-    const p = page.properties;
-    const getText = key => (p[key]?.rich_text||[]).map(r=>r.plain_text||'').join('');
-    const getN    = key => p[key]?.number ?? '';
-    const getSel  = key => p[key]?.select?.name || '';
-    const setV = (id, v) => { const el=document.getElementById(id); if(el) el.value=v; };
-    setV('ef-instrument', getSel('Instrument'));
-    setV('ef-direction',  getSel('Direction'));
-    setV('ef-session',    getSel('Session'));
-    setV('ef-timeframe',  getSel('Timeframe'));
-    setV('ef-outcome',    getSel('Status'));
-    setV('ef-htf',        getText('HTF Timeframe'));
-    setV('ef-model',      getText('Entry Model'));
-    setV('ef-date',       p['Date']?.date?.start||'');
-    setV('ef-entry',      getN('Entry Price'));
-    setV('ef-exit',       getN('Exit Price'));
-    setV('ef-sl',         getN('Stop Loss'));
-    setV('ef-tp',         getN('Take Profit'));
-    const contracts = getN('Contracts')||1;
+    const res = await fetch(`${WORKER}/sb/trades/${id}`, { headers: authHeaders() });
+    const rows = await res.json();
+    const t = Array.isArray(rows) ? rows[0] : rows;
+    if (!t || t.error) throw new Error(t?.error || 'Trade not found');
+    const setV = (elId, v) => { const el=document.getElementById(elId); if(el) el.value = v ?? ''; };
+    setV('ef-instrument', t.instrument);
+    setV('ef-direction',  t.direction);
+    setV('ef-session',    t.session);
+    setV('ef-timeframe',  t.timeframe);
+    setV('ef-outcome',    t.outcome);
+    setV('ef-htf',        t.htf_timeframe);
+    setV('ef-model',      t.entry_model);
+    setV('ef-date',       t.date);
+    setV('ef-entry',      t.entry_price);
+    setV('ef-exit',       t.exit_price);
+    setV('ef-sl',         t.stop_loss);
+    setV('ef-tp',         t.take_profit);
+    const contracts = t.contracts || 1;
     setV('ef-contracts',  contracts);
-    setV('ef-entry-time', getText('Entry Time'));
-    setV('ef-exit-time',  getText('Exit Time'));
-
-    // ── Parse partial exits out of Notes ──
-    const notesRaw = getText('Notes');
+    setV('ef-entry-time', t.entry_time);
+    setV('ef-exit-time',  t.exit_time);
+    // Parse partial exits out of notes
+    const notesRaw = t.notes || '';
     const breakdownMatch = notesRaw.match(/Exit breakdown:\s*(.+?)(?:\n|$)/i);
     const cleanNotes = notesRaw.replace(/\n?Exit breakdown:.+/i, '').trim();
     setV('ef-notes', cleanNotes);
-
     if (breakdownMatch && contracts > 1) {
       document.getElementById('ef-partial-row').style.display = 'block';
       renderEditTPRows(contracts);
@@ -422,32 +414,13 @@ async function loadEditTrade(pageId) {
       document.getElementById('ef-partial-row').style.display = 'block';
       renderEditTPRows(contracts);
     }
-
-    setV('ef-mistakes',   getText('Mistakes'));
-    setV('ef-lessons',    getText('Lessons Learned'));
-    // Emotions
-    const emotions = (p['Emotions']?.multi_select||[]).map(e=>e.name);
-    setEmotions('ef', emotions);
-    setV('ef-emotion-notes', getText('Emotion Notes'));
-    // Screenshot
-    try {
-      const bdata = await notionGet(`/blocks/${pageId}/children`);
-      let screenshot = '';
-      for (const b of (bdata.results||[])) {
-        const texts = b[b.type]?.rich_text||[];
-        for (const t of texts) {
-          const plain = t.plain_text||'';
-          if (plain.includes('Screenshot:')) { screenshot = plain.replace('📸 Screenshot: ','').trim(); }
-        }
-      }
-      setV('ef-screenshot', screenshot);
-    } catch(e) {}
-    // Confluences
-    const confs = (p['Confluences']?.multi_select||[]).map(c=>c.name);
-    setCheckedConf('ef-conf-dropdown','ef-conf-label','ef-conf-tags', confs);
-    // Title
-    const tradeName = (p['Trade Name']?.title||[]).map(r=>r.plain_text||'').join('')||'Trade';
-    document.getElementById('edit-trade-title').textContent = tradeName;
+    setV('ef-mistakes',      t.mistakes);
+    setV('ef-lessons',       t.lessons);
+    setEmotions('ef', t.emotions || []);
+    setV('ef-emotion-notes', t.emotion_notes);
+    setV('ef-screenshot',    t.screenshot);
+    setCheckedConf('ef-conf-dropdown','ef-conf-label','ef-conf-tags', t.confluences || []);
+    document.getElementById('edit-trade-title').textContent = t.trade_name || 'Trade';
     document.getElementById('edit-form-wrap').style.display = 'block';
     document.getElementById('edit-form-wrap').scrollIntoView({behavior:'smooth'});
   } catch(e) { alert('Failed to load trade: '+e.message); }
@@ -477,7 +450,7 @@ async function saveEdit() {
   const emotions    = getSelectedEmotions('ef');
   const emotionNotes= getField('ef-emotion-notes');
 
-  // ── P&L calc — use partial exits if present, else single entry/exit ──
+  // P&L calc
   const tpRows = (contracts > 1) ? getEditTPRows().filter(r => r.price && r.contracts) : [];
   let pnl = null;
   if (entry) {
@@ -488,69 +461,66 @@ async function saveEdit() {
       pnl = calcPnL(entry, exit, contracts, instrument, direction);
     }
   }
-  const rr  = calcRR(entry,sl,tp);
+  const rr = calcRR(entry, sl, tp);
 
   // Re-verify
-  let grade = '', followedRules = 'Partially ⚠️';
+  let grade = '', followedRules = 'Partially';
   try {
     const tradeStr = [`Instrument: ${instrument}`,`Direction: ${direction}`,`Session: ${session}`,`Timeframe: ${timeframe}`,`HTF Context: ${htf}`,`Entry Model: ${model}`,`Date: ${date}`,`Entry Price: ${entry} at ${entryTime}`,`Exit Price: ${exit} at ${exitTime}`,`Stop Loss: ${sl}`,`Take Profit: ${tp}`,`Contracts: ${contracts}`,`R:R: ${rr||''}`,`P&L: $${pnl}`,`Status: ${outcome}`,`Confluences: ${confluences.join(', ')}`,`Notes: ${notes}`,`Mistakes: ${mistakes}`,`Lessons Learned: ${lessons}`].filter(l=>!l.endsWith(': ')&&!l.endsWith(': null')&&!l.endsWith(': undefined')).join('\n');
     const vdata = await verifyTrade(tradeStr);
     if (vdata.grade) grade = vdata.grade;
-    const frMap = {'YES':'Yes ✅','PARTIALLY':'Partially ⚠️','NO':'No ❌'};
-    if (vdata.followedRules) followedRules = frMap[vdata.followedRules]||'Partially ⚠️';
+    const frMap = {'YES':'Yes','PARTIALLY':'Partially','NO':'No'};
+    if (vdata.followedRules) followedRules = frMap[vdata.followedRules]||'Partially';
   } catch(e) {
     grade = autoGradeLocal(confluences, mistakes);
     followedRules = autoFollowedRulesLocal(mistakes);
   }
 
-  // ── Rebuild Notes with exit breakdown if partials exist ──
+  // Rebuild notes with exit breakdown if partials exist
   const exitBreakdown = (tpRows.length > 0)
-    ? 'Exit breakdown: ' + tpRows.map(r => `${r.label}: ${r.contracts} contract${r.contracts>1?'s':''} @ ${r.price}${r.time?' at '+r.time:''}`).join(' · ')
+    ? 'Exit breakdown: ' + tpRows.map(r => `${r.label}: ${r.contracts} contract${r.contracts>1?'s':''} @ ${r.price}${r.time?' at '+r.time:''}`).join(' / ')
     : null;
   const fullNotes = [notes, exitBreakdown].filter(Boolean).join('\n');
 
-  const tradeName = `${instrument} ${direction} — ${session}`;
-  const props = {};
-  props["Trade Name"] = {title:[{text:{content:tradeName}}]};
-  if(instrument)  props["Instrument"]     = {select:{name:instrument}};
-  if(direction)   props["Direction"]      = {select:{name:direction}};
-  if(session)     props["Session"]        = {select:{name:session}};
-  if(timeframe)   props["Timeframe"]      = {select:{name:timeframe}};
-  if(outcome)     props["Status"]         = {select:{name:outcome}};
-  if(date)        props["Date"]           = {date:{start:date}};
-  if(contracts)   props["Contracts"]      = {number:contracts};
-  if(pnl!=null)   props["P&L ($)"]        = {number:pnl};
-  if(rr)          props["R:R"]            = {number:rr};
-  if(entry)       props["Entry Price"]    = {number:entry};
-  if(exit)        props["Exit Price"]     = {number:exit};
-  if(sl)          props["Stop Loss"]      = {number:sl};
-  if(tp)          props["Take Profit"]    = {number:tp};
-  if(entryTime)   props["Entry Time"]     = {rich_text:[{text:{content:entryTime}}]};
-  if(exitTime)    props["Exit Time"]      = {rich_text:[{text:{content:exitTime}}]};
-  if(fullNotes)   props["Notes"]          = {rich_text:[{text:{content:fullNotes}}]};
-  if(mistakes)    props["Mistakes"]       = {rich_text:[{text:{content:mistakes}}]};
-  if(lessons)     props["Lessons Learned"]= {rich_text:[{text:{content:lessons}}]};
-  if(htf)         props["HTF Timeframe"]  = {rich_text:[{text:{content:htf}}]};
-  if(model)       props["Entry Model"]    = {rich_text:[{text:{content:model}}]};
-  if(grade)       props["Setup Grade"]    = {select:{name:grade}};
-  props["Followed Rules"] = {select:{name:followedRules}};
-  if(confluences.length) props["Confluences"] = {multi_select:confluences.map(c=>({name:c}))};
-  if(emotions.length)    props["Emotions"]    = {multi_select:emotions.map(e=>({name:e}))};
-  if(emotionNotes)       props["Emotion Notes"]= {rich_text:[{text:{content:emotionNotes}}]};
+  const tradeName = `${instrument} ${direction} - ${session}`;
+
+  // Upload new images to Imgur first if any are pending
+  let finalScreenshot = screenshot;
+  if (pendingImgFiles.length) {
+    const imgUrls = await uploadImgsToImgur('ef');
+    if (imgUrls.length) finalScreenshot = imgUrls[0];
+  }
+
+  const payload = {
+    trade_name: tradeName,
+    instrument, direction, outcome, session, timeframe, date,
+    contracts, pnl, followed_rules: followedRules, grade,
+    entry_price: entry, exit_price: exit, stop_loss: sl, take_profit: tp,
+    rr: rr||null, entry_time: entryTime||null, exit_time: exitTime||null,
+    notes: fullNotes||null, mistakes: mistakes||null, lessons: lessons||null,
+    htf_timeframe: htf||null, entry_model: model||null,
+    confluences: confluences.length ? confluences : null,
+    emotions: emotions.length ? emotions : null,
+    emotion_notes: emotionNotes||null,
+    screenshot: finalScreenshot||null,
+  };
 
   try {
-    const data = await notionPatch(`/pages/${editPageId}`, {properties:props});
-    if (data.id) {
-      // Upload new image if one was selected
-      if (pendingImgFiles.length) await uploadAllImgsToNotion(editPageId, 'ef');
+    const res = await fetch(`${WORKER}/sb/trades/${editPageId}`, {
+      method: 'PATCH',
+      headers: authHeaders(),
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (res.ok) {
       const msg = document.getElementById('edit-success-msg');
       msg.style.display = 'block';
-      const pnlStr = pnl!=null ? (pnl>=0?'+':'-')+'$'+Math.abs(pnl).toLocaleString() : '—';
-      msg.textContent = `✓ Updated! ${tradeName} · ${pnlStr} · ${grade} · ${followedRules}`;
+      const pnlStr = pnl!=null ? (pnl>=0?'+':'-')+'$'+Math.abs(pnl).toLocaleString() : '-';
+      msg.textContent = 'Updated! ' + tradeName + ' - ' + pnlStr + ' - ' + grade + ' - ' + followedRules;
       await loadTradeList();
     } else { alert('Update failed: '+JSON.stringify(data)); }
   } catch(e) { alert('Save failed: '+e.message); }
-  btn.disabled = false; btn.textContent = '✓ Save Changes & Re-Verify';
+  btn.disabled = false; btn.textContent = 'Save Changes & Re-Verify';
 }
 
 function cancelEdit() {
@@ -631,7 +601,7 @@ function renderImgPreviews(prefix) {
   });
 }
 
-async function uploadAllImgsToNotion(pageId, prefix) {
+async function uploadImgsToImgur(prefix) {
   if (!pendingImgFiles.length) return [];
   const statusEl = document.getElementById(`${prefix}-upload-status`);
   statusEl.style.display = 'block';
@@ -639,7 +609,7 @@ async function uploadAllImgsToNotion(pageId, prefix) {
   const urls = [];
   for (let i = 0; i < pendingImgFiles.length; i++) {
     const file = pendingImgFiles[i];
-    statusEl.textContent = `⏳ Uploading image ${i+1} of ${pendingImgFiles.length}...`;
+    statusEl.textContent = `Uploading image ${i+1} of ${pendingImgFiles.length}...`;
     try {
       const formData = new FormData();
       formData.append('image', file);
@@ -650,23 +620,15 @@ async function uploadAllImgsToNotion(pageId, prefix) {
       });
       const imgurData = await imgurRes.json();
       if (!imgurData.success) throw new Error(imgurData.data?.error || 'unknown');
-      const imgUrl = imgurData.data.link;
-      urls.push(imgUrl);
-      await fetch(`${WORKER}/notion/blocks/${pageId}/children`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          children: [{ object:'block', type:'image', image:{ type:'external', external:{ url:imgUrl } } }]
-        })
-      });
+      urls.push(imgurData.data.link);
     } catch(e) {
-      statusEl.textContent = `⚠ Image ${i+1} failed: ${e.message}`;
+      statusEl.textContent = `Image ${i+1} failed: ${e.message}`;
     }
   }
   if (urls.length) {
     const screenshotEl = document.getElementById(`${prefix}-screenshot`);
     if (screenshotEl && !screenshotEl.value) screenshotEl.value = urls[0];
-    statusEl.textContent = `✓ ${urls.length} image${urls.length>1?'s':''} uploaded`;
+    statusEl.textContent = `${urls.length} image${urls.length>1?'s':''} uploaded`;
     statusEl.style.color = 'var(--green)';
   }
   pendingImgFiles = [];
