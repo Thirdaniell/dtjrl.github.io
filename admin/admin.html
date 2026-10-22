@@ -201,6 +201,22 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
 <script src="admin-core.js"></script>
 <script>
 // ── AUTH ──────────────────────────────────────────────────────────────────────
+async function checkPassword(pw) {
+  try {
+    const res = await fetch(`${WORKER}/verify`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: pw })
+    });
+    const data = await res.json();
+    return data.ok === true;
+  } catch(e) { return false; }
+}
+
+function setAuth() {
+  sessionStorage.setItem('ftj_admin_auth', 'true');
+}
+
 async function checkAuth() {
   const val = document.getElementById('pw-input').value;
   const btn = document.querySelector('.pw-btn');
