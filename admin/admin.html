@@ -203,7 +203,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
 // ── AUTH ──────────────────────────────────────────────────────────────────────
 async function checkPassword(pw) {
   try {
-    const res = await fetch(`${WORKER}/verify`, {
+    const res = await fetch(`${WORKER}/verify-password`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ password: pw })
