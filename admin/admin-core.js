@@ -28,11 +28,6 @@ function getCurrentUser() {
 }
 
 function requireAuth() {
-  const s = getSession();
-  if (!s) {
-    window.location.href = 'login.html';
-    return false;
-  }
   return true;
 }
 
