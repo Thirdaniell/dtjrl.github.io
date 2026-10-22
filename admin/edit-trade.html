@@ -163,6 +163,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
         </div>
       </div>
       <button class="save-btn" id="ef-save-btn" onclick="saveEdit()">✓ Save Changes & Re-Verify</button>
+      <button class="save-btn" id="ef-delete-btn" onclick="deleteTrade()" style="background:none;border:1px solid var(--red);color:var(--red);margin-top:8px;">✕ Delete Trade</button>
       <div class="success-msg" id="edit-success-msg"></div>
     </div>
   </div>
@@ -551,6 +552,24 @@ async function saveEdit() {
     } else { alert('Update failed: '+JSON.stringify(data)); }
   } catch(e) { alert('Save failed: '+e.message); }
   btn.disabled = false; btn.textContent = '✓ Save Changes & Re-Verify';
+}
+
+async function deleteTrade() {
+  if (!editPageId) return;
+  if (!confirm('Delete this trade? This cannot be undone.')) return;
+  const btn = document.getElementById('ef-delete-btn');
+  btn.disabled = true; btn.textContent = 'Deleting...';
+  try {
+    const data = await notionPatch(`/pages/${editPageId}`, { archived: true });
+    if (data.archived) {
+      editPageId = null;
+      document.getElementById('edit-form-wrap').style.display = 'none';
+      await loadTradeList();
+    } else {
+      alert('Delete failed: ' + JSON.stringify(data));
+    }
+  } catch(e) { alert('Delete failed: ' + e.message); }
+  btn.disabled = false; btn.textContent = '✕ Delete Trade';
 }
 
 function cancelEdit() {
