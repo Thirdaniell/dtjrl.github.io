@@ -239,13 +239,27 @@ function processFile(file) {
 function parseCSV(text) {
   const lines = text.trim().split('\n');
   if (lines.length < 2) return [];
-  const headers = lines[0].split(',').map(h => h.trim());
+  const headers = splitCSVLine(lines[0]).map(h => h.trim());
   return lines.slice(1).map(line => {
-    const vals = line.split(',');
+    const vals = splitCSVLine(line);
     const obj = {};
     headers.forEach((h, i) => obj[h] = (vals[i] || '').trim());
     return obj;
   }).filter(r => r.symbol);
+}
+
+// Handles quoted fields with commas inside (e.g. "$2,620.00")
+function splitCSVLine(line) {
+  const result = [];
+  let cur = '', inQuote = false;
+  for (let i = 0; i < line.length; i++) {
+    const c = line[i];
+    if (c === '"') { inQuote = !inQuote; }
+    else if (c === ',' && !inQuote) { result.push(cur); cur = ''; }
+    else { cur += c; }
+  }
+  result.push(cur);
+  return result;
 }
 
 function parsePnl(str) {
@@ -288,21 +302,15 @@ function fmtDateShort(ts) {
 }
 
 function detectDirectionRow(row) {
-  // Tradovate sometimes has soldTimestamp < boughtTimestamp even on Longs
-  // (fill resolution order). Use timestamps as primary signal but fall back
-  // to price comparison: if buyPrice < sellPrice the trade was profitable going Long.
-  const soldFirst = new Date(row.soldTimestamp) < new Date(row.boughtTimestamp);
+  // Most reliable signal: sell price vs buy price tells us which side was profitable.
+  // Long = bought low, sold high (sellPrice > buyPrice).
+  // Short = sold high, bought low (buyPrice > sellPrice).
   const buyP  = parseFloat(row.buyPrice);
   const sellP = parseFloat(row.sellPrice);
-  // If timestamps agree with price direction, trust timestamps.
-  // If they conflict (e.g. soldFirst but sellP > buyP = Long profit), use prices.
-  if (soldFirst && sellP < buyP) return 'Short'; // sold lower = short profit, consistent
-  if (!soldFirst && sellP > buyP) return 'Long';  // sold higher = long profit, consistent
-  // Conflict: trust price direction (pnl sign confirms)
-  const pnl = parsePnl(row.pnl);
-  if (pnl > 0) return sellP > buyP ? 'Long' : 'Short';
-  if (pnl < 0) return sellP > buyP ? 'Short' : 'Long';
-  return soldFirst ? 'Short' : 'Long';
+  if (sellP > buyP) return 'Long';
+  if (buyP  > sellP) return 'Short';
+  // Equal prices (breakeven) — fall back to timestamp order
+  return new Date(row.soldTimestamp) < new Date(row.boughtTimestamp) ? 'Short' : 'Long';
 }
 
 function groupRows(rows) {
