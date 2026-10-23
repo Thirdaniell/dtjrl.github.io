@@ -288,8 +288,21 @@ function fmtDateShort(ts) {
 }
 
 function detectDirectionRow(row) {
-  // Short = sold first (soldTimestamp earlier than boughtTimestamp)
-  return new Date(row.soldTimestamp) < new Date(row.boughtTimestamp) ? 'Short' : 'Long';
+  // Tradovate sometimes has soldTimestamp < boughtTimestamp even on Longs
+  // (fill resolution order). Use timestamps as primary signal but fall back
+  // to price comparison: if buyPrice < sellPrice the trade was profitable going Long.
+  const soldFirst = new Date(row.soldTimestamp) < new Date(row.boughtTimestamp);
+  const buyP  = parseFloat(row.buyPrice);
+  const sellP = parseFloat(row.sellPrice);
+  // If timestamps agree with price direction, trust timestamps.
+  // If they conflict (e.g. soldFirst but sellP > buyP = Long profit), use prices.
+  if (soldFirst && sellP < buyP) return 'Short'; // sold lower = short profit, consistent
+  if (!soldFirst && sellP > buyP) return 'Long';  // sold higher = long profit, consistent
+  // Conflict: trust price direction (pnl sign confirms)
+  const pnl = parsePnl(row.pnl);
+  if (pnl > 0) return sellP > buyP ? 'Long' : 'Short';
+  if (pnl < 0) return sellP > buyP ? 'Short' : 'Long';
+  return soldFirst ? 'Short' : 'Long';
 }
 
 function groupRows(rows) {
@@ -309,17 +322,25 @@ function groupRows(rows) {
     const symbol  = stripExpiry(first.symbol);
 
     // Entry: the fill where position was opened
-    // Long → bought first → entryPrice = buyPrice, entryTime = boughtTimestamp
-    // Short → sold first → entryPrice = sellPrice, entryTime = soldTimestamp
-    const entryPrice = parseFloat(dir === 'Long' ? first.buyPrice  : first.sellPrice);
-    const entryTime  = dir === 'Long' ? first.boughtTimestamp : first.soldTimestamp;
+    // Long → entry = buy side; Short → entry = sell side
+    // Use the earlier timestamp as entry time (handles Tradovate fill order quirks)
+    const entryPrice  = parseFloat(dir === 'Long' ? first.buyPrice  : first.sellPrice);
     const entryFillId = dir === 'Long' ? first.buyFillId : first.sellFillId;
+    const tBuy  = new Date(first.boughtTimestamp);
+    const tSell = new Date(first.soldTimestamp);
+    const entryTime = dir === 'Long'
+      ? (tBuy < tSell ? first.boughtTimestamp : first.soldTimestamp)   // entry is earlier fill
+      : (tSell < tBuy ? first.soldTimestamp   : first.boughtTimestamp);
 
     // Sort exits by exit timestamp ascending → TP1, TP2, TP3...
     const exits = grp
       .map(row => {
         const exitPrice = parseFloat(dir === 'Long' ? row.sellPrice : row.buyPrice);
-        const exitTime  = dir === 'Long' ? row.soldTimestamp  : row.boughtTimestamp;
+        // Exit time: for Longs = sell side, for Shorts = buy side; use later timestamp
+        const tB = new Date(row.boughtTimestamp), tS = new Date(row.soldTimestamp);
+        const exitTime  = dir === 'Long'
+          ? (tS > tB ? row.soldTimestamp  : row.boughtTimestamp)
+          : (tB > tS ? row.boughtTimestamp : row.soldTimestamp);
         const qty       = parseInt(row.qty || 1);
         const pnl       = parsePnl(row.pnl);
         return { exitPrice, exitTime, qty, pnl };
