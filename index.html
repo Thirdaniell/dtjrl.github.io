@@ -874,6 +874,7 @@ function parseProps(page) {
     lessons: extractText(props["Lessons Learned"]?.rich_text),
     grade: props["Setup Grade"]?.select?.name || "",
     followedRules: props["Followed Rules"]?.select?.name || "",
+    bias: props["Bias At Entry"]?.rich_text ? extractText(props["Bias At Entry"].rich_text) : (props["Bias At Entry"]?.select?.name || ""),
     htfTimeframe: extractText(props["HTF Timeframe"]?.rich_text),
     entryModel: extractText(props["Entry Model"]?.rich_text),
     rr: props["R:R"]?.number,
@@ -1206,6 +1207,8 @@ function renderCard(t) {
   const gradeClass = {'A++':'app','A+':'ap','A':'a','A-':'am','B+':'bp','B':'b','B-':'bm','C':'c','D':'d'}[t.grade] || '';
   const gradeBadge = t.grade ? `<span class="grade-badge grade-${gradeClass}">${t.grade}</span>` : '';
   const rulesBadge = t.followedRules ? `<span class="rules-badge">${t.followedRules}</span>` : '';
+  const biasColor = {'Bullish':'#00e676','Bearish':'#ff4444','Ranging':'#ffd740','Waiting':'#888','Bullish (Favored)':'#00e676','Bearish (Favored)':'#ff4444'}[t.bias] || '#888';
+  const biasBadge = t.bias ? `<span style="font-family:var(--mono);font-size:9px;letter-spacing:0.05em;padding:2px 8px;border:1px solid;color:${biasColor};border-color:${biasColor}33;background:${biasColor}0d;">↑ ${t.bias}</span>` : '';
 
   return `<div class="card" id="card-${t.id}">
     <div class="card-top">
@@ -1220,7 +1223,7 @@ function renderCard(t) {
         </div>
       </div>
     </div>
-    ${(gradeBadge || rulesBadge) ? `<div class="card-meta-row">${gradeBadge}${rulesBadge}<button class="verify-btn" onclick="verifyTrade('${t.id}', this)">⚡ Verify Rules</button></div>` : `<div class="card-meta-row"><button class="verify-btn" onclick="verifyTrade('${t.id}', this)">⚡ Verify Rules</button></div>`}
+    <div class="card-meta-row">${gradeBadge}${rulesBadge}${biasBadge}<button class="verify-btn" onclick="verifyTrade('${t.id}', this)">⚡ Verify Rules</button></div>
     <div id="verify-panel-${t.id}"></div>
     <div class="divider"></div>
     <div class="card-grid">
@@ -1292,6 +1295,7 @@ const tradeData = [
   `P&L: $${trade.pnl}`,
   `Status: ${trade.status}`,
   `Confluences: ${trade.confluences.join(', ') || ''}`,
+  `Bias At Entry: ${trade.bias || ''}`,
   `Notes: ${trade.notes || ''}`,
   `Mistakes: ${trade.mistakes || ''}`,
   `Lessons Learned: ${trade.lessons || ''}`,
