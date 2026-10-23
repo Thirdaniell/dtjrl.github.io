@@ -39,21 +39,16 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
 .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent);}
 .field textarea{resize:vertical;min-height:70px;font-family:var(--sans);font-size:13px;line-height:1.6;}
 .field select option{background:var(--surface2);}
-.conf-wrap{position:relative;}
-.conf-btn{font-family:var(--mono);font-size:11px;background:var(--surface2);border:1px solid var(--border2);color:var(--text2);padding:8px 10px;width:100%;text-align:left;cursor:pointer;transition:border-color 0.15s;display:flex;justify-content:space-between;align-items:center;}
-.conf-btn.open{border-color:var(--accent);}
-.conf-dropdown{display:none;position:absolute;top:100%;left:0;right:0;background:var(--surface);border:1px solid var(--accent);border-top:none;z-index:100;max-height:260px;overflow-y:auto;}
-.conf-dropdown.open{display:block;}
-.conf-group-lbl{font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--text3);text-transform:uppercase;padding:7px 10px 3px;border-top:1px solid var(--border2);}
-.conf-group-lbl:first-child{border-top:none;}
-.conf-opt{display:flex;align-items:center;gap:8px;padding:6px 10px;cursor:pointer;font-size:12px;color:var(--text2);transition:background 0.1s;}
-.conf-opt:hover{background:var(--surface2);}
-.conf-opt input{accent-color:var(--accent);width:12px;height:12px;flex-shrink:0;}
-.conf-opt.selected{color:var(--text);}
-.conf-clear{width:100%;font-family:var(--mono);font-size:9px;color:var(--text3);background:none;border:none;border-top:1px solid var(--border2);padding:7px;cursor:pointer;text-transform:uppercase;}
-.conf-clear:hover{color:var(--accent);}
-.conf-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;min-height:24px;}
-.conf-tag{font-family:var(--mono);font-size:9px;padding:2px 8px;border:1px solid var(--border2);color:var(--text3);}
+.conf-search{font-family:var(--mono);font-size:12px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:9px 11px;width:100%;outline:none;transition:border-color 0.15s;margin-bottom:8px;}
+.conf-search:focus{border-color:var(--accent);}
+.conf-chip-area{display:flex;flex-wrap:wrap;gap:5px;max-height:200px;overflow-y:auto;padding:2px 0 4px;}
+.conf-chip{font-family:var(--mono);font-size:9px;letter-spacing:0.04em;padding:4px 10px;border:1px solid var(--border2);color:var(--text3);cursor:pointer;transition:all 0.1s;background:var(--surface2);white-space:nowrap;}
+.conf-chip:hover{border-color:var(--text2);color:var(--text);}
+.conf-chip.active{border-color:var(--accent);color:var(--accent);background:rgba(200,255,0,0.06);}
+.conf-chip.hidden{display:none;}
+.conf-selected-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px;min-height:20px;}
+.conf-tag{font-family:var(--mono);font-size:9px;padding:3px 8px;border:1px solid rgba(200,255,0,0.4);color:var(--accent);background:rgba(200,255,0,0.06);cursor:pointer;}
+.conf-tag::after{content:' ✕';opacity:0.5;}
 .save-btn{font-family:var(--mono);font-size:12px;letter-spacing:0.1em;text-transform:uppercase;padding:14px 28px;background:var(--accent);color:#000;border:none;cursor:pointer;font-weight:700;transition:opacity 0.15s;width:100%;}
 .save-btn:hover{opacity:0.85;}
 .save-btn:disabled{opacity:0.4;cursor:not-allowed;}
@@ -133,12 +128,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
           <div style="font-family:var(--mono);font-size:9px;color:var(--accent);margin-top:5px;display:none;" id="ef-upload-status"></div>
         </div>
         <div class="field form-full">
-          <label>Confluences</label>
-          <div class="conf-wrap" id="ef-conf-wrap">
-            <button class="conf-btn" id="ef-conf-btn" onclick="toggleEditConf()" type="button"><span id="ef-conf-label">Select confluences...</span><span>▼</span></button>
-            <div class="conf-dropdown" id="ef-conf-dropdown"></div>
-          </div>
-          <div class="conf-tags" id="ef-conf-tags"></div>
+          <label>Confluences <span style="color:var(--text3);font-size:9px;">(click to toggle — search to filter)</span></label>
+          <input type="text" class="conf-search" id="ef-conf-search" placeholder="Search confluences..." oninput="filterEditConf(this.value)">
+          <div class="conf-chip-area" id="ef-conf-chip-area"></div>
+          <div class="conf-selected-tags" id="ef-conf-tags"></div>
         </div>
         <div class="field form-full"><label>Notes</label><textarea id="ef-notes" placeholder="What happened during this trade?"></textarea></div>
         <div class="field form-full"><label>Mistakes</label><textarea id="ef-mistakes" placeholder="What did you do wrong?"></textarea></div>
@@ -174,11 +167,57 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
 if (!requireAuth()) { /* redirected */ }
 
 let editPageId = null;
-let editConfOpen = false;
 const EF_TP_LABELS = ['TP1','TP2','TP3','TP4','TP5','TP6','TP7','TP8','TP9','TP10'];
 
-// Build confluence dropdown
-buildConfDropdown('ef-conf-btn','ef-conf-dropdown','ef-conf-label','ef-conf-tags','updateEditConf');
+// ── CHIP CONFLUENCE PICKER ────────────────────────────────────────────────────
+function buildEditConfChips() {
+  const area = document.getElementById('ef-conf-chip-area');
+  if (!area) return;
+  let html = '';
+  CONFLUENCE_GROUPS.forEach(g => {
+    g.items.forEach(item => {
+      const val = confValue(item);
+      html += `<div class="conf-chip" data-val="${val}" data-label="${item}" onclick="toggleEditConfChip(this)">${item}</div>`;
+    });
+  });
+  area.innerHTML = html;
+}
+
+function toggleEditConfChip(el) {
+  el.classList.toggle('active');
+  renderEditConfTags();
+}
+
+function renderEditConfTags() {
+  const tags = document.getElementById('ef-conf-tags');
+  if (!tags) return;
+  const active = Array.from(document.querySelectorAll('#ef-conf-chip-area .conf-chip.active'));
+  tags.innerHTML = active.map(c => `<div class="conf-tag" onclick="removeEditConfChip('${c.dataset.val}')">${c.dataset.val}</div>`).join('');
+}
+
+function removeEditConfChip(val) {
+  const chip = document.querySelector(`#ef-conf-chip-area .conf-chip[data-val="${val}"]`);
+  if (chip) { chip.classList.remove('active'); renderEditConfTags(); }
+}
+
+function filterEditConf(q) {
+  document.querySelectorAll('#ef-conf-chip-area .conf-chip').forEach(c => {
+    c.classList.toggle('hidden', q.length > 0 && !c.dataset.label.toLowerCase().includes(q.toLowerCase()) && !c.dataset.val.toLowerCase().includes(q.toLowerCase()));
+  });
+}
+
+function getEditSelectedConfs() {
+  return Array.from(document.querySelectorAll('#ef-conf-chip-area .conf-chip.active')).map(c => c.dataset.val);
+}
+
+function setEditSelectedConfs(values) {
+  document.querySelectorAll('#ef-conf-chip-area .conf-chip').forEach(c => {
+    c.classList.toggle('active', values.includes(c.dataset.val));
+  });
+  renderEditConfTags();
+}
+
+buildEditConfChips();
 
 function toggleEmotion(btn) { btn.classList.toggle('selected'); }
 function getSelectedEmotions(prefix) {
@@ -189,21 +228,6 @@ function setEmotions(prefix, values) {
     b.classList.toggle('selected', values.includes(b.dataset.emotion));
   });
 }
-
-function toggleEditConf() {
-  editConfOpen = !editConfOpen;
-  document.getElementById('ef-conf-dropdown').classList.toggle('open', editConfOpen);
-  document.getElementById('ef-conf-btn').classList.toggle('open', editConfOpen);
-}
-document.addEventListener('click', e => {
-  const wrap = document.getElementById('ef-conf-wrap');
-  if (wrap && !wrap.contains(e.target)) {
-    editConfOpen = false;
-    document.getElementById('ef-conf-dropdown')?.classList.remove('open');
-    document.getElementById('ef-conf-btn')?.classList.remove('open');
-  }
-});
-function updateEditConf() { updateConfDisplay('ef-conf-dropdown','ef-conf-label','ef-conf-tags'); }
 
 // ── PARTIAL EXITS UI (mirrors log-trade.html) ─────────────────────────────────
 document.getElementById('ef-contracts').addEventListener('input', efTogglePartialRow);
@@ -445,7 +469,7 @@ async function loadEditTrade(pageId) {
     } catch(e) {}
     // Confluences
     const confs = (p['Confluences']?.multi_select||[]).map(c=>c.name);
-    setCheckedConf('ef-conf-dropdown','ef-conf-label','ef-conf-tags', confs);
+    setEditSelectedConfs(confs);
     // Title
     const tradeName = (p['Trade Name']?.title||[]).map(r=>r.plain_text||'').join('')||'Trade';
     document.getElementById('edit-trade-title').textContent = tradeName;
@@ -474,7 +498,7 @@ async function saveEdit() {
   const entryTime   = getField('ef-entry-time'), exitTime  = getField('ef-exit-time');
   const notes       = getField('ef-notes'),      mistakes  = getField('ef-mistakes');
   const lessons     = getField('ef-lessons'),    screenshot= getField('ef-screenshot');
-  const confluences = getCheckedConf('ef-conf-dropdown');
+  const confluences = getEditSelectedConfs();
   const emotions    = getSelectedEmotions('ef');
   const emotionNotes= getField('ef-emotion-notes');
 
