@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Market Journal — FTJ Admin</title>
+<link rel="manifest" href="../manifest.json">
+<meta name="theme-color" content="#0a0a0a">
+<link rel="icon" type="image/png" href="https://i.imgur.com/ZP2pTk2.png">
+<link rel="stylesheet" href="../mobile.css">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0a0a;--surface:#111;--surface2:#181818;--border:#1a1a1a;--border2:#2a2a2a;--text:#e8e8e8;--text2:#888;--text3:#444;--green:#00e676;--red:#ff4444;--yellow:#ffd740;--accent:#c8ff00;--mono:'Space Mono',monospace;--sans:'DM Sans',sans-serif;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;min-height:100vh;}
+::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+#main{padding-left:64px;}
+.page{max-width:860px;margin:0 auto;padding:3rem 2rem 5rem;}
+.sidenav-admin{position:fixed;left:0;top:0;bottom:0;width:64px;background:var(--bg);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:1.5rem 0;z-index:200;}
+.nav-logo-a{font-family:var(--mono);font-size:9px;letter-spacing:0.1em;color:var(--accent);writing-mode:vertical-rl;margin-bottom:2rem;}
+.nav-admin-tag{font-family:var(--mono);font-size:8px;letter-spacing:0.12em;color:var(--red);writing-mode:vertical-rl;margin-top:auto;}
+.back-btn{font-family:var(--mono);font-size:10px;letter-spacing:0.1em;color:var(--text3);background:none;border:1px solid var(--border2);padding:6px 14px;cursor:pointer;text-transform:uppercase;transition:all 0.15s;text-decoration:none;display:inline-block;margin-bottom:2rem;}
+.back-btn:hover{color:var(--accent);border-color:var(--accent);}
+.page-eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:0.2em;color:var(--accent);text-transform:uppercase;margin-bottom:8px;}
+.page-title{font-family:var(--mono);font-size:28px;font-weight:700;line-height:1.1;margin-bottom:.4rem;}
+.page-sub{font-size:13px;color:var(--text2);margin-bottom:2rem;line-height:1.7;}
+.section-label{font-family:var(--mono);font-size:9px;letter-spacing:0.2em;color:var(--text3);text-transform:uppercase;margin-bottom:10px;}
+
+/* ── TAB BAR ─────────────────────────────────────────── */
+.tab-bar{display:flex;gap:1px;background:var(--border);margin-bottom:2rem;}
+.tab-btn{flex:1;font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;padding:12px;background:var(--surface);border:none;color:var(--text3);cursor:pointer;transition:all 0.15s;}
+.tab-btn.active{background:var(--surface2);color:var(--accent);}
+.tab-btn:hover:not(.active){color:var(--text2);}
+
+/* ── PHASE CARDS ─────────────────────────────────────── */
+.phase-card{background:var(--surface);border:1px solid var(--border2);margin-bottom:1rem;}
+.phase-header{display:flex;align-items:center;gap:12px;padding:1rem 1.25rem;border-bottom:1px solid var(--border2);}
+.phase-tag{font-family:var(--mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;padding:3px 10px;border:1px solid;}
+.phase-tag.pre{color:var(--accent);border-color:rgba(200,255,0,0.35);}
+.phase-tag.post{color:#40c4ff;border-color:rgba(64,196,255,0.35);}
+.phase-title{font-family:var(--mono);font-size:13px;font-weight:700;}
+.phase-body{padding:1.25rem;}
+
+/* ── FORM ELEMENTS ───────────────────────────────────── */
+.field{margin-bottom:1rem;}
+.field label{font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--text3);text-transform:uppercase;display:block;margin-bottom:6px;}
+.field input,.field select,.field textarea{width:100%;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:9px 11px;font-family:var(--sans);font-size:13px;outline:none;transition:border-color 0.15s;}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent);}
+.field textarea{resize:vertical;min-height:64px;line-height:1.6;}
+.field select option{background:var(--surface2);}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.field-row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+
+/* ── BIAS BUTTONS ────────────────────────────────────── */
+.bbtn-group{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;}
+.bbtn{font-family:var(--mono);font-size:9px;letter-spacing:0.06em;text-transform:uppercase;padding:9px 4px;background:var(--surface2);border:1px solid var(--border2);color:var(--text3);cursor:pointer;transition:all 0.15s;}
+.bbtn:hover{border-color:var(--text2);color:var(--text);}
+.bbtn.bull.active{border-color:var(--green);color:var(--green);background:rgba(0,230,118,0.08);}
+.bbtn.bear.active{border-color:var(--red);color:var(--red);background:rgba(255,68,68,0.08);}
+.bbtn.range.active{border-color:var(--yellow);color:var(--yellow);background:rgba(255,215,64,0.08);}
+.bbtn.wait.active{border-color:var(--text2);color:var(--text2);background:rgba(136,136,136,0.08);}
+
+/* ── ACCURACY BUTTONS ────────────────────────────────── */
+.acc-group{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;}
+.acc-btn{font-family:var(--mono);font-size:9px;letter-spacing:0.05em;text-transform:uppercase;padding:9px 4px;background:var(--surface2);border:1px solid var(--border2);color:var(--text3);cursor:pointer;transition:all 0.15s;text-align:center;}
+.acc-btn:hover{border-color:var(--text2);color:var(--text);}
+.acc-btn.nailed.active{border-color:var(--green);color:var(--green);background:rgba(0,230,118,0.08);}
+.acc-btn.close.active{border-color:var(--accent);color:var(--accent);background:rgba(200,255,0,0.08);}
+.acc-btn.missed.active{border-color:var(--yellow);color:var(--yellow);background:rgba(255,215,64,0.08);}
+.acc-btn.wrong.active{border-color:var(--red);color:var(--red);background:rgba(255,68,68,0.08);}
+
+/* ── SAVE BUTTON ─────────────────────────────────────── */
+.save-btn{font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;padding:12px;background:var(--accent);color:#000;border:none;cursor:pointer;font-weight:700;width:100%;transition:opacity 0.15s;margin-top:4px;}
+.save-btn:hover{opacity:0.85;}
+.save-btn:disabled{opacity:0.35;cursor:not-allowed;}
+.save-btn.secondary{background:none;border:1px solid var(--border2);color:var(--text3);}
+.save-btn.secondary:hover{border-color:var(--accent);color:var(--accent);opacity:1;}
+
+/* ── STATUS ──────────────────────────────────────────── */
+.status-msg{font-family:var(--mono);font-size:10px;padding:8px 12px;display:none;margin-top:8px;text-align:center;}
+.status-ok{background:rgba(0,230,118,0.07);border:1px solid rgba(0,230,118,0.3);color:var(--green);}
+.status-err{background:rgba(255,68,68,0.07);border:1px solid rgba(255,68,68,0.3);color:var(--red);}
+
+/* ── HISTORY LIST ────────────────────────────────────── */
+.hist-list{display:flex;flex-direction:column;gap:1px;background:var(--border);}
+.hist-row{background:var(--surface);padding:1.25rem;cursor:pointer;transition:background 0.15s;}
+.hist-row:hover{background:var(--surface2);}
+.hist-row-header{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.hist-date{font-family:var(--mono);font-size:10px;color:var(--text2);}
+.hist-inst{font-family:var(--mono);font-size:10px;font-weight:700;}
+.hist-bias{font-family:var(--mono);font-size:10px;padding:2px 8px;border:1px solid;}
+.b-bull{color:var(--green);border-color:rgba(0,230,118,0.35);}
+.b-bear{color:var(--red);border-color:rgba(255,68,68,0.35);}
+.b-range{color:var(--yellow);border-color:rgba(255,215,64,0.35);}
+.b-wait{color:var(--text3);border-color:var(--border2);}
+.b-none{color:var(--border2);border-color:var(--border);}
+.hist-acc{font-family:var(--mono);font-size:9px;padding:2px 8px;border:1px solid;margin-left:auto;}
+.hist-acc.nailed{color:var(--green);border-color:rgba(0,230,118,0.35);}
+.hist-acc.close{color:var(--accent);border-color:rgba(200,255,0,0.35);}
+.hist-acc.missed{color:var(--yellow);border-color:rgba(255,215,64,0.35);}
+.hist-acc.wrong{color:var(--red);border-color:rgba(255,68,68,0.35);}
+.hist-acc.pending{color:var(--text3);border-color:var(--border2);}
+.hist-narrative{font-size:12px;color:var(--text3);line-height:1.6;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
+.hist-expand{display:none;margin-top:12px;border-top:1px solid var(--border2);padding-top:12px;}
+.hist-expand .expand-section{margin-bottom:10px;}
+.hist-expand .expand-label{font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--text3);text-transform:uppercase;margin-bottom:4px;}
+.hist-expand .expand-text{font-size:12px;color:var(--text2);line-height:1.7;}
+.hist-expand .add-debrief-btn{font-family:var(--mono);font-size:9px;letter-spacing:0.08em;text-transform:uppercase;padding:7px 14px;background:none;border:1px solid rgba(64,196,255,0.4);color:#40c4ff;cursor:pointer;transition:all 0.15s;margin-top:8px;}
+.hist-expand .add-debrief-btn:hover{background:rgba(64,196,255,0.08);}
+.hist-row.open .hist-expand{display:block;}
+.hist-row.open .hist-narrative{-webkit-line-clamp:unset;}
+
+/* ── INLINE DEBRIEF FORM ─────────────────────────────── */
+.debrief-form{background:var(--surface2);border:1px solid rgba(64,196,255,0.2);padding:1rem;margin-top:10px;}
+.debrief-form .field label{color:#40c4ff;}
+.debrief-form .field input,.debrief-form .field textarea{background:var(--surface);border-color:var(--border2);}
+
+@media(max-width:600px){
+  #main{padding-left:0;}
+  .field-row,.field-row3{grid-template-columns:1fr;}
+  .acc-group{grid-template-columns:1fr 1fr;}
+}
+</style>
+</head>
+<body>
+<div id="main">
+  <nav class="sidenav-admin">
+    <div class="nav-logo-a">// FTJ</div>
+    <div class="nav-admin-tag">ADMIN</div>
+  </nav>
+  <div class="page">
+    <a href="admin.html" class="back-btn">← Back to Admin</a>
+    <div class="page-eyebrow">// Admin</div>
+    <div class="page-title">Market Journal</div>
+    <p class="page-sub">Write what you expect before the session. Come back after to debrief what actually happened.</p>
+
+    <!-- TABS -->
+    <div class="tab-bar">
+      <button class="tab-btn active" id="tab-today" onclick="switchTab('today')">Today's Entry</button>
+      <button class="tab-btn" id="tab-history" onclick="switchTab('history')">History</button>
+    </div>
+
+    <!-- ══ TODAY TAB ══════════════════════════════════════════ -->
+    <div id="view-today">
+
+      <!-- PRE-SESSION PLAN -->
+      <div class="phase-card" id="pre-card">
+        <div class="phase-header">
+          <span class="phase-tag pre">Pre-Session</span>
+          <span class="phase-title">Market Expectation</span>
+          <span style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-left:auto;" id="today-date-label"></span>
+        </div>
+        <div class="phase-body" id="pre-form">
+          <div class="field-row">
+            <div class="field">
+              <label>Instrument</label>
+              <select id="j-instrument">
+                <option value="NQ">NQ</option>
+                <option value="ES">ES</option>
+                <option value="Both">NQ + ES</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Session</label>
+              <select id="j-session">
+                <option value="London">London</option>
+                <option value="NY AM">NY AM</option>
+                <option value="NY PM">NY PM</option>
+                <option value="Both">London + NY AM</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Bias</label>
+            <div class="bbtn-group" style="margin-top:2px;">
+              <button class="bbtn bull" onclick="selectBias('Bullish')">Bullish</button>
+              <button class="bbtn bear" onclick="selectBias('Bearish')">Bearish</button>
+              <button class="bbtn range" onclick="selectBias('Ranging')">Ranging</button>
+              <button class="bbtn wait" onclick="selectBias('Waiting')">Waiting</button>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>HTF Narrative — what is price doing at the big picture level?</label>
+            <textarea id="j-narrative" placeholder="e.g. NQ broke above last week's high, now delivering into 4H FVG. Expecting consolidation then continuation higher..." rows="3"></textarea>
+          </div>
+
+          <div class="field">
+            <label>Key Levels to Watch</label>
+            <textarea id="j-levels" placeholder="e.g. SSL at 19,820 · BSL at 20,150 · IFVG 19,920–19,950 · Prior day high 20,080..." rows="2"></textarea>
+          </div>
+
+          <div class="field">
+            <label>Expected Play — what setup are you looking for?</label>
+            <textarea id="j-play" placeholder="e.g. Expect sweep of SSL at 19,820 in London open, then MSS on 1m to confirm reversal, target IFVG at 19,950 for ~6R..." rows="3"></textarea>
+          </div>
+
+          <div class="field">
+            <label>What would invalidate this? (optional)</label>
+            <textarea id="j-invalidate" placeholder="e.g. If price closes a 1H candle above 20,150 (BSL), bias flips bearish..." rows="2"></textarea>
+          </div>
+
+          <button class="save-btn" id="pre-save-btn" onclick="savePreSession()">Save Pre-Session Plan</button>
+          <div class="status-msg" id="pre-status"></div>
+        </div>
+
+        <!-- LOCKED STATE (shown after save) -->
+        <div class="phase-body" id="pre-locked" style="display:none;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;margin-bottom:1rem;">
+            <div>
+              <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--text3);text-transform:uppercase;margin-bottom:4px;">Bias</div>
+              <div style="font-family:var(--mono);font-size:20px;font-weight:700;" id="locked-bias">—</div>
+            </div>
+            <div style="flex:1;">
+              <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--text3);text-transform:uppercase;margin-bottom:4px;">Instrument / Session</div>
+              <div style="font-family:var(--mono);font-size:12px;color:var(--text2);" id="locked-meta">—</div>
+            </div>
+          </div>
+          <div style="margin-bottom:10px;">
+            <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--text3);text-transform:uppercase;margin-bottom:5px;">HTF Narrative</div>
+            <div style="font-size:13px;color:var(--text2);line-height:1.7;" id="locked-narrative">—</div>
+          </div>
+          <div style="margin-bottom:10px;">
+            <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--text3);text-transform:uppercase;margin-bottom:5px;">Key Levels</div>
+            <div style="font-size:13px;color:var(--text2);line-height:1.7;" id="locked-levels">—</div>
+          </div>
+          <div style="margin-bottom:10px;">
+            <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--text3);text-transform:uppercase;margin-bottom:5px;">Expected Play</div>
+            <div style="font-size:13px;color:var(--text2);line-height:1.7;" id="locked-play">—</div>
+          </div>
+          <div id="locked-invalidate-wrap" style="margin-bottom:10px;display:none;">
+            <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--text3);text-transform:uppercase;margin-bottom:5px;">Invalidation</div>
+            <div style="font-size:13px;color:var(--text2);line-height:1.7;" id="locked-invalidate">—</div>
+          </div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--green);padding:8px 0;letter-spacing:0.08em;">✓ Pre-session plan saved — come back after the session to debrief</div>
+        </div>
+      </div>
+
+      <!-- POST-SESSION DEBRIEF -->
+      <div class="phase-card" id="post-card">
+        <div class="phase-header">
+          <span class="phase-tag post">Post-Session</span>
+          <span class="phase-title">What Actually Happened</span>
+        </div>
+        <div class="phase-body" id="post-form">
+          <div id="post-pre-required" style="font-family:var(--mono);font-size:11px;color:var(--text3);padding:1rem 0;letter-spacing:0.05em;">Save your pre-session plan first, then come back to debrief after the session.</div>
+          <div id="post-fields" style="display:none;">
+            <div class="field">
+              <label>What actually happened in the market?</label>
+              <textarea id="j-happened" placeholder="e.g. Price swept SSL at 19,820 in London exactly as expected, then gave a clean MSS and ran 130 points into the IFVG zone..." rows="4"></textarea>
+            </div>
+
+            <div class="field-row">
+              <div class="field">
+                <label>Did you take a trade?</label>
+                <select id="j-traded">
+                  <option value="">— Select —</option>
+                  <option value="Yes — win">Yes — Win</option>
+                  <option value="Yes — loss">Yes — Loss</option>
+                  <option value="Yes — BE">Yes — Breakeven</option>
+                  <option value="No — sat out">No — Sat out</option>
+                  <option value="No — missed">No — Missed the setup</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Did price hit your levels?</label>
+                <select id="j-levels-hit">
+                  <option value="">— Select —</option>
+                  <option value="All levels hit">All levels hit</option>
+                  <option value="Some hit">Some hit</option>
+                  <option value="None hit">None hit</option>
+                  <option value="Different levels">Ran to different levels</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field">
+              <label>How accurate was your read?</label>
+              <div class="acc-group" style="margin-top:2px;">
+                <button class="acc-btn nailed" onclick="selectAccuracy('Nailed It')">🎯 Nailed It</button>
+                <button class="acc-btn close"  onclick="selectAccuracy('Close')">~ Close</button>
+                <button class="acc-btn missed" onclick="selectAccuracy('Missed')">⚠ Missed</button>
+                <button class="acc-btn wrong"  onclick="selectAccuracy('Wrong Direction')">✕ Wrong Dir.</button>
+              </div>
+            </div>
+
+            <div class="field">
+              <label>What happened vs what you expected — be specific</label>
+              <textarea id="j-vs-expected" placeholder="e.g. Narrative was right — price did sweep SSL, but I was early on the entry and got stopped. The actual MSS came 20 minutes later than I anticipated..." rows="3"></textarea>
+            </div>
+
+            <div class="field">
+              <label>Lesson / takeaway for next time</label>
+              <textarea id="j-lesson" placeholder="e.g. Wait for the 1m close above the swing high before entering, not just the wick. The setup was right but timing was off..." rows="3"></textarea>
+            </div>
+
+            <button class="save-btn" id="post-save-btn" onclick="savePostSession()" style="background:none;border:1px solid #40c4ff;color:#40c4ff;">Save Debrief</button>
+            <div class="status-msg" id="post-status"></div>
+          </div>
+        </div>
+
+        <!-- POST LOCKED STATE -->
+        <div class="phase-body" id="post-locked" style="display:none;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:1rem;">
+            <div style="font-family:var(--mono);font-size:13px;font-weight:700;" id="post-locked-acc">—</div>
+            <div style="font-family:var(--mono);font-size:11px;color:var(--text3);" id="post-locked-traded">—</div>
+          </div>
+          <div style="margin-bottom:10px;">
+            <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--text3);text-transform:uppercase;margin-bottom:5px;">What Happened</div>
+            <div style="font-size:13px;color:var(--text2);line-height:1.7;" id="post-locked-happened">—</div>
+          </div>
+          <div id="post-locked-lesson-wrap" style="display:none;margin-bottom:10px;">
+            <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--text3);text-transform:uppercase;margin-bottom:5px;">Lesson</div>
+            <div style="font-size:13px;color:var(--text2);line-height:1.7;" id="post-locked-lesson">—</div>
+          </div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--green);letter-spacing:0.08em;">✓ Debrief saved — journal complete for today</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ══ HISTORY TAB ═════════════════════════════════════════ -->
+    <div id="view-history" style="display:none;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+        <div class="section-label" style="margin:0;">Past Journals</div>
+        <select id="hist-filter" onchange="loadHistory()" style="font-family:var(--mono);font-size:10px;background:var(--surface2);border:1px solid var(--border2);color:var(--text2);padding:5px 10px;outline:none;">
+          <option value="all">All</option>
+          <option value="Nailed It">🎯 Nailed It</option>
+          <option value="Close">~ Close</option>
+          <option value="Missed">⚠ Missed</option>
+          <option value="Wrong Direction">✕ Wrong Dir.</option>
+          <option value="pending">Debrief Pending</option>
+        </select>
+      </div>
+      <div id="history-container">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--text3);padding:2rem;text-align:center;">Loading...</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="admin-core.js"></script>
+<script>
+if (!requireAuth()) {}
+
+// ── CONSTANTS ──────────────────────────────────────────────────────────────────
+// Reuses bias DB — journal entries use "MJ:" prefix in Title to distinguish them
+const MJ_DB = BIAS_DB;
+const MJ_PRE_KEY  = 'ftj_mj_pre_'  + TODAY;   // localStorage fallback
+const MJ_POST_KEY = 'ftj_mj_post_' + TODAY;
+
+let selectedBias     = null;
+let selectedAccuracy = null;
+let todayPreId       = null;  // Notion page ID for today's pre entry
+let todayPostId      = null;  // Notion page ID for today's post entry
+
+// ── TAB SWITCH ─────────────────────────────────────────────────────────────────
+function switchTab(tab) {
+  document.getElementById('view-today').style.display   = tab === 'today'   ? 'block' : 'none';
+  document.getElementById('view-history').style.display = tab === 'history' ? 'block' : 'none';
+  document.getElementById('tab-today').classList.toggle('active',   tab === 'today');
+  document.getElementById('tab-history').classList.toggle('active', tab === 'history');
+  if (tab === 'history') loadHistory();
+}
+
+// ── BIAS SELECTOR ──────────────────────────────────────────────────────────────
+function selectBias(bias) {
+  selectedBias = bias;
+  document.querySelectorAll('.bbtn').forEach(b => b.classList.remove('active'));
+  const map = { Bullish:'bull', Bearish:'bear', Ranging:'range', Waiting:'wait' };
+  const cls = map[bias];
+  if (cls) document.querySelector(`.bbtn.${cls}`)?.classList.add('active');
+}
+
+// ── ACCURACY SELECTOR ──────────────────────────────────────────────────────────
+function selectAccuracy(val) {
+  selectedAccuracy = val;
+  document.querySelectorAll('.acc-btn').forEach(b => b.classList.remove('active'));
+  const map = { 'Nailed It':'nailed', 'Close':'close', 'Missed':'missed', 'Wrong Direction':'wrong' };
+  const cls = map[val];
+  if (cls) document.querySelector(`.acc-btn.${cls}`)?.classList.add('active');
+}
+
+function biasClass(b) {
+  return { Bullish:'b-bull', Bearish:'b-bear', Ranging:'b-range', Waiting:'b-wait' }[b] || 'b-none';
+}
+function accClass(a) {
+  return { 'Nailed It':'nailed', 'Close':'close', 'Missed':'missed', 'Wrong Direction':'wrong' }[a] || 'pending';
+}
+
+// ── SAVE PRE-SESSION ───────────────────────────────────────────────────────────
+async function savePreSession() {
+  if (!selectedBias) { showStatus('pre-status', 'Select a bias first', 'err'); return; }
+  const narrative  = document.getElementById('j-narrative').value.trim();
+  const levels     = document.getElementById('j-levels').value.trim();
+  const play       = document.getElementById('j-play').value.trim();
+  const invalidate = document.getElementById('j-invalidate').value.trim();
+  const instrument = document.getElementById('j-instrument').value;
+  const session    = document.getElementById('j-session').value;
+
+  if (!narrative) { showStatus('pre-status', 'Add your HTF narrative first', 'err'); return; }
+
+  const btn = document.getElementById('pre-save-btn');
+  btn.disabled = true; btn.textContent = 'Saving...';
+
+  // Build a structured notes blob to store in Notion Notes field
+  const notesBlob = buildNotesBlob({ narrative, levels, play, invalidate, session });
+
+  const props = {
+    "Title": { title: [{ text: { content: `MJ:PRE ${instrument} ${selectedBias} — ${TODAY}` } }] },
+    "Instrument": { select: { name: instrument === 'Both' ? 'NQ' : instrument } },
+    "Bias": { select: { name: selectedBias } },
+    "Date": { date: { start: TODAY } },
+    "Notes": { rich_text: [{ text: { content: notesBlob } }] },
+    "switched": { checkbox: false }
+  };
+
+  try {
+    const data = await notionPost('/pages', { parent: { database_id: MJ_DB }, properties: props });
+    if (data.id) {
+      todayPreId = data.id;
+      renderPreLocked({ instrument, session, bias: selectedBias, narrative, levels, play, invalidate });
+      showPostFields();
+      showStatus('pre-status', '✓ Saved', 'ok');
+    } else {
+      showStatus('pre-status', 'Error: ' + JSON.stringify(data), 'err');
+      btn.disabled = false; btn.textContent = 'Save Pre-Session Plan';
+    }
+  } catch(e) {
+    showStatus('pre-status', 'Error: ' + e.message, 'err');
+    btn.disabled = false; btn.textContent = 'Save Pre-Session Plan';
+  }
+}
+
+// ── SAVE POST-SESSION ──────────────────────────────────────────────────────────
+async function savePostSession() {
+  if (!selectedAccuracy) { showStatus('post-status', 'Rate your accuracy first', 'err'); return; }
+  const happened   = document.getElementById('j-happened').value.trim();
+  const traded     = document.getElementById('j-traded').value;
+  const levelsHit  = document.getElementById('j-levels-hit').value;
+  const vsExpected = document.getElementById('j-vs-expected').value.trim();
+  const lesson     = document.getElementById('j-lesson').value.trim();
+
+  if (!happened) { showStatus('post-status', 'Describe what happened first', 'err'); return; }
+
+  const btn = document.getElementById('post-save-btn');
+  btn.disabled = true; btn.textContent = 'Saving...';
+
+  const notesBlob = buildDebriefBlob({ happened, traded, levelsHit, vsExpected, lesson, accuracy: selectedAccuracy });
+
+  const props = {
+    "Title": { title: [{ text: { content: `MJ:POST ${selectedAccuracy} — ${TODAY}` } }] },
+    "Instrument": { select: { name: 'NQ' } },
+    "Bias": { select: { name: selectedAccuracy } },
+    "Date": { date: { start: TODAY } },
+    "Notes": { rich_text: [{ text: { content: notesBlob } }] },
+    "switched": { checkbox: true }   // "switched" flag = post-session entry
+  };
+
+  try {
+    const data = await notionPost('/pages', { parent: { database_id: MJ_DB }, properties: props });
+    if (data.id) {
+      todayPostId = data.id;
+      renderPostLocked({ accuracy: selectedAccuracy, traded, happened, lesson });
+      showStatus('post-status', '✓ Debrief saved', 'ok');
+    } else {
+      showStatus('post-status', 'Error: ' + JSON.stringify(data), 'err');
+      btn.disabled = false; btn.textContent = 'Save Debrief';
+    }
+  } catch(e) {
+    showStatus('post-status', 'Error: ' + e.message, 'err');
+    btn.disabled = false; btn.textContent = 'Save Debrief';
+  }
+}
+
+// ── RENDER HELPERS ─────────────────────────────────────────────────────────────
+function renderPreLocked(d) {
+  document.getElementById('pre-form').style.display   = 'none';
+  document.getElementById('pre-locked').style.display = 'block';
+  const biasEl = document.getElementById('locked-bias');
+  biasEl.textContent = d.bias;
+  biasEl.className = biasClass(d.bias).replace('b-','') === 'bull' ? 'b-bull' : biasClass(d.bias);
+  biasEl.style.color = {Bullish:'var(--green)',Bearish:'var(--red)',Ranging:'var(--yellow)',Waiting:'var(--text3)'}[d.bias]||'var(--text)';
+  document.getElementById('locked-meta').textContent      = `${d.instrument} · ${d.session}`;
+  document.getElementById('locked-narrative').textContent = d.narrative || '—';
+  document.getElementById('locked-levels').textContent    = d.levels    || '—';
+  document.getElementById('locked-play').textContent      = d.play      || '—';
+  if (d.invalidate) {
+    document.getElementById('locked-invalidate').textContent  = d.invalidate;
+    document.getElementById('locked-invalidate-wrap').style.display = 'block';
+  }
+}
+
+function showPostFields() {
+  document.getElementById('post-pre-required').style.display = 'none';
+  document.getElementById('post-fields').style.display       = 'block';
+}
+
+function renderPostLocked(d) {
+  document.getElementById('post-form').style.display   = 'none';
+  document.getElementById('post-locked').style.display = 'block';
+  const accEl = document.getElementById('post-locked-acc');
+  accEl.textContent = d.accuracy;
+  const accColors = { 'Nailed It':'var(--green)', 'Close':'var(--accent)', 'Missed':'var(--yellow)', 'Wrong Direction':'var(--red)' };
+  accEl.style.color = accColors[d.accuracy] || 'var(--text)';
+  document.getElementById('post-locked-traded').textContent  = d.traded   || '';
+  document.getElementById('post-locked-happened').textContent = d.happened || '—';
+  if (d.lesson) {
+    document.getElementById('post-locked-lesson').textContent      = d.lesson;
+    document.getElementById('post-locked-lesson-wrap').style.display = 'block';
+  }
+}
+
+// ── NOTE BLOBS (structured text stored in Notion Notes field) ──────────────────
+function buildNotesBlob(d) {
+  return [
+    '[PRE-SESSION]',
+    `SESSION: ${d.session}`,
+    `NARRATIVE: ${d.narrative}`,
+    d.levels     ? `LEVELS: ${d.levels}`         : '',
+    d.play       ? `PLAY: ${d.play}`             : '',
+    d.invalidate ? `INVALIDATE: ${d.invalidate}` : '',
+  ].filter(Boolean).join('\n');
+}
+
+function buildDebriefBlob(d) {
+  return [
+    '[POST-SESSION]',
+    `ACCURACY: ${d.accuracy}`,
+    d.traded    ? `TRADED: ${d.traded}`      : '',
+    d.levelsHit ? `LEVELS HIT: ${d.levelsHit}` : '',
+    `HAPPENED: ${d.happened}`,
+    d.vsExpected ? `VS EXPECTED: ${d.vsExpected}` : '',
+    d.lesson     ? `LESSON: ${d.lesson}`          : '',
+  ].filter(Boolean).join('\n');
+}
+
+function parseNotesBlob(raw) {
+  const out = {};
+  if (!raw) return out;
+  raw.split('\n').forEach(line => {
+    const i = line.indexOf(':');
+    if (i < 0) { out._type = line.replace(/[\[\]]/g,'').trim(); return; }
+    const key = line.slice(0,i).trim().toLowerCase().replace(/ /g,'_');
+    out[key] = line.slice(i+1).trim();
+  });
+  return out;
+}
+
+// ── STATUS ─────────────────────────────────────────────────────────────────────
+function showStatus(id, msg, type) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.className = `status-msg status-${type}`;
+  el.style.display = 'block';
+  if (type === 'ok') setTimeout(() => el.style.display = 'none', 3000);
+}
+
+// ── LOAD HISTORY ───────────────────────────────────────────────────────────────
+async function loadHistory() {
+  const container = document.getElementById('history-container');
+  const filter    = document.getElementById('hist-filter')?.value || 'all';
+  container.innerHTML = '<div style="font-family:var(--mono);font-size:11px;color:var(--text3);padding:2rem;text-align:center;">Loading...</div>';
+
+  try {
+    const data = await notionPost(`/databases/${MJ_DB}/query`, {
+      filter: { property: 'Title', rich_text: { contains: 'MJ:' } },
+      page_size: 100,
+      sorts: [{ property: 'Date', direction: 'descending' }]
+    });
+
+    const pages = (data.results || []);
+    if (!pages.length) {
+      container.innerHTML = '<div style="font-family:var(--mono);font-size:11px;color:var(--text3);padding:2rem;text-align:center;background:var(--surface);">No journal entries yet</div>';
+      return;
+    }
+
+    // Group by date — pair PRE + POST entries
+    const byDate = {};
+    pages.forEach(p => {
+      const date    = p.properties['Date']?.date?.start || '—';
+      const title   = wExtractText(p.properties['Title']?.title) || '';
+      const notes   = wExtractText(p.properties['Notes']?.rich_text) || '';
+      const parsed  = parseNotesBlob(notes);
+      const isPost  = title.includes('MJ:POST');
+      if (!byDate[date]) byDate[date] = { pre: null, post: null };
+      if (isPost) byDate[date].post = { ...parsed, _raw: notes };
+      else        byDate[date].pre  = { ...parsed, _raw: notes,
+        bias:       p.properties['Bias']?.select?.name || '—',
+        instrument: p.properties['Instrument']?.select?.name || 'NQ',
+      };
+    });
+
+    // Filter
+    const dates = Object.keys(byDate).sort((a,b) => b.localeCompare(a));
+    const filtered = dates.filter(date => {
+      const { pre, post } = byDate[date];
+      if (filter === 'all') return true;
+      if (filter === 'pending') return !post;
+      return post?.accuracy === filter;
+    });
+
+    if (!filtered.length) {
+      container.innerHTML = '<div style="font-family:var(--mono);font-size:11px;color:var(--text3);padding:2rem;text-align:center;background:var(--surface);">No entries match this filter</div>';
+      return;
+    }
+
+    const rows = filtered.map(date => {
+      const { pre, post } = byDate[date];
+      const ds = new Date(date + 'T12:00:00').toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric', year:'numeric' });
+      const bias = pre?.bias || '—';
+      const bCls = biasClass(bias);
+      const acc  = post?.accuracy || null;
+      const aCls = acc ? accClass(acc) : 'pending';
+      const narrative = pre?.narrative || '';
+
+      const accLabel = acc
+        ? { 'Nailed It':'🎯 Nailed It', 'Close':'~ Close', 'Missed':'⚠ Missed', 'Wrong Direction':'✕ Wrong Dir.' }[acc] || acc
+        : 'Debrief pending';
+
+      const preSection = pre ? `
+        <div class="expand-section">
+          <div class="expand-label">Pre-Session Plan</div>
+          <div class="expand-text" style="margin-bottom:6px;"><strong style="color:var(--text3);font-size:10px;font-family:var(--mono);">NARRATIVE</strong><br>${escHtml(pre.narrative||'—')}</div>
+          ${pre.levels ? `<div class="expand-text" style="margin-bottom:4px;"><strong style="color:var(--text3);font-size:10px;font-family:var(--mono);">LEVELS</strong><br>${escHtml(pre.levels)}</div>` : ''}
+          ${pre.play   ? `<div class="expand-text"><strong style="color:var(--text3);font-size:10px;font-family:var(--mono);">PLAY</strong><br>${escHtml(pre.play)}</div>` : ''}
+        </div>` : '';
+
+      const postSection = post ? `
+        <div class="expand-section">
+          <div class="expand-label" style="color:#40c4ff;">Post-Session Debrief</div>
+          <div class="expand-text" style="margin-bottom:6px;"><strong style="color:var(--text3);font-size:10px;font-family:var(--mono);">WHAT HAPPENED</strong><br>${escHtml(post.happened||'—')}</div>
+          ${post.vs_expected ? `<div class="expand-text" style="margin-bottom:4px;"><strong style="color:var(--text3);font-size:10px;font-family:var(--mono);">VS EXPECTED</strong><br>${escHtml(post.vs_expected)}</div>` : ''}
+          ${post.lesson      ? `<div class="expand-text"><strong style="color:var(--text3);font-size:10px;font-family:var(--mono);">LESSON</strong><br>${escHtml(post.lesson)}</div>` : ''}
+        </div>` : `<div class="expand-section"><button class="add-debrief-btn" onclick="openInlineDebrief('${date}', event)">+ Add Debrief for This Day</button></div>`;
+
+      return `<div class="hist-row" onclick="toggleHistRow(this)">
+        <div class="hist-row-header">
+          <div class="hist-date">${ds}</div>
+          <div class="hist-inst" style="color:${pre?.instrument==='ES'?'#40c4ff':'#c8ff00'}">${pre?.instrument||'NQ'}</div>
+          <div class="hist-bias ${bCls}">${bias}</div>
+          <div class="hist-acc ${aCls}" style="margin-left:auto;">${accLabel}</div>
+        </div>
+        <div class="hist-narrative">${escHtml(narrative) || '<span style="color:var(--text3);font-style:italic;">No narrative saved</span>'}</div>
+        <div class="hist-expand">${preSection}${postSection}</div>
+      </div>`;
+    }).join('');
+
+    container.innerHTML = `<div class="hist-list">${rows}</div>`;
+  } catch(e) {
+    container.innerHTML = `<div style="font-family:var(--mono);font-size:11px;color:var(--red);padding:1rem;">Error: ${e.message}</div>`;
+  }
+}
+
+function toggleHistRow(el) { el.classList.toggle('open'); }
+function escHtml(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>'); }
+
+// ── INLINE DEBRIEF FOR PAST DAYS ───────────────────────────────────────────────
+function openInlineDebrief(date, e) {
+  e.stopPropagation();
+  const expandEl = e.target.closest('.hist-expand');
+  if (!expandEl || expandEl.querySelector('.debrief-form')) return; // already open
+
+  let localAcc = null;
+  const form = document.createElement('div');
+  form.className = 'debrief-form';
+  form.innerHTML = `
+    <div class="field">
+      <label>How accurate was your read?</label>
+      <div class="acc-group" style="margin-top:2px;">
+        <button class="acc-btn nailed" onclick="setInlineAcc(this,'Nailed It')">🎯 Nailed It</button>
+        <button class="acc-btn close"  onclick="setInlineAcc(this,'Close')">~ Close</button>
+        <button class="acc-btn missed" onclick="setInlineAcc(this,'Missed')">⚠ Missed</button>
+        <button class="acc-btn wrong"  onclick="setInlineAcc(this,'Wrong Direction')">✕ Wrong Dir.</button>
+      </div>
+    </div>
+    <div class="field">
+      <label>What actually happened?</label>
+      <textarea rows="3" placeholder="e.g. Price swept the SSL as expected then MSS'd..."></textarea>
+    </div>
+    <div class="field">
+      <label>Lesson / takeaway</label>
+      <textarea rows="2" placeholder="e.g. Need to wait for confirmation before entry..."></textarea>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button class="save-btn" style="background:none;border:1px solid #40c4ff;color:#40c4ff;flex:1;" onclick="submitInlineDebrief(this,'${date}')">Save Debrief</button>
+      <button class="save-btn secondary" style="flex:0 0 auto;width:80px;" onclick="this.closest('.debrief-form').remove()">Cancel</button>
+    </div>
+    <div class="status-msg" id="inline-status-${date.replace(/-/g,'')}"></div>`;
+  expandEl.appendChild(form);
+}
+
+function setInlineAcc(btn, val) {
+  btn.closest('.acc-group').querySelectorAll('.acc-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  btn.closest('.debrief-form')._acc = val;
+}
+
+async function submitInlineDebrief(btn, date) {
+  const form    = btn.closest('.debrief-form');
+  const acc     = form._acc;
+  const areas   = form.querySelectorAll('textarea');
+  const happened = areas[0].value.trim();
+  const lesson   = areas[1].value.trim();
+  const statusId = `inline-status-${date.replace(/-/g,'')}`;
+
+  if (!acc)      { showStatus(statusId, 'Select accuracy first', 'err'); return; }
+  if (!happened) { showStatus(statusId, 'Describe what happened', 'err'); return; }
+
+  btn.disabled = true; btn.textContent = 'Saving...';
+  const notesBlob = buildDebriefBlob({ happened, lesson, accuracy: acc, traded:'', levelsHit:'', vsExpected:'' });
+  const props = {
+    "Title":      { title: [{ text: { content: `MJ:POST ${acc} — ${date}` } }] },
+    "Instrument": { select: { name: 'NQ' } },
+    "Bias":       { select: { name: acc } },
+    "Date":       { date: { start: date } },
+    "Notes":      { rich_text: [{ text: { content: notesBlob } }] },
+    "switched":   { checkbox: true }
+  };
+  try {
+    const data = await notionPost('/pages', { parent: { database_id: MJ_DB }, properties: props });
+    if (data.id) {
+      showStatus(statusId, '✓ Saved — reload to see full entry', 'ok');
+      setTimeout(() => loadHistory(), 1500);
+    } else {
+      showStatus(statusId, 'Error: ' + JSON.stringify(data), 'err');
+      btn.disabled = false; btn.textContent = 'Save Debrief';
+    }
+  } catch(e) {
+    showStatus(statusId, 'Error: ' + e.message, 'err');
+    btn.disabled = false; btn.textContent = 'Save Debrief';
+  }
+}
+
+// ── INIT — check if today's entry already exists ───────────────────────────────
+async function init() {
+  const d   = new Date();
+  const lbl = document.getElementById('today-date-label');
+  if (lbl) lbl.textContent = d.toLocaleDateString('en-US', { weekday:'long', month:'short', day:'numeric' });
+
+  try {
+    const data = await notionPost(`/databases/${MJ_DB}/query`, {
+      filter: {
+        and: [
+          { property: 'Date', date: { equals: TODAY } },
+          { property: 'Title', rich_text: { contains: 'MJ:' } }
+        ]
+      },
+      page_size: 10
+    });
+
+    const pages   = data.results || [];
+    const preEntry  = pages.find(p => wExtractText(p.properties['Title']?.title||[]).includes('MJ:PRE'));
+    const postEntry = pages.find(p => wExtractText(p.properties['Title']?.title||[]).includes('MJ:POST'));
+
+    if (preEntry) {
+      todayPreId = preEntry.id;
+      const notes  = wExtractText(preEntry.properties['Notes']?.rich_text || []);
+      const parsed = parseNotesBlob(notes);
+      renderPreLocked({
+        instrument: preEntry.properties['Instrument']?.select?.name || 'NQ',
+        session:    parsed.session    || '—',
+        bias:       preEntry.properties['Bias']?.select?.name || '—',
+        narrative:  parsed.narrative  || '',
+        levels:     parsed.levels     || '',
+        play:       parsed.play       || '',
+        invalidate: parsed.invalidate || '',
+      });
+      showPostFields();
+    }
+
+    if (postEntry) {
+      todayPostId = postEntry.id;
+      const notes  = wExtractText(postEntry.properties['Notes']?.rich_text || []);
+      const parsed = parseNotesBlob(notes);
+      renderPostLocked({
+        accuracy:  parsed.accuracy  || postEntry.properties['Bias']?.select?.name || '—',
+        traded:    parsed.traded    || '',
+        happened:  parsed.happened  || '',
+        lesson:    parsed.lesson    || '',
+      });
+    }
+
+  } catch(e) {
+    console.warn('Journal init error:', e);
+  }
+}
+
+init();
+</script>
+<script>if('serviceWorker' in navigator){navigator.serviceWorker.register('../sw.js');}</script>
+</body>
+</html>
