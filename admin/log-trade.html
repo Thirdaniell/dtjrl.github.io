@@ -31,21 +31,25 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
 .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent);}
 .field textarea{resize:vertical;min-height:70px;font-family:var(--sans);font-size:13px;line-height:1.6;}
 .field select option{background:var(--surface2);}
+/* ── CONFLUENCE CHIP PICKER ────────────────────────────────── */
+.conf-search{font-family:var(--mono);font-size:12px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:9px 11px;width:100%;outline:none;transition:border-color 0.15s;margin-bottom:8px;}
+.conf-search:focus{border-color:var(--accent);}
+.conf-search::placeholder{color:var(--text3);}
+.conf-chip-area{display:flex;flex-wrap:wrap;gap:5px;max-height:200px;overflow-y:auto;padding:2px 0 4px;}
+.conf-chip-area::-webkit-scrollbar{width:3px;}
+.conf-chip{font-family:var(--mono);font-size:9px;letter-spacing:0.04em;padding:4px 10px;border:1px solid var(--border2);color:var(--text3);cursor:pointer;transition:all 0.1s;background:var(--surface2);white-space:nowrap;}
+.conf-chip:hover{border-color:var(--text2);color:var(--text);}
+.conf-chip.active{border-color:var(--accent);color:var(--accent);background:rgba(200,255,0,0.06);}
+.conf-chip.hidden{display:none;}
+.conf-group-lbl{font-family:var(--mono);font-size:8px;letter-spacing:0.15em;color:var(--text3);text-transform:uppercase;width:100%;padding:6px 0 2px;border-top:1px solid var(--border2);margin-top:4px;}
+.conf-group-lbl:first-child{border-top:none;margin-top:0;padding-top:0;}
+.conf-selected-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px;min-height:20px;}
+.conf-tag{font-family:var(--mono);font-size:9px;padding:3px 8px;border:1px solid rgba(200,255,0,0.4);color:var(--accent);background:rgba(200,255,0,0.06);cursor:pointer;}
+.conf-tag:hover{background:rgba(200,255,0,0.12);}
+.conf-tag::after{content:' ✕';opacity:0.5;}
 .conf-wrap{position:relative;}
-.conf-btn{font-family:var(--mono);font-size:11px;background:var(--surface2);border:1px solid var(--border2);color:var(--text2);padding:8px 10px;width:100%;text-align:left;cursor:pointer;transition:border-color 0.15s;display:flex;justify-content:space-between;align-items:center;}
-.conf-btn.open,.conf-btn:focus{border-color:var(--accent);outline:none;}
-.conf-dropdown{display:none;position:absolute;top:100%;left:0;right:0;background:var(--surface);border:1px solid var(--accent);border-top:none;z-index:100;max-height:260px;overflow-y:auto;}
-.conf-dropdown.open{display:block;}
-.conf-group-lbl{font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--text3);text-transform:uppercase;padding:7px 10px 3px;border-top:1px solid var(--border2);}
-.conf-group-lbl:first-child{border-top:none;}
-.conf-opt{display:flex;align-items:center;gap:8px;padding:6px 10px;cursor:pointer;font-size:12px;color:var(--text2);transition:background 0.1s;}
-.conf-opt:hover{background:var(--surface2);}
-.conf-opt input{accent-color:var(--accent);width:12px;height:12px;flex-shrink:0;}
-.conf-opt.selected{color:var(--text);}
-.conf-clear{width:100%;font-family:var(--mono);font-size:9px;color:var(--text3);background:none;border:none;border-top:1px solid var(--border2);padding:7px;cursor:pointer;text-transform:uppercase;transition:color 0.15s;}
-.conf-clear:hover{color:var(--accent);}
+.conf-dropdown{display:none;}
 .conf-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;min-height:24px;}
-.conf-tag{font-family:var(--mono);font-size:9px;padding:2px 8px;border:1px solid var(--border2);color:var(--text3);}
 .analyze-btn{font-family:var(--mono);font-size:12px;letter-spacing:0.1em;text-transform:uppercase;padding:14px 28px;background:var(--accent);color:#000;border:none;cursor:pointer;font-weight:700;transition:opacity 0.15s;width:100%;}
 .analyze-btn:hover{opacity:0.85;}
 .analyze-btn:disabled{opacity:0.4;cursor:not-allowed;}
@@ -106,6 +110,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
       <div class="field"><label>Entry Model</label><input type="text" id="f-model" placeholder="e.g. 1m IFVG retracement"></div>
       <div class="field"><label>Date</label><input type="date" id="f-date"></div>
       <div class="field"><label>Outcome</label><select id="f-outcome"><option value="">Select...</option><option value="Closed - Win">Win</option><option value="Closed - Loss">Loss</option><option value="Breakeven">Breakeven</option></select></div>
+      <div class="field form-full"><label>Favored Direction at Entry <span id="bias-autofill-note" style="color:var(--accent);font-size:9px;display:none;">— auto-filled from today's journal</span></label><div style="display:flex;gap:4px;flex-wrap:wrap;" id="bias-btn-group"><button type="button" class="bias-entry-btn" data-val="Bullish" onclick="selectBiasEntry(this)" style="font-family:var(--mono);font-size:9px;letter-spacing:0.06em;padding:7px 14px;background:var(--surface2);border:1px solid var(--border2);color:var(--text3);cursor:pointer;transition:all 0.12s;">Bullish</button><button type="button" class="bias-entry-btn" data-val="Bearish" onclick="selectBiasEntry(this)" style="font-family:var(--mono);font-size:9px;letter-spacing:0.06em;padding:7px 14px;background:var(--surface2);border:1px solid var(--border2);color:var(--text3);cursor:pointer;transition:all 0.12s;">Bearish</button><button type="button" class="bias-entry-btn" data-val="Ranging" onclick="selectBiasEntry(this)" style="font-family:var(--mono);font-size:9px;letter-spacing:0.06em;padding:7px 14px;background:var(--surface2);border:1px solid var(--border2);color:var(--text3);cursor:pointer;transition:all 0.12s;">Ranging</button><button type="button" class="bias-entry-btn" data-val="No Bias" onclick="selectBiasEntry(this)" style="font-family:var(--mono);font-size:9px;letter-spacing:0.06em;padding:7px 14px;background:var(--surface2);border:1px solid var(--border2);color:var(--text3);cursor:pointer;transition:all 0.12s;">No Bias</button></div></div>
       <div class="field"><label>Entry Price</label><input type="number" id="f-entry" placeholder="e.g. 27363.50" step="0.25"></div>
       <div class="field"><label>Entry Time</label><input type="text" id="f-entry-time" placeholder="e.g. 9:40 AM"></div>
       <div class="field"><label>Exit Price</label><input type="number" id="f-exit" placeholder="e.g. 27419.75" step="0.25"></div>
@@ -136,12 +141,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
         <div style="font-family:var(--mono);font-size:9px;color:var(--accent);margin-top:5px;display:none;" id="f-upload-status"></div>
       </div>
       <div class="field form-full">
-        <label>Confluences</label>
-        <div class="conf-wrap">
-          <button class="conf-btn" id="conf-btn" onclick="toggleConf()" type="button"><span id="conf-label">Select confluences...</span><span>▼</span></button>
-          <div class="conf-dropdown" id="conf-dropdown"></div>
-        </div>
-        <div class="conf-tags" id="conf-tags"></div>
+        <label>Confluences <span style="color:var(--text3);font-size:9px;">(click to toggle — search to filter)</span></label>
+        <input type="text" class="conf-search" id="conf-search" placeholder="Search confluences..." oninput="filterConf(this.value)">
+        <div class="conf-chip-area" id="conf-chip-area"></div>
+        <div class="conf-selected-tags" id="conf-tags"></div>
       </div>
       <div class="field form-full"><label>Notes</label><textarea id="f-notes" placeholder="What happened during this trade?"></textarea></div>
       <div class="field form-full"><label>Mistakes</label><textarea id="f-mistakes" placeholder="What did you do wrong?"></textarea></div>
@@ -318,7 +321,7 @@ function resetImgUpload(prefix) {
 
 
 
-buildConfDropdown('conf-btn','conf-dropdown','conf-label','conf-tags','updateConf');
+buildConfChips('conf-chip-area','conf-tags');
 
 // ── AUTO-FILL FROM TRADOVATE IMPORT ──────────────────────────────────────────
 (function checkTradovateImport() {
@@ -358,15 +361,15 @@ buildConfDropdown('conf-btn','conf-dropdown','conf-label','conf-tags','updateCon
         setTimeout(() => {
           t.exits.forEach((exit, i) => {
             const tpNum = i + 1;
-            const qtyEl   = document.getElementById(`tp${tpNum}-qty`);
-            const priceEl = document.getElementById(`tp${tpNum}-price`);
-            const timeEl  = document.getElementById(`tp${tpNum}-time`);
-            if (qtyEl)   qtyEl.value   = exit.qty;
-            if (priceEl) priceEl.value = exit.price;
-            if (timeEl)  timeEl.value  = exit.time;
+            const contractsEl = document.getElementById(`f-tp${tpNum}-contracts`);
+            const priceEl     = document.getElementById(`f-tp${tpNum}-price`);
+            const timeEl      = document.getElementById(`f-tp${tpNum}-time`);
+            if (contractsEl) contractsEl.value = exit.qty;
+            if (priceEl)     priceEl.value     = exit.price;
+            if (timeEl)      timeEl.value      = exit.time;
           });
-          // Trigger P&L preview recalc if available
-          if (typeof calcPartialPnl === 'function') calcPartialPnl();
+          // Trigger P&L preview recalc
+          if (typeof onTPInput === 'function') onTPInput();
         }, 100);
       }
     } else if (t.contracts > 1) {
@@ -398,24 +401,120 @@ function resetEmotions() {
   document.getElementById('f-emotion-notes').value = '';
 }
 
-let confOpen = false;
 let tradeData = {};
 const TP_LABELS = ['TP1','TP2','TP3','TP4','TP5','TP6','TP7','TP8','TP9','TP10'];
 
-function toggleConf() {
-  confOpen = !confOpen;
-  document.getElementById('conf-dropdown').classList.toggle('open', confOpen);
-  document.getElementById('conf-btn').classList.toggle('open', confOpen);
+// ── BIAS AT ENTRY ─────────────────────────────────────────────────────────────
+let selectedBiasEntry = '';
+function selectBiasEntry(btn) {
+  selectedBiasEntry = btn.dataset.val;
+  document.querySelectorAll('.bias-entry-btn').forEach(b => {
+    b.style.borderColor = 'var(--border2)';
+    b.style.color = 'var(--text3)';
+    b.style.background = 'var(--surface2)';
+  });
+  const colors = { Bullish:'#00e676', Bearish:'#ff4444', Ranging:'#ffd740', 'No Bias':'#888' };
+  const c = colors[btn.dataset.val] || '#888';
+  btn.style.borderColor = c;
+  btn.style.color = c;
+  btn.style.background = c + '18';
 }
-document.addEventListener('click', e => {
-  const wrap = document.querySelector('.conf-wrap');
-  if (wrap && !wrap.contains(e.target)) {
-    confOpen = false;
-    document.getElementById('conf-dropdown').classList.remove('open');
-    document.getElementById('conf-btn').classList.remove('open');
+
+// Try to auto-fill favored direction from today's market journal entry
+(async function autofillBias() {
+  try {
+    const data = await notionPost(`/databases/${BIAS_DB}/query`, {
+      filter: { and: [
+        { property: 'Date', date: { equals: TODAY } },
+        { property: 'Title', rich_text: { contains: 'MJ:PRE' } }
+      ]},
+      page_size: 1
+    });
+    const page = data.results?.[0];
+    if (!page) return;
+    const bias = page.properties['Bias']?.select?.name;
+    if (!bias) return;
+    const btn = document.querySelector(`.bias-entry-btn[data-val="${bias}"]`);
+    if (btn) {
+      selectBiasEntry(btn);
+      const note = document.getElementById('bias-autofill-note');
+      if (note) note.style.display = 'inline';
+    }
+  } catch(e) { /* silent */ }
+})();
+
+// ── CHIP CONFLUENCE PICKER ────────────────────────────────────────────────────
+let selectedConfs = new Set();
+
+function buildConfChips(areaId, tagsId) {
+  const area = document.getElementById(areaId);
+  if (!area) return;
+  let html = '';
+  CONFLUENCE_GROUPS.forEach(g => {
+    html += `<div class="conf-group-lbl">${g.label}</div>`;
+    g.items.forEach(item => {
+      const val = confValue(item);
+      const short = item.split(' —')[0].trim(); // short label for chip
+      html += `<span class="conf-chip" data-val="${val}" data-full="${item.toLowerCase()}" onclick="toggleConfChip(this,'${tagsId}')">${short}</span>`;
+    });
+  });
+  area.innerHTML = html;
+}
+
+function toggleConfChip(el, tagsId) {
+  const val = el.dataset.val;
+  if (selectedConfs.has(val)) {
+    selectedConfs.delete(val);
+    el.classList.remove('active');
+  } else {
+    selectedConfs.add(val);
+    el.classList.add('active');
   }
-});
-function updateConf() { updateConfDisplay('conf-dropdown','conf-label','conf-tags'); }
+  renderConfTags(tagsId);
+}
+
+function renderConfTags(tagsId) {
+  const tags = document.getElementById(tagsId);
+  if (!tags) return;
+  tags.innerHTML = [...selectedConfs].map(v =>
+    `<span class="conf-tag" onclick="removeConfChip('${v}','${tagsId}')">${v}</span>`
+  ).join('');
+}
+
+function removeConfChip(val, tagsId) {
+  selectedConfs.delete(val);
+  const chip = document.querySelector(`.conf-chip[data-val="${val}"]`);
+  if (chip) chip.classList.remove('active');
+  renderConfTags(tagsId);
+}
+
+function filterConf(query) {
+  const q = query.toLowerCase().trim();
+  document.querySelectorAll('.conf-chip').forEach(chip => {
+    const match = !q || chip.dataset.full.includes(q) || chip.dataset.val.toLowerCase().includes(q);
+    chip.classList.toggle('hidden', !match);
+  });
+  // Show/hide group labels based on whether any chips in group are visible
+  document.querySelectorAll('.conf-group-lbl').forEach(lbl => {
+    let next = lbl.nextElementSibling;
+    let anyVisible = false;
+    while (next && !next.classList.contains('conf-group-lbl')) {
+      if (!next.classList.contains('hidden')) anyVisible = true;
+      next = next.nextElementSibling;
+    }
+    lbl.classList.toggle('hidden', !anyVisible);
+  });
+}
+
+function getSelectedConfs() { return [...selectedConfs]; }
+
+function setSelectedConfs(values) {
+  selectedConfs = new Set(values);
+  document.querySelectorAll('.conf-chip').forEach(chip => {
+    chip.classList.toggle('active', selectedConfs.has(chip.dataset.val));
+  });
+  renderConfTags('conf-tags');
+}
 
 document.getElementById('f-contracts').addEventListener('input', togglePartialRow);
 
@@ -494,14 +593,15 @@ async function analyzeTrade() {
   const entry=getNum('f-entry'),exit=getNum('f-exit'),sl=getNum('f-sl'),tp=getNum('f-tp'),contracts=getNum('f-contracts')||1;
   const entryTime=getField('f-entry-time'),exitTime=getField('f-exit-time'),notes=getField('f-notes'),mistakes=getField('f-mistakes'),lessons=getField('f-lessons');
   const session=getField('f-session'),timeframe=getField('f-timeframe'),htf=getField('f-htf'),model=getField('f-model'),outcome=getField('f-outcome'),date=getField('f-date')||TODAY,screenshot=getField('f-screenshot');
-  const confluences=getCheckedConf('conf-dropdown');
+  const confluences=getSelectedConfs();
   const emotions=getSelectedEmotions();
   const emotionNotes=getField('f-emotion-notes');
   const tpRows=(contracts>1)?getTPRows().filter(r=>r.price&&r.contracts):[];
   let pnl=0;
   if(entry){if(tpRows.length>0){tpRows.forEach(r=>{pnl+=calcPnL(entry,r.price,r.contracts,instrument,direction);});}else if(exit){pnl=calcPnL(entry,exit,contracts,instrument,direction);}}
   const rr=calcRR(entry,sl,tp),duration=calcDuration(entryTime,exitTime);
-  tradeData={instrument,direction,session,timeframe,htf,model,date,entry,exit,sl,tp,contracts,entryTime,exitTime,pnl,rr,duration,confluences,emotions,emotionNotes,grade:'Pending...',followedRules:'Pending...',outcome,notes,mistakes,lessons,screenshot,tpRows};
+  const biasAtEntry = selectedBiasEntry || '';
+  tradeData={instrument,direction,session,timeframe,htf,model,date,entry,exit,sl,tp,contracts,entryTime,exitTime,pnl,rr,duration,confluences,emotions,emotionNotes,grade:'Pending...',followedRules:'Pending...',outcome,notes,mistakes,lessons,screenshot,tpRows,biasAtEntry};
 
   const btn=document.getElementById('analyze-btn'); btn.disabled=true; btn.textContent='Analyzing...';
   document.getElementById('review-panel').style.display='block';
@@ -528,7 +628,7 @@ async function analyzeTrade() {
   document.getElementById('ai-verdict-badge').innerHTML='';
 
   try {
-    const tradeStr=[`Instrument: ${instrument}`,`Direction: ${direction}`,`Session: ${session}`,`Timeframe: ${timeframe}`,`HTF Context: ${htf}`,`Entry Model: ${model}`,`Date: ${date}`,`Entry Price: ${entry} at ${entryTime}`,`Exit Price: ${exit} at ${exitTime}`,`Stop Loss: ${sl}`,`Take Profit: ${tp}`,`Contracts: ${contracts}`,`R:R: ${rr||''}`,`P&L: $${pnl}`,`Status: ${outcome}`,`Confluences: ${confluences.join(', ')}`,`Notes: ${notes}`,`Mistakes: ${mistakes}`,`Lessons Learned: ${lessons}`].filter(l=>!l.endsWith(': ')&&!l.endsWith(': null')&&!l.endsWith(': undefined')).join('\n');
+    const tradeStr=[`Instrument: ${instrument}`,`Direction: ${direction}`,`Favored Direction at Entry: ${biasAtEntry||'Not set'}`,`Session: ${session}`,`Timeframe: ${timeframe}`,`HTF Context: ${htf}`,`Entry Model: ${model}`,`Date: ${date}`,`Entry Price: ${entry} at ${entryTime}`,`Exit Price: ${exit} at ${exitTime}`,`Stop Loss: ${sl}`,`Take Profit: ${tp}`,`Contracts: ${contracts}`,`R:R: ${rr||''}`,`P&L: $${pnl}`,`Status: ${outcome}`,`Confluences: ${confluences.join(', ')}`,`Notes: ${notes}`,`Mistakes: ${mistakes}`,`Lessons Learned: ${lessons}`].filter(l=>!l.endsWith(': ')&&!l.endsWith(': null')&&!l.endsWith(': undefined')).join('\n');
     const data=await verifyTrade(tradeStr);
     const text=data.result||'No response.';
     if(data.grade&&data.grade!=='Pending...') tradeData.grade=data.grade;
@@ -562,7 +662,7 @@ async function submitTrade() {
   if(t.entry)props["Entry Price"]={number:t.entry};if(t.exit)props["Exit Price"]={number:t.exit};if(t.sl)props["Stop Loss"]={number:t.sl};if(t.tp)props["Take Profit"]={number:t.tp};if(t.rr)props["R:R"]={number:t.rr};if(t.duration)props["Duration (mins)"]={number:t.duration};if(t.entryTime)props["Entry Time"]={rich_text:[{text:{content:t.entryTime}}]};if(t.exitTime)props["Exit Time"]={rich_text:[{text:{content:t.exitTime}}]};
   const exitBreakdown=(t.tpRows&&t.tpRows.length>0)?'Exit breakdown: '+t.tpRows.map(r=>`${r.label}: ${r.contracts} contract${r.contracts>1?'s':''} @ ${r.price}${r.time?' at '+r.time:''}`).join(' · '):null;
   const fullNotes=[t.notes,exitBreakdown].filter(Boolean).join('\n');
-  if(fullNotes)props["Notes"]={rich_text:[{text:{content:fullNotes}}]};if(t.mistakes)props["Mistakes"]={rich_text:[{text:{content:t.mistakes}}]};if(t.lessons)props["Lessons Learned"]={rich_text:[{text:{content:t.lessons}}]};if(t.htf)props["HTF Timeframe"]={rich_text:[{text:{content:t.htf}}]};if(t.model)props["Entry Model"]={rich_text:[{text:{content:t.model}}]};if(t.confluences.length)props["Confluences"]={multi_select:t.confluences.map(c=>({name:c}))};if(t.emotions&&t.emotions.length)props["Emotions"]={multi_select:t.emotions.map(e=>({name:e}))};if(t.emotionNotes)props["Emotion Notes"]={rich_text:[{text:{content:t.emotionNotes}}]};
+  if(fullNotes)props["Notes"]={rich_text:[{text:{content:fullNotes}}]};if(t.mistakes)props["Mistakes"]={rich_text:[{text:{content:t.mistakes}}]};if(t.lessons)props["Lessons Learned"]={rich_text:[{text:{content:t.lessons}}]};if(t.htf)props["HTF Timeframe"]={rich_text:[{text:{content:t.htf}}]};if(t.model)props["Entry Model"]={rich_text:[{text:{content:t.model}}]};if(t.confluences.length)props["Confluences"]={multi_select:t.confluences.map(c=>({name:c}))};if(t.emotions&&t.emotions.length)props["Emotions"]={multi_select:t.emotions.map(e=>({name:e}))};if(t.emotionNotes)props["Emotion Notes"]={rich_text:[{text:{content:t.emotionNotes}}]};if(t.biasAtEntry)props["Bias At Entry"]={rich_text:[{text:{content:t.biasAtEntry}}]};
   const body={parent:{database_id:DB_ID},properties:props};
   if(t.screenshot){body.children=[{object:'block',type:'paragraph',paragraph:{rich_text:[{type:'text',text:{content:'📸 Screenshot: '+t.screenshot,link:{url:t.screenshot}}}]}}];}
   try {
@@ -599,7 +699,11 @@ function resetForm() {
   document.getElementById('partial-tp-rows').innerHTML='';
   document.getElementById('partial-pnl-preview').textContent='';
   document.getElementById('f-date').value=new Date().toISOString().split('T')[0];
-  clearConf('conf-dropdown','conf-label','conf-tags');
+  setSelectedConfs([]);
+  document.getElementById('conf-search').value='';
+  filterConf('');
+  selectedBiasEntry='';
+  document.querySelectorAll('.bias-entry-btn').forEach(b=>{b.style.borderColor='var(--border2)';b.style.color='var(--text3)';b.style.background='var(--surface2)';});
   resetEmotions();
   resetImgUpload('f');
 }
