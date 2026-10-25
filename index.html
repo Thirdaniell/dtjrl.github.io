@@ -1271,7 +1271,7 @@ Keep your response concise — 4-6 bullet points max, then the verdict.`;
 
 async function verifyTrade(tradeId, btn) {
   const panel = document.getElementById('verify-panel-' + tradeId);
-  const trade = allTrades.find(t => t.id === tradeId);
+  const trade = allTradeProps.find(t => t.id === tradeId) || allTrades.find(t => t.id === tradeId);
   if (!trade) return;
 
   btn.disabled = true;
@@ -1393,9 +1393,10 @@ document.addEventListener('click', e => {
 
 // ---- CSV Export ----
 function exportCSV() {
-  if (!allTrades.length) return;
+  const _trades = allTradeProps.length ? allTradeProps : allTrades;
+  if (!_trades.length) return;
   const headers = ['Date','Instrument','Direction','Session','Timeframe','Entry Time','Entry','Exit Time','Exit','Stop Loss','Take Profit','Contracts','P&L','Confluences','Grade','Followed Rules','Notes','Mistakes','Lessons'];
-  const rows = allTrades.map(t => [
+  const rows = _trades.map(t => [
     t.date, t.instrument, t.direction, t.session, t.timeframe,
     t.entryTime, t.entryPrice, t.exitTime, t.exitPrice,
     t.stopLoss, t.takeProfit, t.contracts, t.pnl,
@@ -1425,7 +1426,7 @@ function getRuleBreaches() {
     'No Clear Target': 0,
     'News Avoidance': 0,
   };
-  allTrades.forEach(t => {
+  (allTradeProps.length ? allTradeProps : allTrades).forEach(t => {
     const text = ((t.mistakes||'') + ' ' + (t.notes||'') + ' ' + (t.lessons||'')).toLowerCase();
     if (text.includes('stop') && (text.includes('be') || text.includes('breakeven') || text.includes('moved'))) breaches['Stop Loss Management']++;
     if (text.includes('bias') || text.includes('htf') || text.includes('against')) breaches['HTF Bias Alignment']++;
