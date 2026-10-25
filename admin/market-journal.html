@@ -123,6 +123,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
 .add-scenario-btn{font-family:var(--mono);font-size:9px;letter-spacing:0.08em;text-transform:uppercase;padding:7px 14px;background:none;border:1px solid var(--border2);color:var(--text3);cursor:pointer;transition:all 0.15s;margin-top:4px;}
 .add-scenario-btn:hover{border-color:var(--accent);color:var(--accent);}
 .add-scenario-btn.collapse{color:var(--text3);}
+.scenario-img-zone{border:1px dashed var(--border2);padding:8px 12px;text-align:center;cursor:pointer;transition:border-color 0.15s;background:var(--surface2);margin-top:6px;font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:0.06em;}
+.scenario-img-zone:hover{border-color:var(--text2);}
+.scenario-img-zone.dragover{border-color:var(--accent);}
+.scenario-img-previews{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;}
 
 /* ── INLINE DEBRIEF FORM ─────────────────────────────── */
 .debrief-form{background:var(--surface2);border:1px solid rgba(64,196,255,0.2);padding:1rem;margin-top:10px;}
@@ -214,21 +218,57 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
             <div class="scenario-block" id="scenario-a">
               <div class="scenario-label required">Scenario A</div>
               <textarea id="j-scenario-a" placeholder="e.g. If price sweeps SSL at 19,820 during London, expect MSS on 1m → long into IFVG at 19,950. Target 20,080 (prior day high) for ~6R." rows="2"></textarea>
+              <div class="scenario-img-zone" id="simg-zone-a"
+                ondragover="event.preventDefault();this.classList.add('dragover')"
+                ondragleave="this.classList.remove('dragover')"
+                ondrop="handleScenarioImgDrop(event,'a')"
+                onclick="document.getElementById('simg-file-a').click()">
+                📎 Add chart screenshot (optional)
+                <input type="file" id="simg-file-a" accept="image/*" style="display:none;" onchange="handleScenarioImgFile(event,'a')">
+              </div>
+              <div class="scenario-img-previews" id="simg-previews-a"></div>
             </div>
 
             <div class="scenario-block" id="scenario-b">
               <div class="scenario-label required">Scenario B</div>
               <textarea id="j-scenario-b" placeholder="e.g. If price rejects from BSL at 20,150 with displacement candle, expect short → target SSL at 19,820. No entry without confirmed MSS." rows="2"></textarea>
+              <div class="scenario-img-zone" id="simg-zone-b"
+                ondragover="event.preventDefault();this.classList.add('dragover')"
+                ondragleave="this.classList.remove('dragover')"
+                ondrop="handleScenarioImgDrop(event,'b')"
+                onclick="document.getElementById('simg-file-b').click()">
+                📎 Add chart screenshot (optional)
+                <input type="file" id="simg-file-b" accept="image/*" style="display:none;" onchange="handleScenarioImgFile(event,'b')">
+              </div>
+              <div class="scenario-img-previews" id="simg-previews-b"></div>
             </div>
 
             <div id="optional-scenarios" style="display:none;">
               <div class="scenario-block">
                 <div class="scenario-label">Scenario C <span style="color:var(--text3);font-size:9px;">optional</span></div>
                 <textarea id="j-scenario-c" placeholder="e.g. Consolidation day — if price stays inside yesterday's range, no trade. Watch for 10 AM reversal model." rows="2"></textarea>
+                <div class="scenario-img-zone" id="simg-zone-c"
+                  ondragover="event.preventDefault();this.classList.add('dragover')"
+                  ondragleave="this.classList.remove('dragover')"
+                  ondrop="handleScenarioImgDrop(event,'c')"
+                  onclick="document.getElementById('simg-file-c').click()">
+                  📎 Add chart screenshot (optional)
+                  <input type="file" id="simg-file-c" accept="image/*" style="display:none;" onchange="handleScenarioImgFile(event,'c')">
+                </div>
+                <div class="scenario-img-previews" id="simg-previews-c"></div>
               </div>
               <div class="scenario-block">
                 <div class="scenario-label">Scenario D <span style="color:var(--text3);font-size:9px;">optional</span></div>
                 <textarea id="j-scenario-d" placeholder="e.g. News catalyst at 8:30 — wait for first 15m candle to close, then assess structure before any entry." rows="2"></textarea>
+                <div class="scenario-img-zone" id="simg-zone-d"
+                  ondragover="event.preventDefault();this.classList.add('dragover')"
+                  ondragleave="this.classList.remove('dragover')"
+                  ondrop="handleScenarioImgDrop(event,'d')"
+                  onclick="document.getElementById('simg-file-d').click()">
+                  📎 Add chart screenshot (optional)
+                  <input type="file" id="simg-file-d" accept="image/*" style="display:none;" onchange="handleScenarioImgFile(event,'d')">
+                </div>
+                <div class="scenario-img-previews" id="simg-previews-d"></div>
               </div>
             </div>
 
@@ -404,6 +444,81 @@ if (!requireAuth()) {}
 // ── CONSTANTS ──────────────────────────────────────────────────────────────────
 // Reuses bias DB — journal entries use "MJ:" prefix in Title to distinguish them
 const MJ_DB = BIAS_DB;
+const IMGUR_CLIENT_ID = '546c25a59c58ad7';
+
+// ── SCENARIO IMAGE UPLOADS ─────────────────────────────────────────────────────
+const scenarioImgs = { a: [], b: [], c: [], d: [] };
+
+function handleScenarioImgDrop(event, key) {
+  event.preventDefault();
+  document.getElementById(`simg-zone-${key}`)?.classList.remove('dragover');
+  const files = Array.from(event.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+  addScenarioImg(key, files);
+}
+
+function handleScenarioImgFile(event, key) {
+  addScenarioImg(key, Array.from(event.target.files));
+  event.target.value = '';
+}
+
+function addScenarioImg(key, files) {
+  for (const f of files) {
+    if (scenarioImgs[key].length >= 2) break; // max 2 per scenario
+    scenarioImgs[key].push(f);
+  }
+  renderScenarioImgPreviews(key);
+}
+
+function removeScenarioImg(key, idx) {
+  scenarioImgs[key].splice(idx, 1);
+  renderScenarioImgPreviews(key);
+}
+
+function renderScenarioImgPreviews(key) {
+  const container = document.getElementById(`simg-previews-${key}`);
+  const zone = document.getElementById(`simg-zone-${key}`);
+  if (!container) return;
+  const files = scenarioImgs[key];
+  if (zone) zone.textContent = files.length ? `✓ ${files.length} image${files.length>1?'s':''} selected` : '📎 Add chart screenshot (optional)';
+  if (zone) { const inp = document.createElement('input'); inp.type='file'; inp.id=`simg-file-${key}`; inp.accept='image/*'; inp.style.display='none'; inp.onchange=e=>handleScenarioImgFile(e,key); zone.appendChild(inp); }
+  container.innerHTML = '';
+  files.forEach((file, i) => {
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const wrap = document.createElement('div');
+      wrap.style.cssText = 'position:relative;flex-shrink:0;';
+      wrap.innerHTML = `<img src="${ev.target.result}" style="width:100px;height:68px;object-fit:cover;border:1px solid var(--border2);display:block;">
+        <button onclick="removeScenarioImg('${key}',${i})" style="position:absolute;top:2px;right:2px;font-family:var(--mono);font-size:9px;background:rgba(0,0,0,0.8);border:1px solid var(--red);color:var(--red);padding:2px 5px;cursor:pointer;line-height:1;">✕</button>`;
+      container.appendChild(wrap);
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+async function uploadScenarioImgsToNotion(pageId, key) {
+  const files = scenarioImgs[key];
+  if (!files.length) return;
+  const label = `Scenario ${key.toUpperCase()}`;
+  // Upload each image to Imgur then append to Notion page as image block with a heading
+  const children = [{ object:'block', type:'heading_3', heading_3:{ rich_text:[{type:'text',text:{content:label}}] } }];
+  for (const file of files) {
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+      const res = await fetch('https://api.imgur.com/3/image', {
+        method:'POST', headers:{ 'Authorization':`Client-ID ${IMGUR_CLIENT_ID}` }, body: formData
+      });
+      const data = await res.json();
+      if (data.success) children.push({ object:'block', type:'image', image:{ type:'external', external:{ url: data.data.link } } });
+    } catch(e) { console.warn(`Scenario ${key} image upload failed:`, e); }
+  }
+  if (children.length > 1) {
+    await fetch(`${WORKER}/notion/blocks/${pageId}/children`, {
+      method:'PATCH', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ children })
+    });
+  }
+}
 const MJ_PRE_KEY  = 'ftj_mj_pre_'  + TODAY;   // localStorage fallback
 const MJ_POST_KEY = 'ftj_mj_post_' + TODAY;
 
@@ -491,6 +606,8 @@ async function savePreSession() {
     const data = await notionPost('/pages', { parent: { database_id: MJ_DB }, properties: props });
     if (data.id) {
       todayPreId = data.id;
+      // Upload scenario images in the background (non-blocking)
+      Promise.all(['a','b','c','d'].map(k => uploadScenarioImgsToNotion(data.id, k)));
       renderPreLocked({ instrument, session, bias: selectedBias, narrative, levels, scenarioA, scenarioB, scenarioC, scenarioD, invalidate });
       showPostFields();
       showStatus('pre-status', '✓ Saved', 'ok');
