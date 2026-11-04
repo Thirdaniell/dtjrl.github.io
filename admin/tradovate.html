@@ -314,65 +314,87 @@ function detectDirectionRow(row) {
 }
 
 function groupRows(rows) {
+  // Group by EXIT fill ID so that scaled-in entries (multiple buys before one close)
+  // are merged into a single trade with a weighted average entry price.
+  // Long: exit fill = sellFillId (all legs close via same sell)
+  // Short: exit fill = buyFillId (all legs close via same buy-to-cover)
   const groups = {};
   rows.forEach(row => {
     const dir = detectDirectionRow(row);
-    // Entry fill: for Longs = buyFillId (bought first), for Shorts = sellFillId (sold first)
-    const entryFillId = dir === 'Long' ? row.buyFillId : row.sellFillId;
-    const key = `${row.symbol}_${entryFillId}`;
-    if (!groups[key]) groups[key] = [];
-    groups[key].push(row);
+    const exitFillId = dir === 'Long' ? row.sellFillId : row.buyFillId;
+    const key = `${row.symbol}_${exitFillId}`;
+    if (!groups[key]) groups[key] = { dir, rows: [] };
+    groups[key].rows.push(row);
   });
 
   return Object.values(groups).map(grp => {
-    const first   = grp[0];
-    const dir     = detectDirectionRow(first);
-    const symbol  = stripExpiry(first.symbol);
+    const dir    = grp.dir;
+    const rows   = grp.rows;
+    const first  = rows[0];
+    const symbol = stripExpiry(first.symbol);
 
-    // Entry: the fill where position was opened
-    // Long → entry = buy side; Short → entry = sell side
-    // Use the earlier timestamp as entry time (handles Tradovate fill order quirks)
-    const entryPrice  = parseFloat(dir === 'Long' ? first.buyPrice  : first.sellPrice);
-    const entryFillId = dir === 'Long' ? first.buyFillId : first.sellFillId;
-    const tBuy  = new Date(first.boughtTimestamp);
-    const tSell = new Date(first.soldTimestamp);
-    const entryTime = dir === 'Long'
-      ? (tBuy < tSell ? first.boughtTimestamp : first.soldTimestamp)   // entry is earlier fill
-      : (tSell < tBuy ? first.soldTimestamp   : first.boughtTimestamp);
+    // ── ENTRY LEGS ────────────────────────────────────────────────────────────
+    // Each row in the group is a separate entry leg (different entry fill ID)
+    const entries = rows.map(row => {
+      const entryPrice = parseFloat(dir === 'Long' ? row.buyPrice : row.sellPrice);
+      const tB = new Date(row.boughtTimestamp), tS = new Date(row.soldTimestamp);
+      const entryTime = dir === 'Long'
+        ? (tB < tS ? row.boughtTimestamp : row.soldTimestamp)
+        : (tS < tB ? row.soldTimestamp   : row.boughtTimestamp);
+      const qty = parseInt(row.qty || 1);
+      return { entryPrice, entryTime, qty };
+    }).sort((a, b) => new Date(a.entryTime) - new Date(b.entryTime));
 
-    // Sort exits by exit timestamp ascending → TP1, TP2, TP3...
-    const exits = grp
-      .map(row => {
+    // Weighted average entry price across all legs
+    const totalQty = entries.reduce((s, e) => s + e.qty, 0);
+    const weightedEntry = entries.reduce((s, e) => s + e.entryPrice * e.qty, 0) / totalQty;
+    const firstEntryTime = entries[0].entryTime;
+
+    // ── EXIT LEGS ─────────────────────────────────────────────────────────────
+    // For a scaled-in trade all rows share the same exit fill, so exits may be
+    // the same fill repeated — deduplicate by exit fill ID.
+    const seenExitFills = new Set();
+    const exits = [];
+    rows.forEach(row => {
+      const exitFillId = dir === 'Long' ? row.sellFillId : row.buyFillId;
+      if (!seenExitFills.has(exitFillId)) {
+        seenExitFills.add(exitFillId);
         const exitPrice = parseFloat(dir === 'Long' ? row.sellPrice : row.buyPrice);
-        // Exit time: for Longs = sell side, for Shorts = buy side; use later timestamp
         const tB = new Date(row.boughtTimestamp), tS = new Date(row.soldTimestamp);
-        const exitTime  = dir === 'Long'
+        const exitTime = dir === 'Long'
           ? (tS > tB ? row.soldTimestamp  : row.boughtTimestamp)
           : (tB > tS ? row.boughtTimestamp : row.soldTimestamp);
-        const qty       = parseInt(row.qty || 1);
-        const pnl       = parsePnl(row.pnl);
-        return { exitPrice, exitTime, qty, pnl };
-      })
-      .sort((a, b) => new Date(a.exitTime) - new Date(b.exitTime));
+        // For a scaled-in trade the exit qty is the full position size
+        // For a partial-exit trade each row has a different qty
+        exits.push({ exitFillId, exitPrice, exitTime, qty: parseInt(row.qty || 1), pnl: parsePnl(row.pnl) });
+      } else {
+        // Same exit fill but different entry — add this leg's qty & pnl to it
+        const ex = exits.find(e => e.exitFillId === exitFillId);
+        if (ex) { ex.qty += parseInt(row.qty || 1); ex.pnl += parsePnl(row.pnl); }
+      }
+    });
+    exits.sort((a, b) => new Date(a.exitTime) - new Date(b.exitTime));
 
-    const totalQty  = exits.reduce((s, e) => s + e.qty, 0);
-    const totalPnl  = Math.round(exits.reduce((s, e) => s + e.pnl, 0) * 100) / 100;
-    const lastExit  = exits[exits.length - 1];
+    const totalPnl = Math.round(exits.reduce((s, e) => s + e.pnl, 0) * 100) / 100;
+    const lastExit = exits[exits.length - 1];
+    const exitFillKey = dir === 'Long' ? first.sellFillId : first.buyFillId;
 
     return {
-      _key:       `${first.symbol}_${entryFillId}`,
+      _key:       `${first.symbol}_${exitFillKey}`,
       symbol,
       direction:  dir,
       contracts:  totalQty,
-      entryPrice: Math.round(entryPrice * 100) / 100,
-      entryTime,
+      entryPrice: Math.round(weightedEntry * 100) / 100,
+      entryTime:  firstEntryTime,
       exitTime:   lastExit.exitTime,
       exitPrice:  Math.round(lastExit.exitPrice * 100) / 100,
       pnl:        totalPnl,
       outcome:    totalPnl > 0 ? 'Win' : totalPnl < 0 ? 'Loss' : 'Breakeven',
-      session:    detectSession(entryTime),
-      partials:   exits.length, // number of exit fills
-      exits,      // [{exitPrice, exitTime, qty, pnl}, ...]
+      session:    detectSession(firstEntryTime),
+      partials:   exits.length,
+      entries,    // [{entryPrice, entryTime, qty}, ...] — sorted by time
+      exits,      // [{exitPrice, exitTime, qty, pnl}, ...] — sorted by time
+      scaled:     entries.length > 1, // true if this was a pyramid/scale-in
       logged:     false
     };
   }).sort((a, b) => new Date(b.entryTime) - new Date(a.entryTime));
@@ -416,7 +438,7 @@ function renderAll() {
         <div style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--text);">${t.symbol}</div>
         <div class="tr-dir ${dirCls}">${t.direction}</div>
       </div>
-      <div class="tr-cell tr-qty">${t.contracts}x<span style="display:block;font-size:8px;color:var(--text3);">${t.partials>1?t.partials+' exits':'1 exit'}</span></div>
+      <div class="tr-cell tr-qty">${t.contracts}x<span style="display:block;font-size:8px;color:var(--text3);">${t.partials>1?t.partials+' exits':'1 exit'}${t.scaled?' · <span style="color:var(--yellow);">'+t.entries.length+'x adds</span>':''}</span></div>
       <div class="tr-cell tr-pnl ${pnlCls}">${pnlStr}</div>
       <div class="tr-cell"><span class="tr-outcome ${outCls}">${t.outcome}</span></div>
       <div class="tr-actions">${actions}</div>
@@ -451,6 +473,13 @@ function logTrade(index) {
       price: e.exitPrice,
       time:  fmtTime(e.exitTime),
       pnl:   e.pnl
+    })),
+    // Pass entry legs so log-trade.html can pre-fill pyramid adds
+    entries: t.entries.map((e, i) => ({
+      leg:   i + 1,
+      qty:   e.qty,
+      price: e.entryPrice,
+      time:  fmtTime(e.entryTime)
     }))
   }));
   localStorage.setItem('ftj_tv_pending_index', index);
