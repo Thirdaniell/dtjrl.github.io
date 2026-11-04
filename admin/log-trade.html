@@ -82,6 +82,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
 /* PARTIAL EXITS */
 .partial-row{display:none;background:rgba(200,255,0,0.03);border:1px solid rgba(200,255,0,0.15);padding:1rem 1.25rem;}
+/* ENTRY LEGS (pyramiding) */
+.entry-legs-row{display:none;background:rgba(255,215,64,0.03);border:1px solid rgba(255,215,64,0.2);padding:1rem 1.25rem;}
 /* EMOTION BUTTONS */
 .emo-btn{font-family:var(--mono);font-size:10px;letter-spacing:0.04em;padding:5px 10px;background:var(--surface2);border:1px solid var(--border2);color:var(--text3);cursor:pointer;transition:all 0.12s;white-space:nowrap;}
 .emo-btn:hover{border-color:var(--text2);color:var(--text);}
@@ -115,6 +117,19 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
       <div class="field"><label>Entry Time</label><input type="text" id="f-entry-time" placeholder="e.g. 9:40 AM"></div>
       <div class="field"><label>Exit Price</label><input type="number" id="f-exit" placeholder="e.g. 27419.75" step="0.25"></div>
       <div class="field"><label>Exit Time <span style="color:var(--text3);font-size:9px;">(final)</span></label><input type="text" id="f-exit-time" placeholder="e.g. 10:01 AM"></div>
+      <!-- ENTRY LEGS (PYRAMIDING / SCALE-IN) -->
+      <div class="field form-full entry-legs-row" id="entry-legs-row">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <div>
+            <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--yellow);text-transform:uppercase;">Entry Legs (Scale-In)</div>
+            <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:3px;">Add each entry leg — weighted avg entry will update automatically</div>
+          </div>
+          <button type="button" onclick="addLegRow()" style="font-family:var(--mono);font-size:9px;letter-spacing:0.08em;text-transform:uppercase;padding:5px 12px;background:none;border:1px solid rgba(255,215,64,0.4);color:var(--yellow);cursor:pointer;transition:all 0.15s;" onmouseover="this.style.background='rgba(255,215,64,0.08)'" onmouseout="this.style.background='none'">+ Add Leg</button>
+        </div>
+        <div id="entry-leg-rows"></div>
+        <div style="font-family:var(--mono);font-size:10px;margin-top:10px;padding:10px 12px;background:var(--surface2);border:1px solid var(--border2);" id="entry-legs-avg-preview"></div>
+      </div>
+
       <!-- PARTIAL EXITS -->
       <div class="field form-full partial-row" id="partial-row">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
@@ -126,7 +141,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
       </div>
       <div class="field"><label>Stop Loss</label><input type="number" id="f-sl" placeholder="e.g. 27336.75" step="0.25"></div>
       <div class="field"><label>Take Profit</label><input type="number" id="f-tp" placeholder="e.g. 27453.75" step="0.25"></div>
-      <div class="field"><label>Contracts</label><input type="number" id="f-contracts" placeholder="e.g. 2" min="1"></div>
+      <div class="field">
+        <label>Contracts <span style="color:var(--text3);font-size:9px;">total across all entries</span></label>
+        <input type="number" id="f-contracts" placeholder="e.g. 2" min="1">
+        <button type="button" id="toggle-legs-btn" onclick="toggleEntryLegsSection()" style="font-family:var(--mono);font-size:8px;letter-spacing:0.08em;text-transform:uppercase;padding:5px 10px;background:none;border:1px solid var(--border2);color:var(--text3);cursor:pointer;margin-top:6px;transition:all 0.15s;width:100%;">+ Scale-In / Pyramid</button>
+      </div>
       <div class="field form-full">
         <label>Chart Screenshots <span style="color:var(--text3);font-size:9px;">(up to 5 images)</span></label>
         <div id="f-upload-zone" style="border:1px dashed var(--border2);padding:1.25rem;text-align:center;cursor:pointer;transition:border-color 0.15s;background:var(--surface2);margin-bottom:8px;" ondragover="event.preventDefault();document.getElementById('f-upload-zone').style.borderColor='var(--accent)'" ondragleave="document.getElementById('f-upload-zone').style.borderColor='var(--border2)'" ondrop="handleImgDrop(event,'f')" onclick="document.getElementById('f-img-file').click()">
@@ -350,6 +369,31 @@ buildConfChips('conf-chip-area','conf-tags');
     else if (t.pnl < 0) setV('f-outcome', 'Closed - Loss');
     else                 setV('f-outcome', 'Breakeven');
 
+    // Pre-fill entry legs if multiple entries (scale-in / pyramid)
+    if (t.entries && t.entries.length > 1) {
+      const entryLegsRow = document.getElementById('entry-legs-row');
+      if (entryLegsRow) {
+        entryLegsVisible = true;
+        entryLegsRow.style.display = 'block';
+        const btn = document.getElementById('toggle-legs-btn');
+        if (btn) { btn.style.borderColor='rgba(255,215,64,0.5)'; btn.style.color='var(--yellow)'; btn.textContent='− Hide Scale-In'; }
+        // Build leg rows for each entry
+        t.entries.forEach(entry => {
+          addLegRow();
+          const idx = activeLegIds[activeLegIds.length - 1];
+          setTimeout(() => {
+            const priceEl = document.getElementById(`f-leg${idx}-price`);
+            const qtyEl   = document.getElementById(`f-leg${idx}-contracts`);
+            const timeEl  = document.getElementById(`f-leg${idx}-time`);
+            if (priceEl) priceEl.value = entry.price;
+            if (qtyEl)   qtyEl.value   = entry.qty;
+            if (timeEl)  timeEl.value  = entry.time;
+          }, 50);
+        });
+        setTimeout(() => onLegInput(), 100);
+      }
+    }
+
     // Pre-fill partial exits if exits array provided
     if (t.exits && t.exits.length > 0) {
       const partialRow = document.getElementById('partial-row');
@@ -403,6 +447,98 @@ function resetEmotions() {
 
 let tradeData = {};
 const TP_LABELS = ['TP1','TP2','TP3','TP4','TP5','TP6','TP7','TP8','TP9','TP10'];
+const LEG_LABELS = ['Leg 1','Leg 2','Leg 3','Leg 4','Leg 5','Leg 6','Leg 7','Leg 8'];
+
+// ── ENTRY LEGS (PYRAMIDING) ───────────────────────────────────────────────────
+let entryLegsVisible = false;
+
+function toggleEntryLegsSection() {
+  const row = document.getElementById('entry-legs-row');
+  entryLegsVisible = !entryLegsVisible;
+  row.style.display = entryLegsVisible ? 'block' : 'none';
+  const btn = document.getElementById('toggle-legs-btn');
+  if (entryLegsVisible) {
+    btn.style.borderColor = 'rgba(255,215,64,0.5)';
+    btn.style.color = 'var(--yellow)';
+    btn.textContent = '− Hide Scale-In';
+    // Auto-render 2 leg rows if empty
+    const legRows = document.getElementById('entry-leg-rows');
+    if (!legRows.innerHTML) { addLegRow(); addLegRow(); }
+  } else {
+    btn.style.borderColor = 'var(--border2)';
+    btn.style.color = 'var(--text3)';
+    btn.textContent = '+ Scale-In / Pyramid';
+  }
+}
+
+function buildLegRow(idx) {
+  const inp = `style="font-family:var(--mono);font-size:12px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:8px 10px;width:100%;outline:none;"`;
+  const lbl = `style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;color:var(--text3);text-transform:uppercase;display:block;margin-bottom:4px;"`;
+  return `<div id="leg-row-${idx}" style="margin-bottom:10px;padding:12px;background:var(--surface2);border:1px solid rgba(255,215,64,0.2);">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+      <div style="font-family:var(--mono);font-size:9px;color:var(--yellow);text-transform:uppercase;">${LEG_LABELS[idx-1]||'Leg '+idx}</div>
+      <button type="button" onclick="removeLegRow(${idx})" style="font-family:var(--mono);font-size:9px;background:none;border:1px solid var(--border2);color:var(--text3);padding:2px 7px;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.borderColor='var(--red)';this.style.color='var(--red)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text3)'">✕</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+      <div><label ${lbl}>Entry Price</label><input type="number" id="f-leg${idx}-price" step="0.25" ${inp} oninput="onLegInput()"></div>
+      <div><label ${lbl}>Entry Time</label><input type="text" id="f-leg${idx}-time" placeholder="e.g. 9:40 AM" ${inp}></div>
+      <div><label ${lbl}>Contracts</label><input type="number" id="f-leg${idx}-contracts" min="1" ${inp} oninput="onLegInput()"></div>
+    </div>
+  </div>`;
+}
+
+let legCount = 0;
+const activeLegIds = [];
+
+function addLegRow() {
+  legCount++;
+  activeLegIds.push(legCount);
+  const container = document.getElementById('entry-leg-rows');
+  const div = document.createElement('div');
+  div.innerHTML = buildLegRow(legCount);
+  container.appendChild(div.firstElementChild);
+  onLegInput();
+}
+
+function removeLegRow(idx) {
+  const el = document.getElementById(`leg-row-${idx}`);
+  if (el) el.remove();
+  const i = activeLegIds.indexOf(idx);
+  if (i > -1) activeLegIds.splice(i, 1);
+  onLegInput();
+}
+
+function getLegRows() {
+  const rows = [];
+  activeLegIds.forEach(idx => {
+    const el = document.getElementById(`leg-row-${idx}`);
+    if (!el) return;
+    const price = parseFloat(document.getElementById(`f-leg${idx}-price`)?.value || '');
+    const qty   = parseInt(document.getElementById(`f-leg${idx}-contracts`)?.value || '0');
+    const time  = document.getElementById(`f-leg${idx}-time`)?.value || '';
+    if (price && qty) rows.push({ price, qty, time, label: LEG_LABELS[rows.length] || `Leg ${rows.length+1}` });
+  });
+  return rows;
+}
+
+function onLegInput() {
+  const rows = getLegRows();
+  const preview = document.getElementById('entry-legs-avg-preview');
+  if (!preview) return;
+  if (!rows.length) { preview.innerHTML = ''; return; }
+  const totalQty = rows.reduce((s, r) => s + r.qty, 0);
+  const weightedAvg = rows.reduce((s, r) => s + r.price * r.qty, 0) / totalQty;
+  const lines = rows.map(r => `<span style="color:var(--text3);">${r.label}:</span> ${r.qty} contract${r.qty>1?'s':''} @ <span style="color:var(--yellow);">${r.price.toLocaleString()}</span>${r.time?' at '+r.time:''}`);
+  lines.push(`<span style="color:var(--text2);">─────────────────────────────</span>`);
+  lines.push(`<span style="color:var(--text2);">Weighted avg entry:</span> <span style="color:var(--accent);font-weight:700;">${weightedAvg.toFixed(2)}</span> &nbsp;·&nbsp; <span style="color:var(--text2);">${totalQty} contracts total</span>`);
+  preview.innerHTML = lines.join('<br>');
+  // Auto-set the entry price field with weighted avg
+  const entryEl = document.getElementById('f-entry');
+  if (entryEl) { entryEl.value = weightedAvg.toFixed(2); entryEl.dispatchEvent(new Event('input')); }
+  // Auto-set contracts field
+  const contractsEl = document.getElementById('f-contracts');
+  if (contractsEl && !contractsEl.value) contractsEl.value = totalQty;
+}
 
 // ── BIAS AT ENTRY ─────────────────────────────────────────────────────────────
 let selectedBiasEntry = '';
@@ -601,7 +737,8 @@ async function analyzeTrade() {
   if(entry){if(tpRows.length>0){tpRows.forEach(r=>{pnl+=calcPnL(entry,r.price,r.contracts,instrument,direction);});}else if(exit){pnl=calcPnL(entry,exit,contracts,instrument,direction);}}
   const rr=calcRR(entry,sl,tp),duration=calcDuration(entryTime,exitTime);
   const biasAtEntry = selectedBiasEntry || '';
-  tradeData={instrument,direction,session,timeframe,htf,model,date,entry,exit,sl,tp,contracts,entryTime,exitTime,pnl,rr,duration,confluences,emotions,emotionNotes,grade:'Pending...',followedRules:'Pending...',outcome,notes,mistakes,lessons,screenshot,tpRows,biasAtEntry};
+  const entryLegs = entryLegsVisible ? getLegRows() : [];
+  tradeData={instrument,direction,session,timeframe,htf,model,date,entry,exit,sl,tp,contracts,entryTime,exitTime,pnl,rr,duration,confluences,emotions,emotionNotes,grade:'Pending...',followedRules:'Pending...',outcome,notes,mistakes,lessons,screenshot,tpRows,biasAtEntry,entryLegs};
 
   const btn=document.getElementById('analyze-btn'); btn.disabled=true; btn.textContent='Analyzing...';
   document.getElementById('review-panel').style.display='block';
@@ -661,8 +798,11 @@ async function submitTrade() {
   const props={"Trade Name":{title:[{text:{content:tradeName}}]},"Instrument":{select:{name:t.instrument}},"Direction":{select:{name:t.direction}},"Status":{select:{name:t.outcome}},"Session":{select:{name:t.session}},"Timeframe":{select:{name:t.timeframe}},"Date":{date:{start:t.date}},"Contracts":{number:t.contracts},"P&L ($)":{number:t.pnl},"Followed Rules":{select:{name:t.followedRules}},"Setup Grade":{select:{name:t.grade}}};
   if(t.entry)props["Entry Price"]={number:t.entry};if(t.exit)props["Exit Price"]={number:t.exit};if(t.sl)props["Stop Loss"]={number:t.sl};if(t.tp)props["Take Profit"]={number:t.tp};if(t.rr)props["R:R"]={number:t.rr};if(t.duration)props["Duration (mins)"]={number:t.duration};if(t.entryTime)props["Entry Time"]={rich_text:[{text:{content:t.entryTime}}]};if(t.exitTime)props["Exit Time"]={rich_text:[{text:{content:t.exitTime}}]};
   const exitBreakdown=(t.tpRows&&t.tpRows.length>0)?'Exit breakdown: '+t.tpRows.map(r=>`${r.label}: ${r.contracts} contract${r.contracts>1?'s':''} @ ${r.price}${r.time?' at '+r.time:''}`).join(' · '):null;
-  const fullNotes=[t.notes,exitBreakdown].filter(Boolean).join('\n');
+  const entryBreakdown=(t.entryLegs&&t.entryLegs.length>1)?'Entry legs: '+t.entryLegs.map(r=>`${r.label}: ${r.qty} contract${r.qty>1?'s':''} @ ${r.price}${r.time?' at '+r.time:''}`).join(' · '):null;
+  const fullNotes=[t.notes,entryBreakdown,exitBreakdown].filter(Boolean).join('\n');
   if(fullNotes)props["Notes"]={rich_text:[{text:{content:fullNotes}}]};if(t.mistakes)props["Mistakes"]={rich_text:[{text:{content:t.mistakes}}]};if(t.lessons)props["Lessons Learned"]={rich_text:[{text:{content:t.lessons}}]};if(t.htf)props["HTF Timeframe"]={rich_text:[{text:{content:t.htf}}]};if(t.model)props["Entry Model"]={rich_text:[{text:{content:t.model}}]};if(t.confluences.length)props["Confluences"]={multi_select:t.confluences.map(c=>({name:c}))};if(t.emotions&&t.emotions.length)props["Emotions"]={multi_select:t.emotions.map(e=>({name:e}))};if(t.emotionNotes)props["Emotion Notes"]={rich_text:[{text:{content:t.emotionNotes}}]};if(t.biasAtEntry)props["Bias At Entry"]={rich_text:[{text:{content:t.biasAtEntry}}]};
+  // Save entry legs as JSON to "Entry Legs" Notion property
+  if(t.entryLegs&&t.entryLegs.length>1){const legsJson=JSON.stringify(t.entryLegs.map(r=>({label:r.label,qty:r.qty,price:r.price,time:r.time})));props["Entry Legs"]={rich_text:[{text:{content:legsJson}}]};}
   const body={parent:{database_id:DB_ID},properties:props};
   if(t.screenshot){body.children=[{object:'block',type:'paragraph',paragraph:{rich_text:[{type:'text',text:{content:'📸 Screenshot: '+t.screenshot,link:{url:t.screenshot}}}]}}];}
   try {
@@ -698,6 +838,15 @@ function resetForm() {
   document.getElementById('partial-row').style.display='none';
   document.getElementById('partial-tp-rows').innerHTML='';
   document.getElementById('partial-pnl-preview').textContent='';
+  // Reset entry legs
+  entryLegsVisible=false;
+  legCount=0;
+  activeLegIds.length=0;
+  document.getElementById('entry-legs-row').style.display='none';
+  document.getElementById('entry-leg-rows').innerHTML='';
+  document.getElementById('entry-legs-avg-preview').innerHTML='';
+  const legsBtn=document.getElementById('toggle-legs-btn');
+  if(legsBtn){legsBtn.style.borderColor='var(--border2)';legsBtn.style.color='var(--text3)';legsBtn.textContent='+ Scale-In / Pyramid';}
   document.getElementById('f-date').value=new Date().toISOString().split('T')[0];
   setSelectedConfs([]);
   document.getElementById('conf-search').value='';
