@@ -57,6 +57,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
 /* PARTIAL EXITS */
 .partial-row{display:none;background:rgba(200,255,0,0.03);border:1px solid rgba(200,255,0,0.15);padding:1rem 1.25rem;}
+.entry-legs-row{display:none;background:rgba(255,215,64,0.03);border:1px solid rgba(255,215,64,0.15);padding:1rem 1.25rem;}
 /* EMOTION BUTTONS */
 .emo-btn{font-family:var(--mono);font-size:10px;letter-spacing:0.04em;padding:5px 10px;background:var(--surface2);border:1px solid var(--border2);color:var(--text3);cursor:pointer;transition:all 0.12s;white-space:nowrap;}
 .emo-btn:hover{border-color:var(--text2);color:var(--text);}
@@ -114,7 +115,22 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
         </div>
         <div class="field"><label>Stop Loss</label><input type="number" id="ef-sl" step="0.25"></div>
         <div class="field"><label>Take Profit</label><input type="number" id="ef-tp" step="0.25"></div>
-        <div class="field"><label>Contracts</label><input type="number" id="ef-contracts" min="1"></div>
+        <div class="field">
+          <label>Contracts</label>
+          <div style="display:flex;gap:8px;align-items:stretch;">
+            <input type="number" id="ef-contracts" min="1" style="flex:1;">
+            <button type="button" id="ef-toggle-legs-btn" onclick="efToggleEntryLegsSection()" style="font-family:var(--mono);font-size:9px;letter-spacing:0.06em;padding:6px 10px;background:none;border:1px solid var(--border2);color:var(--text3);cursor:pointer;white-space:nowrap;transition:all 0.15s;">+ Scale-In</button>
+          </div>
+        </div>
+        <!-- ENTRY LEGS -->
+        <div class="field form-full entry-legs-row" id="ef-entry-legs-row">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+            <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--yellow);text-transform:uppercase;">Entry Legs / Scale-In</div>
+            <div style="font-family:var(--mono);font-size:9px;color:var(--text3);" id="ef-legs-avg-preview"></div>
+          </div>
+          <div id="ef-entry-leg-rows"></div>
+          <button type="button" onclick="efAddLegRow()" style="font-family:var(--mono);font-size:9px;letter-spacing:0.08em;text-transform:uppercase;padding:7px 14px;background:none;border:1px solid rgba(255,215,64,0.3);color:var(--yellow);cursor:pointer;margin-top:4px;transition:all 0.15s;" onmouseover="this.style.borderColor='rgba(255,215,64,0.6)'" onmouseout="this.style.borderColor='rgba(255,215,64,0.3)'">+ Add Leg</button>
+        </div>
         <div class="field form-full">
           <label>Chart Screenshots <span style="color:var(--text3);font-size:9px;">(up to 5 images)</span></label>
           <div id="ef-upload-zone" style="border:1px dashed var(--border2);padding:1.25rem;text-align:center;cursor:pointer;transition:border-color 0.15s;background:var(--surface2);margin-bottom:8px;" ondragover="event.preventDefault();document.getElementById('ef-upload-zone').style.borderColor='var(--accent)'" ondragleave="document.getElementById('ef-upload-zone').style.borderColor='var(--border2)'" ondrop="handleImgDrop(event,'ef')" onclick="document.getElementById('ef-img-file').click()">
@@ -132,6 +148,15 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
           <input type="text" class="conf-search" id="ef-conf-search" placeholder="Search confluences..." oninput="filterEditConf(this.value)">
           <div class="conf-chip-area" id="ef-conf-chip-area"></div>
           <div class="conf-selected-tags" id="ef-conf-tags"></div>
+        </div>
+        <div class="field form-full">
+          <label>Bias At Entry <span style="color:var(--text3);font-size:9px;">(your directional lean when you took this trade)</span></label>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;">
+            <button type="button" class="ef-bbtn" data-bias="Bullish" onclick="selectEditBias('Bullish')" style="font-family:var(--mono);font-size:10px;letter-spacing:0.06em;padding:6px 14px;background:none;border:1px solid var(--border2);color:var(--text3);cursor:pointer;transition:all 0.15s;">Bullish</button>
+            <button type="button" class="ef-bbtn" data-bias="Bearish" onclick="selectEditBias('Bearish')" style="font-family:var(--mono);font-size:10px;letter-spacing:0.06em;padding:6px 14px;background:none;border:1px solid var(--border2);color:var(--text3);cursor:pointer;transition:all 0.15s;">Bearish</button>
+            <button type="button" class="ef-bbtn" data-bias="Both" onclick="selectEditBias('Both')" style="font-family:var(--mono);font-size:10px;letter-spacing:0.06em;padding:6px 14px;background:none;border:1px solid var(--border2);color:var(--text3);cursor:pointer;transition:all 0.15s;">Both</button>
+            <button type="button" class="ef-bbtn" data-bias="No Lean" onclick="selectEditBias('No Lean')" style="font-family:var(--mono);font-size:10px;letter-spacing:0.06em;padding:6px 14px;background:none;border:1px solid var(--border2);color:var(--text3);cursor:pointer;transition:all 0.15s;">No Lean</button>
+          </div>
         </div>
         <div class="field form-full"><label>Notes</label><textarea id="ef-notes" placeholder="What happened during this trade?"></textarea></div>
         <div class="field form-full"><label>Mistakes</label><textarea id="ef-mistakes" placeholder="What did you do wrong?"></textarea></div>
@@ -167,6 +192,17 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
 if (!requireAuth()) { /* redirected */ }
 
 let editPageId = null;
+let editSelectedBias = '';
+
+function selectEditBias(bias) {
+  editSelectedBias = bias;
+  document.querySelectorAll('.ef-bbtn').forEach(b => {
+    const active = b.dataset.bias === bias;
+    b.style.borderColor = active ? 'var(--accent)' : 'var(--border2)';
+    b.style.color = active ? 'var(--accent)' : 'var(--text3)';
+    b.style.background = active ? 'rgba(200,255,0,0.06)' : 'none';
+  });
+}
 const EF_TP_LABELS = ['TP1','TP2','TP3','TP4','TP5','TP6','TP7','TP8','TP9','TP10'];
 
 // ── CHIP CONFLUENCE PICKER ────────────────────────────────────────────────────
@@ -347,6 +383,105 @@ function updateEditPartialPreview() {
   preview.style.color = total>=0 ? 'var(--green)' : 'var(--red)';
 }
 
+// ── ENTRY LEGS / PYRAMIDING ───────────────────────────────────────────────────
+const EF_LEG_LABELS = ['Leg 1','Leg 2','Leg 3','Leg 4','Leg 5','Leg 6','Leg 7','Leg 8'];
+let efEntryLegsVisible = false;
+let efLegCount = 0;
+const efActiveLegIds = [];
+
+function efToggleEntryLegsSection() {
+  const row = document.getElementById('ef-entry-legs-row');
+  efEntryLegsVisible = !efEntryLegsVisible;
+  row.style.display = efEntryLegsVisible ? 'block' : 'none';
+  const btn = document.getElementById('ef-toggle-legs-btn');
+  if (efEntryLegsVisible) {
+    btn.style.borderColor = 'rgba(255,215,64,0.5)';
+    btn.style.color = 'var(--yellow)';
+    btn.textContent = '− Hide';
+    if (!document.getElementById('ef-entry-leg-rows').innerHTML.trim()) {
+      efAddLegRow(); efAddLegRow();
+    }
+  } else {
+    btn.style.borderColor = 'var(--border2)';
+    btn.style.color = 'var(--text3)';
+    btn.textContent = '+ Scale-In';
+  }
+}
+
+function efBuildLegRow(idx) {
+  const inp = `style="font-family:var(--mono);font-size:12px;background:var(--bg);border:1px solid var(--border2);color:var(--text);padding:8px 10px;width:100%;outline:none;"`;
+  const lbl = `style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;color:var(--text3);text-transform:uppercase;display:block;margin-bottom:4px;"`;
+  return `<div id="ef-leg-row-${idx}" style="margin-bottom:10px;padding:12px;background:var(--surface2);border:1px solid rgba(255,215,64,0.2);">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+      <div style="font-family:var(--mono);font-size:9px;color:var(--yellow);text-transform:uppercase;">${EF_LEG_LABELS[idx-1]||'Leg '+idx}</div>
+      <button type="button" onclick="efRemoveLegRow(${idx})" style="font-family:var(--mono);font-size:9px;background:none;border:1px solid var(--border2);color:var(--text3);padding:2px 8px;cursor:pointer;transition:all 0.12s;" onmouseover="this.style.color='var(--red)';this.style.borderColor='var(--red)'" onmouseout="this.style.color='var(--text3)';this.style.borderColor='var(--border2)'">✕</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+      <div><label ${lbl}>Entry Price</label><input type="number" id="ef-leg${idx}-price" step="0.25" ${inp} oninput="efOnLegInput()"></div>
+      <div><label ${lbl}>Entry Time</label><input type="text" id="ef-leg${idx}-time" placeholder="e.g. 9:40 AM" ${inp}></div>
+      <div><label ${lbl}>Contracts</label><input type="number" id="ef-leg${idx}-contracts" min="1" ${inp} oninput="efOnLegInput()"></div>
+    </div>
+  </div>`;
+}
+
+function efAddLegRow() {
+  efLegCount++;
+  efActiveLegIds.push(efLegCount);
+  const container = document.getElementById('ef-entry-leg-rows');
+  const div = document.createElement('div');
+  div.innerHTML = efBuildLegRow(efLegCount);
+  container.appendChild(div.firstElementChild);
+  efOnLegInput();
+}
+
+function efRemoveLegRow(idx) {
+  const el = document.getElementById(`ef-leg-row-${idx}`);
+  if (el) el.remove();
+  const i = efActiveLegIds.indexOf(idx);
+  if (i > -1) efActiveLegIds.splice(i, 1);
+  efOnLegInput();
+}
+
+function efGetLegRows() {
+  const rows = [];
+  efActiveLegIds.forEach(idx => {
+    if (!document.getElementById(`ef-leg-row-${idx}`)) return;
+    const price = parseFloat(document.getElementById(`ef-leg${idx}-price`)?.value || '');
+    const qty   = parseInt(document.getElementById(`ef-leg${idx}-contracts`)?.value || '0');
+    const time  = document.getElementById(`ef-leg${idx}-time`)?.value || '';
+    if (price && qty) rows.push({ price, qty, time, label: EF_LEG_LABELS[rows.length] || `Leg ${rows.length+1}` });
+  });
+  return rows;
+}
+
+function efOnLegInput() {
+  const rows = efGetLegRows();
+  const preview = document.getElementById('ef-legs-avg-preview');
+  if (!preview) return;
+  if (!rows.length) { preview.textContent = ''; return; }
+  const totalQty = rows.reduce((s, r) => s + r.qty, 0);
+  const weightedAvg = rows.reduce((s, r) => s + r.price * r.qty, 0) / totalQty;
+  preview.textContent = `Avg entry: ${weightedAvg.toFixed(2)} · ${totalQty} total`;
+  const entryEl = document.getElementById('ef-entry');
+  if (entryEl) { entryEl.value = weightedAvg.toFixed(2); entryEl.dispatchEvent(new Event('input')); }
+  const contractsEl = document.getElementById('ef-contracts');
+  if (contractsEl && !contractsEl.value) contractsEl.value = totalQty;
+}
+
+function efResetEntryLegs() {
+  efEntryLegsVisible = false;
+  efLegCount = 0;
+  efActiveLegIds.length = 0;
+  const row = document.getElementById('ef-entry-legs-row');
+  if (row) row.style.display = 'none';
+  const container = document.getElementById('ef-entry-leg-rows');
+  if (container) container.innerHTML = '';
+  const preview = document.getElementById('ef-legs-avg-preview');
+  if (preview) preview.textContent = '';
+  const btn = document.getElementById('ef-toggle-legs-btn');
+  if (btn) { btn.style.borderColor='var(--border2)'; btn.style.color='var(--text3)'; btn.textContent='+ Scale-In'; }
+}
+
 // ── LOAD TRADE LIST ───────────────────────────────────────────────────────────
 async function loadTradeList() {
   const wrap = document.getElementById('trade-list-wrap');
@@ -392,11 +527,12 @@ async function loadEditTrade(pageId) {
   const btn = document.getElementById('ef-save-btn');
   btn.disabled = true; btn.textContent = 'Loading...';
   document.getElementById('edit-success-msg').style.display = 'none';
-  // Reset partial exits UI before loading
+  // Reset partial exits + entry legs UI before loading
   document.getElementById('ef-partial-row').style.display = 'none';
   document.getElementById('ef-partial-tp-rows').innerHTML = '';
   document.getElementById('ef-partial-pnl-preview').textContent = '';
   document.getElementById('ef-partial-contracts-remaining').textContent = '';
+  efResetEntryLegs();
   try {
     const page = await notionGet(`/pages/${pageId}`);
     const p = page.properties;
@@ -404,6 +540,8 @@ async function loadEditTrade(pageId) {
     const getN    = key => p[key]?.number ?? '';
     const getSel  = key => p[key]?.select?.name || '';
     const setV = (id, v) => { const el=document.getElementById(id); if(el) el.value=v; };
+    editSelectedBias = '';
+    document.querySelectorAll('.ef-bbtn').forEach(b => { b.style.borderColor='var(--border2)'; b.style.color='var(--text3)'; b.style.background='none'; });
     setV('ef-instrument', getSel('Instrument'));
     setV('ef-direction',  getSel('Direction'));
     setV('ef-session',    getSel('Session'));
@@ -454,6 +592,40 @@ async function loadEditTrade(pageId) {
     const emotions = (p['Emotions']?.multi_select||[]).map(e=>e.name);
     setEmotions('ef', emotions);
     setV('ef-emotion-notes', getText('Emotion Notes'));
+    // Bias At Entry
+    const biasAtEntry = getText('Bias At Entry');
+    if (biasAtEntry) selectEditBias(biasAtEntry);
+    // Entry Legs (pyramiding / scale-in)
+    try {
+      const entryLegsJson = getText('Entry Legs');
+      if (entryLegsJson) {
+        const legs = JSON.parse(entryLegsJson);
+        if (Array.isArray(legs) && legs.length > 1) {
+          efEntryLegsVisible = true;
+          document.getElementById('ef-entry-legs-row').style.display = 'block';
+          const btn = document.getElementById('ef-toggle-legs-btn');
+          if (btn) { btn.style.borderColor='rgba(255,215,64,0.5)'; btn.style.color='var(--yellow)'; btn.textContent='− Hide'; }
+          legs.forEach(leg => {
+            efLegCount++;
+            efActiveLegIds.push(efLegCount);
+            const container = document.getElementById('ef-entry-leg-rows');
+            const div = document.createElement('div');
+            div.innerHTML = efBuildLegRow(efLegCount);
+            container.appendChild(div.firstElementChild);
+            const idx = efLegCount;
+            setTimeout(() => {
+              const pEl = document.getElementById(`ef-leg${idx}-price`);
+              const cEl = document.getElementById(`ef-leg${idx}-contracts`);
+              const tEl = document.getElementById(`ef-leg${idx}-time`);
+              if (pEl) pEl.value = leg.price;
+              if (cEl) cEl.value = leg.qty;
+              if (tEl && leg.time) tEl.value = leg.time;
+            }, 50);
+          });
+          setTimeout(() => efOnLegInput(), 100);
+        }
+      }
+    } catch(e) {}
     // Screenshot
     try {
       const bdata = await notionGet(`/blocks/${pageId}/children`);
@@ -502,6 +674,9 @@ async function saveEdit() {
   const emotions    = getSelectedEmotions('ef');
   const emotionNotes= getField('ef-emotion-notes');
 
+  // ── Entry legs ──
+  const entryLegRows = efGetLegRows();
+
   // ── P&L calc — use partial exits if present, else single entry/exit ──
   const tpRows = (contracts > 1) ? getEditTPRows().filter(r => r.price && r.contracts) : [];
   let pnl = null;
@@ -528,11 +703,14 @@ async function saveEdit() {
     followedRules = autoFollowedRulesLocal(mistakes);
   }
 
-  // ── Rebuild Notes with exit breakdown if partials exist ──
+  // ── Rebuild Notes with exit + entry breakdowns if present ──
   const exitBreakdown = (tpRows.length > 0)
     ? 'Exit breakdown: ' + tpRows.map(r => `${r.label}: ${r.contracts} contract${r.contracts>1?'s':''} @ ${r.price}${r.time?' at '+r.time:''}`).join(' · ')
     : null;
-  const fullNotes = [notes, exitBreakdown].filter(Boolean).join('\n');
+  const entryBreakdown = (entryLegRows.length > 1)
+    ? 'Entry legs: ' + entryLegRows.map(r => `${r.label}: ${r.qty} contract${r.qty>1?'s':''} @ ${r.price}${r.time?' at '+r.time:''}`).join(' · ')
+    : null;
+  const fullNotes = [notes, entryBreakdown, exitBreakdown].filter(Boolean).join('\n');
 
   const tradeName = `${instrument} ${direction} — ${session}`;
   const props = {};
@@ -557,8 +735,10 @@ async function saveEdit() {
   if(lessons)     props["Lessons Learned"]= {rich_text:[{text:{content:lessons}}]};
   if(htf)         props["HTF Timeframe"]  = {rich_text:[{text:{content:htf}}]};
   if(model)       props["Entry Model"]    = {rich_text:[{text:{content:model}}]};
+  if(editSelectedBias) props["Bias At Entry"] = {rich_text:[{text:{content:editSelectedBias}}]};
   if(grade)       props["Setup Grade"]    = {select:{name:grade}};
   props["Followed Rules"] = {select:{name:followedRules}};
+  if(entryLegRows.length>1){const legsJson=JSON.stringify(entryLegRows.map(r=>({label:r.label,qty:r.qty,price:r.price,time:r.time})));props["Entry Legs"]={rich_text:[{text:{content:legsJson}}]};}
   if(confluences.length) props["Confluences"] = {multi_select:confluences.map(c=>({name:c}))};
   if(emotions.length)    props["Emotions"]    = {multi_select:emotions.map(e=>({name:e}))};
   if(emotionNotes)       props["Emotion Notes"]= {rich_text:[{text:{content:emotionNotes}}]};
@@ -600,6 +780,7 @@ function cancelEdit() {
   editPageId = null;
   document.getElementById('edit-form-wrap').style.display = 'none';
   document.getElementById('edit-success-msg').style.display = 'none';
+  efResetEntryLegs();
 }
 
 // ── IMAGE UPLOAD (multi-file, Imgur anonymous) ────────────────────────────────
