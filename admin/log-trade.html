@@ -22,8 +22,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
 .back-btn{font-family:var(--mono);font-size:10px;letter-spacing:0.1em;color:var(--text3);background:none;border:1px solid var(--border2);padding:6px 14px;cursor:pointer;text-transform:uppercase;transition:all 0.15s;text-decoration:none;display:inline-block;margin-bottom:2rem;}
 .back-btn:hover{color:var(--accent);border-color:var(--accent);}
 .page-eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:0.2em;color:var(--accent);text-transform:uppercase;margin-bottom:8px;}
-.page-title{font-family:var(--mono);font-size:28px;font-weight:700;line-height:1.1;margin-bottom:2rem;}
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);margin-bottom:2rem;}
+.page-title{font-family:var(--mono);font-size:28px;font-weight:700;line-height:1.1;margin-bottom:0.5rem;}
+.page-sub{font-size:13px;color:var(--text2);margin:0 0 2rem;line-height:1.6;}
+
+/* CORE FORM */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);margin-bottom:1px;}
 .form-full{grid-column:1/-1;}
 .field{background:var(--surface);padding:1rem 1.25rem;}
 .field label{font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--text3);text-transform:uppercase;display:block;margin-bottom:6px;}
@@ -31,7 +34,24 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
 .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent);}
 .field textarea{resize:vertical;min-height:70px;font-family:var(--sans);font-size:13px;line-height:1.6;}
 .field select option{background:var(--surface2);}
-/* ── CONFLUENCE CHIP PICKER ────────────────────────────────── */
+
+/* RULES QUICK PICK */
+.rules-btn{font-family:var(--mono);font-size:10px;letter-spacing:0.06em;padding:9px 18px;background:var(--surface2);border:1px solid var(--border2);color:var(--text3);cursor:pointer;transition:all 0.12s;flex:1;}
+.rules-btn:hover{border-color:var(--text2);color:var(--text);}
+.rules-btn.sel-yes{border-color:var(--green);color:var(--green);background:rgba(0,230,118,0.08);}
+.rules-btn.sel-partial{border-color:var(--yellow);color:var(--yellow);background:rgba(255,215,64,0.08);}
+.rules-btn.sel-no{border-color:var(--red);color:var(--red);background:rgba(255,68,68,0.08);}
+
+/* BIAS BUTTONS */
+.bias-btn{font-family:var(--mono);font-size:9px;letter-spacing:0.06em;padding:7px 14px;background:var(--surface2);border:1px solid var(--border2);color:var(--text3);cursor:pointer;transition:all 0.12s;}
+
+/* MORE DETAILS TOGGLE */
+.more-toggle{width:100%;background:var(--surface);border:none;border-top:1px solid var(--border2);padding:0.75rem 1.25rem;font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--text3);text-transform:uppercase;cursor:pointer;text-align:left;transition:color 0.15s;display:flex;align-items:center;gap:8px;margin-bottom:1px;}
+.more-toggle:hover{color:var(--text2);}
+.more-section{display:none;margin-bottom:1px;}
+.more-section.open{display:block;}
+
+/* CONFLUENCE */
 .conf-search{font-family:var(--mono);font-size:12px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:9px 11px;width:100%;outline:none;transition:border-color 0.15s;margin-bottom:8px;}
 .conf-search:focus{border-color:var(--accent);}
 .conf-search::placeholder{color:var(--text3);}
@@ -41,16 +61,26 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
 .conf-chip:hover{border-color:var(--text2);color:var(--text);}
 .conf-chip.active{border-color:var(--accent);color:var(--accent);background:rgba(200,255,0,0.06);}
 .conf-chip.hidden{display:none;}
+.conf-chip.dir-hidden{display:none;}
 .conf-group-lbl{font-family:var(--mono);font-size:8px;letter-spacing:0.15em;color:var(--text3);text-transform:uppercase;width:100%;padding:6px 0 2px;border-top:1px solid var(--border2);margin-top:4px;}
 .conf-group-lbl:first-child{border-top:none;margin-top:0;padding-top:0;}
+.conf-group-lbl.dir-hidden{display:none;}
 .conf-selected-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px;min-height:20px;}
 .conf-tag{font-family:var(--mono);font-size:9px;padding:3px 8px;border:1px solid rgba(200,255,0,0.4);color:var(--accent);background:rgba(200,255,0,0.06);cursor:pointer;}
 .conf-tag:hover{background:rgba(200,255,0,0.12);}
 .conf-tag::after{content:' ✕';opacity:0.5;}
-.conf-wrap{position:relative;}
-.conf-dropdown{display:none;}
-.conf-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;min-height:24px;}
-.analyze-btn{font-family:var(--mono);font-size:12px;letter-spacing:0.1em;text-transform:uppercase;padding:14px 28px;background:var(--accent);color:#000;border:none;cursor:pointer;font-weight:700;transition:opacity 0.15s;width:100%;}
+
+/* PARTIAL EXITS */
+.partial-row{display:none;background:rgba(200,255,0,0.03);border:1px solid rgba(200,255,0,0.15);padding:1rem 1.25rem;}
+/* ENTRY LEGS */
+.entry-legs-row{display:none;background:rgba(255,215,64,0.03);border:1px solid rgba(255,215,64,0.2);padding:1rem 1.25rem;}
+/* EMOTION BUTTONS */
+.emo-btn{font-family:var(--mono);font-size:10px;letter-spacing:0.04em;padding:5px 10px;background:var(--surface2);border:1px solid var(--border2);color:var(--text3);cursor:pointer;transition:all 0.12s;white-space:nowrap;}
+.emo-btn:hover{border-color:var(--text2);color:var(--text);}
+.emo-btn.selected{background:rgba(200,255,0,0.08);border-color:var(--accent);color:var(--accent);}
+
+/* ANALYZE / REVIEW */
+.analyze-btn{font-family:var(--mono);font-size:12px;letter-spacing:0.1em;text-transform:uppercase;padding:14px 28px;background:var(--accent);color:#000;border:none;cursor:pointer;font-weight:700;transition:opacity 0.15s;width:100%;margin-top:1px;}
 .analyze-btn:hover{opacity:0.85;}
 .analyze-btn:disabled{opacity:0.4;cursor:not-allowed;}
 #review-panel{display:none;margin-top:2rem;border:1px solid var(--border2);}
@@ -58,12 +88,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
 .review-title{font-family:var(--mono);font-size:11px;letter-spacing:0.12em;color:var(--accent);text-transform:uppercase;}
 .review-body{padding:1.25rem;}
 .review-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 24px;margin-bottom:1.25rem;}
-.review-label{font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--text3);text-transform:uppercase;margin-bottom:2px;}
+.review-field .review-label{font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--text3);text-transform:uppercase;margin-bottom:2px;}
 .review-value{font-family:var(--mono);font-size:12px;color:var(--text2);}
-.review-value.accent{color:var(--accent);}
 .review-value.green{color:var(--green);}
 .review-value.red{color:var(--red);}
 .review-value.yellow{color:var(--yellow);}
+.review-value.accent{color:var(--accent);}
 .ai-section{background:var(--surface2);padding:1rem;margin-bottom:1.25rem;border:1px solid var(--border2);}
 .ai-title{font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--accent);text-transform:uppercase;margin-bottom:8px;}
 .ai-result{font-size:13px;color:var(--text2);line-height:1.8;white-space:pre-wrap;}
@@ -80,14 +110,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
 .success-msg{display:none;background:rgba(0,230,118,0.08);border:1px solid rgba(0,230,118,0.3);padding:1rem 1.25rem;font-family:var(--mono);font-size:12px;color:var(--green);text-align:center;margin-top:1rem;letter-spacing:0.05em;}
 .loading-msg{font-family:var(--mono);font-size:11px;color:var(--text3);letter-spacing:0.1em;text-align:center;padding:1rem;animation:blink 1s infinite;}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
-/* PARTIAL EXITS */
-.partial-row{display:none;background:rgba(200,255,0,0.03);border:1px solid rgba(200,255,0,0.15);padding:1rem 1.25rem;}
-/* ENTRY LEGS (pyramiding) */
-.entry-legs-row{display:none;background:rgba(255,215,64,0.03);border:1px solid rgba(255,215,64,0.2);padding:1rem 1.25rem;}
-/* EMOTION BUTTONS */
-.emo-btn{font-family:var(--mono);font-size:10px;letter-spacing:0.04em;padding:5px 10px;background:var(--surface2);border:1px solid var(--border2);color:var(--text3);cursor:pointer;transition:all 0.12s;white-space:nowrap;}
-.emo-btn:hover{border-color:var(--text2);color:var(--text);}
-.emo-btn.selected{background:rgba(200,255,0,0.08);border-color:var(--accent);color:var(--accent);}
 @media(max-width:600px){.form-grid{grid-template-columns:1fr;}#main{padding-left:0;}}
 </style>
 </head>
@@ -101,28 +123,33 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
     <a href="admin.html" class="back-btn">← Back to Admin</a>
     <div class="page-eyebrow">// Admin</div>
     <div class="page-title">Log Trade</div>
-    <p style="font-size:13px;color:var(--text2);margin:0 0 2rem;line-height:1.7;">Fill in your trade details. The AI will grade, verify, and calculate all values — then show you a preview before submitting to Notion.</p>
+    <div class="page-sub">Core fields only. Add more detail below if you want it — but you don't have to.</div>
 
+    <!-- ── CORE FIELDS ── -->
     <div class="form-grid">
       <div class="field"><label>Instrument</label><select id="f-instrument"><option value="">Select...</option><option>NQ</option><option>ES</option><option>MNQ</option><option>MES</option><option>CL</option><option>GC</option><option>RTY</option></select></div>
       <div class="field"><label>Direction</label><select id="f-direction"><option value="">Select...</option><option>Long</option><option>Short</option></select></div>
       <div class="field"><label>Session</label><select id="f-session"><option value="">Select...</option><option>Asia</option><option>London</option><option>NY AM</option><option>NY Lunch</option><option>NY PM</option><option>Overnight</option></select></div>
-      <div class="field"><label>Timeframe</label><select id="f-timeframe"><option value="">Select...</option><option>1m</option><option>3m</option><option>5m</option><option>15m</option><option>1h</option><option>4h</option><option>Daily</option></select></div>
-      <div class="field"><label>HTF Context</label><input type="text" id="f-htf" placeholder="e.g. 4H Quadrant discount, Daily IFVG, 15m First Presented FVG"></div>
-      <div class="field"><label>Entry Model</label><input type="text" id="f-model" placeholder="e.g. 1m IFVG retracement"></div>
       <div class="field"><label>Date</label><input type="date" id="f-date"></div>
-      <div class="field"><label>Outcome</label><select id="f-outcome"><option value="">Select...</option><option value="Closed - Win">Win</option><option value="Closed - Loss">Loss</option><option value="Breakeven">Breakeven</option></select></div>
-      <div class="field form-full"><label>Favored Direction at Entry <span id="bias-autofill-note" style="color:var(--accent);font-size:9px;display:none;">— auto-filled from today's journal</span></label><div style="display:flex;gap:4px;flex-wrap:wrap;" id="bias-btn-group"><button type="button" class="bias-entry-btn" data-val="Bullish" onclick="selectBiasEntry(this)" style="font-family:var(--mono);font-size:9px;letter-spacing:0.06em;padding:7px 14px;background:var(--surface2);border:1px solid var(--border2);color:var(--text3);cursor:pointer;transition:all 0.12s;">Bullish</button><button type="button" class="bias-entry-btn" data-val="Bearish" onclick="selectBiasEntry(this)" style="font-family:var(--mono);font-size:9px;letter-spacing:0.06em;padding:7px 14px;background:var(--surface2);border:1px solid var(--border2);color:var(--text3);cursor:pointer;transition:all 0.12s;">Bearish</button><button type="button" class="bias-entry-btn" data-val="Ranging" onclick="selectBiasEntry(this)" style="font-family:var(--mono);font-size:9px;letter-spacing:0.06em;padding:7px 14px;background:var(--surface2);border:1px solid var(--border2);color:var(--text3);cursor:pointer;transition:all 0.12s;">Ranging</button><button type="button" class="bias-entry-btn" data-val="No Bias" onclick="selectBiasEntry(this)" style="font-family:var(--mono);font-size:9px;letter-spacing:0.06em;padding:7px 14px;background:var(--surface2);border:1px solid var(--border2);color:var(--text3);cursor:pointer;transition:all 0.12s;">No Bias</button></div></div>
-      <div class="field"><label>Entry Price</label><input type="number" id="f-entry" placeholder="e.g. 27363.50" step="0.25"></div>
+      <div class="field"><label>Entry Price</label><input type="number" id="f-entry" placeholder="e.g. 21363.50" step="0.25"></div>
       <div class="field"><label>Entry Time</label><input type="text" id="f-entry-time" placeholder="e.g. 9:40 AM"></div>
-      <div class="field"><label>Exit Price</label><input type="number" id="f-exit" placeholder="e.g. 27419.75" step="0.25"></div>
-      <div class="field"><label>Exit Time <span style="color:var(--text3);font-size:9px;">(final)</span></label><input type="text" id="f-exit-time" placeholder="e.g. 10:01 AM"></div>
-      <!-- ENTRY LEGS (PYRAMIDING / SCALE-IN) -->
+      <div class="field"><label>Exit Price</label><input type="number" id="f-exit" placeholder="e.g. 21419.75" step="0.25"></div>
+      <div class="field"><label>Exit Time</label><input type="text" id="f-exit-time" placeholder="e.g. 10:01 AM"></div>
+      <div class="field">
+        <label>Contracts</label>
+        <div style="display:flex;gap:8px;align-items:stretch;">
+          <input type="number" id="f-contracts" placeholder="e.g. 2" min="1" style="flex:1;">
+          <button type="button" id="toggle-legs-btn" onclick="toggleEntryLegsSection()" style="font-family:var(--mono);font-size:9px;letter-spacing:0.06em;padding:6px 10px;background:none;border:1px solid var(--border2);color:var(--text3);cursor:pointer;white-space:nowrap;transition:all 0.15s;">+ Scale-In</button>
+        </div>
+      </div>
+      <div class="field"><label>Outcome</label><select id="f-outcome"><option value="">Select...</option><option value="Closed - Win">Win</option><option value="Closed - Loss">Loss</option><option value="Breakeven">Breakeven</option></select></div>
+
+      <!-- ENTRY LEGS -->
       <div class="field form-full entry-legs-row" id="entry-legs-row">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
           <div>
             <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--yellow);text-transform:uppercase;">Entry Legs (Scale-In)</div>
-            <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:3px;">Add each entry leg — weighted avg entry will update automatically</div>
+            <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:3px;">Weighted avg entry auto-calculates</div>
           </div>
           <button type="button" onclick="addLegRow()" style="font-family:var(--mono);font-size:9px;letter-spacing:0.08em;text-transform:uppercase;padding:5px 12px;background:none;border:1px solid rgba(255,215,64,0.4);color:var(--yellow);cursor:pointer;transition:all 0.15s;" onmouseover="this.style.background='rgba(255,215,64,0.08)'" onmouseout="this.style.background='none'">+ Add Leg</button>
         </div>
@@ -139,52 +166,97 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
         <div id="partial-tp-rows"></div>
         <div style="font-family:var(--mono);font-size:10px;color:var(--green);margin-top:10px;line-height:1.8;" id="partial-pnl-preview"></div>
       </div>
-      <div class="field"><label>Stop Loss</label><input type="number" id="f-sl" placeholder="e.g. 27336.75" step="0.25"></div>
-      <div class="field"><label>Take Profit</label><input type="number" id="f-tp" placeholder="e.g. 27453.75" step="0.25"></div>
-      <div class="field">
-        <label>Contracts <span style="color:var(--text3);font-size:9px;">total across all entries</span></label>
-        <input type="number" id="f-contracts" placeholder="e.g. 2" min="1">
-        <button type="button" id="toggle-legs-btn" onclick="toggleEntryLegsSection()" style="font-family:var(--mono);font-size:8px;letter-spacing:0.08em;text-transform:uppercase;padding:5px 10px;background:none;border:1px solid var(--border2);color:var(--text3);cursor:pointer;margin-top:6px;transition:all 0.15s;width:100%;">+ Scale-In / Pyramid</button>
-      </div>
+
+      <!-- FOLLOWED RULES — always visible -->
       <div class="field form-full">
-        <label>Chart Screenshots <span style="color:var(--text3);font-size:9px;">(up to 5 images)</span></label>
+        <label>Followed My Rules?</label>
+        <div style="display:flex;gap:6px;">
+          <button type="button" class="rules-btn" id="rb-yes" onclick="selectRules('Yes ✅')">✅ Yes</button>
+          <button type="button" class="rules-btn" id="rb-partial" onclick="selectRules('Partially ⚠️')">⚠️ Partial</button>
+          <button type="button" class="rules-btn" id="rb-no" onclick="selectRules('No ❌')">❌ No</button>
+        </div>
+      </div>
+
+      <!-- SCREENSHOT -->
+      <div class="field form-full">
+        <label>Chart Screenshot <span style="color:var(--text3);font-size:9px;">(up to 5 images)</span></label>
         <div id="f-upload-zone" style="border:1px dashed var(--border2);padding:1.25rem;text-align:center;cursor:pointer;transition:border-color 0.15s;background:var(--surface2);margin-bottom:8px;" ondragover="event.preventDefault();document.getElementById('f-upload-zone').style.borderColor='var(--accent)'" ondragleave="document.getElementById('f-upload-zone').style.borderColor='var(--border2)'" ondrop="handleImgDrop(event,'f')" onclick="document.getElementById('f-img-file').click()">
           <input type="file" id="f-img-file" accept="image/*" multiple style="display:none;" onchange="handleImgFile(event,'f')">
           <div id="f-upload-label" style="font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:0.08em;">📎 Drag & drop, Ctrl+V, or click to upload</div>
           <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:3px;">PNG, JPG, WEBP · Multiple images supported</div>
         </div>
-        <!-- Image preview grid with delete buttons -->
         <div id="f-img-previews" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;"></div>
         <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-bottom:4px;text-align:center;">— or paste a link instead —</div>
-        <input type="text" id="f-screenshot" placeholder="TradingView or imgur URL (optional if image uploaded)" style="font-family:var(--mono);font-size:12px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:8px 10px;width:100%;outline:none;transition:border-color 0.15s;">
+        <input type="text" id="f-screenshot" placeholder="TradingView or imgur URL" style="font-family:var(--mono);font-size:12px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:8px 10px;width:100%;outline:none;transition:border-color 0.15s;">
         <div style="font-family:var(--mono);font-size:9px;color:var(--accent);margin-top:5px;display:none;" id="f-upload-status"></div>
       </div>
+
+      <!-- CONFLUENCES — always visible but collapsed -->
       <div class="field form-full">
-        <label>Confluences <span style="color:var(--text3);font-size:9px;">(click to toggle — search to filter)</span></label>
-        <input type="text" class="conf-search" id="conf-search" placeholder="Search confluences..." oninput="filterConf(this.value)">
-        <div class="conf-chip-area" id="conf-chip-area"></div>
-        <div class="conf-selected-tags" id="conf-tags"></div>
-      </div>
-      <div class="field form-full"><label>Notes</label><textarea id="f-notes" placeholder="What happened during this trade?"></textarea></div>
-      <div class="field form-full"><label>Mistakes</label><textarea id="f-mistakes" placeholder="What did you do wrong?"></textarea></div>
-      <div class="field form-full"><label>Lessons Learned</label><textarea id="f-lessons" placeholder="What will you do differently?"></textarea></div>
-      <div class="field form-full">
-        <label>Emotions During Trade <span style="color:var(--text3);font-size:9px;">(select all that apply)</span></label>
-        <div id="f-emotions-wrap" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;">
-          <button type="button" class="emo-btn" data-emotion="Neutral / Calm" onclick="toggleEmotion(this)">😐 Neutral / Calm</button>
-          <button type="button" class="emo-btn" data-emotion="Focused / In the Zone" onclick="toggleEmotion(this)">🎯 Focused / In the Zone</button>
-          <button type="button" class="emo-btn" data-emotion="Confident" onclick="toggleEmotion(this)">💪 Confident</button>
-          <button type="button" class="emo-btn" data-emotion="Anxious / Nervous" onclick="toggleEmotion(this)">😰 Anxious / Nervous</button>
-          <button type="button" class="emo-btn" data-emotion="Frustrated" onclick="toggleEmotion(this)">😤 Frustrated</button>
-          <button type="button" class="emo-btn" data-emotion="Angry" onclick="toggleEmotion(this)">😠 Angry</button>
-          <button type="button" class="emo-btn" data-emotion="Tilted" onclick="toggleEmotion(this)">🤯 Tilted</button>
-          <button type="button" class="emo-btn" data-emotion="Greedy" onclick="toggleEmotion(this)">🤑 Greedy</button>
-          <button type="button" class="emo-btn" data-emotion="FOMO" onclick="toggleEmotion(this)">😨 FOMO</button>
-          <button type="button" class="emo-btn" data-emotion="Tired / Unfocused" onclick="toggleEmotion(this)">😴 Tired / Unfocused</button>
-          <button type="button" class="emo-btn" data-emotion="Revenge Mode" onclick="toggleEmotion(this)">🛑 Revenge Mode</button>
-          <button type="button" class="emo-btn" data-emotion="Overconfident" onclick="toggleEmotion(this)">😎 Overconfident</button>
+        <label style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;" onclick="toggleConf()">
+          <span>Confluences <span style="color:var(--text3);font-size:9px;">(click to expand)</span></span>
+          <span id="conf-arrow" style="color:var(--text3);font-size:10px;">▶</span>
+        </label>
+        <div id="conf-selected-preview" style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;min-height:0;"></div>
+        <div id="conf-panel" style="display:none;margin-top:10px;">
+          <input type="text" class="conf-search" id="conf-search" placeholder="Search confluences..." oninput="filterConf(this.value)">
+          <div class="conf-chip-area" id="conf-chip-area"></div>
         </div>
-        <textarea id="f-emotion-notes" placeholder="Emotion notes — optional. What were you thinking or feeling? Any context..." style="font-family:var(--sans);font-size:13px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:8px 10px;width:100%;outline:none;resize:vertical;min-height:55px;line-height:1.6;transition:border-color 0.15s;margin-top:8px;" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border2)'"></textarea>
+      </div>
+    </div>
+
+    <!-- ── MORE DETAILS (COLLAPSED) ── -->
+    <button class="more-toggle" id="more-toggle-btn" onclick="toggleMoreSection()">
+      <span id="more-arrow" style="color:var(--text3);">▶</span>
+      <span>More Details — SL / TP / HTF / Notes / Emotions</span>
+      <span style="margin-left:auto;font-size:8px;color:var(--text3);">OPTIONAL</span>
+    </button>
+    <div class="more-section" id="more-section">
+      <div class="form-grid">
+        <div class="field"><label>Stop Loss</label><input type="number" id="f-sl" placeholder="e.g. 21336.75" step="0.25"></div>
+        <div class="field"><label>Take Profit</label><input type="number" id="f-tp" placeholder="e.g. 21453.75" step="0.25"></div>
+        <div class="field"><label>Timeframe</label><select id="f-timeframe"><option value="">Select...</option><option>1m</option><option>3m</option><option>5m</option><option>15m</option><option>1h</option><option>4h</option><option>Daily</option></select></div>
+        <div class="field"><label>HTF Context</label><input type="text" id="f-htf" placeholder="e.g. Daily IFVG, 15m FVG"></div>
+        <div class="field form-full">
+          <label>Setup Type</label>
+          <select id="f-model">
+            <option value="">Select...</option>
+            <option value="1st Presentation">1st Presentation</option>
+            <option value="10am Silver Bullet">10am Silver Bullet</option>
+            <option value="9:50 Macro">9:50 Macro</option>
+            <option value="London Close">London Close</option>
+          </select>
+        </div>
+        <div class="field form-full">
+          <label>Bias At Entry <span id="bias-autofill-note" style="color:var(--accent);font-size:9px;display:none;">— auto-filled from today's journal</span></label>
+          <div style="display:flex;gap:4px;flex-wrap:wrap;" id="bias-btn-group">
+            <button type="button" class="bias-btn" data-val="Bullish" onclick="selectBiasEntry(this)" style="font-family:var(--mono);font-size:9px;letter-spacing:0.06em;padding:7px 14px;background:var(--surface2);border:1px solid var(--border2);color:var(--text3);cursor:pointer;transition:all 0.12s;">Bullish</button>
+            <button type="button" class="bias-btn" data-val="Bearish" onclick="selectBiasEntry(this)" style="font-family:var(--mono);font-size:9px;letter-spacing:0.06em;padding:7px 14px;background:var(--surface2);border:1px solid var(--border2);color:var(--text3);cursor:pointer;transition:all 0.12s;">Bearish</button>
+            <button type="button" class="bias-btn" data-val="Ranging" onclick="selectBiasEntry(this)" style="font-family:var(--mono);font-size:9px;letter-spacing:0.06em;padding:7px 14px;background:var(--surface2);border:1px solid var(--border2);color:var(--text3);cursor:pointer;transition:all 0.12s;">Ranging</button>
+            <button type="button" class="bias-btn" data-val="No Bias" onclick="selectBiasEntry(this)" style="font-family:var(--mono);font-size:9px;letter-spacing:0.06em;padding:7px 14px;background:var(--surface2);border:1px solid var(--border2);color:var(--text3);cursor:pointer;transition:all 0.12s;">No Bias</button>
+          </div>
+        </div>
+        <div class="field form-full"><label>Notes</label><textarea id="f-notes" placeholder="What happened?"></textarea></div>
+        <div class="field form-full"><label>Mistakes</label><textarea id="f-mistakes" placeholder="What did you do wrong?"></textarea></div>
+        <div class="field form-full"><label>Lessons Learned</label><textarea id="f-lessons" placeholder="What will you do differently?"></textarea></div>
+        <div class="field form-full">
+          <label>Emotions <span style="color:var(--text3);font-size:9px;">(select all that apply)</span></label>
+          <div id="f-emotions-wrap" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;">
+            <button type="button" class="emo-btn" data-emotion="Neutral / Calm" onclick="toggleEmotion(this)">😐 Neutral</button>
+            <button type="button" class="emo-btn" data-emotion="Focused / In the Zone" onclick="toggleEmotion(this)">🎯 Focused</button>
+            <button type="button" class="emo-btn" data-emotion="Confident" onclick="toggleEmotion(this)">💪 Confident</button>
+            <button type="button" class="emo-btn" data-emotion="Anxious / Nervous" onclick="toggleEmotion(this)">😰 Anxious</button>
+            <button type="button" class="emo-btn" data-emotion="Frustrated" onclick="toggleEmotion(this)">😤 Frustrated</button>
+            <button type="button" class="emo-btn" data-emotion="Angry" onclick="toggleEmotion(this)">😠 Angry</button>
+            <button type="button" class="emo-btn" data-emotion="Tilted" onclick="toggleEmotion(this)">🤯 Tilted</button>
+            <button type="button" class="emo-btn" data-emotion="Greedy" onclick="toggleEmotion(this)">🤑 Greedy</button>
+            <button type="button" class="emo-btn" data-emotion="FOMO" onclick="toggleEmotion(this)">😨 FOMO</button>
+            <button type="button" class="emo-btn" data-emotion="Tired / Unfocused" onclick="toggleEmotion(this)">😴 Tired</button>
+            <button type="button" class="emo-btn" data-emotion="Revenge Mode" onclick="toggleEmotion(this)">🛑 Revenge</button>
+            <button type="button" class="emo-btn" data-emotion="Overconfident" onclick="toggleEmotion(this)">😎 Overconfident</button>
+          </div>
+          <textarea id="f-emotion-notes" placeholder="Emotion notes — optional." style="font-family:var(--sans);font-size:13px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:8px 10px;width:100%;outline:none;resize:vertical;min-height:55px;line-height:1.6;transition:border-color 0.15s;margin-top:8px;" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border2)'"></textarea>
+        </div>
       </div>
     </div>
 
@@ -209,22 +281,125 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
 <script>
 if (!requireAuth()) { /* redirected */ }
 
-// ── IMAGE UPLOAD (multi-file, Imgur anonymous) ────────────────────────────────
+// ── SYSTEM CONFLUENCE GROUPS (overrides admin-core.js) ────────────────────────
+// Groups tagged with pda:'premium' are hidden when direction = Long
+// Groups tagged with pda:'discount' are hidden when direction = Short
+// FPG chips (data-fpg="1") are always visible regardless of direction
+CONFLUENCE_GROUPS = [
+  {
+    label: 'HTF Context',
+    items: [
+      'Weekly Bullish',
+      'Weekly Bearish',
+      'MM Buy Model',
+      'MM Sell Model',
+      'Daily PDA aligned with LTF'
+    ]
+  },
+  {
+    label: '15m',
+    items: [
+      '15m SIBI above (shorts)',
+      '15m BISI below (longs)',
+      'Sensitivity in lower portion of 15m SIBI',
+      'Displaced through 15m BISI',
+      '15m liquidity swept'
+    ]
+  },
+  {
+    label: 'RTH',
+    items: [
+      'Premium RTH',
+      'Discount RTH',
+      'Manipulation higher (shorts)',
+      'Straight through delivery',
+      'RTH fill in play'
+    ]
+  },
+  {
+    label: '1m Setup',
+    items: [
+      'BSL swept',
+      'SSL swept',
+      'Failure swing + displacement',
+      '1st Presentation clean',
+      'FPG — BISI',
+      'FPG — SIBI',
+      'FPG inversed',
+      'Reflection gap (SIBI)',
+      'AMD structure'
+    ],
+    fpgItems: ['FPG — BISI', 'FPG — SIBI', 'FPG inversed', 'Reflection gap (SIBI)']
+  },
+  {
+    label: 'Entry',
+    items: [
+      'CE entry — BISI',
+      'CE entry — SIBI',
+      '2022 MM entry off reflection',
+      'Breaker block (Unicorn)',
+      '10am FPG',
+      '9:50 Macro',
+      'London Close retracement'
+    ],
+    fpgItems: ['10am FPG']
+  },
+  {
+    label: 'PDA in Play — Premium / Bearish',
+    pda: 'premium',
+    items: [
+      'Old Highs / BSL',
+      'Bearish OB',
+      'Bearish BPR',
+      'SIBI',
+      'Bearish FVG',
+      'IFVG',
+      'Bearish VI',
+      'Breaker Block',
+      'Rejection Block',
+      'Propulsion Block'
+    ]
+  },
+  {
+    label: 'PDA in Play — Discount / Bullish',
+    pda: 'discount',
+    items: [
+      'Old Lows / SSL',
+      'Bullish OB',
+      'Bullish BPR',
+      'BISI',
+      'Bullish FVG',
+      'IFVG',
+      'Bullish VI',
+      'Breaker Block',
+      'Rejection Block',
+      'Propulsion Block'
+    ]
+  },
+  {
+    label: 'PDA in Play — Neutral',
+    items: [
+      'NWOG',
+      'NDOG',
+      'Balanced Price Range',
+      'Void'
+    ]
+  }
+];
+
+// ── IMAGE UPLOAD ──────────────────────────────────────────────────────────────
 const IMGUR_CLIENT_ID = '546c25a59c58ad7';
-let pendingImgFiles = []; // array of File objects
+let pendingImgFiles = [];
 
 function handleImgDrop(event, prefix) {
   event.preventDefault();
   document.getElementById(`${prefix}-upload-zone`).style.borderColor = 'var(--border2)';
   addImgFiles(Array.from(event.dataTransfer.files).filter(f => f.type.startsWith('image/')), prefix);
 }
-
 function handleImgFile(event, prefix) {
   addImgFiles(Array.from(event.target.files), prefix);
-  event.target.value = ''; // reset so same file can be re-added
+  event.target.value = '';
 }
-
-// CTRL+V paste from clipboard
 document.addEventListener('paste', e => {
   const items = e.clipboardData?.items;
   if (!items) return;
@@ -240,22 +415,19 @@ document.addEventListener('paste', e => {
     }
   }
 });
-
 function addImgFiles(files, prefix) {
-  const max = 5;
   for (const file of files) {
-    if (pendingImgFiles.length >= max) break;
+    if (pendingImgFiles.length >= 5) break;
     pendingImgFiles.push(file);
   }
   renderImgPreviews(prefix);
-  document.getElementById(`${prefix}-screenshot`).value = '';
+  const sc = document.getElementById(`${prefix}-screenshot`);
+  if (sc) sc.value = '';
 }
-
 function removeImgFile(index, prefix) {
   pendingImgFiles.splice(index, 1);
   renderImgPreviews(prefix);
 }
-
 function renderImgPreviews(prefix) {
   const container = document.getElementById(`${prefix}-img-previews`);
   const labelEl   = document.getElementById(`${prefix}-upload-label`);
@@ -272,21 +444,16 @@ function renderImgPreviews(prefix) {
     reader.onload = e => {
       const wrap = document.createElement('div');
       wrap.style.cssText = 'position:relative;width:120px;flex-shrink:0;';
-      wrap.innerHTML = `
-        <img src="${e.target.result}" style="width:120px;height:80px;object-fit:cover;border:1px solid var(--border2);display:block;">
-        <button onclick="removeImgFile(${i},'${prefix}')" style="position:absolute;top:2px;right:2px;font-family:var(--mono);font-size:9px;background:rgba(0,0,0,0.8);border:1px solid var(--red);color:var(--red);padding:2px 5px;cursor:pointer;line-height:1;">✕</button>
-        <div style="font-family:var(--mono);font-size:8px;color:var(--text3);padding:2px 4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${file.name||'image'}</div>`;
+      wrap.innerHTML = `<img src="${e.target.result}" style="width:120px;height:80px;object-fit:cover;border:1px solid var(--border2);display:block;"><button onclick="removeImgFile(${i},'${prefix}')" style="position:absolute;top:2px;right:2px;font-family:var(--mono);font-size:9px;background:rgba(0,0,0,0.8);border:1px solid var(--red);color:var(--red);padding:2px 5px;cursor:pointer;line-height:1;">✕</button><div style="font-family:var(--mono);font-size:8px;color:var(--text3);padding:2px 4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${file.name||'image'}</div>`;
       container.appendChild(wrap);
     };
     reader.readAsDataURL(file);
   });
 }
-
 async function uploadAllImgsToNotion(pageId, prefix) {
   if (!pendingImgFiles.length) return [];
   const statusEl = document.getElementById(`${prefix}-upload-status`);
-  statusEl.style.display = 'block';
-  statusEl.style.color = 'var(--accent)';
+  statusEl.style.display = 'block'; statusEl.style.color = 'var(--accent)';
   const urls = [];
   for (let i = 0; i < pendingImgFiles.length; i++) {
     const file = pendingImgFiles[i];
@@ -294,366 +461,177 @@ async function uploadAllImgsToNotion(pageId, prefix) {
     try {
       const formData = new FormData();
       formData.append('image', file);
-      const imgurRes = await fetch('https://api.imgur.com/3/image', {
-        method: 'POST',
-        headers: { 'Authorization': `Client-ID ${IMGUR_CLIENT_ID}` },
-        body: formData
-      });
+      const imgurRes = await fetch('https://api.imgur.com/3/image', { method:'POST', headers:{'Authorization':`Client-ID ${IMGUR_CLIENT_ID}`}, body:formData });
       const imgurData = await imgurRes.json();
       if (!imgurData.success) throw new Error(imgurData.data?.error || 'unknown');
       const imgUrl = imgurData.data.link;
       urls.push(imgUrl);
-      // Add each as an image block on the Notion page
-      await fetch(`${WORKER}/notion/blocks/${pageId}/children`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          children: [{ object:'block', type:'image', image:{ type:'external', external:{ url:imgUrl } } }]
-        })
-      });
-    } catch(e) {
-      statusEl.textContent = `⚠ Image ${i+1} failed: ${e.message}`;
-    }
+      await fetch(`${WORKER}/notion/blocks/${pageId}/children`, { method:'PATCH', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ children:[{object:'block',type:'image',image:{type:'external',external:{url:imgUrl}}}] }) });
+    } catch(e) { statusEl.textContent = `⚠ Image ${i+1} failed: ${e.message}`; }
   }
   if (urls.length) {
-    // Save first URL to screenshot field so index.html picks it up
-    const screenshotEl = document.getElementById(`${prefix}-screenshot`);
-    if (screenshotEl && !screenshotEl.value) screenshotEl.value = urls[0];
+    const sc = document.getElementById(`${prefix}-screenshot`);
+    if (sc && !sc.value) sc.value = urls[0];
     statusEl.textContent = `✓ ${urls.length} image${urls.length>1?'s':''} uploaded`;
     statusEl.style.color = 'var(--green)';
   }
   pendingImgFiles = [];
   return urls;
 }
-
 function resetImgUpload(prefix) {
   pendingImgFiles = [];
-  const container = document.getElementById(`${prefix}-img-previews`);
-  const labelEl   = document.getElementById(`${prefix}-upload-label`);
-  const statusEl  = document.getElementById(`${prefix}-upload-status`);
-  const fileEl    = document.getElementById(`${prefix}-img-file`);
-  if (container) container.innerHTML = '';
-  if (labelEl)   labelEl.textContent = '📎 Drag & drop, Ctrl+V, or click to upload';
-  if (statusEl)  { statusEl.style.display='none'; statusEl.style.color='var(--accent)'; }
-  if (fileEl)    fileEl.value = '';
+  const c=document.getElementById(`${prefix}-img-previews`), l=document.getElementById(`${prefix}-upload-label`), s=document.getElementById(`${prefix}-upload-status`), f=document.getElementById(`${prefix}-img-file`);
+  if(c)c.innerHTML=''; if(l)l.textContent='📎 Drag & drop, Ctrl+V, or click to upload'; if(s){s.style.display='none';s.style.color='var(--accent)';} if(f)f.value='';
 }
 
-
-
-buildConfChips('conf-chip-area','conf-tags');
-
-// ── AUTO-FILL FROM TRADOVATE IMPORT ──────────────────────────────────────────
-(function checkTradovateImport() {
-  const params = new URLSearchParams(window.location.search);
-  if (params.get('from') !== 'tradovate') return;
-  const raw = sessionStorage.getItem('tv_import');
-  if (!raw) return;
-  try {
-    const t = JSON.parse(raw);
-    sessionStorage.removeItem('tv_import');
-
-    const setV = (id, v) => { const el = document.getElementById(id); if (el && v != null) el.value = v; };
-    setV('f-instrument', t.instrument);
-    setV('f-direction',  t.direction);
-    setV('f-session',    t.session);
-    setV('f-timeframe',  t.timeframe || '1m');
-    setV('f-date',       t.date);
-    setV('f-entry',      t.entryPrice);
-    setV('f-exit',       t.exitPrice);
-    setV('f-contracts',  t.contracts);
-    setV('f-entry-time', t.entryTime);
-    setV('f-exit-time',  t.exitTime);
-
-    // Detect outcome from P&L
-    if (t.pnl > 0)      setV('f-outcome', 'Closed - Win');
-    else if (t.pnl < 0) setV('f-outcome', 'Closed - Loss');
-    else                 setV('f-outcome', 'Breakeven');
-
-    // Pre-fill entry legs if multiple entries (scale-in / pyramid)
-    if (t.entries && t.entries.length > 1) {
-      const entryLegsRow = document.getElementById('entry-legs-row');
-      if (entryLegsRow) {
-        entryLegsVisible = true;
-        entryLegsRow.style.display = 'block';
-        const btn = document.getElementById('toggle-legs-btn');
-        if (btn) { btn.style.borderColor='rgba(255,215,64,0.5)'; btn.style.color='var(--yellow)'; btn.textContent='− Hide Scale-In'; }
-        // Build leg rows for each entry
-        t.entries.forEach(entry => {
-          addLegRow();
-          const idx = activeLegIds[activeLegIds.length - 1];
-          setTimeout(() => {
-            const priceEl = document.getElementById(`f-leg${idx}-price`);
-            const qtyEl   = document.getElementById(`f-leg${idx}-contracts`);
-            const timeEl  = document.getElementById(`f-leg${idx}-time`);
-            if (priceEl) priceEl.value = entry.price;
-            if (qtyEl)   qtyEl.value   = entry.qty;
-            if (timeEl)  timeEl.value  = entry.time;
-          }, 50);
-        });
-        setTimeout(() => onLegInput(), 100);
-      }
-    }
-
-    // Pre-fill partial exits if exits array provided
-    if (t.exits && t.exits.length > 0) {
-      const partialRow = document.getElementById('partial-row');
-      if (partialRow) {
-        partialRow.style.display = 'block';
-        // Render TP rows first
-        if (typeof renderTPRows === 'function') renderTPRows(t.contracts);
-        // Wait a tick then fill in the values
-        setTimeout(() => {
-          t.exits.forEach((exit, i) => {
-            const tpNum = i + 1;
-            const contractsEl = document.getElementById(`f-tp${tpNum}-contracts`);
-            const priceEl     = document.getElementById(`f-tp${tpNum}-price`);
-            const timeEl      = document.getElementById(`f-tp${tpNum}-time`);
-            if (contractsEl) contractsEl.value = exit.qty;
-            if (priceEl)     priceEl.value     = exit.price;
-            if (timeEl)      timeEl.value      = exit.time;
-          });
-          // Trigger P&L preview recalc
-          if (typeof onTPInput === 'function') onTPInput();
-        }, 100);
-      }
-    } else if (t.contracts > 1) {
-      const row = document.getElementById('partial-row');
-      if (row) { row.style.display = 'block'; if (typeof renderTPRows === 'function') renderTPRows(t.contracts); }
-    }
-
-    // Banner at top of form
-    const banner = document.createElement('div');
-    banner.style.cssText = 'background:rgba(200,255,0,0.07);border:1px solid rgba(200,255,0,0.3);padding:10px 16px;font-family:var(--mono);font-size:10px;color:var(--accent);letter-spacing:0.08em;margin-bottom:1.5rem;';
-    banner.textContent = `✓ Pre-filled from Tradovate — ${t.instrument} ${t.direction} · ${t.pnl >= 0 ? '+' : ''}$${Math.abs(t.pnl || 0).toLocaleString()} · Add confluences and notes to complete`;
-    const formGrid = document.querySelector('.form-grid');
-    if (formGrid) formGrid.parentNode.insertBefore(banner, formGrid);
-
-    // Index is already stored in localStorage by tradovate.html before redirect
-    // Clean URL
-    window.history.replaceState({}, '', 'log-trade.html');
-  } catch(e) {
-    console.warn('Tradovate import parse error:', e);
-  }
-})();
-
-function toggleEmotion(btn) { btn.classList.toggle('selected'); }
-function getSelectedEmotions() {
-  return Array.from(document.querySelectorAll('#f-emotions-wrap .emo-btn.selected')).map(b => b.dataset.emotion);
-}
-function resetEmotions() {
-  document.querySelectorAll('#f-emotions-wrap .emo-btn').forEach(b => b.classList.remove('selected'));
-  document.getElementById('f-emotion-notes').value = '';
+// ── RULES QUICK SELECT ────────────────────────────────────────────────────────
+let selectedRules = '';
+function selectRules(val) {
+  selectedRules = val;
+  document.getElementById('rb-yes').className     = 'rules-btn' + (val==='Yes ✅' ? ' sel-yes' : '');
+  document.getElementById('rb-partial').className = 'rules-btn' + (val==='Partially ⚠️' ? ' sel-partial' : '');
+  document.getElementById('rb-no').className      = 'rules-btn' + (val==='No ❌' ? ' sel-no' : '');
 }
 
-let tradeData = {};
-const TP_LABELS = ['TP1','TP2','TP3','TP4','TP5','TP6','TP7','TP8','TP9','TP10'];
-const LEG_LABELS = ['Leg 1','Leg 2','Leg 3','Leg 4','Leg 5','Leg 6','Leg 7','Leg 8'];
-
-// ── ENTRY LEGS (PYRAMIDING) ───────────────────────────────────────────────────
-let entryLegsVisible = false;
-
-function toggleEntryLegsSection() {
-  const row = document.getElementById('entry-legs-row');
-  entryLegsVisible = !entryLegsVisible;
-  row.style.display = entryLegsVisible ? 'block' : 'none';
-  const btn = document.getElementById('toggle-legs-btn');
-  if (entryLegsVisible) {
-    btn.style.borderColor = 'rgba(255,215,64,0.5)';
-    btn.style.color = 'var(--yellow)';
-    btn.textContent = '− Hide Scale-In';
-    // Auto-render 2 leg rows if empty
-    const legRows = document.getElementById('entry-leg-rows');
-    if (!legRows.innerHTML) { addLegRow(); addLegRow(); }
-  } else {
-    btn.style.borderColor = 'var(--border2)';
-    btn.style.color = 'var(--text3)';
-    btn.textContent = '+ Scale-In / Pyramid';
-  }
+// ── MORE DETAILS TOGGLE ───────────────────────────────────────────────────────
+function toggleMoreSection() {
+  const sec = document.getElementById('more-section');
+  const arrow = document.getElementById('more-arrow');
+  const open = sec.classList.toggle('open');
+  arrow.textContent = open ? '▼' : '▶';
 }
 
-function buildLegRow(idx) {
-  const inp = `style="font-family:var(--mono);font-size:12px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:8px 10px;width:100%;outline:none;"`;
-  const lbl = `style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;color:var(--text3);text-transform:uppercase;display:block;margin-bottom:4px;"`;
-  return `<div id="leg-row-${idx}" style="margin-bottom:10px;padding:12px;background:var(--surface2);border:1px solid rgba(255,215,64,0.2);">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-      <div style="font-family:var(--mono);font-size:9px;color:var(--yellow);text-transform:uppercase;">${LEG_LABELS[idx-1]||'Leg '+idx}</div>
-      <button type="button" onclick="removeLegRow(${idx})" style="font-family:var(--mono);font-size:9px;background:none;border:1px solid var(--border2);color:var(--text3);padding:2px 7px;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.borderColor='var(--red)';this.style.color='var(--red)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text3)'">✕</button>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
-      <div><label ${lbl}>Entry Price</label><input type="number" id="f-leg${idx}-price" step="0.25" ${inp} oninput="onLegInput()"></div>
-      <div><label ${lbl}>Entry Time</label><input type="text" id="f-leg${idx}-time" placeholder="e.g. 9:40 AM" ${inp}></div>
-      <div><label ${lbl}>Contracts</label><input type="number" id="f-leg${idx}-contracts" min="1" ${inp} oninput="onLegInput()"></div>
-    </div>
-  </div>`;
-}
-
-let legCount = 0;
-const activeLegIds = [];
-
-function addLegRow() {
-  legCount++;
-  activeLegIds.push(legCount);
-  const container = document.getElementById('entry-leg-rows');
-  const div = document.createElement('div');
-  div.innerHTML = buildLegRow(legCount);
-  container.appendChild(div.firstElementChild);
-  onLegInput();
-}
-
-function removeLegRow(idx) {
-  const el = document.getElementById(`leg-row-${idx}`);
-  if (el) el.remove();
-  const i = activeLegIds.indexOf(idx);
-  if (i > -1) activeLegIds.splice(i, 1);
-  onLegInput();
-}
-
-function getLegRows() {
-  const rows = [];
-  activeLegIds.forEach(idx => {
-    const el = document.getElementById(`leg-row-${idx}`);
-    if (!el) return;
-    const price = parseFloat(document.getElementById(`f-leg${idx}-price`)?.value || '');
-    const qty   = parseInt(document.getElementById(`f-leg${idx}-contracts`)?.value || '0');
-    const time  = document.getElementById(`f-leg${idx}-time`)?.value || '';
-    if (price && qty) rows.push({ price, qty, time, label: LEG_LABELS[rows.length] || `Leg ${rows.length+1}` });
-  });
-  return rows;
-}
-
-function onLegInput() {
-  const rows = getLegRows();
-  const preview = document.getElementById('entry-legs-avg-preview');
-  if (!preview) return;
-  if (!rows.length) { preview.innerHTML = ''; return; }
-  const totalQty = rows.reduce((s, r) => s + r.qty, 0);
-  const weightedAvg = rows.reduce((s, r) => s + r.price * r.qty, 0) / totalQty;
-  const lines = rows.map(r => `<span style="color:var(--text3);">${r.label}:</span> ${r.qty} contract${r.qty>1?'s':''} @ <span style="color:var(--yellow);">${r.price.toLocaleString()}</span>${r.time?' at '+r.time:''}`);
-  lines.push(`<span style="color:var(--text2);">─────────────────────────────</span>`);
-  lines.push(`<span style="color:var(--text2);">Weighted avg entry:</span> <span style="color:var(--accent);font-weight:700;">${weightedAvg.toFixed(2)}</span> &nbsp;·&nbsp; <span style="color:var(--text2);">${totalQty} contracts total</span>`);
-  preview.innerHTML = lines.join('<br>');
-  // Auto-set the entry price field with weighted avg
-  const entryEl = document.getElementById('f-entry');
-  if (entryEl) { entryEl.value = weightedAvg.toFixed(2); entryEl.dispatchEvent(new Event('input')); }
-  // Auto-set contracts field
-  const contractsEl = document.getElementById('f-contracts');
-  if (contractsEl && !contractsEl.value) contractsEl.value = totalQty;
-}
-
-// ── BIAS AT ENTRY ─────────────────────────────────────────────────────────────
-let selectedBiasEntry = '';
-function selectBiasEntry(btn) {
-  selectedBiasEntry = btn.dataset.val;
-  document.querySelectorAll('.bias-entry-btn').forEach(b => {
-    b.style.borderColor = 'var(--border2)';
-    b.style.color = 'var(--text3)';
-    b.style.background = 'var(--surface2)';
-  });
-  const colors = { Bullish:'#00e676', Bearish:'#ff4444', Ranging:'#ffd740', 'No Bias':'#888' };
-  const c = colors[btn.dataset.val] || '#888';
-  btn.style.borderColor = c;
-  btn.style.color = c;
-  btn.style.background = c + '18';
-}
-
-// Try to auto-fill favored direction from today's market journal entry
-(async function autofillBias() {
-  try {
-    const data = await notionPost(`/databases/${BIAS_DB}/query`, {
-      filter: { and: [
-        { property: 'Date', date: { equals: TODAY } },
-        { property: 'Title', rich_text: { contains: 'MJ:PRE' } }
-      ]},
-      page_size: 1
-    });
-    const page = data.results?.[0];
-    if (!page) return;
-    const bias = page.properties['Bias']?.select?.name;
-    if (!bias) return;
-    const btn = document.querySelector(`.bias-entry-btn[data-val="${bias}"]`);
-    if (btn) {
-      selectBiasEntry(btn);
-      const note = document.getElementById('bias-autofill-note');
-      if (note) note.style.display = 'inline';
-    }
-  } catch(e) { /* silent */ }
-})();
-
-// ── CHIP CONFLUENCE PICKER ────────────────────────────────────────────────────
+// ── CONFLUENCE PICKER (collapsed by default) ──────────────────────────────────
+let confPanelOpen = false;
 let selectedConfs = new Set();
 
-function buildConfChips(areaId, tagsId) {
+function toggleConf() {
+  confPanelOpen = !confPanelOpen;
+  document.getElementById('conf-panel').style.display = confPanelOpen ? 'block' : 'none';
+  document.getElementById('conf-arrow').textContent = confPanelOpen ? '▼' : '▶';
+}
+
+function buildConfChips(areaId) {
   const area = document.getElementById(areaId);
   if (!area) return;
   let html = '';
   CONFLUENCE_GROUPS.forEach(g => {
-    html += `<div class="conf-group-lbl">${g.label}</div>`;
+    const pdaAttr = g.pda ? ` data-pda="${g.pda}"` : '';
+    html += `<div class="conf-group-lbl"${pdaAttr}>${g.label}</div>`;
     g.items.forEach(item => {
       const val = confValue(item);
-      const short = item.split(' —')[0].trim(); // short label for chip
-      html += `<span class="conf-chip" data-val="${val}" data-full="${item.toLowerCase()}" onclick="toggleConfChip(this,'${tagsId}')">${short}</span>`;
+      const short = item.split(' —')[0].trim();
+      const isFpg = g.fpgItems && g.fpgItems.includes(item);
+      const fpgAttr = isFpg ? ' data-fpg="1"' : '';
+      const pdaChipAttr = g.pda ? ` data-pda="${g.pda}"` : '';
+      html += `<span class="conf-chip" data-val="${val}" data-full="${item.toLowerCase()}"${pdaChipAttr}${fpgAttr} onclick="toggleConfChip(this)">${short}</span>`;
     });
   });
   area.innerHTML = html;
 }
 
-function toggleConfChip(el, tagsId) {
+function toggleConfChip(el) {
   const val = el.dataset.val;
-  if (selectedConfs.has(val)) {
-    selectedConfs.delete(val);
-    el.classList.remove('active');
-  } else {
-    selectedConfs.add(val);
-    el.classList.add('active');
-  }
-  renderConfTags(tagsId);
+  if (selectedConfs.has(val)) { selectedConfs.delete(val); el.classList.remove('active'); }
+  else { selectedConfs.add(val); el.classList.add('active'); }
+  renderConfPreview();
 }
 
-function renderConfTags(tagsId) {
-  const tags = document.getElementById(tagsId);
-  if (!tags) return;
-  tags.innerHTML = [...selectedConfs].map(v =>
-    `<span class="conf-tag" onclick="removeConfChip('${v}','${tagsId}')">${v}</span>`
+function renderConfPreview() {
+  const preview = document.getElementById('conf-selected-preview');
+  if (!preview) return;
+  preview.innerHTML = [...selectedConfs].map(v =>
+    `<span style="font-family:var(--mono);font-size:9px;padding:3px 8px;border:1px solid rgba(200,255,0,0.4);color:var(--accent);background:rgba(200,255,0,0.06);cursor:pointer;" onclick="removeConfChip('${v}')">${v} ✕</span>`
   ).join('');
 }
 
-function removeConfChip(val, tagsId) {
+function removeConfChip(val) {
   selectedConfs.delete(val);
   const chip = document.querySelector(`.conf-chip[data-val="${val}"]`);
   if (chip) chip.classList.remove('active');
-  renderConfTags(tagsId);
+  renderConfPreview();
 }
 
 function filterConf(query) {
   const q = query.toLowerCase().trim();
   document.querySelectorAll('.conf-chip').forEach(chip => {
-    const match = !q || chip.dataset.full.includes(q) || chip.dataset.val.toLowerCase().includes(q);
-    chip.classList.toggle('hidden', !match);
+    // respect dir-hidden separately — only toggle search hidden
+    const matchesSearch = !q || chip.dataset.full.includes(q) || chip.dataset.val.toLowerCase().includes(q);
+    chip.classList.toggle('hidden', !matchesSearch);
   });
-  // Show/hide group labels based on whether any chips in group are visible
   document.querySelectorAll('.conf-group-lbl').forEach(lbl => {
-    let next = lbl.nextElementSibling;
-    let anyVisible = false;
+    let next = lbl.nextElementSibling; let anyVisible = false;
     while (next && !next.classList.contains('conf-group-lbl')) {
-      if (!next.classList.contains('hidden')) anyVisible = true;
+      if (!next.classList.contains('hidden') && !next.classList.contains('dir-hidden')) anyVisible = true;
       next = next.nextElementSibling;
     }
     lbl.classList.toggle('hidden', !anyVisible);
   });
 }
 
-function getSelectedConfs() { return [...selectedConfs]; }
-
-function setSelectedConfs(values) {
-  selectedConfs = new Set(values);
-  document.querySelectorAll('.conf-chip').forEach(chip => {
-    chip.classList.toggle('active', selectedConfs.has(chip.dataset.val));
+// ── DIRECTION-BASED PDA FILTERING ────────────────────────────────────────────
+// Short → hide Discount/Bullish PDA chips (keep Premium/Bearish + FPG always)
+// Long  → hide Premium/Bearish PDA chips (keep Discount/Bullish + FPG always)
+// No direction → show all
+function filterConfByDirection(direction) {
+  document.querySelectorAll('.conf-chip[data-pda]').forEach(chip => {
+    const pda = chip.dataset.pda;
+    const isFpg = chip.dataset.fpg === '1';
+    if (isFpg) { chip.classList.remove('dir-hidden'); return; }
+    if (!direction) { chip.classList.remove('dir-hidden'); return; }
+    if (direction === 'Long'  && pda === 'premium')  chip.classList.add('dir-hidden');
+    else if (direction === 'Short' && pda === 'discount') chip.classList.add('dir-hidden');
+    else chip.classList.remove('dir-hidden');
   });
-  renderConfTags('conf-tags');
+  // Show/hide the PDA group labels accordingly
+  document.querySelectorAll('.conf-group-lbl[data-pda]').forEach(lbl => {
+    const pda = lbl.dataset.pda;
+    if (!direction) { lbl.classList.remove('dir-hidden'); return; }
+    if (direction === 'Long'  && pda === 'premium')  lbl.classList.add('dir-hidden');
+    else if (direction === 'Short' && pda === 'discount') lbl.classList.add('dir-hidden');
+    else lbl.classList.remove('dir-hidden');
+  });
 }
 
-document.getElementById('f-contracts').addEventListener('input', togglePartialRow);
+document.getElementById('f-direction').addEventListener('change', function() {
+  filterConfByDirection(this.value);
+});
 
+function getSelectedConfs() { return [...selectedConfs]; }
+function setSelectedConfs(values) {
+  selectedConfs = new Set(values);
+  document.querySelectorAll('.conf-chip').forEach(chip => chip.classList.toggle('active', selectedConfs.has(chip.dataset.val)));
+  renderConfPreview();
+}
+
+buildConfChips('conf-chip-area');
+
+// ── BIAS AT ENTRY ─────────────────────────────────────────────────────────────
+let selectedBiasEntry = '';
+function selectBiasEntry(btn) {
+  selectedBiasEntry = btn.dataset.val;
+  document.querySelectorAll('.bias-btn').forEach(b => { b.style.borderColor='var(--border2)'; b.style.color='var(--text3)'; b.style.background='var(--surface2)'; });
+  const colors = { Bullish:'#00e676', Bearish:'#ff4444', Ranging:'#ffd740', 'No Bias':'#888' };
+  const c = colors[btn.dataset.val] || '#888';
+  btn.style.borderColor = c; btn.style.color = c; btn.style.background = c + '18';
+}
+
+(async function autofillBias() {
+  try {
+    const data = await notionPost(`/databases/${BIAS_DB}/query`, { filter:{and:[{property:'Date',date:{equals:TODAY}},{property:'Title',rich_text:{contains:'MJ:PRE'}}]}, page_size:1 });
+    const page = data.results?.[0];
+    if (!page) return;
+    const bias = page.properties['Bias']?.select?.name;
+    if (!bias) return;
+    const btn = document.querySelector(`.bias-btn[data-val="${bias}"]`);
+    if (btn) { selectBiasEntry(btn); const note=document.getElementById('bias-autofill-note'); if(note) note.style.display='inline'; }
+  } catch(e) {}
+})();
+
+// ── PARTIAL EXITS ─────────────────────────────────────────────────────────────
+const TP_LABELS = ['TP1','TP2','TP3','TP4','TP5','TP6','TP7','TP8','TP9','TP10'];
+
+document.getElementById('f-contracts').addEventListener('input', togglePartialRow);
 function togglePartialRow() {
   const contracts = getNum('f-contracts') || 1;
   const row = document.getElementById('partial-row');
@@ -680,9 +658,9 @@ function buildTPRow(i, remainingBefore) {
 }
 
 function renderTPRows(total) {
-  let html = ''; for(let i=1;i<=Math.min(total,10);i++) html+=buildTPRow(i,total);
-  document.getElementById('partial-tp-rows').innerHTML = html;
-  document.getElementById('partial-contracts-remaining').textContent = `${total} contracts total`;
+  let html=''; for(let i=1;i<=Math.min(total,10);i++) html+=buildTPRow(i,total);
+  document.getElementById('partial-tp-rows').innerHTML=html;
+  document.getElementById('partial-contracts-remaining').textContent=`${total} contracts total`;
   onTPInput();
 }
 
@@ -698,11 +676,11 @@ function onTPInput() {
     const c=getNum(`f-tp${i}-contracts`)||0, p=getNum(`f-tp${i}-price`);
     if(c>avail){const el=document.getElementById(`f-tp${i}-contracts`);if(el)el.value=avail;}
     let note='';
-    if(p&&entry&&c>0){const isAtSL=sl&&Math.abs(p-sl)<0.5,isAtBE=Math.abs(p-entry)<1.0&&!isAtSL;if(isAtBE)note='⚡ BE exit';else if(isAtSL)note='⛔ Stop loss hit';else if(inst&&dir){const pnl=calcPnL(entry,p,c,inst,dir);note=`${pnl>=0?'+':'-'}$${Math.abs(pnl).toLocaleString()} on ${c} contract${c>1?'s':''}`;}}
-    if(noteEl){noteEl.textContent=note;noteEl.style.color=note.includes('BE')?'var(--yellow)':note.includes('Stop')?'var(--red)':'var(--green)';}
+    if(p&&entry&&c>0){const isAtSL=sl&&Math.abs(p-sl)<0.5,isAtBE=Math.abs(p-entry)<1.0&&!isAtSL;if(isAtBE)note='⚡ BE exit';else if(isAtSL)note='⛔ SL hit';else if(inst&&dir){const pnl=calcPnL(entry,p,c,inst,dir);note=`${pnl>=0?'+':'-'}$${Math.abs(pnl).toLocaleString()} on ${c}c`;}}
+    if(noteEl){noteEl.textContent=note;noteEl.style.color=note.includes('BE')?'var(--yellow)':note.includes('SL')?'var(--red)':'var(--green)';}
     used+=c; if(used>=total) allExited=true;
   }
-  document.getElementById('partial-contracts-remaining').textContent = used>0?`${used}/${total} exited${allExited?' — fully closed':` · ${total-used} running`}`:`${total} contracts total`;
+  document.getElementById('partial-contracts-remaining').textContent=used>0?`${used}/${total} exited${allExited?' — fully closed':` · ${total-used} running`}`:`${total} contracts total`;
   updatePartialPreview();
 }
 
@@ -723,22 +701,175 @@ function updatePartialPreview() {
   preview.innerHTML=lines.join('<br>');preview.style.color=total>=0?'var(--green)':'var(--red)';
 }
 
+// ── ENTRY LEGS (PYRAMIDING) ───────────────────────────────────────────────────
+const LEG_LABELS = ['Leg 1','Leg 2','Leg 3','Leg 4','Leg 5','Leg 6','Leg 7','Leg 8'];
+let entryLegsVisible = false;
+let legCount = 0;
+const activeLegIds = [];
+
+function toggleEntryLegsSection() {
+  const row = document.getElementById('entry-legs-row');
+  entryLegsVisible = !entryLegsVisible;
+  row.style.display = entryLegsVisible ? 'block' : 'none';
+  const btn = document.getElementById('toggle-legs-btn');
+  if (entryLegsVisible) {
+    btn.style.borderColor='rgba(255,215,64,0.5)'; btn.style.color='var(--yellow)'; btn.textContent='− Scale-In';
+    if (!document.getElementById('entry-leg-rows').innerHTML) { addLegRow(); addLegRow(); }
+  } else {
+    btn.style.borderColor='var(--border2)'; btn.style.color='var(--text3)'; btn.textContent='+ Scale-In';
+  }
+}
+
+function buildLegRow(idx) {
+  const inp=`style="font-family:var(--mono);font-size:12px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:8px 10px;width:100%;outline:none;"`;
+  const lbl=`style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;color:var(--text3);text-transform:uppercase;display:block;margin-bottom:4px;"`;
+  return `<div id="leg-row-${idx}" style="margin-bottom:10px;padding:12px;background:var(--surface2);border:1px solid rgba(255,215,64,0.2);">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+      <div style="font-family:var(--mono);font-size:9px;color:var(--yellow);text-transform:uppercase;">${LEG_LABELS[idx-1]||'Leg '+idx}</div>
+      <button type="button" onclick="removeLegRow(${idx})" style="font-family:var(--mono);font-size:9px;background:none;border:1px solid var(--border2);color:var(--text3);padding:2px 7px;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.borderColor='var(--red)';this.style.color='var(--red)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text3)'">✕</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+      <div><label ${lbl}>Entry Price</label><input type="number" id="f-leg${idx}-price" step="0.25" ${inp} oninput="onLegInput()"></div>
+      <div><label ${lbl}>Entry Time</label><input type="text" id="f-leg${idx}-time" placeholder="e.g. 9:40 AM" ${inp}></div>
+      <div><label ${lbl}>Contracts</label><input type="number" id="f-leg${idx}-contracts" min="1" ${inp} oninput="onLegInput()"></div>
+    </div>
+  </div>`;
+}
+
+function addLegRow() {
+  legCount++; activeLegIds.push(legCount);
+  const container = document.getElementById('entry-leg-rows');
+  const div = document.createElement('div');
+  div.innerHTML = buildLegRow(legCount);
+  container.appendChild(div.firstElementChild);
+  onLegInput();
+}
+
+function removeLegRow(idx) {
+  const el = document.getElementById(`leg-row-${idx}`);
+  if (el) el.remove();
+  const i = activeLegIds.indexOf(idx);
+  if (i > -1) activeLegIds.splice(i, 1);
+  onLegInput();
+}
+
+function getLegRows() {
+  const rows = [];
+  activeLegIds.forEach(idx => {
+    if (!document.getElementById(`leg-row-${idx}`)) return;
+    const price=parseFloat(document.getElementById(`f-leg${idx}-price`)?.value||''), qty=parseInt(document.getElementById(`f-leg${idx}-contracts`)?.value||'0'), time=document.getElementById(`f-leg${idx}-time`)?.value||'';
+    if (price && qty) rows.push({price, qty, time, label: LEG_LABELS[rows.length]||`Leg ${rows.length+1}`});
+  });
+  return rows;
+}
+
+function onLegInput() {
+  const rows = getLegRows();
+  const preview = document.getElementById('entry-legs-avg-preview');
+  if (!preview) return;
+  if (!rows.length) { preview.innerHTML=''; return; }
+  const totalQty = rows.reduce((s,r)=>s+r.qty,0);
+  const weightedAvg = rows.reduce((s,r)=>s+r.price*r.qty,0)/totalQty;
+  const lines = rows.map(r=>`<span style="color:var(--text3);">${r.label}:</span> ${r.qty}c @ <span style="color:var(--yellow);">${r.price.toLocaleString()}</span>${r.time?' at '+r.time:''}`);
+  lines.push(`<span style="color:var(--text2);">Avg entry:</span> <span style="color:var(--accent);font-weight:700;">${weightedAvg.toFixed(2)}</span> · <span style="color:var(--text2);">${totalQty}c total</span>`);
+  preview.innerHTML = lines.join('<br>');
+  const entryEl = document.getElementById('f-entry');
+  if (entryEl) { entryEl.value = weightedAvg.toFixed(2); entryEl.dispatchEvent(new Event('input')); }
+  const contractsEl = document.getElementById('f-contracts');
+  if (contractsEl && !contractsEl.value) contractsEl.value = totalQty;
+}
+
+// ── EMOTIONS ──────────────────────────────────────────────────────────────────
+function toggleEmotion(btn) { btn.classList.toggle('selected'); }
+function getSelectedEmotions() { return Array.from(document.querySelectorAll('#f-emotions-wrap .emo-btn.selected')).map(b=>b.dataset.emotion); }
+function resetEmotions() { document.querySelectorAll('#f-emotions-wrap .emo-btn').forEach(b=>b.classList.remove('selected')); document.getElementById('f-emotion-notes').value=''; }
+
+// ── TRADOVATE AUTO-FILL ───────────────────────────────────────────────────────
+let tradeData = {};
+
+(function checkTradovateImport() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('from') !== 'tradovate') return;
+  const raw = sessionStorage.getItem('tv_import');
+  if (!raw) return;
+  try {
+    const t = JSON.parse(raw);
+    sessionStorage.removeItem('tv_import');
+    const setV = (id, v) => { const el=document.getElementById(id); if(el && v!=null) el.value=v; };
+    setV('f-instrument', t.instrument);
+    setV('f-direction',  t.direction);
+    setV('f-session',    t.session);
+    setV('f-date',       t.date);
+    setV('f-entry',      t.entryPrice);
+    setV('f-exit',       t.exitPrice);
+    setV('f-contracts',  t.contracts);
+    setV('f-entry-time', t.entryTime);
+    setV('f-exit-time',  t.exitTime);
+    if (t.pnl>0) setV('f-outcome','Closed - Win');
+    else if (t.pnl<0) setV('f-outcome','Closed - Loss');
+    else setV('f-outcome','Breakeven');
+    // Trigger direction filter after auto-fill
+    if (t.direction) filterConfByDirection(t.direction);
+    // Entry legs (scale-in)
+    if (t.entries && t.entries.length > 1) {
+      entryLegsVisible=true;
+      document.getElementById('entry-legs-row').style.display='block';
+      const btn=document.getElementById('toggle-legs-btn');
+      if(btn){btn.style.borderColor='rgba(255,215,64,0.5)';btn.style.color='var(--yellow)';btn.textContent='− Scale-In';}
+      t.entries.forEach(entry => {
+        addLegRow();
+        const idx=activeLegIds[activeLegIds.length-1];
+        setTimeout(()=>{
+          const pE=document.getElementById(`f-leg${idx}-price`), qE=document.getElementById(`f-leg${idx}-contracts`), tE=document.getElementById(`f-leg${idx}-time`);
+          if(pE)pE.value=entry.price; if(qE)qE.value=entry.qty; if(tE)tE.value=entry.time;
+        },50);
+      });
+      setTimeout(()=>onLegInput(),100);
+    }
+    // Partial exits
+    if (t.exits && t.exits.length > 0) {
+      const partialRow=document.getElementById('partial-row');
+      if(partialRow){
+        partialRow.style.display='block';
+        if(typeof renderTPRows==='function') renderTPRows(t.contracts);
+        setTimeout(()=>{
+          t.exits.forEach((exit,i)=>{
+            const tpNum=i+1;
+            const cE=document.getElementById(`f-tp${tpNum}-contracts`), pE=document.getElementById(`f-tp${tpNum}-price`), tEl=document.getElementById(`f-tp${tpNum}-time`);
+            if(cE)cE.value=exit.qty; if(pE)pE.value=exit.price; if(tEl)tEl.value=exit.time;
+          });
+          if(typeof onTPInput==='function') onTPInput();
+        },100);
+      }
+    } else if(t.contracts>1) {
+      const row=document.getElementById('partial-row');
+      if(row){row.style.display='block';if(typeof renderTPRows==='function')renderTPRows(t.contracts);}
+    }
+    const banner=document.createElement('div');
+    banner.style.cssText='background:rgba(200,255,0,0.07);border:1px solid rgba(200,255,0,0.3);padding:10px 16px;font-family:var(--mono);font-size:10px;color:var(--accent);letter-spacing:0.08em;margin-bottom:1.5rem;';
+    banner.textContent=`✓ Pre-filled from Tradovate — ${t.instrument} ${t.direction} · ${t.pnl>=0?'+':''}$${Math.abs(t.pnl||0).toLocaleString()} · Add confluences to complete`;
+    const formGrid=document.querySelector('.form-grid');
+    if(formGrid) formGrid.parentNode.insertBefore(banner,formGrid);
+    window.history.replaceState({},'','log-trade.html');
+  } catch(e) { console.warn('Tradovate import parse error:',e); }
+})();
+
+// ── ANALYZE ───────────────────────────────────────────────────────────────────
 async function analyzeTrade() {
-  const instrument=getField('f-instrument'),direction=getField('f-direction');
-  if(!instrument||!direction){alert('Please fill in Instrument and Direction at minimum.');return;}
-  const entry=getNum('f-entry'),exit=getNum('f-exit'),sl=getNum('f-sl'),tp=getNum('f-tp'),contracts=getNum('f-contracts')||1;
-  const entryTime=getField('f-entry-time'),exitTime=getField('f-exit-time'),notes=getField('f-notes'),mistakes=getField('f-mistakes'),lessons=getField('f-lessons');
-  const session=getField('f-session'),timeframe=getField('f-timeframe'),htf=getField('f-htf'),model=getField('f-model'),outcome=getField('f-outcome'),date=getField('f-date')||TODAY,screenshot=getField('f-screenshot');
-  const confluences=getSelectedConfs();
-  const emotions=getSelectedEmotions();
-  const emotionNotes=getField('f-emotion-notes');
+  const instrument=getField('f-instrument'), direction=getField('f-direction');
+  if (!instrument||!direction) { alert('Please fill in Instrument and Direction at minimum.'); return; }
+  const entry=getNum('f-entry'), exit=getNum('f-exit'), sl=getNum('f-sl'), tp=getNum('f-tp'), contracts=getNum('f-contracts')||1;
+  const entryTime=getField('f-entry-time'), exitTime=getField('f-exit-time'), notes=getField('f-notes'), mistakes=getField('f-mistakes'), lessons=getField('f-lessons');
+  const session=getField('f-session'), timeframe=getField('f-timeframe'), htf=getField('f-htf'), model=getField('f-model'), outcome=getField('f-outcome'), date=getField('f-date')||TODAY, screenshot=getField('f-screenshot');
+  const confluences=getSelectedConfs(), emotions=getSelectedEmotions(), emotionNotes=getField('f-emotion-notes');
   const tpRows=(contracts>1)?getTPRows().filter(r=>r.price&&r.contracts):[];
   let pnl=0;
   if(entry){if(tpRows.length>0){tpRows.forEach(r=>{pnl+=calcPnL(entry,r.price,r.contracts,instrument,direction);});}else if(exit){pnl=calcPnL(entry,exit,contracts,instrument,direction);}}
-  const rr=calcRR(entry,sl,tp),duration=calcDuration(entryTime,exitTime);
-  const biasAtEntry = selectedBiasEntry || '';
-  const entryLegs = entryLegsVisible ? getLegRows() : [];
-  tradeData={instrument,direction,session,timeframe,htf,model,date,entry,exit,sl,tp,contracts,entryTime,exitTime,pnl,rr,duration,confluences,emotions,emotionNotes,grade:'Pending...',followedRules:'Pending...',outcome,notes,mistakes,lessons,screenshot,tpRows,biasAtEntry,entryLegs};
+  const rr=calcRR(entry,sl,tp), duration=calcDuration(entryTime,exitTime);
+  const biasAtEntry=selectedBiasEntry||'';
+  const entryLegs=entryLegsVisible?getLegRows():[];
+  const manualRules = selectedRules || '';
+  tradeData={instrument,direction,session,timeframe,htf,model,date,entry,exit,sl,tp,contracts,entryTime,exitTime,pnl,rr,duration,confluences,emotions,emotionNotes,grade:'Pending...',followedRules:manualRules||'Partially ⚠️',outcome,notes,mistakes,lessons,screenshot,tpRows,biasAtEntry,entryLegs};
 
   const btn=document.getElementById('analyze-btn'); btn.disabled=true; btn.textContent='Analyzing...';
   document.getElementById('review-panel').style.display='block';
@@ -747,79 +878,80 @@ async function analyzeTrade() {
   const pnlClass=pnl>0?'green':pnl<0?'red':'';
   document.getElementById('review-grid').innerHTML=`
     <div class="review-field"><div class="review-label">Instrument</div><div class="review-value">${instrument} ${direction}</div></div>
-    <div class="review-field"><div class="review-label">Session / TF</div><div class="review-value">${session} · ${timeframe}</div></div>
+    <div class="review-field"><div class="review-label">Session</div><div class="review-value">${session||'—'}</div></div>
     <div class="review-field"><div class="review-label">Entry</div><div class="review-value">${entry?.toLocaleString()||'—'} @ ${entryTime||'—'}</div></div>
     <div class="review-field"><div class="review-label">Exit</div><div class="review-value">${exit?.toLocaleString()||'—'} @ ${exitTime||'—'}</div></div>
-    <div class="review-field"><div class="review-label">SL / TP</div><div class="review-value">${sl?.toLocaleString()||'—'} / ${tp?.toLocaleString()||'—'}</div></div>
+    <div class="review-field"><div class="review-label">P&amp;L</div><div class="review-value ${pnlClass}">${pnl>=0?'+':''}$${Math.abs(pnl).toLocaleString()}</div></div>
     <div class="review-field"><div class="review-label">Contracts</div><div class="review-value">${contracts}</div></div>
-    <div class="review-field"><div class="review-label">P&L</div><div class="review-value ${pnlClass}">${pnl>=0?'+':''}$${Math.abs(pnl).toLocaleString()}</div></div>
     <div class="review-field"><div class="review-label">R:R</div><div class="review-value">${rr?'1:'+rr:'—'}</div></div>
     <div class="review-field"><div class="review-label">Duration</div><div class="review-value">${duration?duration+'m':'—'}</div></div>
     <div class="review-field" id="rg-grade"><div class="review-label">Setup Grade</div><div class="review-value" id="rg-grade-val" style="opacity:0.4;">Analyzing...</div></div>
-    <div class="review-field"><div class="review-label">Followed Rules</div><div class="review-value" id="rg-rules-val" style="opacity:0.4;">Analyzing...</div></div>
-    <div class="review-field"><div class="review-label">Outcome</div><div class="review-value">${outcome||'—'}</div></div>
-    <div class="review-field" style="grid-column:1/-1"><div class="review-label">Confluences</div><div class="review-value">${confluences.join(', ')||'—'}</div></div>
-    ${htf?`<div class="review-field"><div class="review-label">HTF TF</div><div class="review-value">${htf}</div></div>`:''}
-    ${model?`<div class="review-field"><div class="review-label">Entry Model</div><div class="review-value">${model}</div></div>`:''}`;
+    <div class="review-field"><div class="review-label">Followed Rules</div><div class="review-value" id="rg-rules-val" style="${manualRules?'':'opacity:0.4;'}">${manualRules||'Analyzing...'}</div></div>
+    ${model?`<div class="review-field"><div class="review-label">Setup Type</div><div class="review-value">${model}</div></div>`:''}
+    ${confluences.length?`<div class="review-field" style="grid-column:1/-1"><div class="review-label">Confluences</div><div class="review-value">${confluences.join(', ')}</div></div>`:''}`;
   document.getElementById('ai-result').innerHTML='<span class="loading-msg">Verifying against your rules...</span>';
   document.getElementById('ai-verdict-badge').innerHTML='';
 
   try {
-    const tradeStr=[`Instrument: ${instrument}`,`Direction: ${direction}`,`Favored Direction at Entry: ${biasAtEntry||'Not set'}`,`Session: ${session}`,`Timeframe: ${timeframe}`,`HTF Context: ${htf}`,`Entry Model: ${model}`,`Date: ${date}`,`Entry Price: ${entry} at ${entryTime}`,`Exit Price: ${exit} at ${exitTime}`,`Stop Loss: ${sl}`,`Take Profit: ${tp}`,`Contracts: ${contracts}`,`R:R: ${rr||''}`,`P&L: $${pnl}`,`Status: ${outcome}`,`Confluences: ${confluences.join(', ')}`,`Notes: ${notes}`,`Mistakes: ${mistakes}`,`Lessons Learned: ${lessons}`].filter(l=>!l.endsWith(': ')&&!l.endsWith(': null')&&!l.endsWith(': undefined')).join('\n');
+    const tradeStr=[`Instrument: ${instrument}`,`Direction: ${direction}`,`Bias At Entry: ${biasAtEntry||'Not set'}`,`Session: ${session}`,`HTF Context: ${htf}`,`Setup Type: ${model}`,`Date: ${date}`,`Entry: ${entry} at ${entryTime}`,`Exit: ${exit} at ${exitTime}`,`SL: ${sl}`,`TP: ${tp}`,`Contracts: ${contracts}`,`R:R: ${rr||''}`,`P&L: $${pnl}`,`Status: ${outcome}`,`Confluences: ${confluences.join(', ')}`,`Notes: ${notes}`,`Mistakes: ${mistakes}`].filter(l=>!l.endsWith(': ')&&!l.endsWith(': null')&&!l.endsWith(': undefined')).join('\n');
     const data=await verifyTrade(tradeStr);
     const text=data.result||'No response.';
     if(data.grade&&data.grade!=='Pending...') tradeData.grade=data.grade;
     const frMap={'YES':'Yes ✅','PARTIALLY':'Partially ⚠️','NO':'No ❌'};
-    if(data.followedRules&&frMap[data.followedRules]){tradeData.followedRules=frMap[data.followedRules];}
-    else{const u=text.toUpperCase();if(u.includes('VERDICT: YES'))tradeData.followedRules='Yes ✅';else if(u.includes('VERDICT: NO'))tradeData.followedRules='No ❌';else tradeData.followedRules='Partially ⚠️';}
+    if(!manualRules){
+      if(data.followedRules&&frMap[data.followedRules]){tradeData.followedRules=frMap[data.followedRules];}
+      else{const u=text.toUpperCase();if(u.includes('VERDICT: YES'))tradeData.followedRules='Yes ✅';else if(u.includes('VERDICT: NO'))tradeData.followedRules='No ❌';else tradeData.followedRules='Partially ⚠️';}
+    }
     const gradeColors={'A++':'accent','A+':'green','A':'green','A-':'green','B+':'yellow','B':'yellow','B-':'yellow','C':'red','D':'red'};
-    const gradeEl=document.getElementById('rg-grade-val');if(gradeEl){gradeEl.textContent=tradeData.grade;gradeEl.style.opacity='1';gradeEl.className='review-value '+(gradeColors[tradeData.grade]||'');}
-    const rulesEl=document.getElementById('rg-rules-val');if(rulesEl){rulesEl.textContent=tradeData.followedRules;rulesEl.style.opacity='1';if(tradeData.followedRules.includes('✅'))rulesEl.className='review-value green';else if(tradeData.followedRules.includes('⚠️'))rulesEl.className='review-value yellow';else rulesEl.className='review-value red';}
+    const gradeEl=document.getElementById('rg-grade-val'); if(gradeEl){gradeEl.textContent=tradeData.grade;gradeEl.style.opacity='1';gradeEl.className='review-value '+(gradeColors[tradeData.grade]||'');}
+    const rulesEl=document.getElementById('rg-rules-val'); if(rulesEl){rulesEl.textContent=tradeData.followedRules;rulesEl.style.opacity='1';if(tradeData.followedRules.includes('✅'))rulesEl.className='review-value green';else if(tradeData.followedRules.includes('⚠️'))rulesEl.className='review-value yellow';else rulesEl.className='review-value red';}
     let vc,vl;
-    if(data.followedRules==='YES'||tradeData.followedRules.includes('✅')){vc='verdict-yes';vl='FOLLOWED RULES ✅';}
-    else if(data.followedRules==='NO'||tradeData.followedRules.includes('❌')){vc='verdict-no';vl='RULES BROKEN ❌';}
+    if(tradeData.followedRules.includes('✅')){vc='verdict-yes';vl='FOLLOWED RULES ✅';}
+    else if(tradeData.followedRules.includes('❌')){vc='verdict-no';vl='RULES BROKEN ❌';}
     else{vc='verdict-partial';vl='PARTIALLY ⚠️';}
     document.getElementById('ai-result').innerHTML=text.replace(/\*\*(.*?)\*\*/g,'$1').replace(/\n/g,'<br>');
     document.getElementById('ai-verdict-badge').innerHTML=`<span class="ai-verdict ${vc}">${vl}</span>`;
   } catch(e) {
     document.getElementById('ai-result').textContent='Verification failed: '+e.message;
     tradeData.grade=autoGradeLocal(confluences,mistakes);
-    tradeData.followedRules=autoFollowedRulesLocal(mistakes);
-    const gradeEl=document.getElementById('rg-grade-val');if(gradeEl){gradeEl.textContent=tradeData.grade;gradeEl.style.opacity='1';}
-    const rulesEl=document.getElementById('rg-rules-val');if(rulesEl){rulesEl.textContent=tradeData.followedRules;rulesEl.style.opacity='1';}
+    if(!manualRules) tradeData.followedRules=autoFollowedRulesLocal(mistakes);
+    const gradeEl=document.getElementById('rg-grade-val'); if(gradeEl){gradeEl.textContent=tradeData.grade;gradeEl.style.opacity='1';}
+    const rulesEl=document.getElementById('rg-rules-val'); if(rulesEl){rulesEl.textContent=tradeData.followedRules;rulesEl.style.opacity='1';}
   }
   btn.disabled=false; btn.textContent='⚡ Analyze & Preview Trade';
   document.getElementById('review-panel').scrollIntoView({behavior:'smooth'});
 }
 
+// ── SUBMIT ────────────────────────────────────────────────────────────────────
 async function submitTrade() {
   const btn=document.getElementById('confirm-btn'); btn.disabled=true; btn.textContent='Submitting...';
   const t=tradeData, tradeName=`${t.instrument} ${t.direction} — ${t.session}`;
-  const props={"Trade Name":{title:[{text:{content:tradeName}}]},"Instrument":{select:{name:t.instrument}},"Direction":{select:{name:t.direction}},"Status":{select:{name:t.outcome}},"Session":{select:{name:t.session}},"Timeframe":{select:{name:t.timeframe}},"Date":{date:{start:t.date}},"Contracts":{number:t.contracts},"P&L ($)":{number:t.pnl},"Followed Rules":{select:{name:t.followedRules}},"Setup Grade":{select:{name:t.grade}}};
-  if(t.entry)props["Entry Price"]={number:t.entry};if(t.exit)props["Exit Price"]={number:t.exit};if(t.sl)props["Stop Loss"]={number:t.sl};if(t.tp)props["Take Profit"]={number:t.tp};if(t.rr)props["R:R"]={number:t.rr};if(t.duration)props["Duration (mins)"]={number:t.duration};if(t.entryTime)props["Entry Time"]={rich_text:[{text:{content:t.entryTime}}]};if(t.exitTime)props["Exit Time"]={rich_text:[{text:{content:t.exitTime}}]};
-  const exitBreakdown=(t.tpRows&&t.tpRows.length>0)?'Exit breakdown: '+t.tpRows.map(r=>`${r.label}: ${r.contracts} contract${r.contracts>1?'s':''} @ ${r.price}${r.time?' at '+r.time:''}`).join(' · '):null;
-  const entryBreakdown=(t.entryLegs&&t.entryLegs.length>1)?'Entry legs: '+t.entryLegs.map(r=>`${r.label}: ${r.qty} contract${r.qty>1?'s':''} @ ${r.price}${r.time?' at '+r.time:''}`).join(' · '):null;
+  const props={"Trade Name":{title:[{text:{content:tradeName}}]},"Instrument":{select:{name:t.instrument}},"Direction":{select:{name:t.direction}},"Status":{select:{name:t.outcome}},"Session":{select:{name:t.session}},"Date":{date:{start:t.date}},"Contracts":{number:t.contracts},"P&L ($)":{number:t.pnl},"Followed Rules":{select:{name:t.followedRules}},"Setup Grade":{select:{name:t.grade}}};
+  if(t.entry)props["Entry Price"]={number:t.entry}; if(t.exit)props["Exit Price"]={number:t.exit}; if(t.sl)props["Stop Loss"]={number:t.sl}; if(t.tp)props["Take Profit"]={number:t.tp}; if(t.rr)props["R:R"]={number:t.rr}; if(t.duration)props["Duration (mins)"]={number:t.duration};
+  if(t.entryTime)props["Entry Time"]={rich_text:[{text:{content:t.entryTime}}]}; if(t.exitTime)props["Exit Time"]={rich_text:[{text:{content:t.exitTime}}]};
+  if(t.timeframe)props["Timeframe"]={select:{name:t.timeframe}}; if(t.htf)props["HTF Timeframe"]={rich_text:[{text:{content:t.htf}}]};
+  // Save Setup Type to Entry Model property in Notion
+  if(t.model)props["Entry Model"]={rich_text:[{text:{content:t.model}}]};
+  const exitBreakdown=(t.tpRows&&t.tpRows.length>0)?'Exit breakdown: '+t.tpRows.map(r=>`${r.label}: ${r.contracts}c @ ${r.price}${r.time?' at '+r.time:''}`).join(' · '):null;
+  const entryBreakdown=(t.entryLegs&&t.entryLegs.length>1)?'Entry legs: '+t.entryLegs.map(r=>`${r.label}: ${r.qty}c @ ${r.price}${r.time?' at '+r.time:''}`).join(' · '):null;
   const fullNotes=[t.notes,entryBreakdown,exitBreakdown].filter(Boolean).join('\n');
-  if(fullNotes)props["Notes"]={rich_text:[{text:{content:fullNotes}}]};if(t.mistakes)props["Mistakes"]={rich_text:[{text:{content:t.mistakes}}]};if(t.lessons)props["Lessons Learned"]={rich_text:[{text:{content:t.lessons}}]};if(t.htf)props["HTF Timeframe"]={rich_text:[{text:{content:t.htf}}]};if(t.model)props["Entry Model"]={rich_text:[{text:{content:t.model}}]};if(t.confluences.length)props["Confluences"]={multi_select:t.confluences.map(c=>({name:c}))};if(t.emotions&&t.emotions.length)props["Emotions"]={multi_select:t.emotions.map(e=>({name:e}))};if(t.emotionNotes)props["Emotion Notes"]={rich_text:[{text:{content:t.emotionNotes}}]};if(t.biasAtEntry)props["Bias At Entry"]={rich_text:[{text:{content:t.biasAtEntry}}]};
-  // Save entry legs as JSON to "Entry Legs" Notion property
+  if(fullNotes)props["Notes"]={rich_text:[{text:{content:fullNotes}}]}; if(t.mistakes)props["Mistakes"]={rich_text:[{text:{content:t.mistakes}}]}; if(t.lessons)props["Lessons Learned"]={rich_text:[{text:{content:t.lessons}}]};
+  if(t.confluences.length)props["Confluences"]={multi_select:t.confluences.map(c=>({name:c}))};
+  if(t.emotions&&t.emotions.length)props["Emotions"]={multi_select:t.emotions.map(e=>({name:e}))};
+  if(t.emotionNotes)props["Emotion Notes"]={rich_text:[{text:{content:t.emotionNotes}}]};
+  if(t.biasAtEntry)props["Bias At Entry"]={rich_text:[{text:{content:t.biasAtEntry}}]};
   if(t.entryLegs&&t.entryLegs.length>1){const legsJson=JSON.stringify(t.entryLegs.map(r=>({label:r.label,qty:r.qty,price:r.price,time:r.time})));props["Entry Legs"]={rich_text:[{text:{content:legsJson}}]};}
   const body={parent:{database_id:DB_ID},properties:props};
   if(t.screenshot){body.children=[{object:'block',type:'paragraph',paragraph:{rich_text:[{type:'text',text:{content:'📸 Screenshot: '+t.screenshot,link:{url:t.screenshot}}}]}}];}
   try {
     const data=await notionPost('/pages',body);
     if(data.id){
-      // Upload all images to Notion if any were selected
-      if (pendingImgFiles.length) await uploadAllImgsToNotion(data.id, 'f');
-      // If came from Tradovate importer, mark trade as logged in localStorage
-      const tvPendingIdx = localStorage.getItem('ftj_tv_pending_index');
-      if (tvPendingIdx != null) {
-        localStorage.setItem('ftj_tv_logged_index', tvPendingIdx);
-        localStorage.removeItem('ftj_tv_pending_index');
-      }
-      const fromTV = tvPendingIdx != null;
+      if(pendingImgFiles.length) await uploadAllImgsToNotion(data.id,'f');
+      const tvPendingIdx=localStorage.getItem('ftj_tv_pending_index');
+      if(tvPendingIdx!=null){localStorage.setItem('ftj_tv_logged_index',tvPendingIdx);localStorage.removeItem('ftj_tv_pending_index');}
       const msg=document.getElementById('success-msg');
       msg.style.display='block';
-      if (fromTV) {
+      if(tvPendingIdx!=null){
         msg.innerHTML=`✓ Trade logged! ${tradeName} · ${t.grade} · ${t.pnl>=0?'+':''}$${Math.abs(t.pnl).toLocaleString()} &nbsp;<a href="tradovate.html" style="font-family:var(--mono);font-size:10px;color:#000;background:var(--accent);padding:4px 12px;text-decoration:none;margin-left:8px;">← Back to Importer</a>`;
       } else {
         msg.textContent=`✓ Trade logged! ${tradeName} · ${t.grade} · ${t.pnl>=0?'+':''}$${Math.abs(t.pnl).toLocaleString()}`;
@@ -827,35 +959,40 @@ async function submitTrade() {
       document.getElementById('review-panel').style.display='none';
       resetForm();
     } else {
-      const m=data.message||'';alert('\u26a0\ufe0f '+(m.includes('Status')?'Please select an Outcome.':m.includes('Instrument')?'Please select an Instrument.':m.includes('Direction')?'Please select a Direction.':'Please fill in all required fields.'));
+      const m=data.message||''; alert('⚠ '+(m.includes('Status')?'Please select an Outcome.':m.includes('Instrument')?'Please select an Instrument.':m.includes('Direction')?'Please select a Direction.':'Please fill in required fields.'));
     }
   } catch(e){alert('Submit failed: '+e.message);}
   btn.disabled=false; btn.textContent='✓ Confirm & Submit to Notion';
 }
 
+// ── RESET ─────────────────────────────────────────────────────────────────────
 function resetForm() {
-  ['f-instrument','f-direction','f-session','f-timeframe','f-outcome','f-htf','f-model','f-entry','f-exit','f-sl','f-tp','f-contracts','f-entry-time','f-exit-time','f-notes','f-mistakes','f-lessons','f-screenshot'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['f-instrument','f-direction','f-session','f-outcome','f-htf','f-model','f-entry','f-exit','f-sl','f-tp','f-contracts','f-entry-time','f-exit-time','f-notes','f-mistakes','f-lessons','f-screenshot'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  if(document.getElementById('f-timeframe')) document.getElementById('f-timeframe').value='';
   document.getElementById('partial-row').style.display='none';
   document.getElementById('partial-tp-rows').innerHTML='';
   document.getElementById('partial-pnl-preview').textContent='';
-  // Reset entry legs
-  entryLegsVisible=false;
-  legCount=0;
-  activeLegIds.length=0;
+  entryLegsVisible=false; legCount=0; activeLegIds.length=0;
   document.getElementById('entry-legs-row').style.display='none';
   document.getElementById('entry-leg-rows').innerHTML='';
   document.getElementById('entry-legs-avg-preview').innerHTML='';
   const legsBtn=document.getElementById('toggle-legs-btn');
-  if(legsBtn){legsBtn.style.borderColor='var(--border2)';legsBtn.style.color='var(--text3)';legsBtn.textContent='+ Scale-In / Pyramid';}
+  if(legsBtn){legsBtn.style.borderColor='var(--border2)';legsBtn.style.color='var(--text3)';legsBtn.textContent='+ Scale-In';}
   document.getElementById('f-date').value=new Date().toISOString().split('T')[0];
   setSelectedConfs([]);
   document.getElementById('conf-search').value='';
   filterConf('');
+  filterConfByDirection('');
   selectedBiasEntry='';
-  document.querySelectorAll('.bias-entry-btn').forEach(b=>{b.style.borderColor='var(--border2)';b.style.color='var(--text3)';b.style.background='var(--surface2)';});
+  document.querySelectorAll('.bias-btn').forEach(b=>{b.style.borderColor='var(--border2)';b.style.color='var(--text3)';b.style.background='var(--surface2)';});
+  selectedRules='';
+  document.querySelectorAll('.rules-btn').forEach(b=>b.className='rules-btn');
   resetEmotions();
   resetImgUpload('f');
 }
+
+// Set today's date on load
+document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
 </script>
 <script>if('serviceWorker' in navigator){navigator.serviceWorker.register('../sw.js');}</script>
 </body>
